@@ -2,6 +2,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
+import { Mail } from 'lucide-react';
+import { useState } from "react";
+import { Eye, EyeOff } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -26,21 +29,38 @@ const Login = () => {
     navigate("/");
   };
 
+const [password, setPassword] = useState('');
+ const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold text-center">Login</h2>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-[40%]">
+        <img className="w-full" src="login image.png" alt="" />
+      </div>
+      <div>
+        <h2 className="text-[48px] leading-[56px] font-semibold text-center">Welcome back</h2>
+        <p className="text-[#475569] font-normal text-4 mt-[10px] text-center">Enter your email and password to access your account</p>
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           {/* Email Field */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Email
+            <label className="block text-sm font-medium text-[#1D2028] mb-3">
+              Email*
             </label>
-            <input
-              type="email"
-              {...register("email")}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            
+            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none">
+              <Mail className="ml-[17px] w-[5%]"/>
+                <input
+                type="email"
+                {...register("email")}
+                placeholder="Enter your email"
+                className="w-full py-[14px] px-2  bg-[#F5F8FA] rounded-md focus:outline-none"
+              />
+              {/* <BadgeQuestionMark /> */}
+            </div>
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
@@ -48,32 +68,50 @@ const Login = () => {
 
           {/* Password Field */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Password
+            <label className="block text-sm font-medium text-[#1D2028] mb-3">
+              Password*
             </label>
-            <input
-              type="password"
-              {...register("password")}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none relative">
+              <input
+               id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                {...register("password")}
+                onChange={(e) => {
+                  setPassword(e.target.value);}}
+              placeholder="Enter your password"
+              className="w-full py-[14px] px-4  bg-[#F5F8FA] rounded-md focus:outline-none"
             />
+
+            <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800 transition-colors"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+            
             {errors.password && (
               <p className="text-red-500 text-sm">{errors.password.message}</p>
             )}
-          </div>
 
-          <div className="mb-3">
-            <p>
-              Already have an account?{" "}
-              <Link to="/signup" className="text-blue-400 ">
-                Sign up here
-              </Link>
-            </p>
+            <div className="flex gap-4 items-baseline my-6 justify-between">
+              <input type="checkbox" name="policy" id="policy" className="text-[#D0D5DD] rounded-3xl cursor-pointer"/>
+              <p className="text-[#0F1325] w-[90%]">Remember me</p>
+              <h4 className="font-medium text-[#0151FF] w-[60%] cursor-pointer">Forgot Password?</h4>
+            </div>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+            className="w-full cursor-pointer bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
             Login
           </button>
