@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -6,8 +7,4 @@
   --color-website-color-lightGray: #d3d9d4;
   --color-website-color-green: #124e66;
   --color-website-color-lightGreen: #748d92;
-}
-
-body {
-  font-family: "Open Sans", sans-serif;
 }
