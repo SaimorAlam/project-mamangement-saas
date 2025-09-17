@@ -18,6 +18,7 @@ import BillingsPlans from "@/pages/Admin/BillingsPlans";
 import APIIntegrations from "@/pages/Admin/APIIntegrations";
 import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
 import GlobalSettings from "@/pages/Admin/GlobalSettings";
+import { SingleClient } from "@/pages/Admin/SingleClient";
 
 const routes = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ const routes = createBrowserRouter([
           {
             path: "clients", 
             element: <Clients />
+          },
+          {
+            path: "clients/:id", 
+            element: <SingleClient />
           },
           {
             path: "analytics", 
