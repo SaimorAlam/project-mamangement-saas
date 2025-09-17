@@ -1,15 +1,17 @@
 import Footer from "./Footer";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 
 const Layout: React.FC = () => {
+  const location = useLocation();
+  const isDashboardRoute = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/admin");
   return (
     <div>
-      <Navbar />
+      {!isDashboardRoute && <Navbar />}
       <main>
         <Outlet />
       </main>
-      <Footer />
+      {!isDashboardRoute && <Footer />}
     </div>
   );
 };

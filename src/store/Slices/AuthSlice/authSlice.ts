@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface AuthState {
-  user: { role: string } | null;
+  user: { name: string, role: string } | null;
 }
 
 const initialState: AuthState = {
-  user: { role: "user" },
+  user: { name: "Amitav Roy Chowdhury", role: "admin" },
 };
 
 const authSlice = createSlice({

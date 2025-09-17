@@ -7,3 +7,7 @@
   --color-website-color-green: #124e66;
   --color-website-color-lightGreen: #748d92;
 }
+
+body {
+  font-family: "Open Sans", sans-serif;
+}

@@ -1,5 +1,11 @@
-const AdminDashboard = () => {
-  return <div>AdminDashboard</div>;
-};
+import { MetricsCards } from "@/components/admin/metricsCards/metricsCards"
 
-export default AdminDashboard;
+const AdminDashboard = () => {
+  return (
+    <>
+      <MetricsCards />
+    </>
+  )
+}
+
+export default AdminDashboard

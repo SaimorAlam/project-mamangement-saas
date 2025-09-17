@@ -1,0 +1,90 @@
+import {
+  Clock,
+  Users,
+  BarChart3,
+  Activity,
+  CreditCard,
+  Plug,
+  Shield,
+  HelpCircle,
+  Settings,
+  ChevronRight,
+  Power,
+} from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+
+export default function SidebarNavigation() {
+    return (
+        <div className="w-64 h-screen bg-white flex flex-col">
+            <div className="p-4 mt-5">
+                <h3 className="text-sm font-medium text-gray-500 mb-3">Main Menu</h3>
+                <div className="space-y-2">
+                    <div className="flex items-center gap-3 px-3 py-2 bg-blue-500 text-white rounded-lg">
+                        <Clock className="w-5 h-5" />
+                        <span className="font-medium">Overview</span>
+                    </div>
+                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <Users className="w-5 h-5" />
+                        <span>Clients</span>
+                    </div>
+                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <BarChart3 className="w-5 h-5" />
+                        <span>Analytics</span>
+                    </div>
+                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <Activity className="w-5 h-5" />
+                        <span>System Health</span>
+                    </div>
+                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <CreditCard className="w-5 h-5" />
+                        <span>Billing & Plans</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="px-4 pb-4">
+                <h3 className="text-sm font-medium text-gray-500 mb-3">Support</h3>
+                <div className="space-y-1">
+                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <Plug className="w-5 h-5" />
+                        <span>API & Integration</span>
+                    </div>
+                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <Shield className="w-5 h-5" />
+                        <span>Security & Privacy</span>
+                    </div>
+                    <div className="flex items-center justify-between px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <div className="flex items-center gap-3">
+                            <HelpCircle className="w-5 h-5" />
+                            <span>Help</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4" />
+                    </div>
+                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <Settings className="w-5 h-5" />
+                        <span>Global Settings</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-auto p-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <Avatar className="w-10 h-10">
+                            <AvatarImage src="/professional-woman-headshot.png" alt="Sofia Martin" />
+                            <AvatarFallback>SM</AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <p className="font-medium text-gray-900">Sofia Martin</p>
+                            <p className="text-sm text-gray-500">Admin</p>
+                        </div>
+                    </div>
+                    <Button variant="ghost" size="icon" className="text-gray-500 hover:text-red-500">
+                        <Power className="w-4 h-4" />
+                    </Button>
+                </div>
+            </div>
+        </div>
+    )
+}
