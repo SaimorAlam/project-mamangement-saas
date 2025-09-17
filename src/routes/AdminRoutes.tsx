@@ -1,6 +1,7 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate} from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store/store";
+import DashboardLayout from "@/Layout/DashboardLayout";
 
 const AdminRoute = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -10,7 +11,7 @@ const AdminRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
-  return <Outlet />;
+  return <DashboardLayout />;
 };
 
 export default AdminRoute;
