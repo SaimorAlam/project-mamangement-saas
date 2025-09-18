@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { useSelector } from "react-redux"
 import { RootState } from "@/store/store"
+import { useLocation } from "react-router-dom"
 
 const AdminTopBar = () => {
     const user = useSelector((state: RootState) => state.auth.user)
+    const location = useLocation();
     const mockNotifications = [
         {
             id: 1,
@@ -184,6 +186,10 @@ const AdminTopBar = () => {
                         </DropdownMenu>
 
                         {/* Export Button */}
+                        <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-gray-200 cursor-pointer transition-[300ms]" onClick={handleExport}>
+                            <Download className="h-4 w-4" />
+                            Export
+                        </Button>
                         <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-gray-200 cursor-pointer transition-[300ms]" onClick={handleExport}>
                             <Download className="h-4 w-4" />
                             Export
