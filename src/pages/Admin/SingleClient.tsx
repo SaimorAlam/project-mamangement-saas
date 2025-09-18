@@ -1,14 +1,18 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, act } from "react"
 import { useParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import {
-  Users, TrendingUp, AlertTriangle, HardDrive, User,
-  FolderOpen, Database, Zap, Building2, Mail, Phone,
+  User, Building2, Mail, Phone,
   MapPin, Pause, Ticket
 } from "lucide-react"
+import ClientInfoCards from "@/components/admin/clientInfoCards/clientInfoCards"
+import ClientSingleOverviewTab from "@/components/admin/clientSingleOverView/ClientSingleOverviewTab"
+import ClientPrograms from "@/components/admin/clientSingleProgramsTab/clientSingleProgramTab"
+import ClientSingleActiveAlerts from "@/components/admin/clientSingleAlerts/ClientSingleActiveAlerts"
+import ClientSingleSubscriptionTab from "@/components/admin/clientSingleSubscriptionDetails/ClientSingleSubscriptionTab"
+import ClientSingleActivityLog from "@/components/admin/clientSingleActivityLog/clientSingleActivityLog"
 
 export function SingleClient() {
   const [customers, setCustomers] = useState<any[]>([])
@@ -24,185 +28,53 @@ export function SingleClient() {
   if (!userData) return <p>Client not found</p>
 
   // Fix: actual data is inside userData.user
-  const client = userData.user.client
-  const metrics = userData.user.metrics
-  const planSummary = userData.user.planSummary
+  console.log(userData)
+  const {client,metrics,planSummary,programs,alertsList,invoices,activityLog} = userData.user;
+  const {plan} = userData.user.client;
 
   return (
     <div className="flex h-full">
       {/* Main Content */}
       <div className="flex-1 p-6">
         {/* Metrics Cards */}
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          <Card className="border border-gray-200 h-44">
-            <CardContent className="">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">Total User</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {metrics.totalUsers.current}/{metrics.totalUsers.total}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-8 bg-green-50 rounded-lg p-3">
-                <p className="text-sm text-green-700">{metrics.totalUsers.percentage}% of capacity used</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">Active Program</p>
-                  <p className="text-2xl font-bold text-gray-900">{metrics.activePrograms.current}</p>
-                </div>
-              </div>
-              <div className="mt-4 bg-green-50 rounded-lg p-3">
-                <p className="text-sm text-green-700">
-                  {metrics.activePrograms.newThisMonth} new Program in this month
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-yellow-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">Critical Alerts</p>
-                  <p className="text-2xl font-bold text-gray-900">{metrics.criticalAlerts.current}</p>
-                </div>
-              </div>
-              <div className="mt-4 bg-green-50 rounded-lg p-3">
-                <p className="text-sm text-green-700">
-                  {metrics.criticalAlerts.newIn24Hours} new alerts in the last 24 hours
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                  <HardDrive className="w-6 h-6 text-red-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">Storage Usage</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {metrics.storageUsage.current}/{metrics.storageUsage.total}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4 bg-red-50 rounded-lg p-3">
-                <p className="text-sm text-red-700">{metrics.storageUsage.percentage}% of storage used</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <ClientInfoCards metrics={metrics} />
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="program">Program</TabsTrigger>
-            <TabsTrigger value="alerts">Alerts</TabsTrigger>
-            <TabsTrigger value="subscription">Subscription</TabsTrigger>
-            <TabsTrigger value="api">API</TabsTrigger>
-            <TabsTrigger value="activity">Activity Log</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="overview">Overview</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="program">Program</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="alerts">Alerts</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="subscription">Subscription</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="activity">Activity Log</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-6">Plan Summary</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <User className="w-5 h-5 text-gray-400" />
-                      <span className="text-gray-700">Users</span>
-                    </div>
-                    <span className="font-medium">
-                      {planSummary.users.current}/{planSummary.users.total}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <FolderOpen className="w-5 h-5 text-gray-400" />
-                      <span className="text-gray-700">Projects</span>
-                    </div>
-                    <span className="font-medium">
-                      {planSummary.projects.current}/{planSummary.projects.total}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <Database className="w-5 h-5 text-gray-400" />
-                      <span className="text-gray-700">Storage</span>
-                    </div>
-                    <span className="font-medium">
-                      {planSummary.storage.current}/{planSummary.storage.total}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <div className="flex items-center gap-3">
-                      <Zap className="w-5 h-5 text-gray-400" />
-                      <span className="text-gray-700">API Calls</span>
-                    </div>
-                    <span className="font-medium">
-                      {planSummary.apiCalls.current}/{planSummary.apiCalls.total}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ClientSingleOverviewTab planSummary={planSummary} />
           </TabsContent>
 
           <TabsContent value="program" className="mt-6">
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Active Programs</h3>
-                <p className="text-gray-600">
-                  You have {metrics.activePrograms.current} active programs running.
-                  {metrics.activePrograms.newThisMonth} new programs were added this month.
-                </p>
-                <div className="mt-6 space-y-4">
-                  <div className="p-4 border border-gray-200 rounded-lg">
-                    <h4 className="font-medium">Data Analytics Pipeline</h4>
-                    <p className="text-sm text-gray-600 mt-1">Processing customer behavior data</p>
-                    <Badge className="mt-2" variant="secondary">
-                      Running
-                    </Badge>
-                  </div>
-                  <div className="p-4 border border-gray-200 rounded-lg">
-                    <h4 className="font-medium">ML Model Training</h4>
-                    <p className="text-sm text-gray-600 mt-1">Training recommendation engine</p>
-                    <Badge className="mt-2" variant="secondary">
-                      Running
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ClientPrograms programs={programs}/>
+          </TabsContent>
+
+          <TabsContent value="alerts" className="mt-6">
+            <ClientSingleActiveAlerts alerts={alertsList}/>
+          </TabsContent>
+
+          <TabsContent value="subscription" className="mt-6">
+            <ClientSingleSubscriptionTab invoices={invoices} subscription={plan}/>
+          </TabsContent>
+          <TabsContent value="activity" className="mt-6">
+            <ClientSingleActivityLog activityLogs={activityLog}/>
           </TabsContent>
         </Tabs>
       </div>
 
       {/* Right Sidebar */}
-      <div className="w-80 bg-white border-l border-gray-200 p-6">
+      <div className="w-80 bg-white px-6">
         <div className="space-y-6">
           {/* Client Information */}
-          <div>
+          <div className="border border-gray-200 px-5 py-5 rounded-xl">
             <h3 className="text-lg font-semibold mb-4">Client Information</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
@@ -244,7 +116,7 @@ export function SingleClient() {
           </div>
 
           {/* Plan Info */}
-          <div>
+          <div className="border border-gray-200 px-5 py-5 rounded-xl">
             <h3 className="text-lg font-semibold mb-4">Plan Information</h3>
             <div className="space-y-4">
               <div>
