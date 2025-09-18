@@ -24,6 +24,8 @@ import APIIntegrations from "@/pages/Admin/APIIntegrations";
 import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
 import GlobalSettings from "@/pages/Admin/GlobalSettings";
 import { SingleClient } from "@/pages/Admin/SingleClient";
+import ManageBillings from "@/pages/Admin/ManageBillings";
+import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
 
 
 
@@ -125,7 +127,15 @@ const routes = createBrowserRouter([
           {
             path: "globalSettings", 
             element: <GlobalSettings />
-          }
+          },
+          {
+            path: "manage-billings", 
+            element: <ManageBillings />
+          },
+          {
+            path: "Platform-Analytics-Overview", 
+            element: <PlatformAnalyticsOverview />
+          },
         ],
       },
     ],
