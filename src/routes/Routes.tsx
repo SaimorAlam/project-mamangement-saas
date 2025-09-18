@@ -10,6 +10,7 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
+import Employees from "@/pages/Employees";
 import Help from "@/pages/Admin/Help";
 import Clients from "@/pages/Admin/Clients";
 import Analytics from "@/pages/Admin/Analytics";
@@ -44,6 +45,10 @@ const routes = createBrowserRouter([
       {
         path: "/form",
         element: <Form />,
+      },
+      {
+        path: "/Employees",
+        element: <Employees />,
       },
       {
         path: "/login",
