@@ -1,92 +1,63 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { NavLink, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, CircleAlert  } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Eye, EyeOff } from 'lucide-react';
+import { toast } from "sonner";
 
-
-const signupSchema = z.object({
-  email: z.string().email("Invalid email format"),
+const forgotSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Confirm Password is required"),
 });
 
-type SignupFormInputs = z.infer<typeof signupSchema>;
+type ForgotFormInputs = z.infer<typeof forgotSchema>;
 
-const Signup = () => {
+const Forgot = () => {
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue
+      } = useForm<ForgotFormInputs>({
+        resolver: zodResolver(forgotSchema),
+      });
+    
+      const navigate = useNavigate();
+    
+      const onSubmit = (data: ForgotFormInputs) => {
+      const formData = new FormData();
+      formData.append("password", data.password);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue
-  } = useForm<SignupFormInputs>({
-    resolver: zodResolver(signupSchema),
-  });
-
-  const navigate = useNavigate();
-
-
-  const onSubmit = (data: SignupFormInputs) => {
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
-
-    console.log("Signup Data:", Object.fromEntries(formData));
-    navigate("/login");
-  };
+      console.log("Forgot Data:", Object.fromEntries(formData));
+      navigate("/login");
+    };
 
 
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
-  
+      const [password, setPassword] = useState('');
+      const [showPassword, setShowPassword] = useState(false);
+      const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+      const [confirmPassword, setConfirmPassword] = useState('');
+      
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+      const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+      };
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
+      const toggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+      };
+      
 
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[40%]">
-        <img src="Logo.png" alt="" />
-        <img className="w-full" src="signup image.png" alt="" />
+        <img className="w-full" src="login image.png" alt="" />
       </div>
       <div>
-        <h2 className="text-[48px] leading-[56px] font-semibold">Create your account</h2>
-        <p className="text-[#475569] font-normal text-4 mt-[10px] text-center">Enter your email and password to create your account</p>
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-[48px]">
-          {/* Email Field */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-[#1D2028] mb-3">
-              Email*
-            </label>
-
-            <div className={`flex items-center border ${errors.password ? "border-red-500" : "border-[#94A3B8]"} bg-[#F5F8FA] rounded-md focus:outline-none relative`}>
-              <Mail className="ml-[17px] w-[5%]" />
-              <input
-                type="email"
-                {...register("email")}
-                placeholder="Enter your email"
-                className="w-full py-[14px] px-2  bg-[#F5F8FA] rounded-md focus:outline-none"
-              />
-              {errors.password 
-              ?
-              <CircleAlert className="mr-[17px] text-red-500"/>
-              :
-              ""
-              }
-            </div>
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-[8px]">{errors.email.message}</p>
-            )}
-          </div>
+        <h2 className="text-[48px] leading-[56px] font-semibold text-center">Reset Password?</h2>
+        <p className="text-[#475569] font-normal text-4 mt-[10px] mb-[48px] text-center w-[99%]">Please enter a new password & confirm to reset your password</p>
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
 
           {/* Password Field */}
           <div className="mb-4">
@@ -119,11 +90,12 @@ const Signup = () => {
                 )}
               </button>
             </div>
-
+            
             {errors.password && (
               <p className="text-red-500 text-sm mt-[8px]">{errors.password.message}</p>
             )}
           </div>
+
           {/* Confirm Password Field */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-[#1D2028] mb-3">
@@ -141,7 +113,7 @@ const Signup = () => {
                 className="w-full py-[14px] px-4 bg-[#F5F8FA] rounded-md focus:outline-none"
               />
 
-              <button
+               <button
                 type="button"
                 onClick={toggleConfirmPasswordVisibility}
                 className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800 transition-colors"
@@ -153,32 +125,26 @@ const Signup = () => {
                   <EyeOff className="w-5 h-5" />
                 )}
               </button>
-            </div>
 
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-[8px]">{errors.confirmPassword.message}</p>
+            </div>
+            
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-[8px]">{errors.password.message}</p>
             )}
           </div>
 
+          {/* Submit Button */}
           <button
-            type="submit" 
-            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 cursor-pointer"
+            type="submit" onClick={()=> toast.success("Your Password Has been rested Successfully")}
+            className="w-full cursor-pointer bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
-            Register Now
+            Reset Password
+            
           </button>
-          <div className="text-center mt-6">
-            <div>
-              <NavLink to="/login" className="font-medium text-[#0151FF] ">
-                  Log In Now
-              </NavLink>
-            <NavLink to="/login" />
-
-            </div>
-          </div>
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Signup;
+export default Forgot
