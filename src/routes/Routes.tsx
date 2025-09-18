@@ -25,7 +25,8 @@ import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
 import GlobalSettings from "@/pages/Admin/GlobalSettings";
 import { SingleClient } from "@/pages/Admin/SingleClient";
 import ManageBillings from "@/pages/Admin/ManageBillings";
-import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
+import PlatformAnalyticsOverview from "@/pages/Admin/Analytics";
+// import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
 
 
 
