@@ -14,6 +14,7 @@ import EmailCode from "@/pages/EmailCode";
 import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
+import Employees from "@/pages/Employees";
 import Help from "@/pages/Admin/Help";
 import Clients from "@/pages/Admin/Clients";
 import Analytics from "@/pages/Admin/Analytics";
@@ -22,6 +23,7 @@ import BillingsPlans from "@/pages/Admin/BillingsPlans";
 import APIIntegrations from "@/pages/Admin/APIIntegrations";
 import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
 import GlobalSettings from "@/pages/Admin/GlobalSettings";
+import { SingleClient } from "@/pages/Admin/SingleClient";
 
 
 
@@ -50,6 +52,10 @@ const routes = createBrowserRouter([
       {
         path: "/form",
         element: <Form />,
+      },
+      {
+        path: "/Employees",
+        element: <Employees />,
       },
       {
         path: "/login",
@@ -87,6 +93,10 @@ const routes = createBrowserRouter([
           {
             path: "clients", 
             element: <Clients />
+          },
+          {
+            path: "clients/:id", 
+            element: <SingleClient />
           },
           {
             path: "analytics", 
