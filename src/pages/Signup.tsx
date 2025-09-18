@@ -4,6 +4,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CiSquarePlus } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
+// import { BadgeQuestionMark } from 'lucide-react';
+import { Mail } from 'lucide-react';
+
 
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -54,34 +57,29 @@ const Signup = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-200">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold text-center">Signup</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-          {/* Name Field */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Name
-            </label>
-            <input
-              type="text"
-              {...register("name")}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
-            )}
-          </div>
-
+      <div>
+        <img src="signup.webp" alt="" />
+      </div>
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-[48px] leading-[56px] font-semibold">Create your account</h2>
+        <p className="text-[#475569] font-normal text-4 mt-[10px] text-center">Enter your email and password to create your account</p>
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-[48px]">
           {/* Email Field */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Email
+            <label className="block text-sm font-medium text-[#1D2028] mb-3">
+              Email*
             </label>
-            <input
-              type="email"
-              {...register("email")}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            
+            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none">
+              <Mail className="ml-[17px] w-[5%]"/>
+                <input
+                type="email"
+                {...register("email")}
+                placeholder="Enter your email"
+                className="w-full py-[14px] px-2  bg-[#F5F8FA] rounded-md focus:outline-none"
+              />
+              {/* <BadgeQuestionMark /> */}
+            </div>
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
@@ -89,40 +87,48 @@ const Signup = () => {
 
           {/* Password Field */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Password
+            <label className="block text-sm font-medium text-[#1D2028] mb-3">
+              Password*
             </label>
-            <input
+            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none">
+              <input
               type="password"
               {...register("password")}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your password"
+              className="w-full py-[14px] px-4  bg-[#F5F8FA] rounded-md focus:outline-none"
             />
+            </div>
+            
             {errors.password && (
               <p className="text-red-500 text-sm">{errors.password.message}</p>
             )}
           </div>
+          {/* Confirm Password Field */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Profile Picture
+            <label className="block text-sm font-medium text-[#1D2028] mb-3">
+              Confirm Password*
             </label>
-            {/* input box  */}
-            <div
-              className="relative w-full h-36 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center cursor-pointer hover:border-blue-500 transition"
-              onClick={() => document.getElementById("fileInput")?.click()}
-            >
-              {preview ? (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <div className="flex flex-col items-center text-gray-500">
-                  <CiSquarePlus className="h-12 w-12" />
-                  <p className="text-sm">Click to upload</p>
-                </div>
-              )}
+
+            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none">
+              <input
+              type="password"
+              {...register("password")}
+              placeholder="Confirm your password"
+              className="w-full py-[14px] px-4  bg-[#F5F8FA] rounded-md focus:outline-none"
+            />
             </div>
+            
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
+
+            <div className="flex gap-4 items-baseline my-6">
+              <input type="checkbox" name="policy" id="policy" className="text-[#D0D5DD] rounded-3xl cursor-pointer"/>
+              <p className="text-[#0F1325] w-[90%]">I agree to Theta Analyzer <span className="text-[#1C73E0] underline">Licence Agreement</span> and <span className="text-[#1C73E0] underline">Privacy policy</span></p>
+            </div>
+          </div>
+          <div className="mb-4">
+            {/* input box  */}
             <input
               type="file"
               accept="image/*"
@@ -139,10 +145,13 @@ const Signup = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 cursor-pointer" 
           >
-            Signup
+            Register Now
           </button>
+          <div className="text-center mt-6">
+            <a href="#" className="font-medium text-[#0151FF] ">Log in Now</a>
+          </div>
         </form>
       </div>
     </div>

@@ -11,6 +11,15 @@ import Signup from "@/pages/Signup";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
 import Employees from "@/pages/Employees";
+import Help from "@/pages/Admin/Help";
+import Clients from "@/pages/Admin/Clients";
+import Analytics from "@/pages/Admin/Analytics";
+import SystemHealth from "@/pages/Admin/SystemHealth";
+import BillingsPlans from "@/pages/Admin/BillingsPlans";
+import APIIntegrations from "@/pages/Admin/APIIntegrations";
+import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
+import GlobalSettings from "@/pages/Admin/GlobalSettings";
+import { SingleClient } from "@/pages/Admin/SingleClient";
 
 const routes = createBrowserRouter([
   {
@@ -53,7 +62,47 @@ const routes = createBrowserRouter([
         path: "/admin",
         element: <AdminRoute />, // This will check if the user is an admin
         children: [
-          { path: "", element: <AdminDashboard /> }, // Admin Dashboard
+          { 
+            index: true,
+            path: "", 
+            element: <AdminDashboard /> 
+          },
+          {
+            path: "clients", 
+            element: <Clients />
+          },
+          {
+            path: "clients/:id", 
+            element: <SingleClient />
+          },
+          {
+            path: "analytics", 
+            element: <Analytics />
+          },
+          {
+            path: "systemHealth", 
+            element: <SystemHealth />
+          },
+          {
+            path: "billings", 
+            element: <BillingsPlans />
+          },
+          {
+            path: "apiIntegration", 
+            element: <APIIntegrations />
+          },
+          {
+            path: "security", 
+            element: <SecurityPrivacy />
+          },
+          {
+            path: "help", 
+            element: <Help />
+          },
+          {
+            path: "globalSettings", 
+            element: <GlobalSettings />
+          }
         ],
       },
     ],
