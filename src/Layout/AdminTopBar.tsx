@@ -68,6 +68,7 @@ const AdminTopBar = () => {
         console.log("Exporting dashboard data")
         alert("Exporting dashboard data...")
     }
+    const isSingleClientRoute = location.pathname.startsWith("/admin/clients");
     return (
         <>
             <div className="space-y-6">
@@ -186,14 +187,17 @@ const AdminTopBar = () => {
                         </DropdownMenu>
 
                         {/* Export Button */}
-                        <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-gray-200 cursor-pointer transition-[300ms]" onClick={handleExport}>
-                            <Download className="h-4 w-4" />
-                            Export
-                        </Button>
-                        <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-gray-200 cursor-pointer transition-[300ms]" onClick={handleExport}>
-                            <Download className="h-4 w-4" />
-                            Export
-                        </Button>
+                        {isSingleClientRoute ?
+                            <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-gray-200 cursor-pointer transition-[300ms]" onClick={handleExport}>
+                                <Download className="h-4 w-4" />
+                                Add Client
+                            </Button>
+                            :
+                            <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-gray-200 cursor-pointer transition-[300ms]" onClick={handleExport}>
+                                <Download className="h-4 w-4" />
+                                Export
+                            </Button>
+                        }
                     </div>
                 </div>
 

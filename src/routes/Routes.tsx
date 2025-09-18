@@ -24,6 +24,7 @@ import APIIntegrations from "@/pages/Admin/APIIntegrations";
 import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
 import GlobalSettings from "@/pages/Admin/GlobalSettings";
 import { SingleClient } from "@/pages/Admin/SingleClient";
+import AddClientForm from "@/pages/Admin/AddClientForm/AddClientForm";
 
 
 
@@ -125,6 +126,10 @@ const routes = createBrowserRouter([
           {
             path: "globalSettings", 
             element: <GlobalSettings />
+          },
+          {
+            path: "addClient", 
+            element: <AddClientForm />
           }
         ],
       },
