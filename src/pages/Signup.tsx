@@ -2,22 +2,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CiSquarePlus } from "react-icons/ci";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Mail } from 'lucide-react';
-import { Eye, EyeOff } from 'lucide-react';
-import Login from "./Login";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Mail, CircleAlert  } from 'lucide-react';
 
 
 const signupSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Confirm Password is required"),
-  image: z
-    .any()
-    .refine((file) => file, "Image is required")
-    .optional(),
 });
 
 type SignupFormInputs = z.infer<typeof signupSchema>;
@@ -35,12 +27,9 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
-  
-
 
   const onSubmit = (data: SignupFormInputs) => {
     const formData = new FormData();
-    formData.append("name", data.name);
     formData.append("email", data.email);
     formData.append("password", data.password);
 
@@ -66,6 +55,7 @@ const Signup = () => {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[40%]">
+        <img src="Logo.png" alt="" />
         <img className="w-full" src="signup image.png" alt="" />
       </div>
       <div>
@@ -78,7 +68,7 @@ const Signup = () => {
               Email*
             </label>
 
-            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none">
+            <div className={`flex items-center border ${errors.password ? "border-red-500" : "border-[#94A3B8]"} bg-[#F5F8FA] rounded-md focus:outline-none relative`}>
               <Mail className="ml-[17px] w-[5%]" />
               <input
                 type="email"
@@ -86,9 +76,15 @@ const Signup = () => {
                 placeholder="Enter your email"
                 className="w-full py-[14px] px-2  bg-[#F5F8FA] rounded-md focus:outline-none"
               />
+              {errors.password 
+              ?
+              <CircleAlert className="mr-[17px] text-red-500"/>
+              :
+              ""
+              }
             </div>
             {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
+              <p className="text-red-500 text-sm mt-[8px]">{errors.email.message}</p>
             )}
           </div>
 
@@ -97,7 +93,7 @@ const Signup = () => {
             <label className="block text-sm font-medium text-[#1D2028] mb-3">
               Password*
             </label>
-            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none relative">
+            <div className={`flex items-center border ${errors.password ? "border-red-500" : "border-[#94A3B8]"} bg-[#F5F8FA] rounded-md focus:outline-none relative`}>
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -117,15 +113,15 @@ const Signup = () => {
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
                   <Eye className="w-5 h-5" />
+                ) : (
+                  <EyeOff className="w-5 h-5" />
                 )}
               </button>
             </div>
 
             {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
+              <p className="text-red-500 text-sm mt-[8px]">{errors.password.message}</p>
             )}
           </div>
           {/* Confirm Password Field */}
@@ -134,7 +130,7 @@ const Signup = () => {
               Confirm Password*
             </label>
 
-            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none relative">
+            <div className={`flex items-center border ${errors.password ? "border-red-500" : "border-[#94A3B8]"} bg-[#F5F8FA] rounded-md focus:outline-none relative`}>
               <input
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
@@ -152,20 +148,20 @@ const Signup = () => {
                 aria-label={showConfirmPassword  ? 'Hide password' : 'Show password'}
               >
                 {showConfirmPassword  ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
                   <Eye className="w-5 h-5" />
+                ) : (
+                  <EyeOff className="w-5 h-5" />
                 )}
               </button>
             </div>
 
             {errors.confirmPassword && (
-              <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
+              <p className="text-red-500 text-sm mt-[8px]">{errors.confirmPassword.message}</p>
             )}
           </div>
 
           <button
-            type="submit"
+            type="submit" 
             className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 cursor-pointer"
           >
             Register Now
@@ -178,8 +174,6 @@ const Signup = () => {
             <NavLink to="/login" />
 
             </div>
-            {/* <a href="#" className="font-medium text-[#0151FF] ">Log in Now</a> */}
-
           </div>
         </form>
       </div>

@@ -1,8 +1,9 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router-dom";
-import { Mail } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { Mail, CircleAlert } from 'lucide-react';
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -41,7 +42,7 @@ const Forgot = () => {
               Email*
             </label>
             
-            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none">
+            <div className={`flex items-center border ${errors.password ? "border-red-500" : "border-[#94A3B8]"} bg-[#F5F8FA] rounded-md focus:outline-none relative`}>
               <Mail className="ml-[17px] w-[5%]"/>
                 <input
                 type="email"
@@ -49,7 +50,12 @@ const Forgot = () => {
                 placeholder="Enter your email"
                 className="w-full py-[14px] px-2  bg-[#F5F8FA] rounded-md focus:outline-none"
               />
-
+              {errors.password 
+              ?
+              <CircleAlert className="mr-[17px] text-red-500"/>
+              :
+              ""
+              }
             </div>
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email.message}</p>
@@ -58,7 +64,7 @@ const Forgot = () => {
 
           {/* Submit Button */}
           <button
-            type="submit"
+            type="submit" onClick={()=> toast.success("Your Password Has been rested Successfully")}
             className="w-full cursor-pointer bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
             Send Reset Password Link

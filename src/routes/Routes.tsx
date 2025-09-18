@@ -10,6 +10,8 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Forgot from "@/pages/Forgot";
 import Reset from "@/pages/ResetPassword"
+import EmailCode from "@/pages/EmailCode";
+import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
 import Help from "@/pages/Admin/Help";
@@ -20,6 +22,8 @@ import BillingsPlans from "@/pages/Admin/BillingsPlans";
 import APIIntegrations from "@/pages/Admin/APIIntegrations";
 import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
 import GlobalSettings from "@/pages/Admin/GlobalSettings";
+
+
 
 
 const routes = createBrowserRouter([
@@ -62,6 +66,14 @@ const routes = createBrowserRouter([
       {
         path: "/reset",
         element: <Reset />,
+      },
+      {
+        path: "/verification",
+        element: <TwoStepVerification/>,
+      },
+      {
+        path: "/emailcode",
+        element: <EmailCode/>,
       },
       {
         path: "/admin",

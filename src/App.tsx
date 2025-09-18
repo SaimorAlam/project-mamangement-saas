@@ -1,3 +1,4 @@
+import { Toaster } from 'sonner'
 import Layout from './Layout/Layout'
 
 function App() {
@@ -5,6 +6,7 @@ function App() {
   return (
     <>
      <Layout></Layout>
+     <Toaster/>
     </>
   )
 }

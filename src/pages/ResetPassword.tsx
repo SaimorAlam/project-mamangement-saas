@@ -1,31 +1,54 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router-dom";
-import { Mail } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Eye, EyeOff } from 'lucide-react';
+import { toast } from "sonner";
 
-const loginSchema = z.object({
-  email: z.string().email("Invalid email format"),
+const forgotSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Confirm Password is required"),
 });
 
-type LoginFormInputs = z.infer<typeof loginSchema>;
+type ForgotFormInputs = z.infer<typeof forgotSchema>;
 
 const Forgot = () => {
     const {
         register,
         handleSubmit,
         formState: { errors },
-      } = useForm<LoginFormInputs>({
-        resolver: zodResolver(loginSchema),
+        setValue
+      } = useForm<ForgotFormInputs>({
+        resolver: zodResolver(forgotSchema),
       });
     
       const navigate = useNavigate();
     
-      const onSubmit = (data: LoginFormInputs) => {
-        console.log("Login Data:", data);
-        navigate("/");
+      const onSubmit = (data: ForgotFormInputs) => {
+      const formData = new FormData();
+      formData.append("password", data.password);
+
+      console.log("Forgot Data:", Object.fromEntries(formData));
+      navigate("/login");
+    };
+
+
+      const [password, setPassword] = useState('');
+      const [showPassword, setShowPassword] = useState(false);
+      const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+      const [confirmPassword, setConfirmPassword] = useState('');
+      
+
+      const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
       };
+
+      const toggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+      };
+      
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[40%]">
@@ -34,24 +57,42 @@ const Forgot = () => {
       <div>
         <h2 className="text-[48px] leading-[56px] font-semibold text-center">Reset Password?</h2>
         <p className="text-[#475569] font-normal text-4 mt-[10px] mb-[48px] text-center w-[99%]">Please enter a new password & confirm to reset your password</p>
-        <form className="mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
 
           {/* Password Field */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-[#1D2028] mb-3">
               Password*
             </label>
-            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none">
+            <div className={`flex items-center border ${errors.password ? "border-red-500" : "border-[#94A3B8]"} bg-[#F5F8FA] rounded-md focus:outline-none relative`}>
               <input
-              type="password"
-              {...register("password")}
-              placeholder="Enter your password"
-              className="w-full py-[14px] px-4  bg-[#F5F8FA] rounded-md focus:outline-none"
-            />
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setValue("password", e.target.value);
+                }}
+                placeholder="Enter your password"
+                className="w-full py-[14px] px-4 bg-[#F5F8FA] rounded-md focus:outline-none"
+              />
+
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800 transition-colors"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <Eye className="w-5 h-5" />
+                ) : (
+                  <EyeOff className="w-5 h-5" />
+                )}
+              </button>
             </div>
             
             {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
+              <p className="text-red-500 text-sm mt-[8px]">{errors.password.message}</p>
             )}
           </div>
 
@@ -61,26 +102,44 @@ const Forgot = () => {
               Confirm Password*
             </label>
 
-            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none">
+            <div className={`flex items-center border ${errors.password ? "border-red-500" : "border-[#94A3B8]"} bg-[#F5F8FA] rounded-md focus:outline-none relative`}>
               <input
-              type="password"
-              {...register("password")}
-              placeholder="Confirm your password"
-              className="w-full py-[14px] px-4  bg-[#F5F8FA] rounded-md focus:outline-none"
-            />
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                {...register("confirmPassword")}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                className="w-full py-[14px] px-4 bg-[#F5F8FA] rounded-md focus:outline-none"
+              />
+
+               <button
+                type="button"
+                onClick={toggleConfirmPasswordVisibility}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800 transition-colors"
+                aria-label={showConfirmPassword  ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword  ? (
+                  <Eye className="w-5 h-5" />
+                ) : (
+                  <EyeOff className="w-5 h-5" />
+                )}
+              </button>
+
             </div>
             
             {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
+              <p className="text-red-500 text-sm mt-[8px]">{errors.password.message}</p>
             )}
           </div>
 
           {/* Submit Button */}
           <button
-            type="submit"
+            type="submit" onClick={()=> toast.success("Your Password Has been rested Successfully")}
             className="w-full cursor-pointer bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
             Reset Password
+            
           </button>
         </form>
       </div>

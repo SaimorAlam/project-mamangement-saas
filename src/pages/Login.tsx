@@ -1,10 +1,9 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router-dom";
-import { Mail } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Mail, CircleAlert } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -39,19 +38,20 @@ const [password, setPassword] = useState('');
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[40%]">
-        <img className="w-full" src="login image.png" alt="" />
+        <img src="Logo.png" alt="logo" />
+        <img className="w-full" src="login image.png" alt="login-Image" />
       </div>
       <div>
         <h2 className="text-[48px] leading-[56px] font-semibold text-center">Welcome back</h2>
         <p className="text-[#475569] font-normal text-4 mt-[10px] text-center">Enter your email and password to access your account</p>
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-[48px]">
           {/* Email Field */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-[#1D2028] mb-3">
               Email*
             </label>
             
-            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none">
+            <div className={`flex items-center border ${errors.password ? "border-red-500" : "border-[#94A3B8]"} bg-[#F5F8FA] rounded-md focus:outline-none relative`}>
               <Mail className="ml-[17px] w-[5%]"/>
                 <input
                 type="email"
@@ -59,10 +59,15 @@ const [password, setPassword] = useState('');
                 placeholder="Enter your email"
                 className="w-full py-[14px] px-2  bg-[#F5F8FA] rounded-md focus:outline-none"
               />
-              {/* <BadgeQuestionMark /> */}
+              {errors.password 
+              ?
+              <CircleAlert className="mr-[17px] text-red-500"/>
+              :
+              ""
+              }
             </div>
             {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
+              <p className="text-red-500 text-sm mt-[8px]">{errors.email.message}</p>
             )}
           </div>
 
@@ -71,7 +76,7 @@ const [password, setPassword] = useState('');
             <label className="block text-sm font-medium text-[#1D2028] mb-3">
               Password*
             </label>
-            <div className="flex items-center border border-[#94A3B8] bg-[#F5F8FA] rounded-md focus:outline-none relative">
+            <div className={`flex items-center border ${errors.password ? "border-red-500" : "border-[#94A3B8]"} bg-[#F5F8FA] rounded-md focus:outline-none relative`}>
               <input
                id="password"
                 type={showPassword ? "text" : "password"}
@@ -90,15 +95,15 @@ const [password, setPassword] = useState('');
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
                   <Eye className="w-5 h-5" />
+                ) : (
+                  <EyeOff className="w-5 h-5" />
                 )}
               </button>
             </div>
             
             {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
+              <p className="text-red-500 text-sm mt-[8px]">{errors.password.message}</p>
             )}
 
             <div className="flex gap-4 items-baseline my-6 justify-between">
