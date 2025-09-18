@@ -34,8 +34,8 @@ export function SingleClient() {
       <div className="flex-1 p-6">
         {/* Metrics Cards */}
         <div className="grid grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
+          <Card className="border border-gray-200 h-44">
+            <CardContent className="">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <Users className="w-6 h-6 text-green-600" />
@@ -47,7 +47,7 @@ export function SingleClient() {
                   </p>
                 </div>
               </div>
-              <div className="mt-4 bg-green-50 rounded-lg p-3">
+              <div className="mt-8 bg-green-50 rounded-lg p-3">
                 <p className="text-sm text-green-700">{metrics.totalUsers.percentage}% of capacity used</p>
               </div>
             </CardContent>
