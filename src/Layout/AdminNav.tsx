@@ -1,70 +1,107 @@
 import {
-  Clock,
-  Users,
-  BarChart3,
-  Activity,
-  CreditCard,
-  Plug,
-  Shield,
-  HelpCircle,
-  Settings,
-  ChevronRight,
-  Power,
-} from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+    Clock,
+    Users,
+    BarChart3,
+    Activity,
+    CreditCard,
+    Plug,
+    Shield,
+    HelpCircle,
+    Settings,
+    ChevronRight,
+    Power,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { NavLink } from "react-router-dom";
 
 export default function SidebarNavigation() {
+    const getLinkClassName = ({ isActive }) => {
+        const baseClasses = "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors";
+        const activeClasses = "bg-blue-500 text-white";
+        const inactiveClasses = "text-gray-700 hover:bg-gray-50";
+        
+        return `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
+    };
+
     return (
-        <div className="w-64 h-screen bg-white flex flex-col">
+        <div className="w-64 h-screen bg-white flex flex-col fixed top-0">
             <div className="p-4 mt-5">
                 <h3 className="text-sm font-medium text-gray-500 mb-3">Main Menu</h3>
                 <div className="space-y-2">
-                    <div className="flex items-center gap-3 px-3 py-2 bg-blue-500 text-white rounded-lg">
+                    <NavLink
+                        to="/admin"
+                        className={getLinkClassName}
+                        end
+                    >
                         <Clock className="w-5 h-5" />
                         <span className="font-medium">Overview</span>
-                    </div>
-                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    </NavLink>
+                    <NavLink
+                        to="/admin/clients"
+                        className={getLinkClassName}
+                    >
                         <Users className="w-5 h-5" />
                         <span>Clients</span>
-                    </div>
-                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    </NavLink>
+                    <NavLink
+                        to="/admin/analytics"
+                        className={getLinkClassName}
+                    >
                         <BarChart3 className="w-5 h-5" />
                         <span>Analytics</span>
-                    </div>
-                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    </NavLink>
+                    <NavLink
+                        to="/admin/systemHealth"
+                        className={getLinkClassName}
+                    >
                         <Activity className="w-5 h-5" />
                         <span>System Health</span>
-                    </div>
-                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    </NavLink>
+                    <NavLink
+                        to="/admin/billings"
+                        className={getLinkClassName}
+                    >
                         <CreditCard className="w-5 h-5" />
                         <span>Billing & Plans</span>
-                    </div>
+                    </NavLink>
                 </div>
             </div>
 
             <div className="px-4 pb-4">
                 <h3 className="text-sm font-medium text-gray-500 mb-3">Support</h3>
                 <div className="space-y-1">
-                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    <NavLink
+                        to="/admin/apiIntegration"
+                        className={getLinkClassName}
+                    >
                         <Plug className="w-5 h-5" />
                         <span>API & Integration</span>
-                    </div>
-                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    </NavLink>
+                    <NavLink
+                        to="/admin/security"
+                        className={getLinkClassName}
+                    >
                         <Shield className="w-5 h-5" />
                         <span>Security & Privacy</span>
-                    </div>
-                    <div className="flex items-center justify-between px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    </NavLink>
+                    <NavLink
+                        to="/admin/help"
+                        className={getLinkClassName}
+                    >
                         <div className="flex items-center gap-3">
                             <HelpCircle className="w-5 h-5" />
                             <span>Help</span>
                         </div>
                         <ChevronRight className="w-4 h-4" />
-                    </div>
-                    <div className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    </NavLink>
+                    <NavLink
+                        to="/admin/globalSettings"
+                        className={getLinkClassName}
+                    >
                         <Settings className="w-5 h-5" />
                         <span>Global Settings</span>
-                    </div>
+                    </NavLink>
                 </div>
             </div>
 
@@ -86,5 +123,5 @@ export default function SidebarNavigation() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
