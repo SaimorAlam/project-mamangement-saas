@@ -8,6 +8,10 @@ import AdminRoute from "./AdminRoutes";
 import AdminDashboard from "@/pages/Admin/AdminDashboard";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
+import Forgot from "@/pages/Forgot";
+import Reset from "@/pages/ResetPassword"
+import EmailCode from "@/pages/EmailCode";
+import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
 import Employees from "@/pages/Employees";
@@ -20,6 +24,9 @@ import APIIntegrations from "@/pages/Admin/APIIntegrations";
 import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
 import GlobalSettings from "@/pages/Admin/GlobalSettings";
 import { SingleClient } from "@/pages/Admin/SingleClient";
+
+
+
 
 const routes = createBrowserRouter([
   {
@@ -57,6 +64,22 @@ const routes = createBrowserRouter([
       {
         path: "/signup",
         element: <Signup />,
+      },
+      {
+        path: "/forgot",
+        element: <Forgot />,
+      },
+      {
+        path: "/reset",
+        element: <Reset />,
+      },
+      {
+        path: "/verification",
+        element: <TwoStepVerification/>,
+      },
+      {
+        path: "/emailcode",
+        element: <EmailCode/>,
       },
       {
         path: "/admin",
