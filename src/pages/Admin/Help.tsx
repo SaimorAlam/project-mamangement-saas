@@ -628,7 +628,7 @@ const SupportTickets: React.FC = () => {
     setShowTeamWorkloadModal(false);
   };
 
-  const handleConfirmAssignment = (priority?: PriorityType) => {
+  const handleConfirmAssignment = () => {
     if (!selectedStaff) return;
     if (selectedTickets.size === 0) return;
 
