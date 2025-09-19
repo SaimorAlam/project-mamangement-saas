@@ -10,9 +10,8 @@ import { Upload, TrendingUp } from "lucide-react"
 import { useState } from "react"
 
 export default function StepTwo() {
-  const { control, watch, setValue, register } = useFormContext() // <-- register added
+  const { control, watch, register } = useFormContext() // <-- register added
 
-  const showFooter = watch("showFooter")
   const primaryColor = watch("primaryColor") || "#1C73E0"
   const secondaryColor = watch("secondaryColor") || "#F59E0B"
 

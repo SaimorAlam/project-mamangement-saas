@@ -4,9 +4,9 @@ export interface ClientBilling {
     companyName: string;
     companyLogo: string;
     subscriptionPlan: string;
-    planType: 'Business' | 'Enterprise' | 'Professional' | 'Starter';
+    planType: string;
     billingCycle: string;
     renewsDate: string;
-    status: 'Active' | 'Suspended' | 'Trial' | 'Expired' | 'Pending';
+    status: string;
     paymentMethod?: string;
 }

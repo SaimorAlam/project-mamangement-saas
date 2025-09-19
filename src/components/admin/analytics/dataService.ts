@@ -10,7 +10,7 @@ export interface TrendingIndustry {
   name: string;
   usage: number;
   monthlyComp: number;
-  trend: 'up' | 'down';
+  trend: string,
   status: string;
 }
 
