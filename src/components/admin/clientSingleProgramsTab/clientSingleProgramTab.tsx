@@ -1,6 +1,11 @@
+import { Program } from "@/types/customer";
 import { useMemo, useState } from "react";
 
-const ClientPrograms = ({ programs }) => {
+interface ProgramDataType {
+  programs: Program[]
+}
+
+const ClientPrograms:React.FC<ProgramDataType> = ({ programs }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 

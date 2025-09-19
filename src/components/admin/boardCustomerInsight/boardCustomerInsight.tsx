@@ -5,8 +5,13 @@ import { cn } from "@/lib/utils"
 import { ProgressBar } from "@/components/ui/ProgressBarCustom"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
+import { ClientData } from "@/types/client"
 
-const BoardCustomerInsight: React.FC<{ customer }> = ({ customer }) => {
+interface CustomerProps {
+    customer: ClientData
+}
+
+const BoardCustomerInsight: React.FC<CustomerProps> = ({ customer }) => {
     const statusColors = {
         Active: "bg-emerald-100 text-emerald-700 border-emerald-200",
         Suspended: "bg-red-100 text-red-700 border-red-200",

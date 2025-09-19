@@ -1,10 +1,15 @@
 import { Badge } from "@/components/ui/badge"
 import { ProgressBar } from "@/components/ui/ProgressBarCustom"
 import { cn } from "@/lib/utils"
+import { ClientData } from "@/types/client"
 import { Eye, Pencil, Trash, } from "lucide-react"
 
+interface CustomerData {
+    customer: ClientData
+}
 
-const TableCustomerInsight = ({ customer }) => {
+
+const TableCustomerInsight:React.FC<CustomerData> = ({ customer }) => {
     const statusColors = {
         Active: "bg-emerald-100 text-emerald-700 border-emerald-200",
         Suspended: "bg-red-100 text-red-700 border-red-200",

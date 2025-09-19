@@ -1,7 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { PlanSummary } from "@/types/customer"
 import { Database, FolderOpen, User, Zap } from "lucide-react"
 
-const ClientSingleOverviewTab = ({planSummary}) => {
+interface PlanSummaryProps {
+  planSummary: PlanSummary
+}
+
+const ClientSingleOverviewTab:React.FC<PlanSummaryProps> = ({planSummary}) => {
   return (
     <Card className="w-1/3 border-none shadow-md">
       <CardContent className="">

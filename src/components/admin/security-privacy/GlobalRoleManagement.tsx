@@ -221,7 +221,7 @@ const GlobalRoleManagement: React.FC = () => {
                     <div className="font-medium text-gray-700 text-center">Viewer</div>
                   </div>
 
-                  {filteredPermissions.map((permission, index) => {
+                  {filteredPermissions.map((permission) => {
                     const originalIndex = permissions.findIndex(p => p.module === permission.module);
                     return (
                       <div key={permission.module} className="grid grid-cols-5 gap-4 pb-3 items-center border-b border-gray-100">

@@ -1,7 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { Metrics } from "@/types/metrics"
 import { AlertTriangle, HardDrive, TrendingUp, Users } from "lucide-react"
 
-const ClientInfoCards = ({metrics}) => {
+interface MetricsProps {
+    metrics: Metrics
+}
+const ClientInfoCards:React.FC<MetricsProps> = ({metrics}) => {
     return (
         <div className="grid grid-cols-4 gap-6 mb-8">
             <Card className="border border-gray-200 h-44">
