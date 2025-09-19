@@ -1,4 +1,11 @@
-function CustomCheckbox({ id, label, checked, onChange }) {
+interface CustomCheckBoxProps {
+  id: string;
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+const CustomCheckbox=({ id, label, checked, onChange }: CustomCheckBoxProps)=> {
   return (
     <div className="flex items-center gap-3">
       <label

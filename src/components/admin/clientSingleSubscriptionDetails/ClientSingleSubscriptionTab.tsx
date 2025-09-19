@@ -1,8 +1,38 @@
-import { useState, useMemo } from 'react';
+
 import { Download, HardDriveDownload, FileText, Calendar, CreditCard, Clock } from 'lucide-react';
 
-const ClientSingleSubscriptionTab = ({subscription,invoices}) => {
-  const statusColors = {
+import { useState, useMemo, ReactNode } from "react";
+
+
+interface Subscription {
+  current: string;
+  billingCycle: string;
+  nextRenewal: string;
+  status: "Paid" | "Unpaid" | "Pending" | "Active";
+}
+
+interface Invoice {
+  invoiceId: string;
+  date: string;
+  amount: string;
+  status: "Paid" | "Unpaid" | "Pending" | "Active";
+}
+
+interface ClientSingleSubscriptionTabProps {
+  subscription: Subscription;
+  invoices: Invoice[];
+}
+
+interface BadgeProps {
+  children: ReactNode;
+  className?: string;
+}
+
+const ClientSingleSubscriptionTab: React.FC<ClientSingleSubscriptionTabProps> = ({
+  subscription,
+  invoices,
+}) => {
+  const statusColors: Record<Subscription["status"], string> = {
     Paid: "bg-green-100 text-green-700",
     Unpaid: "bg-red-100 text-red-700",
     Pending: "bg-yellow-100 text-yellow-700",
@@ -10,7 +40,7 @@ const ClientSingleSubscriptionTab = ({subscription,invoices}) => {
   };
 
   // A simple badge component for styling
-  const Badge = ({ children, className }) => (
+ const Badge: React.FC<BadgeProps> = ({ children, className }) => (
     <span className={`inline-flex items-center px-3 py-1 rounded-full bg-blue-300 text-gray-800 text-sm font-medium ${className}`}>
       {children}
     </span>
@@ -71,11 +101,13 @@ const ClientSingleSubscriptionTab = ({subscription,invoices}) => {
                   </div>
                   <span className="text-sm text-gray-600">{item.label}</span>
                 </div>
-                {item.label === 'Plan Type' || item.label === 'Status' ? (
-                  <Badge className={statusColors[item.value]}>{item.value}</Badge>
-                ) : (
-                  <span className="text-sm font-medium text-gray-800">{item.value}</span>
-                )}
+               {item.label === 'Plan Type' || item.label === 'Status' ? (
+  <Badge className={statusColors[item.value as keyof typeof statusColors]}>
+    {item.value}
+  </Badge>
+) : (
+  <span className="text-sm font-medium text-gray-800">{item.value}</span>
+)}
               </div>
             ))}
           </div>

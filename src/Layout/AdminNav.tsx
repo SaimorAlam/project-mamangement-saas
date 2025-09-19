@@ -15,12 +15,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router-dom";
 
-export default function SidebarNavigation() {
-    const getLinkClassName = ({ isActive }) => {
-        const baseClasses = "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors";
+const SidebarNavigation=()=> {
+  const getLinkClassName = ({ isActive }: { isActive: boolean }) => {
+        const baseClasses =
+            "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors";
         const activeClasses = "bg-blue-500 text-white";
         const inactiveClasses = "text-gray-700 hover:bg-gray-50";
-        
+
         return `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
     };
 
@@ -126,3 +127,5 @@ export default function SidebarNavigation() {
         </div>
     );
 }
+
+export default SidebarNavigation;
