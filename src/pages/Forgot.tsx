@@ -3,7 +3,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { Mail, CircleAlert } from "lucide-react";
-import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -14,7 +13,7 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 const Forgot = () => {
   const {
     register,
-    handleSubmit, // ✅ from react-hook-form
+    handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
@@ -24,13 +23,13 @@ const Forgot = () => {
 
   const onSubmit = (data: LoginFormInputs) => {
     console.log("Login Data:", data);
-    toast.success("Your Password has been reset successfully");
-    navigate("/");
+    navigate("/verification");
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[40%]">
+        <img src="Logo.png" alt="logo" />
         <img className="w-full" src="login image.png" alt="" />
       </div>
       <div>
@@ -40,7 +39,6 @@ const Forgot = () => {
         <p className="text-[#475569] font-normal text-4 mt-[10px] mb-[48px] text-center">
           Enter your email and we’ll send you a password reset link.
         </p>
-        {/* ✅ fixed form submission */}
         <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Email Field */}
           <div className="mb-4">
@@ -65,7 +63,7 @@ const Forgot = () => {
               )}
             </div>
             {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
+              <p className="text-red-500 text-sm mt-2">{errors.email.message}</p>
             )}
           </div>
 
@@ -74,7 +72,7 @@ const Forgot = () => {
             type="submit"
             className="w-full cursor-pointer bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
-            Send Reset Password Link
+               Send Reset Password Link
           </button>
         </form>
       </div>
