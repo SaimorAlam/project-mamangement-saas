@@ -9,7 +9,7 @@ import AdminDashboard from "@/pages/Admin/AdminDashboard";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Forgot from "@/pages/Forgot";
-import Reset from "@/pages/ResetPassword"
+import Reset from "@/pages/ResetPassword";
 import EmailCode from "@/pages/EmailCode";
 import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
@@ -76,68 +76,65 @@ const routes = createBrowserRouter([
       },
       {
         path: "/verification",
-        element: <TwoStepVerification/>,
+        element: <TwoStepVerification />,
       },
       {
         path: "/emailcode",
-        element: <EmailCode/>,
+        element: <EmailCode />,
       },
       {
         path: "/admin",
         element: <AdminRoute />, // This will check if the user is an admin
         children: [
-          { 
+          {
             index: true,
-            path: "", 
-            element: <AdminDashboard /> 
+            path: "",
+            element: <AdminDashboard />,
           },
           {
-            path: "clients", 
-            element: <Clients />
+            path: "clients",
+            element: <Clients />,
           },
           {
-            path: "clients/:id", 
-            element: <SingleClient />
+            path: "clients/:id",
+            element: <SingleClient />,
           },
           {
-            path: "analytics", 
-            element: <Analytics />
+            path: "analytics",
+            element: <Analytics />,
           },
           {
-            path: "systemHealth", 
-            element: <SystemHealth />
+            path: "systemHealth",
+            element: <SystemHealth />,
           },
           {
-            path: "billings", 
-            element: <BillingsPlans />
+            path: "billings",
+            element: <BillingsPlans />,
           },
           {
-            path: "apiIntegration", 
-            element: <APIIntegrations />
+            path: "apiIntegration",
+            element: <APIIntegrations />,
           },
           {
-            path: "security", 
-            element: <SecurityPrivacy />
+            path: "security",
+            element: <SecurityPrivacy />,
           },
           {
-            path: "help", 
-            element: <Help />
+            path: "help",
+            element: <Help />,
           },
           {
-            path: "globalSettings", 
-            element: <GlobalSettings />
+            path: "globalSettings",
+            element: <GlobalSettings />,
           },
           {
-
-            path: "addClient", 
-            element: <AddClientForm />
-          }
-            path: "manage-billings", 
-            element: <ManageBillings />
+            path: "addClient",
+            element: <AddClientForm />,
           },
+          { path: "manage-billings", element: <ManageBillings /> },
           {
-            path: "Platform-Analytics-Overview", 
-            element: <PlatformAnalyticsOverview />
+            path: "Platform-Analytics-Overview",
+            element: <PlatformAnalyticsOverview />,
           },
         ],
       },
