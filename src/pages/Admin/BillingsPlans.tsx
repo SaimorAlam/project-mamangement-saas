@@ -1,385 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Eye, Edit2, ChevronDown, X } from 'lucide-react';
+import { ClientBilling } from '@/components/admin/ClientBillings/types/clientBilling';
+import { clientBillingService } from '@/components/admin/ClientBillings/services/clientBillingService'; 
 
-interface ClientBilling {
-    id: string;
-    clientId: string;
-    companyName: string;
-    companyLogo: string;
-    subscriptionPlan: string;
-    planType: 'Business' | 'Enterprise' | 'Professional' | 'Starter';
-    billingCycle: string;
-    renewsDate: string;
-    status: 'Active' | 'Suspended' | 'Trial' | 'Expired' | 'Pending';
-    paymentMethod?: string;
-}
-
-
-const initialClientBillings: ClientBilling[] = [
-    {
-        id: '1',
-        clientId: 'CLI001',
-        companyName: 'Acme Corporation',
-        companyLogo: '🅰️',
-        subscriptionPlan: 'Business Plus',
-        planType: 'Business',
-        billingCycle: 'Annually',
-        renewsDate: '25-Jun-2025',
-        status: 'Active',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '2',
-        clientId: 'CLI002',
-        companyName: 'Global Tech Solutions',
-        companyLogo: '🌐',
-        subscriptionPlan: 'Enterprise Elite',
-        planType: 'Enterprise',
-        billingCycle: 'Biennially',
-        renewsDate: '15-Aug-2026',
-        status: 'Suspended',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '3',
-        clientId: 'CLI003',
-        companyName: 'Tech Stark Industries',
-        companyLogo: '⚡',
-        subscriptionPlan: 'Professional Suite',
-        planType: 'Professional',
-        billingCycle: 'Monthly',
-        renewsDate: '05-Jul-2025',
-        status: 'Trial',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '4',
-        clientId: 'CLI004',
-        companyName: 'Next Gen Innovations',
-        companyLogo: '🚀',
-        subscriptionPlan: 'Business Standard',
-        planType: 'Business',
-        billingCycle: 'Quarterly',
-        renewsDate: '30-Sep-2025',
-        status: 'Expired',
-        paymentMethod: 'PayPal'
-    },
-    {
-        id: '5',
-        clientId: 'CLI005',
-        companyName: 'Softvence Ltd',
-        companyLogo: '💼',
-        subscriptionPlan: 'Starter Pack',
-        planType: 'Starter',
-        billingCycle: 'Monthly',
-        renewsDate: '12-Jul-2025',
-        status: 'Active',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '6',
-        clientId: 'CLI006',
-        companyName: 'Data Dynamics',
-        companyLogo: '📊',
-        subscriptionPlan: 'Enterprise Basic',
-        planType: 'Enterprise',
-        billingCycle: 'Annually',
-        renewsDate: '01-Jan-2026',
-        status: 'Active',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '7',
-        clientId: 'CLI007',
-        companyName: 'CloudScape Technologies',
-        companyLogo: '☁️',
-        subscriptionPlan: 'Professional Plus',
-        planType: 'Professional',
-        billingCycle: 'Semi-Annually',
-        renewsDate: '20-Nov-2025',
-        status: 'Active',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '8',
-        clientId: 'CLI008',
-        companyName: 'WebWorks Studio',
-        companyLogo: '💻',
-        subscriptionPlan: 'Starter',
-        planType: 'Starter',
-        billingCycle: 'Monthly',
-        renewsDate: '03-Jul-2025',
-        status: 'Trial',
-        paymentMethod: 'None'
-    },
-    {
-        id: '9',
-        clientId: 'CLI009',
-        companyName: 'InnoTech Systems',
-        companyLogo: '🔬',
-        subscriptionPlan: 'Business Pro',
-        planType: 'Business',
-        billingCycle: 'Annually',
-        renewsDate: '14-Oct-2025',
-        status: 'Suspended',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '10',
-        clientId: 'CLI010',
-        companyName: 'SecureNet Solutions',
-        companyLogo: '🔒',
-        subscriptionPlan: 'Enterprise Security',
-        planType: 'Enterprise',
-        billingCycle: 'Biennially',
-        renewsDate: '22-Dec-2026',
-        status: 'Active',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '11',
-        clientId: 'CLI011',
-        companyName: 'AppCraft Studios',
-        companyLogo: '📱',
-        subscriptionPlan: 'Professional Mobile',
-        planType: 'Professional',
-        billingCycle: 'Quarterly',
-        renewsDate: '08-Aug-2025',
-        status: 'Active',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '12',
-        clientId: 'CLI012',
-        companyName: 'DataMinds Analytics',
-        companyLogo: '📈',
-        subscriptionPlan: 'Business Intelligence',
-        planType: 'Business',
-        billingCycle: 'Annually',
-        renewsDate: '19-Sep-2025',
-        status: 'Active',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '13',
-        clientId: 'CLI013',
-        companyName: 'NetVantage Communications',
-        companyLogo: '📡',
-        subscriptionPlan: 'Starter',
-        planType: 'Starter',
-        billingCycle: 'Monthly',
-        renewsDate: '28-Jun-2025',
-        status: 'Expired',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '14',
-        clientId: 'CLI014',
-        companyName: 'FutureVision Tech',
-        companyLogo: '👁️',
-        subscriptionPlan: 'Enterprise Vision',
-        planType: 'Enterprise',
-        billingCycle: 'Biennially',
-        renewsDate: '05-May-2026',
-        status: 'Active',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '15',
-        clientId: 'CLI015',
-        companyName: 'CodeCraft Developers',
-        companyLogo: '⚒️',
-        subscriptionPlan: 'Professional Dev',
-        planType: 'Professional',
-        billingCycle: 'Monthly',
-        renewsDate: '15-Jul-2025',
-        status: 'Trial',
-        paymentMethod: 'None'
-    },
-    {
-        id: '16',
-        clientId: 'CLI016',
-        companyName: 'MarketGuru Solutions',
-        companyLogo: '📣',
-        subscriptionPlan: 'Business Marketing',
-        planType: 'Business',
-        billingCycle: 'Quarterly',
-        renewsDate: '10-Aug-2025',
-        status: 'Suspended',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '17',
-        clientId: 'CLI017',
-        companyName: 'ServiceSphere',
-        companyLogo: '🔄',
-        subscriptionPlan: 'Enterprise Support',
-        planType: 'Enterprise',
-        billingCycle: 'Annually',
-        renewsDate: '30-Nov-2025',
-        status: 'Active',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '18',
-        clientId: 'CLI018',
-        companyName: 'DesignHub Creatives',
-        companyLogo: '🎨',
-        subscriptionPlan: 'Professional Design',
-        planType: 'Professional',
-        billingCycle: 'Semi-Annually',
-        renewsDate: '22-Oct-2025',
-        status: 'Active',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '19',
-        clientId: 'CLI019',
-        companyName: 'LogiChain Solutions',
-        companyLogo: '📦',
-        subscriptionPlan: 'Business Logistics',
-        planType: 'Business',
-        billingCycle: 'Annually',
-        renewsDate: '07-Dec-2025',
-        status: 'Active',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '20',
-        clientId: 'CLI020',
-        companyName: 'HealthTech Innovations',
-        companyLogo: '🏥',
-        subscriptionPlan: 'Enterprise Health',
-        planType: 'Enterprise',
-        billingCycle: 'Biennially',
-        renewsDate: '18-Mar-2026',
-        status: 'Pending',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '21',
-        clientId: 'CLI021',
-        companyName: 'EduTech Learning',
-        companyLogo: '🎓',
-        subscriptionPlan: 'Professional Education',
-        planType: 'Professional',
-        billingCycle: 'Quarterly',
-        renewsDate: '25-Jul-2025',
-        status: 'Active',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '22',
-        clientId: 'CLI022',
-        companyName: 'FinTech Advisors',
-        companyLogo: '💰',
-        subscriptionPlan: 'Business Finance',
-        planType: 'Business',
-        billingCycle: 'Monthly',
-        renewsDate: '09-Aug-2025',
-        status: 'Suspended',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '23',
-        clientId: 'CLI023',
-        companyName: 'GreenTech Solutions',
-        companyLogo: '🌿',
-        subscriptionPlan: 'Enterprise Eco',
-        planType: 'Enterprise',
-        billingCycle: 'Annually',
-        renewsDate: '14-Feb-2026',
-        status: 'Active',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '24',
-        clientId: 'CLI024',
-        companyName: 'MediaMasters Studio',
-        companyLogo: '🎬',
-        subscriptionPlan: 'Professional Media',
-        planType: 'Professional',
-        billingCycle: 'Semi-Annually',
-        renewsDate: '03-Sep-2025',
-        status: 'Active',
-        paymentMethod: 'Credit Card'
-    },
-    {
-        id: '25',
-        clientId: 'CLI025',
-        companyName: 'RetailHub Solutions',
-        companyLogo: '🛒',
-        subscriptionPlan: 'Business Retail',
-        planType: 'Business',
-        billingCycle: 'Quarterly',
-        renewsDate: '28-Jul-2025',
-        status: 'Expired',
-        paymentMethod: 'PayPal'
-    },
-    {
-        id: '26',
-        clientId: 'CLI026',
-        companyName: 'TravelTech Adventures',
-        companyLogo: '✈️',
-        subscriptionPlan: 'Enterprise Travel',
-        planType: 'Enterprise',
-        billingCycle: 'Biennially',
-        renewsDate: '11-Nov-2026',
-        status: 'Active',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '27',
-        clientId: 'CLI027',
-        companyName: 'GameDev Studios',
-        companyLogo: '🎮',
-        subscriptionPlan: 'Professional Gaming',
-        planType: 'Professional',
-        billingCycle: 'Monthly',
-        renewsDate: '16-Jul-2025',
-        status: 'Trial',
-        paymentMethod: 'None'
-    },
-    {
-        id: '28',
-        clientId: 'CLI028',
-        companyName: 'LegalEase Solutions',
-        companyLogo: '⚖️',
-        subscriptionPlan: 'Business Legal',
-        planType: 'Business',
-        billingCycle: 'Annually',
-        renewsDate: '23-Oct-2025',
-        status: 'Active',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '29',
-        clientId: 'CLI029',
-        companyName: 'RealEstate Tech',
-        companyLogo: '🏠',
-        subscriptionPlan: 'Enterprise Property',
-        planType: 'Enterprise',
-        billingCycle: 'Biennially',
-        renewsDate: '30-Apr-2026',
-        status: 'Pending',
-        paymentMethod: 'Bank Transfer'
-    },
-    {
-        id: '30',
-        clientId: 'CLI030',
-        companyName: 'FoodTech Delights',
-        companyLogo: '🍕',
-        subscriptionPlan: 'Professional Food',
-        planType: 'Professional',
-        billingCycle: 'Quarterly',
-        renewsDate: '12-Aug-2025',
-        status: 'Active',
-        paymentMethod: 'Credit Card'
-    }
-];
 const ClientBillings: React.FC = () => {
-    const [clientBillings, setClientBillings] = useState<ClientBilling[]>(initialClientBillings);
-
+    const [clientBillings, setClientBillings] = useState<ClientBilling[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [planTypeFilter, setPlanTypeFilter] = useState<string>('Plan Type');
     const [statusFilter, setStatusFilter] = useState<string>('Status');
@@ -390,9 +15,26 @@ const ClientBillings: React.FC = () => {
     const [selectAll, setSelectAll] = useState<boolean>(false);
     const [editingClient, setEditingClient] = useState<ClientBilling | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const itemsPerPage = 11;
-    const totalItems = 500;
+
+    // Load initial data
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                setLoading(true);
+                const data = await clientBillingService.getClientBillings();
+                setClientBillings(data);
+            } catch (error) {
+                console.error('Error loading client billings:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadData();
+    }, []);
 
     // Filter clients based on search term and selected filters
     const filteredClients = useMemo(() => {
@@ -406,7 +48,7 @@ const ClientBillings: React.FC = () => {
             
             return matchesSearch && matchesPlan && matchesStatus;
         });
-    }, [searchTerm, planTypeFilter, statusFilter]);
+    }, [clientBillings, searchTerm, planTypeFilter, statusFilter]);
 
     // Calculate pagination
     const paginatedClients = useMemo(() => {
@@ -470,20 +112,28 @@ const ClientBillings: React.FC = () => {
         setIsEditModalOpen(true);
     };
 
-    const handleSaveEdit = () => {
+    const handleSaveEdit = async () => {
         if (editingClient) {
-            setClientBillings(prev =>
-                prev.map(client =>
-                    client.id === editingClient.id
-                        ? { ...client, ...editingClient }
-                        : client
-                )
-            );
+            try {
+                // Update the client in the service
+                await clientBillingService.updateClientBilling(editingClient);
+                
+                // Update local state
+                setClientBillings(prev =>
+                    prev.map(client =>
+                        client.id === editingClient.id
+                            ? { ...client, ...editingClient }
+                            : client
+                    )
+                );
+                
+                setIsEditModalOpen(false);
+                setEditingClient(null);
+            } catch (error) {
+                console.error('Error updating client:', error);
+            }
         }
-        setIsEditModalOpen(false);
-        setEditingClient(null);
     };
-
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         if (!editingClient) return;
@@ -496,6 +146,14 @@ const ClientBillings: React.FC = () => {
     };
 
     const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+                <div className="text-gray-600">Loading client billings...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
@@ -829,7 +487,7 @@ const ClientBillings: React.FC = () => {
 
             {/* Edit Modal */}
             {isEditModalOpen && editingClient && (
-                <div className="fixed inset-0 bg-opacity-60 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
                         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                             <h3 className="text-lg font-semibold text-gray-900">Edit Client Billing</h3>
