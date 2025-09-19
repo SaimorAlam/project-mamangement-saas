@@ -1,10 +1,4 @@
-// const GlobalSettings = () => {
-//   return (
-//     <div>Settings</div>
-//   )
-// }
 
-// export default GlobalSettings
 import React, { useState } from 'react';
 import { Upload, ChevronDown, Check, X } from 'lucide-react';
 
@@ -35,7 +29,7 @@ const LanguageSettingsPanel = () => {
   const weekDays = ['Sunday', 'Monday'];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen">
       <div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <h1 className="text-2xl font-semibold text-gray-900 mb-8">

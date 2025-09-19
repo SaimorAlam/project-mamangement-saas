@@ -1,20 +1,41 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { LoginData } from './dataService';
 
 interface AreaChartProps {
   data: LoginData;
   height?: number;
-  width?: number;
 }
 
-const AreaChart: React.FC<AreaChartProps> = ({ data, height = 350, width = 800 }) => {
+const AreaChart: React.FC<AreaChartProps> = ({ data, height = 350 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number>(800); // Initial fallback width
+
+  // Responsive: observe container width
+  useEffect(() => {
+    const observer = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        if (entry.contentRect.width) {
+          setWidth(entry.contentRect.width);
+        }
+      }
+    });
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const maxValue = Math.max(...data.series.flatMap(s => s.data));
   const padding = { top: 40, right: 40, bottom: 60, left: 80 };
-  
-  const xScale = (index: number) => 
+
+  const xScale = (index: number) =>
     (index / (data.months.length - 1)) * (width - padding.left - padding.right) + padding.left;
-  
-  const yScale = (value: number) => 
+
+  const yScale = (value: number) =>
     height - padding.bottom - (value / maxValue) * (height - padding.top - padding.bottom);
 
   const createPath = (points: number[]) => {
@@ -38,17 +59,27 @@ const AreaChart: React.FC<AreaChartProps> = ({ data, height = 350, width = 800 }
   };
 
   return (
-    <div className="w-full">
+    <div ref={containerRef} className="w-full">
+      {/* Legend */}
       <div className="flex items-center space-x-4 mb-4 text-xs">
         {data.series.map((series, index) => (
           <div key={index} className="flex items-center space-x-2">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: series.color }}></div>
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: series.color }}
+            ></div>
             <span className="text-gray-600">{series.name}</span>
           </div>
         ))}
       </div>
+
       <div className="relative">
-        <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`}>
+        <svg
+          width="100%"
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="none"
+        >
           {/* Grid lines */}
           {[0, 250, 500, 750, 1000, 1250, 1500, 1750].map((value, index) => (
             <g key={index}>
@@ -72,8 +103,8 @@ const AreaChart: React.FC<AreaChartProps> = ({ data, height = 350, width = 800 }
               </text>
             </g>
           ))}
-          
-          {/* Area fills */}
+
+          {/* Area Fills */}
           {data.series.map((series, index) => (
             <path
               key={`area-${index}`}
@@ -82,7 +113,7 @@ const AreaChart: React.FC<AreaChartProps> = ({ data, height = 350, width = 800 }
               fillOpacity="0.15"
             />
           ))}
-          
+
           {/* Lines */}
           {data.series.map((series, index) => (
             <path
@@ -93,8 +124,8 @@ const AreaChart: React.FC<AreaChartProps> = ({ data, height = 350, width = 800 }
               strokeWidth="2.5"
             />
           ))}
-          
-          {/* X-axis labels */}
+
+          {/* X-axis Labels */}
           {data.months.map((month, index) => (
             <text
               key={index}
