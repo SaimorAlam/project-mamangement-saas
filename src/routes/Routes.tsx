@@ -24,12 +24,10 @@ import APIIntegrations from "@/pages/Admin/APIIntegrations";
 import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
 import GlobalSettings from "@/pages/Admin/GlobalSettings";
 import { SingleClient } from "@/pages/Admin/SingleClient";
+import AddClientForm from "@/pages/Admin/AddClientForm/AddClientForm";
 import ManageBillings from "@/pages/Admin/ManageBillings";
 import PlatformAnalyticsOverview from "@/pages/Admin/Analytics";
 // import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
-
-
-
 
 const routes = createBrowserRouter([
   {
@@ -130,6 +128,10 @@ const routes = createBrowserRouter([
             element: <GlobalSettings />
           },
           {
+
+            path: "addClient", 
+            element: <AddClientForm />
+          }
             path: "manage-billings", 
             element: <ManageBillings />
           },
