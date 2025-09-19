@@ -156,8 +156,8 @@ const ClientBillings: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen ">
+            <div className="">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                     {/* Header */}
                     <div className="px-6 py-4 border-b border-gray-200">
@@ -487,7 +487,7 @@ const ClientBillings: React.FC = () => {
 
             {/* Edit Modal */}
             {isEditModalOpen && editingClient && (
-                <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
                         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                             <h3 className="text-lg font-semibold text-gray-900">Edit Client Billing</h3>
