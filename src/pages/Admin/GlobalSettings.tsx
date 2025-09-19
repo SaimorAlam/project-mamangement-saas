@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Upload, ChevronDown, Check, X } from 'lucide-react';
+import { useState } from 'react';
+import { Upload, ChevronDown } from 'lucide-react';
 
 const LanguageSettingsPanel = () => {
   const [defaultLanguage, setDefaultLanguage] = useState('English (US)');
