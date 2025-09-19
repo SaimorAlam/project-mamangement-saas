@@ -4,164 +4,220 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
+import type { FormData } from "@/types/form-types"
 
-export default function StepFive() {
-  const { register, watch, setValue } = useFormContext()
-  const enableUsageWarning = watch("enableUsageWarning")
-  const internalNotes = watch("internalNotes")
+export function StepFive() {
+  const { watch, setValue } = useFormContext<FormData>()
+  const formData = watch()
 
-  const billingCycles = [
-    { value: "Monthly", label: "Monthly", discount: null },
-    { value: "Half-Yearly", label: "Half-Yearly", discount: "Save up to 10% Annually" },
-    { value: "Yearly", label: "Yearly", discount: "Save 15% Annually" },
-    { value: "2-Yearly", label: "2-Yearly", discount: "Save 20% Annually" },
-    { value: "Enterprise", label: "Enterprise", discount: "Custom Billing" },
-  ]
+  const updateFormData = (data: Partial<FormData>) => {
+    Object.entries(data).forEach(([key, value]) => {
+      setValue(key as keyof FormData, value, { shouldValidate: true })
+    })
+  }
 
   return (
     <div className="space-y-8">
+      {/* Storage Configuration */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Storage Configuration</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
+        <h3 className="text-lg font-medium text-blue-600 mb-4">Storage Configuration</h3>
+        <div className="grid grid-cols-2 gap-6">
+          <div>
             <Label htmlFor="storageQuota">Storage Quota (GB) *</Label>
-            <div className="flex">
-              <Input id="storageQuota" {...register("storageQuota", { required: true })} className="rounded-r-none" />
-              <div className="bg-gray-100 border border-l-0 px-3 py-2 rounded-r text-sm text-gray-600">GB</div>
+            <div className="flex items-center gap-2 mt-1">
+              <Input
+                id="storageQuota"
+                placeholder="e.g 10 GB"
+                value={formData.storageQuota || ""}
+                onChange={(e) => updateFormData({ storageQuota: e.target.value })}
+              />
             </div>
           </div>
-
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="archiveAfter">Archive after (Days) *</Label>
-            <div className="flex">
-              <Input id="archiveAfter" {...register("archiveAfter", { required: true })} className="rounded-r-none" />
-              <div className="bg-gray-100 border border-l-0 px-3 py-2 rounded-r text-sm text-gray-600">days</div>
+            <div className="flex items-center gap-2 mt-1">
+              <Input
+                id="archiveAfter"
+                placeholder="e.g 90 days"
+                value={formData.archiveAfter || ""}
+                onChange={(e) => updateFormData({ archiveAfter: e.target.value })}
+              />
             </div>
           </div>
         </div>
 
-        <div className="mt-4">
-          <div className="flex items-center space-x-2">
+        <div className="mt-6">
+          <div className="flex items-center space-x-2 mb-4">
             <Switch
-              id="enableUsageWarning"
-              checked={enableUsageWarning}
-              onCheckedChange={(checked) => setValue("enableUsageWarning", checked)}
+              id="enableUsageWarningAlerts"
+              checked={formData.enableUsageWarningAlerts || false}
+              onCheckedChange={(checked) => updateFormData({ enableUsageWarningAlerts: checked })}
             />
-            <Label htmlFor="enableUsageWarning">Enable usage warning alerts</Label>
+            <Label htmlFor="enableUsageWarningAlerts">Enable usage warning alerts</Label>
           </div>
-          <p className="text-sm text-gray-600 mt-1">Send alert when client reaches 80% of capacity</p>
+          <p className="text-sm text-gray-600">Send alert when client reaches 80% of capacity</p>
+
+          <div className="mt-4">
+            <Label htmlFor="autoArchiveThreshold">Auto-Archive Threshold (%) *</Label>
+            <Input
+              id="autoArchiveThreshold"
+              placeholder="e.g 85%"
+              value={formData.autoArchiveThreshold || ""}
+              onChange={(e) => updateFormData({ autoArchiveThreshold: e.target.value })}
+              className="mt-1 max-w-xs"
+            />
+          </div>
         </div>
       </div>
 
+      {/* Billing Information */}
       <div>
         <h3 className="text-lg font-medium text-blue-600 mb-4">Billing Information</h3>
 
-        <div className="space-y-6">
-          <div>
-            <Label className="text-sm font-medium mb-3 block">Billing Cycle</Label>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-              {billingCycles.map((cycle) => (
-                <div
-                  key={cycle.value}
-                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                    watch("billingCycle") === cycle.value
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+        <div className="mb-6">
+          <Label>Billing Cycle</Label>
+          <div className="flex gap-2 mt-2">
+            {[
+              { value: "Monthly", label: "Monthly" },
+              { value: "Half-Yearly", label: "Half-Yearly", discount: "Save up to 10% Annually" },
+              { value: "Yearly", label: "Yearly", discount: "Save 15% Annually" },
+              { value: "2-Yearly", label: "2-Yearly", discount: "Save 20% Annually" },
+            ].map((option) => (
+              <div key={option.value} className="flex flex-col">
+                <button
+                  type="button"
+                  onClick={() => updateFormData({ billingCycle: option.value })}
+                  className={`px-4 py-2 rounded-md border text-sm font-medium ${
+                    formData.billingCycle === option.value
+                      ? "bg-blue-50 border-blue-500 text-blue-700"
+                      : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                   }`}
-                  onClick={() => setValue("billingCycle", cycle.value)}
                 >
-                  <div className="text-sm font-medium">{cycle.label}</div>
-                  {cycle.discount && (
-                    <Badge variant="secondary" className="text-xs mt-1 bg-green-100 text-green-700">
-                      {cycle.discount}
-                    </Badge>
-                  )}
-                </div>
-              ))}
+                  {option.label}
+                </button>
+                {option.discount && <span className="text-xs text-green-600 mt-1">{option.discount}</span>}
+              </div>
+            ))}
+          </div>
+          <div className="mt-2">
+            <button
+              type="button"
+              onClick={() => updateFormData({ billingCycle: "Enterprise" })}
+              className={`px-4 py-2 rounded-md border text-sm font-medium ${
+                formData.billingCycle === "Enterprise"
+                  ? "bg-blue-50 border-blue-500 text-blue-700"
+                  : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Enterprise
+            </button>
+            <span className="text-xs text-blue-600 ml-2">Custom Billing</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <Label htmlFor="subscriptionPlan">Subscription Plan *</Label>
+            <Select
+              value={formData.subscriptionPlan || ""}
+              onValueChange={(value) => updateFormData({ subscriptionPlan: value })}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select a plan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="basic">Basic Plan</SelectItem>
+                <SelectItem value="professional">Professional Plan</SelectItem>
+                <SelectItem value="enterprise">Enterprise Plan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="discountPromotion">Discount/Promotions</Label>
+            <Input
+              id="discountPromotion"
+              placeholder="Enter discount rate or promo code here"
+              value={formData.discountPromotion || ""}
+              onChange={(e) => updateFormData({ discountPromotion: e.target.value })}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label htmlFor="startBillingDate">Start Billing Date</Label>
+            <Input
+              id="startBillingDate"
+              type="date"
+              value={formData.startBillingDate || ""}
+              onChange={(e) => updateFormData({ startBillingDate: e.target.value })}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label htmlFor="trialPeriod">Trial Period</Label>
+            <div className="flex items-center gap-2 mt-1">
+              <Input
+                id="trialPeriod"
+                placeholder="e.g. 15 Days"
+                value={formData.trialPeriod || ""}
+                onChange={(e) => updateFormData({ trialPeriod: e.target.value })}
+              />
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label>Subscription Plan *</Label>
-              <Select value={watch("subscriptionPlan")} onValueChange={(value) => setValue("subscriptionPlan", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a plan" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="starter">Starter - $29/month</SelectItem>
-                  <SelectItem value="professional">Professional - $79/month</SelectItem>
-                  <SelectItem value="enterprise">Enterprise - $199/month</SelectItem>
-                  <SelectItem value="custom">Custom Plan</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Discount/Promotions</Label>
-              <Input placeholder="Enter discount rate or promo code here" {...register("discountCode")} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="startBillingDate">Start Billing Date</Label>
-              <Input id="startBillingDate" type="date" {...register("startBillingDate")} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="trialPeriod">Trial Period</Label>
-              <div className="flex">
-                <Input id="trialPeriod" {...register("trialPeriod")} className="rounded-r-none" />
-                <div className="bg-gray-100 border border-l-0 px-3 py-2 rounded-r text-sm text-gray-600">Days</div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Client's Preferred Payment Method *</Label>
-              <Select value={watch("paymentMethod")} onValueChange={(value) => setValue("paymentMethod", value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Stripe">Stripe</SelectItem>
-                  <SelectItem value="PayPal">PayPal</SelectItem>
-                  <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
-                  <SelectItem value="Invoice">Invoice</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Discount/Promotions</Label>
-              <Input placeholder="Enter discount rate or promo code here" {...register("discountCode")} />
-            </div>
+          <div>
+            <Label htmlFor="paymentMethod">Client's Preferred Payment Method *</Label>
+            <Select
+              value={formData.paymentMethod || ""}
+              onValueChange={(value) => updateFormData({ paymentMethod: value })}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Stripe">Stripe</SelectItem>
+                <SelectItem value="PayPal">PayPal</SelectItem>
+                <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                <SelectItem value="Credit Card">Credit Card</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="discountPromotionSecond">Discount/Promotions</Label>
+            <Input
+              id="discountPromotionSecond"
+              placeholder="Enter discount rate or promo code here"
+              value={formData.discountPromotion || ""}
+              onChange={(e) => updateFormData({ discountPromotion: e.target.value })}
+              className="mt-1"
+            />
           </div>
         </div>
       </div>
 
+      {/* Internal Notes */}
       <div>
         <div className="flex items-center space-x-2 mb-4">
           <Switch
-            id="internalNotes"
-            checked={internalNotes}
-            onCheckedChange={(checked) => setValue("internalNotes", checked)}
+            id="internalNotesEnabled"
+            checked={formData.internalNotesEnabled || false}
+            onCheckedChange={(checked) => updateFormData({ internalNotesEnabled: checked })}
           />
-          <Label htmlFor="internalNotes">Internal Notes</Label>
+          <Label htmlFor="internalNotesEnabled">Internal Notes</Label>
         </div>
 
-        {internalNotes && (
+        {formData.internalNotesEnabled && (
           <div>
-            <h4 className="text-blue-600 font-medium mb-3">Internal Notes for Admin only</h4>
-            <div className="space-y-2">
+            <h4 className="text-blue-600 font-medium mb-2">Internal Notes for Admin only</h4>
+            <div>
               <Label htmlFor="adminNote">Admin Note</Label>
               <Textarea
                 id="adminNote"
                 placeholder="e.g. Custom instance setup required for this client."
+                value={formData.adminNote || ""}
+                onChange={(e) => updateFormData({ adminNote: e.target.value })}
+                className="mt-1"
                 rows={4}
-                {...register("adminNote")}
               />
-              <p className="text-xs text-gray-500">Not visible to client</p>
+              <p className="text-xs text-gray-500 mt-1">Not visible to client</p>
             </div>
           </div>
         )}
