@@ -27,7 +27,8 @@ export default function SidebarNavigation() {
     return (
         <div className="w-64 h-screen bg-white flex flex-col fixed top-0">
             <div className="p-4 mt-5">
-                <h3 className="text-sm font-medium text-gray-500 mb-3">Main Menu</h3>
+                <img src="/sitelogo.png" />
+                <h3 className="text-sm font-medium text-gray-500 mb-3 mt-10">Main Menu</h3>
                 <div className="space-y-2">
                     <NavLink
                         to="/admin"
