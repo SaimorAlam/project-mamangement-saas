@@ -1,4 +1,3 @@
-import React from 'react'
 import { MessageSquareText, Mail  } from 'lucide-react';
 
 const TwoStepVerification = () => {
