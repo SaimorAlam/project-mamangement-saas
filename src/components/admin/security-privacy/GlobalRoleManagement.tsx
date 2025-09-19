@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Search } from 'lucide-react';
+import { X, Search, Save } from 'lucide-react';
 
 interface Permission {
   module: string;
@@ -77,7 +77,7 @@ const GlobalRoleManagement: React.FC = () => {
   }> = ({ checked, onChange }) => (
     <button
       onClick={onChange}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none cursor-pointer focus:ring-offset-2 ${
         checked ? 'bg-blue-600' : 'bg-gray-300'
       }`}
     >
@@ -92,17 +92,17 @@ const GlobalRoleManagement: React.FC = () => {
   return (
     <div>
       {/* Main Table View */}
-      <div className="bg-white rounded-lg border border-gray-200">
+      <div className="bg-white rounded-lg border border-gray-200 mt-8">
         <div className="flex items-center justify-between p-4 border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Template Global role management</h2>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsOpen(true)}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none cursor-pointer"
             >
               Edit Template
             </button>
-            <select className="px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <select className="px-3 py-2 border border-gray-300 focus:outline-none rounded-md text-sm cursor-pointer">
               <option>Industry</option>
             </select>
           </div>
@@ -177,8 +177,8 @@ const GlobalRoleManagement: React.FC = () => {
 
       {/* Popup Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-[80%] mx-4 max-h-[90vh] overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">Edit Template global role</h3>
@@ -186,19 +186,35 @@ const GlobalRoleManagement: React.FC = () => {
                 onClick={() => setIsOpen(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                <X size={24} />
+                <X size={24} className='cursor-pointer'/>
               </button>
             </div>
 
             {/* Content */}
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
               <div className="mb-6">
+              <div className='border border-gray-200 rounded-md p-6'>
+                  <div className='flex justify-between items-center mb-8'>
+                    <h4 className="text-[24px] font-medium text-gray-900">Template Global role management</h4>
+                    {/* Search Box */}
+                    <div className="relative flex justify-end">
+                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <Search className="h-5 w-5 text-gray-400 "/>
+                     </div>
+                    <input
+                      type="text"
+                      placeholder="Search module..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 sm:text-sm"
+                    />
+                  </div>
+                </div>
 
                 {/* Permissions Grid */}
-                <div className="space-y-4">
-                <h4 className="text-base font-medium text-gray-900 mb-12">Template Global role management</h4>
-                  <div className="grid grid-cols-5 gap-4 pb-3 border-b border-gray-200">
-                    <div className="font-medium text-gray-700">Module</div>
+                <div className="space-y-4 border border-gray-200 rounded-md">
+                  <div className="grid grid-cols-5 gap-4 py-3 border-b border-t border-gray-200 bg-gray-100">
+                    <div className="font-medium text-gray-700 ml-4">Module</div>
                     <div className="font-medium text-gray-700 text-center">Platform Admin</div>
                     <div className="font-medium text-gray-700 text-center">Client Admin</div>
                     <div className="font-medium text-gray-700 text-center">Staff</div>
@@ -208,8 +224,8 @@ const GlobalRoleManagement: React.FC = () => {
                   {filteredPermissions.map((permission, index) => {
                     const originalIndex = permissions.findIndex(p => p.module === permission.module);
                     return (
-                      <div key={permission.module} className="grid grid-cols-5 gap-4 py-3 items-center border-b border-gray-100">
-                        <div className="text-sm text-gray-900">{permission.module}</div>
+                      <div key={permission.module} className="grid grid-cols-5 gap-4 pb-3 items-center border-b border-gray-100">
+                        <div className="text-sm text-gray-900 ml-4">{permission.module}</div>
                         <div className="flex justify-center">
                           <ToggleSwitch
                             checked={permission.platformAdmin}
@@ -238,13 +254,14 @@ const GlobalRoleManagement: React.FC = () => {
                     );
                   })}
                 </div>
+              </div>
 
                 {/* Warning Message */}
                 <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                  <div className="flex">
+                  <div className="flex justify-center">
                     <div className="ml-3">
                       <p className="text-sm text-yellow-800">
-                        ⚠️ Changes to the global role template will override any client-specific settings. This may affect existing user permissions across the platform.
+                        ⚠️ Changes to the global role template will override any client-specific settings. This may affect existinguser permissions across the platform.
                       </p>
                     </div>
                   </div>
@@ -256,15 +273,18 @@ const GlobalRoleManagement: React.FC = () => {
             <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveChanges}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none cursor-pointer"
               >
-                Save Changes
+                <span className='flex items-center gap-1.5'>
+                  <Save />  
+                  Save Changes
+                </span>
               </button>
             </div>
           </div>
