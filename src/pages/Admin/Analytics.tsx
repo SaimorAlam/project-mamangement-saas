@@ -6,11 +6,7 @@ import DonutChart from '../../components/admin/analytics/DonutChart';
 import BarChart from '../../components/admin/analytics/BarChart';
 
 const AnalyticsDashboard: React.FC = () => {
-  const [sortBy, setSortBy] = useState('Sort By');
-  const [industry, setIndustry] = useState('Industry');
-  const [thisMonth, setThisMonth] = useState('This Month');
   const [showLivesOnly, setShowLivesOnly] = useState(true);
-  const [selectedCompany, setSelectedCompany] = useState('Select Multiple Company');
   
   const [trendingData, setTrendingData] = useState<TrendingIndustry[]>([]);
   const [chartUsageData, setChartUsageData] = useState<{ chartUsages: ChartUsage[]; totalUsage: number }>({ chartUsages: [], totalUsage: 0 });
@@ -70,8 +66,7 @@ const AnalyticsDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen">
         <div className="grid grid-cols-12 gap-6">
           {/* Left Section - Trending Industries */}
           <div className="col-span-6">
@@ -81,7 +76,7 @@ const AnalyticsDashboard: React.FC = () => {
                   <h2 className="text-lg font-semibold text-gray-900">Trending Industries</h2>
                   <div className="relative">
                     <button className="flex items-center space-x-2 px-3 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50">
-                      <span>{sortBy}</span>
+                      <span>Sort By</span>
                       <ChevronDown className="w-4 h-4" />
                     </button>
                   </div>
@@ -145,11 +140,11 @@ const AnalyticsDashboard: React.FC = () => {
                   <h2 className="text-lg font-semibold text-gray-900">Chart Usages</h2>
                   <div className="flex items-center space-x-2">
                     <button className="flex items-center space-x-1 px-3 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50">
-                      <span>{industry}</span>
+                      <span>Industry</span>
                       <ChevronDown className="w-4 h-4" />
                     </button>
                     <button className="flex items-center space-x-1 px-3 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50">
-                      <span>{thisMonth}</span>
+                      <span>This Month</span>
                       <ChevronDown className="w-4 h-4" />
                     </button>
                   </div>
@@ -200,7 +195,7 @@ const AnalyticsDashboard: React.FC = () => {
                   <h2 className="text-lg font-semibold text-gray-900">Logins Over Time</h2>
                   <button className="flex items-center space-x-2 px-3 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50">
                     <User className="w-4 h-4" />
-                    <span>{selectedCompany}</span>
+                    <span>Select Multiple Company</span>
                     <ChevronDown className="w-4 h-4" />
                   </button>
                 </div>
@@ -267,7 +262,6 @@ const AnalyticsDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

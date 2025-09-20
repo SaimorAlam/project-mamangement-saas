@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Search, Bell, Download, ChevronDown, X } from "lucide-react"
+import { Search, Bell, Download, ChevronDown, X, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -7,11 +7,21 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { useSelector } from "react-redux"
 import { RootState } from "@/store/store"
-import { useLocation } from "react-router-dom"
+import { NavLink, useLocation } from "react-router-dom"
+import Swal from 'sweetalert2'
+import Breadcrumbs from "./Breadcumbs"
 
 const AdminTopBar = () => {
     const user = useSelector((state: RootState) => state.auth.user)
     const location = useLocation();
+    function downloadFile(filePath:string, fileName:string) {
+        const a = document.createElement("a");
+        a.href = filePath;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
     const mockNotifications = [
         {
             id: 1,
@@ -65,8 +75,16 @@ const AdminTopBar = () => {
     const unreadCount = notifications.filter((n) => n.unread).length
 
     const handleExport = () => {
-        console.log("Exporting dashboard data")
-        alert("Exporting dashboard data...")
+        Swal.fire({
+            title: "Exported Successfully.",
+            icon: "success",
+            draggable: true,
+            confirmButtonText: "Download Now"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                downloadFile("/download.pdf","download.pdf");
+            }
+        })
     }
     const isSingleClientRoute = location.pathname.startsWith("/admin/clients");
     return (
@@ -172,12 +190,12 @@ const AdminTopBar = () => {
                         {/* Time Period Selector */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild className="cursor-pointer">
-                                <Button className="gap-2 bg-transparent border border-gray-100 text-gray-600 cursor-pointer">
+                                <Button className="gap-2 bg-white border border-gray-100 text-gray-600 cursor-pointer">
                                     {selectedPeriod}
                                     <ChevronDown className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="border-gray-100 cursor-pointer">
+                            <DropdownMenuContent align="end" className="border-gray-100 bg-white cursor-pointer">
                                 <DropdownMenuItem className="cursor-pointer text-gray-600" onClick={() => setSelectedPeriod("Last 24 Hours")}>Last 24 Hours</DropdownMenuItem>
                                 <DropdownMenuItem className="cursor-pointer text-gray-600" onClick={() => setSelectedPeriod("Last 1 Week")}>Last 1 Week</DropdownMenuItem>
                                 <DropdownMenuItem className="cursor-pointer text-gray-600" onClick={() => setSelectedPeriod("Last 1 Month")}>Last 1 Month</DropdownMenuItem>
@@ -188,10 +206,12 @@ const AdminTopBar = () => {
 
                         {/* Export Button */}
                         {isSingleClientRoute ?
-                            <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-gray-200 cursor-pointer transition-[300ms]" onClick={handleExport}>
-                                <Download className="h-4 w-4" />
-                                Add Client
-                            </Button>
+                            <NavLink to="/admin/addClient">
+                                <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white cursor-pointer transition-[300ms]">
+                                    <Plus className="h-4 w-4 text-white" />
+                                    Add Client
+                                </Button>
+                            </NavLink>
                             :
                             <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-gray-200 cursor-pointer transition-[300ms]" onClick={handleExport}>
                                 <Download className="h-4 w-4" />
@@ -203,7 +223,7 @@ const AdminTopBar = () => {
 
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-sm">
-                    <span className="text-blue-500 font-medium">🏠 Home</span>
+                    <Breadcrumbs />
                 </div>
             </div>
         </>

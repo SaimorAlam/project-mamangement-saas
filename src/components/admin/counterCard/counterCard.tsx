@@ -1,4 +1,11 @@
-const CounterCard = ({image, title, count}) => {
+interface CounterCardProps{
+    image: string,
+    title:string,
+    count:string
+}
+
+
+const CounterCard = ({image, title, count}:CounterCardProps) => {
     return (
         <div className="border border-gray-200 rounded-xl p-5 w-full">
             <div className="flex items-center gap-3">

@@ -4,9 +4,14 @@ import { Button } from "@/components/ui/button";
 import { LayoutGrid, Table, Filter } from "lucide-react";
 import BoardCustomerInsight from "@/components/admin/boardCustomerInsight/boardCustomerInsight";
 import TableCustomerInsight from "@/components/admin/tableCustomerInsight/tableCustomerInsight";
+import { ClientData } from "@/types/client";
 
-const Clients = () => {
-  const [customers, setCustomers] = useState([])
+interface Clientdata {
+  customer?: ClientData
+}
+
+const Clients:React.FC<Clientdata> = () => {
+  const [customers, setCustomers] = useState<ClientData[]>([]);
   fetch("/customerData.json")
     .then(res => res.json())
     .then(data => {

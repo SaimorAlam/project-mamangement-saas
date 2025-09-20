@@ -5,8 +5,13 @@ import { cn } from "@/lib/utils"
 import { ProgressBar } from "@/components/ui/ProgressBarCustom"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
+import { ClientData } from "@/types/client"
 
-const BoardCustomerInsight: React.FC<{ customer }> = ({ customer }) => {
+interface CustomerProps {
+    customer: ClientData
+}
+
+const BoardCustomerInsight: React.FC<CustomerProps> = ({ customer }) => {
     const statusColors = {
         Active: "bg-emerald-100 text-emerald-700 border-emerald-200",
         Suspended: "bg-red-100 text-red-700 border-red-200",
@@ -17,11 +22,6 @@ const BoardCustomerInsight: React.FC<{ customer }> = ({ customer }) => {
     const alertColors = {
         Critical: "text-red-600",
         Warning: "text-yellow-600",
-    }
-
-    const handleViewClient = (companyName: string) => {
-        console.log("[v0] Viewing client:", companyName)
-        alert(`Viewing ${companyName} details`)
     }
     return (
         <Card key={customer.id} className="border-0 shadow-sm">
@@ -89,8 +89,7 @@ const BoardCustomerInsight: React.FC<{ customer }> = ({ customer }) => {
                     </div>
 
                     <Button
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                        onClick={() => handleViewClient(customer.companyName)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                     >
                         View Client
                     </Button>
