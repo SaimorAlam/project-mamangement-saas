@@ -2,10 +2,10 @@
 
 import { useFormContext } from "react-hook-form"
 import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import type { FormData } from "@/types/form-types"
+import { CustomCheckBox } from "@/components/ui/CustomCheckBox"
 
 export function StepOne() {
   const { control, watch } = useFormContext<FormData>()
@@ -15,15 +15,15 @@ export function StepOne() {
     <div className="space-y-8">
       {/* Company Information */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">Company Information</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">Company Information</h3>
         <div className="grid grid-cols-2 gap-6">
           <FormField
             control={control}
             name="clientName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Client Name *</FormLabel>
-                <Input placeholder="Enter Client company name" value={field.value} onChange={field.onChange} />
+                <FormLabel className="text-md">Client Name *</FormLabel>
+                <Input className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500" placeholder="Enter Client company name" value={field.value} onChange={field.onChange} />
                 <FormMessage />
               </FormItem>
             )}
@@ -34,8 +34,8 @@ export function StepOne() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email *</FormLabel>
-                <Input type="email" placeholder="Enter your email" value={field.value} onChange={field.onChange} />
+                <FormLabel className="text-md">Email *</FormLabel>
+                <Input className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500" type="email" placeholder="Enter your email" value={field.value} onChange={field.onChange} />
                 <FormMessage />
               </FormItem>
             )}
@@ -46,8 +46,8 @@ export function StepOne() {
             name="contactPersonName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Contact Person Name *</FormLabel>
-                <Input placeholder="Enter company contact person name" value={field.value} onChange={field.onChange} />
+                <FormLabel className="text-md">Contact Person Name *</FormLabel>
+                <Input className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500" placeholder="Enter company contact person name" value={field.value} onChange={field.onChange} />
                 <FormMessage />
               </FormItem>
             )}
@@ -58,16 +58,16 @@ export function StepOne() {
             name="phoneNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone number *</FormLabel>
+                <FormLabel className="text-md">Phone number *</FormLabel>
                 <div className="flex">
-                  <select className="px-3 py-2 border border-r-0 rounded-l-md bg-gray-50 text-sm">
+                  <select className="appearance-none px-3 py-1 border border-r-0 border-gray-300 rounded-l-md bg-gray-50 text-sm">
                     <option>US</option>
                   </select>
                   <Input
                     placeholder="+1 (555) 000-0000"
                     value={field.value}
                     onChange={field.onChange}
-                    className="rounded-l-none"
+                    className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 rounded-l-none"
                   />
                 </div>
                 <FormMessage />
@@ -80,26 +80,29 @@ export function StepOne() {
           control={control}
           name="isReferred"
           render={({ field }) => (
-            <FormItem className="flex items-center space-x-2 mt-6">
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-              <FormLabel>Client is referred by a partner or contact</FormLabel>
+            <FormItem className="flex items-center space-x-3 mt-6">
+              <CustomCheckBox checked={field.value} onChange={field.onChange} />
+              <FormLabel className="text-md font-medium text-gray-800">
+                Client is referred by a partner or contact
+              </FormLabel>
             </FormItem>
           )}
         />
+
       </div>
 
       {/* Referrer Information */}
       {isReferred && (
         <div>
-          <h3 className="text-lg font-medium text-blue-600 mb-4">Referrer Information</h3>
+          <h3 className="text-xl font-medium text-blue-600 mb-4">Referrer Information</h3>
           <div className="grid grid-cols-2 gap-6">
             <FormField
               control={control}
               name="referrerName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name *</FormLabel>
-                  <Input placeholder="Enter referrer name" value={field.value || ""} onChange={field.onChange} />
+                  <FormLabel className="text-md">Name *</FormLabel>
+                  <Input className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500" placeholder="Enter referrer name" value={field.value || ""} onChange={field.onChange} />
                   <FormMessage />
                 </FormItem>
               )}
@@ -110,12 +113,13 @@ export function StepOne() {
               name="referrerEmail"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-md">Email</FormLabel>
                   <Input
                     type="email"
                     placeholder="Enter referrer email"
                     value={field.value || ""}
                     onChange={field.onChange}
+                    className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
                   />
                   <FormMessage />
                 </FormItem>
@@ -127,16 +131,16 @@ export function StepOne() {
               name="referrerPhone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone number *</FormLabel>
+                  <FormLabel className="text-md">Phone number *</FormLabel>
                   <div className="flex">
-                    <select className="px-3 py-2 border border-r-0 rounded-l-md bg-gray-50 text-sm">
+                    <select className="appearance-none px-3 py-1 border border-gray-300 border-r-0 rounded-l-md bg-gray-50 text-sm">
                       <option>US</option>
                     </select>
                     <Input
                       placeholder="+1 (555) 000-0000"
                       value={field.value || ""}
                       onChange={field.onChange}
-                      className="rounded-l-none"
+                      className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 rounded-l-none"
                     />
                   </div>
                   <FormMessage />
@@ -149,12 +153,13 @@ export function StepOne() {
               name="howDidClientHear"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>How did this client hear about us?</FormLabel>
+                  <FormLabel className="text-md">How did this client hear about us?</FormLabel>
                   <Textarea
                     placeholder="e.g. Social Media, Google, Friend, etc"
                     value={field.value || ""}
                     onChange={field.onChange}
                     rows={3}
+                    className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
                   />
                   <p className="text-xs text-gray-500 mt-1">Not visible to client</p>
                   <FormMessage />

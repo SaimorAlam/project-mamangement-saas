@@ -3,13 +3,13 @@ import type React from "react"
 import { useFormContext } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Upload, TrendingUp, X } from "lucide-react"
 import { useState, useRef } from "react"
 import type { FormData } from "@/types/form-types"
+import { CustomCheckBox } from "@/components/ui/CustomCheckBox"
 
 export function StepTwo() {
   const { control, watch, setValue } = useFormContext<FormData>()
@@ -56,10 +56,10 @@ export function StepTwo() {
     <div className="space-y-8">
       {/* Client Branding */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">Client Branding</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">Client Branding</h3>
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <Label>Client logo *</Label>
+            <Label className="text-md">Client logo *</Label>
             <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative">
               {logoPreview ? (
                 <div className="relative">
@@ -102,7 +102,7 @@ export function StepTwo() {
             </div>
           </div>
           <div>
-            <Label>Favicon (Optional)</Label>
+            <Label className="text-md">Favicon (Optional)</Label>
             <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center relative">
               {faviconPreview ? (
                 <div className="relative">
@@ -152,14 +152,14 @@ export function StepTwo() {
             name="primaryBrandColor"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Primary brand color *</FormLabel>
+                <FormLabel className="text-md">Primary brand color *</FormLabel>
                 <div className="flex items-center gap-3">
-                  <Input value={field.value} onChange={field.onChange} className="w-24" />
+                  <Input value={field.value} onChange={field.onChange} className="w-24 border border-gray-300" />
                   <input
                     type="color"
                     value={field.value}
                     onChange={(e) => field.onChange(e.target.value)}
-                    className="w-16 h-10 rounded border cursor-pointer"
+                    className="w-16 h-10 rounded border border-gray-300 cursor-pointer"
                   />
                 </div>
                 <FormMessage />
@@ -172,14 +172,14 @@ export function StepTwo() {
             name="secondaryBrandColor"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Secondary brand color *</FormLabel>
+                <FormLabel className="text-md">Secondary brand color *</FormLabel>
                 <div className="flex items-center gap-3">
-                  <Input value={field.value} onChange={field.onChange} className="w-24" />
+                  <Input value={field.value} onChange={field.onChange} className="w-24 border border-gray-300" />
                   <input
                     type="color"
                     value={field.value}
                     onChange={(e) => field.onChange(e.target.value)}
-                    className="w-16 h-10 rounded border cursor-pointer"
+                    className="w-16 h-10 rounded border cursor-pointer border border-gray-300"
                   />
                 </div>
                 <FormMessage />
@@ -191,15 +191,15 @@ export function StepTwo() {
 
       {/* Viewer Panel Configuration */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">Viewer panel configuration</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">Viewer panel configuration</h3>
 
         <FormField
           control={control}
           name="showFooterInViewer"
           render={({ field }) => (
             <FormItem className="flex items-center space-x-2 mb-4">
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-              <FormLabel>Show footer in viewer panel</FormLabel>
+              <CustomCheckBox checked={field.value} onChange={field.onChange} />
+              <FormLabel className="text-md">Show footer in viewer panel</FormLabel>
             </FormItem>
           )}
         />
@@ -210,8 +210,8 @@ export function StepTwo() {
             name="customFooterText"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Custom footer text</FormLabel>
-                <Input value={field.value} onChange={field.onChange} />
+                <FormLabel className="text-md">Custom footer text</FormLabel>
+                <Input value={field.value} onChange={field.onChange} className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"/>
                 <FormMessage />
               </FormItem>
             )}
@@ -222,8 +222,8 @@ export function StepTwo() {
             name="supportContactLink"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Support contact link</FormLabel>
-                <Input value={field.value} onChange={field.onChange} />
+                <FormLabel className="text-md">Support contact link</FormLabel>
+                <Input value={field.value} onChange={field.onChange} className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"/>
                 <FormMessage />
               </FormItem>
             )}
@@ -233,9 +233,9 @@ export function StepTwo() {
 
       {/* Branding Preview */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">Branding preview</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">Branding preview</h3>
         <div className="grid grid-cols-2 gap-6">
-          <Card>
+          <Card className="border border-gray-300">
             <CardContent className="p-4">
               <h4 className="font-medium mb-3">Overview</h4>
               <div className="space-y-2">
@@ -245,14 +245,14 @@ export function StepTwo() {
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-4">
+          <Card className="border-gray-300">
+            <CardContent>
               <h4 className="font-medium mb-3">Statics</h4>
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded" style={{ backgroundColor: primaryColor }}>
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
-                <div>
+                <div className="ml-3">
                   <p className="font-semibold">Total Sales</p>
                   <p className="text-2xl font-bold">$2150k</p>
                   <p className="text-sm text-green-600">+15% ↗</p>

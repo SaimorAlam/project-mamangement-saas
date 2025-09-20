@@ -123,12 +123,29 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
     }
 
     return (
-      <p ref={ref} id={formMessageId} className={cn("text-sm font-medium text-destructive", className)} {...props}>
+      <p
+        ref={ref}
+        id={formMessageId}
+        className={cn(
+          "flex items-center gap-2 text-sm rounded-md border border-red-300 bg-red-50 p-2 text-red-700",
+          className
+        )}
+        {...props}
+      >
+        {/* Example error icon */}
+        <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 00-2 0v4a1 1 0 002 0V6zm0 8a1 1 0 11-2 0 1 1 0 012 0z"
+            clipRule="evenodd"
+          />
+        </svg>
         {body}
       </p>
     )
   },
 )
+
 FormMessage.displayName = "FormMessage"
 
 export { useFormField, Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField }

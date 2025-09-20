@@ -1,8 +1,8 @@
-import {StepOne} from "@/components/admin/addClientSteps/stepOne"
-import {StepTwo} from "@/components/admin/addClientSteps/stepTwo"
-import {StepThree} from "@/components/admin/addClientSteps/stepThree"
-import {StepFour} from "@/components/admin/addClientSteps/stepFour"
-import {StepFive} from "@/components/admin/addClientSteps/stepFive"
+import { StepOne } from "@/components/admin/addClientSteps/stepOne"
+import { StepTwo } from "@/components/admin/addClientSteps/stepTwo"
+import { StepThree } from "@/components/admin/addClientSteps/stepThree"
+import { StepFour } from "@/components/admin/addClientSteps/stepFour"
+import { StepFive } from "@/components/admin/addClientSteps/stepFive"
 import { useState } from "react"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { FormSubmissionSuccess } from "@/components/form-submission-success"
-import { FormDebugPanel } from "@/components/form-debug-panel"
 import { formSchema, type FormData } from "@/types/form-types"
 
 const steps = [
@@ -87,12 +86,8 @@ export default function MultiLevelForm() {
   const {
     handleSubmit,
     trigger,
-    watch,
     reset,
-    formState: { errors, isValid },
   } = methods
-
-  const watchedValues = watch()
 
   const nextStep = async () => {
     const fieldsToValidate = getFieldsForStep(currentStep)
@@ -196,24 +191,15 @@ export default function MultiLevelForm() {
               <p className="text-gray-600 mt-1">{steps[currentStep - 1].description}</p>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="border border-gray-600 text-gray-600 cursor-pointer transition-[200] hover:bg-blue-600 hover:border hover:border-blue-600 hover:text-white">
                 Save Draft
               </Button>
             </div>
           </div>
-
-          {/* Breadcrumb */}
-          <div className="flex items-center text-sm text-gray-500 mb-6">
-            <span>Home</span>
-            <span className="mx-2">›</span>
-            <span>Clients</span>
-            <span className="mx-2">›</span>
-            <span className="text-blue-600">Add Client</span>
-          </div>
-
-          <div className="relative mb-6">
+          {/* Steps Timeline */}
+          <div className="relative mt-10">
             {/* Connecting line */}
-            <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-200 z-0">
+            <div className="absolute top-6 left-5 right-5 h-0.5 bg-gray-200 -translate-y-1/2">
               <div
                 className="h-full bg-blue-600 transition-all duration-500 ease-in-out"
                 style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
@@ -221,17 +207,16 @@ export default function MultiLevelForm() {
             </div>
 
             {/* Steps */}
-            <div className="flex items-center justify-between relative z-10">
+            <div className="flex justify-between relative z-10">
               {steps.map((step) => (
-                <div key={step.id} className="flex flex-col items-center">
+                <div key={step.id} className="flex flex-col items-center w-20">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 shadow-sm ${
-                      currentStep > step.id
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 shadow-sm ${currentStep > step.id
                         ? "bg-blue-600 text-white shadow-blue-200"
                         : currentStep === step.id
                           ? "bg-blue-600 text-white shadow-blue-200 ring-4 ring-blue-100"
                           : "bg-white border-2 border-gray-300 text-gray-500"
-                    }`}
+                      }`}
                   >
                     {currentStep > step.id ? (
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -247,16 +232,14 @@ export default function MultiLevelForm() {
                   </div>
                   <div className="text-xs mt-3 text-center max-w-24">
                     <div
-                      className={`font-semibold leading-tight ${
-                        currentStep >= step.id ? "text-blue-600" : "text-gray-600"
-                      }`}
+                      className={`font-semibold leading-tight ${currentStep >= step.id ? "text-blue-600" : "text-gray-600"
+                        }`}
                     >
                       {step.title}
                     </div>
                     <div
-                      className={`text-xs mt-1 leading-tight ${
-                        currentStep >= step.id ? "text-blue-500" : "text-gray-500"
-                      }`}
+                      className={`text-xs mt-1 leading-tight ${currentStep >= step.id ? "text-blue-500" : "text-gray-500"
+                        }`}
                     >
                       {step.description.split(" ").slice(0, 3).join(" ")}...
                     </div>
@@ -266,31 +249,30 @@ export default function MultiLevelForm() {
             </div>
           </div>
 
+
           {/* Progress Bar */}
           <Progress value={progressPercentage} className="h-2" />
         </div>
 
         {/* Form Content */}
-        <Card>
+        <Card className="border border-gray-200 shadow-md">
           <CardContent className="p-8">{renderStep()}</CardContent>
         </Card>
 
         {/* Navigation */}
         <div className="flex justify-between mt-6">
-          <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1}>
+          <Button className="cursor-pointer" type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1}>
             {currentStep === 1 ? "Cancel" : "← Previous"}
           </Button>
 
           <Button
             type={currentStep === 5 ? "submit" : "button"}
             onClick={currentStep === 5 ? undefined : nextStep}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
           >
             {currentStep === 5 ? "Submit →" : "Next →"}
           </Button>
         </div>
-
-        <FormDebugPanel formData={watchedValues} errors={errors} currentStep={currentStep} isValid={isValid} />
       </form>
     </FormProvider>
   )
