@@ -20,6 +20,7 @@ import {
   Radar,
 } from "recharts"
 import type { FormData } from "@/types/form-types"
+import { CustomCheckBox } from "@/components/ui/CustomCheckBox"
 
 const columnData = [
   { name: "Mon", onTime: 60, absent: 20, late: 20 },
@@ -54,12 +55,11 @@ export function StepFour() {
     <div className="space-y-8">
       {/* Library Assignment */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">Library Assignment</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">Library Assignment</h3>
         <div className="flex items-center space-x-2 mb-4">
-          <Switch
-            id="enableCustomChartLibrary"
+          <CustomCheckBox
             checked={formData.enableCustomChartLibrary || false}
-            onCheckedChange={(checked) => setValue("enableCustomChartLibrary", checked)}
+            onChange={(checked) => setValue("enableCustomChartLibrary", checked)}
           />
           <Label htmlFor="enableCustomChartLibrary">Enable Custom chart library</Label>
         </div>
@@ -85,7 +85,7 @@ export function StepFour() {
         <h3 className="text-lg font-medium text-blue-600 mb-4">Chart render testing</h3>
         <div className="grid grid-cols-2 gap-4">
           {/* Column Chart */}
-          <Card>
+          <Card className="border border-gray-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium">Column Chart</h4>
@@ -117,7 +117,7 @@ export function StepFour() {
           </Card>
 
           {/* Bar Chart */}
-          <Card>
+          <Card className="border border-gray-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium">Bar Chart</h4>
@@ -147,7 +147,7 @@ export function StepFour() {
           </Card>
 
           {/* Radar Chart */}
-          <Card>
+          <Card className="border border-gray-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium">Radar Chart</h4>
@@ -183,7 +183,7 @@ export function StepFour() {
           </Card>
 
           {/* Doughnut Pie Charts */}
-          <Card>
+          <Card className="border border-gray-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium">Doughnut Pie Charts</h4>
@@ -199,15 +199,15 @@ export function StepFour() {
                 <span className="w-2 h-2 bg-yellow-500 rounded-full ml-2"></span>
                 <span>Organic traffic</span>
               </div>
-              <div className="h-32 relative">
+              <div className="h-40 relative">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={pieData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={25}
-                      outerRadius={45}
+                      innerRadius={40}
+                      outerRadius={80}
                       paddingAngle={2}
                       dataKey="value"
                     >
@@ -226,7 +226,7 @@ export function StepFour() {
           </Card>
 
           {/* Heatmap Chart */}
-          <Card className="col-span-2">
+          <Card className="col-span-2 border border-gray-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium">Heatmap chart</h4>
@@ -274,10 +274,9 @@ export function StepFour() {
       {/* Team Notification */}
       <div>
         <div className="flex items-center space-x-2 mb-4">
-          <Switch
-            id="notifyDevQATeam"
+          <CustomCheckBox
             checked={formData.notifyDevQATeam || false}
-            onCheckedChange={(checked) => setValue("notifyDevQATeam", checked)}
+            onChange={(checked) => setValue("notifyDevQATeam", checked)}
           />
           <Label htmlFor="notifyDevQATeam">Notify Dev / QA Team</Label>
         </div>
@@ -292,7 +291,7 @@ export function StepFour() {
               <SelectTrigger className="mt-1 max-w-xs">
                 <SelectValue placeholder="Select an employee" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 <SelectItem value="john-doe">John Doe</SelectItem>
                 <SelectItem value="jane-smith">Jane Smith</SelectItem>
                 <SelectItem value="mike-johnson">Mike Johnson</SelectItem>

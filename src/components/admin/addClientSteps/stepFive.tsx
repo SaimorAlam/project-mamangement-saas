@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import type { FormData } from "@/types/form-types"
+import { CustomCheckBox } from "@/components/ui/CustomCheckBox"
 
 export function StepFive() {
   const { watch, setValue } = useFormContext<FormData>()
@@ -20,27 +21,29 @@ export function StepFive() {
     <div className="space-y-8">
       {/* Storage Configuration */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">Storage Configuration</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">Storage Configuration</h3>
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <Label htmlFor="storageQuota">Storage Quota (GB) *</Label>
+            <Label className="text-md" htmlFor="storageQuota">Storage Quota (GB) *</Label>
             <div className="flex items-center gap-2 mt-1">
               <Input
                 id="storageQuota"
                 placeholder="e.g 10 GB"
                 value={formData.storageQuota || ""}
                 onChange={(e) => updateFormData({ storageQuota: e.target.value })}
+                className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
               />
             </div>
           </div>
           <div>
-            <Label htmlFor="archiveAfter">Archive after (Days) *</Label>
+            <Label className="text-md" htmlFor="archiveAfter">Archive after (Days) *</Label>
             <div className="flex items-center gap-2 mt-1">
               <Input
                 id="archiveAfter"
                 placeholder="e.g 90 days"
                 value={formData.archiveAfter || ""}
                 onChange={(e) => updateFormData({ archiveAfter: e.target.value })}
+                className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
               />
             </div>
           </div>
@@ -48,23 +51,22 @@ export function StepFive() {
 
         <div className="mt-6">
           <div className="flex items-center space-x-2 mb-4">
-            <Switch
-              id="enableUsageWarningAlerts"
+            <CustomCheckBox
               checked={formData.enableUsageWarningAlerts || false}
-              onCheckedChange={(checked) => updateFormData({ enableUsageWarningAlerts: checked })}
+              onChange={(checked) => updateFormData({ enableUsageWarningAlerts: checked })}
             />
-            <Label htmlFor="enableUsageWarningAlerts">Enable usage warning alerts</Label>
+            <Label className="text-md" htmlFor="enableUsageWarningAlerts">Enable usage warning alerts</Label>
           </div>
           <p className="text-sm text-gray-600">Send alert when client reaches 80% of capacity</p>
 
           <div className="mt-4">
-            <Label htmlFor="autoArchiveThreshold">Auto-Archive Threshold (%) *</Label>
+            <Label className="text-md" htmlFor="autoArchiveThreshold">Auto-Archive Threshold (%) *</Label>
             <Input
               id="autoArchiveThreshold"
               placeholder="e.g 85%"
               value={formData.autoArchiveThreshold || ""}
               onChange={(e) => updateFormData({ autoArchiveThreshold: e.target.value })}
-              className="mt-1 max-w-xs"
+              className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 mt-1 max-w-xs"
             />
           </div>
         </div>
@@ -72,7 +74,7 @@ export function StepFive() {
 
       {/* Billing Information */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">Billing Information</h3>
+        <h3 className="text-xl text-lg font-medium text-blue-600 mb-4">Billing Information</h3>
 
         <div className="mb-6">
           <Label>Billing Cycle</Label>
@@ -117,15 +119,15 @@ export function StepFive() {
 
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <Label htmlFor="subscriptionPlan">Subscription Plan *</Label>
+            <Label className="text-md" htmlFor="subscriptionPlan">Subscription Plan *</Label>
             <Select
               value={formData.subscriptionPlan || ""}
               onValueChange={(value) => updateFormData({ subscriptionPlan: value })}
             >
-              <SelectTrigger className="mt-1">
+              <SelectTrigger className="mt-1 border border-gray-300">
                 <SelectValue placeholder="Select a plan" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border-none">
                 <SelectItem value="basic">Basic Plan</SelectItem>
                 <SelectItem value="professional">Professional Plan</SelectItem>
                 <SelectItem value="enterprise">Enterprise Plan</SelectItem>
@@ -133,46 +135,47 @@ export function StepFive() {
             </Select>
           </div>
           <div>
-            <Label htmlFor="discountPromotion">Discount/Promotions</Label>
+            <Label className="text-md" htmlFor="discountPromotion">Discount/Promotions</Label>
             <Input
               id="discountPromotion"
               placeholder="Enter discount rate or promo code here"
               value={formData.discountPromotion || ""}
               onChange={(e) => updateFormData({ discountPromotion: e.target.value })}
-              className="mt-1"
+              className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 mt-1"
             />
           </div>
           <div>
-            <Label htmlFor="startBillingDate">Start Billing Date</Label>
+            <Label className="text-md" htmlFor="startBillingDate">Start Billing Date</Label>
             <Input
               id="startBillingDate"
               type="date"
               value={formData.startBillingDate || ""}
               onChange={(e) => updateFormData({ startBillingDate: e.target.value })}
-              className="mt-1"
+              className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 mt-2"
             />
           </div>
           <div>
-            <Label htmlFor="trialPeriod">Trial Period</Label>
-            <div className="flex items-center gap-2 mt-1">
+            <Label className="text-md" htmlFor="trialPeriod">Trial Period</Label>
+            <div className="flex items-center gap-2 mt-2">
               <Input
                 id="trialPeriod"
                 placeholder="e.g. 15 Days"
                 value={formData.trialPeriod || ""}
                 onChange={(e) => updateFormData({ trialPeriod: e.target.value })}
+                className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
               />
             </div>
           </div>
           <div>
-            <Label htmlFor="paymentMethod">Client's Preferred Payment Method *</Label>
+            <Label className="text-md" htmlFor="paymentMethod">Client's Preferred Payment Method *</Label>
             <Select
               value={formData.paymentMethod || ""}
               onValueChange={(value) => updateFormData({ paymentMethod: value })}
             >
-              <SelectTrigger className="mt-1">
+              <SelectTrigger className="mt-2 border border-gray-300">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border-none">
                 <SelectItem value="Stripe">Stripe</SelectItem>
                 <SelectItem value="PayPal">PayPal</SelectItem>
                 <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
@@ -181,13 +184,13 @@ export function StepFive() {
             </Select>
           </div>
           <div>
-            <Label htmlFor="discountPromotionSecond">Discount/Promotions</Label>
+            <Label className="text-md" htmlFor="discountPromotionSecond">Discount/Promotions</Label>
             <Input
               id="discountPromotionSecond"
               placeholder="Enter discount rate or promo code here"
               value={formData.discountPromotion || ""}
               onChange={(e) => updateFormData({ discountPromotion: e.target.value })}
-              className="mt-1"
+              className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 mt-2"
             />
           </div>
         </div>
@@ -196,17 +199,16 @@ export function StepFive() {
       {/* Internal Notes */}
       <div>
         <div className="flex items-center space-x-2 mb-4">
-          <Switch
-            id="internalNotesEnabled"
+          <CustomCheckBox
             checked={formData.internalNotesEnabled || false}
-            onCheckedChange={(checked) => updateFormData({ internalNotesEnabled: checked })}
+            onChange={(checked) => updateFormData({ internalNotesEnabled: checked })}
           />
           <Label htmlFor="internalNotesEnabled">Internal Notes</Label>
         </div>
 
         {formData.internalNotesEnabled && (
           <div>
-            <h4 className="text-blue-600 font-medium mb-2">Internal Notes for Admin only</h4>
+            <h4 className="text-blue-600 font-medium mb-2 text-md">Internal Notes for Admin only</h4>
             <div>
               <Label htmlFor="adminNote">Admin Note</Label>
               <Textarea
@@ -214,7 +216,7 @@ export function StepFive() {
                 placeholder="e.g. Custom instance setup required for this client."
                 value={formData.adminNote || ""}
                 onChange={(e) => updateFormData({ adminNote: e.target.value })}
-                className="mt-1"
+                className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 mt-2"
                 rows={4}
               />
               <p className="text-xs text-gray-500 mt-1">Not visible to client</p>

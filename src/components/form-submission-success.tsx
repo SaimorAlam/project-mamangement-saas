@@ -10,6 +10,7 @@ interface FormSubmissionSuccessProps {
 }
 
 export function FormSubmissionSuccess({ formData, onStartOver, onGoHome }: FormSubmissionSuccessProps) {
+  console.log(formData)
   const handleDownloadSummary = () => {
     const summary = {
       submissionDate: new Date().toISOString(),
@@ -38,7 +39,7 @@ export function FormSubmissionSuccess({ formData, onStartOver, onGoHome }: FormS
         {/* Success Icon and Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-6">
-            <CheckCircle className="w-12 h-12 text-primary" />
+            <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
           <h1 className="text-4xl font-bold text-foreground mb-4 text-balance">Congratulations!</h1>
           <p className="text-xl text-muted-foreground text-balance">
@@ -47,7 +48,7 @@ export function FormSubmissionSuccess({ formData, onStartOver, onGoHome }: FormS
         </div>
 
         {/* Success Details Card */}
-        <Card className="mb-8 border-primary/20 shadow-lg">
+        <Card className="mb-8 border border-gray-100 shadow-lg">
           <CardContent className="p-8">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
@@ -110,15 +111,15 @@ export function FormSubmissionSuccess({ formData, onStartOver, onGoHome }: FormS
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button onClick={handleDownloadSummary} variant="outline" className="flex items-center gap-2 bg-transparent">
+          <Button onClick={handleDownloadSummary} variant="outline" className="flex items-center gap-2 bg-transparent cursor-pointer">
             <Download className="w-4 h-4" />
             Download Summary
           </Button>
-          <Button onClick={onStartOver} variant="outline" className="flex items-center gap-2 bg-transparent">
+          <Button onClick={onStartOver} variant="outline" className="flex items-center gap-2 bg-transparent cursor-pointer">
             <RefreshCw className="w-4 h-4" />
             Submit Another Form
           </Button>
-          <Button onClick={onGoHome} className="flex items-center gap-2">
+          <Button onClick={onGoHome} className="flex items-center gap-2 cursor-pointer">
             <Home className="w-4 h-4" />
             Go to Dashboard
           </Button>
