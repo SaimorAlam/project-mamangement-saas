@@ -23,11 +23,6 @@ const BoardCustomerInsight: React.FC<CustomerProps> = ({ customer }) => {
         Critical: "text-red-600",
         Warning: "text-yellow-600",
     }
-
-    const handleViewClient = (companyName: string) => {
-        console.log("[v0] Viewing client:", companyName)
-        alert(`Viewing ${companyName} details`)
-    }
     return (
         <Card key={customer.id} className="border-0 shadow-sm">
             <Link to={`/admin/clients/${customer.id}`}>
@@ -94,8 +89,7 @@ const BoardCustomerInsight: React.FC<CustomerProps> = ({ customer }) => {
                     </div>
 
                     <Button
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                        onClick={() => handleViewClient(customer.companyName)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                     >
                         View Client
                     </Button>
