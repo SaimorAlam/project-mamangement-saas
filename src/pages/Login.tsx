@@ -25,7 +25,7 @@ const Login = () => {
 
   const onSubmit = (data: LoginFormInputs) => {
     console.log("Login Data:", data);
-    navigate("/");
+    navigate("/admin");
   };
 
 const [password, setPassword] = useState('');

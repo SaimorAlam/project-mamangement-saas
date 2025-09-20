@@ -3,39 +3,39 @@ import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-[#212a31] text-white py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="bg-white shadow-2xl text-white py-8">
+      <div className="max-w-7xl mx-auto pt-8 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About Section */}
           <div>
-            <h3 className="text-lg font-bold mb-4">About Us</h3>
-            <p className="text-sm">
+            <h3 className="text-lg font-bold pb-4 w-[30%] text-black border-b-2 border-blue-500">About Us</h3>
+            <p className="text-sm mt-4 text-black w-[75%]">
               We are a team of passionate developers building amazing web
               applications with modern technologies.
             </p>
           </div>
 
           {/* Quick Links Section */}
-          <div>
-            <h3 className="text-lg font-bold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
+          <div className="text-black">
+            <h3 className="text-lg font-bold pb-4 w-[40%] border-b-2 border-blue-500">Quick Links</h3>
+            <ul className="space-y-2 mt-4">
               <li>
-                <a href="/" className="hover:text-gray-300">
+                <a href="/" className="hover:text-blue-500 duration-300">
                   Home
                 </a>
               </li>
               <li>
-                <a href="/about" className="hover:text-gray-300">
+                <a href="/about" className="hover:text-blue-500 duration-300">
                   About
                 </a>
               </li>
               <li>
-                <a href="/services" className="hover:text-gray-300">
+                <a href="/services" className="hover:text-blue-500 duration-300">
                   Services
                 </a>
               </li>
               <li>
-                <a href="/contact" className="hover:text-gray-300">
+                <a href="/contact" className="hover:text-blue-500 duration-300">
                   Contact
                 </a>
               </li>
@@ -43,14 +43,14 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Social Media Section */}
-          <div>
-            <h3 className="text-lg font-bold mb-4">Follow Us</h3>
-            <div className="flex space-x-4">
+          <div className="text-black">
+            <h3 className="text-lg pb-4 w-[30%] font-bold mb-4 border-b-2 border-blue-500">Follow Us</h3>
+            <div className="flex space-x-4 mt-4">
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gray-300"
+                className="hover:text-blue-500 duration-300"
               >
                 <FaFacebook size={24} />
               </a>
@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gray-300"
+                className="hover:text-blue-500 duration-300"
               >
                 <FaTwitter size={24} />
               </a>
@@ -66,7 +66,7 @@ const Footer: React.FC = () => {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gray-300"
+                className="hover:text-red-400 duration-300"
               >
                 <FaInstagram size={24} />
               </a>
@@ -74,7 +74,7 @@ const Footer: React.FC = () => {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gray-300"
+                className="hover:text-blue-500 duration-300"
               >
                 <FaLinkedin size={24} />
               </a>
@@ -82,8 +82,8 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Newsletter Section */}
-          <div>
-            <h3 className="text-lg font-bold mb-4">Newsletter</h3>
+          <div className="text-black">
+            <h3 className="text-lg font-bold pb-4 w-[30%] mb-4 border-b-2 border-blue-500">Newsletter</h3>
             <p className="text-sm mb-4">
               Subscribe to our newsletter to get the latest updates.
             </p>
@@ -91,11 +91,11 @@ const Footer: React.FC = () => {
               <input
                 type="email"
                 placeholder="Your email"
-                className="p-2 mr-2 rounded-md border-1 border-white  text-white focus:outline-none"
+                className="p-2 mr-2 rounded-md border-1 border-black  text-black focus:outline-none"
               />
               <button
                 type="submit"
-                className="bg-[#124e66] text-[#d3d9d4] px-4 rounded-md hover:bg-[#124e66]/50"
+                className="bg-blue-100 text-blue-500 px-4 rounded-md hover:bg-blue-500 hover:text-white duration-300 cursor-pointer"
               >
                 Subscribe
               </button>
@@ -104,7 +104,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Copyright Section */}
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center">
+        <div className="border-t border-gray-300 text-gray-600 mt-8 pt-8 text-center">
           <p className="text-sm">
             &copy; {new Date().getFullYear()} Sazzad Mahim. All rights reserved.
           </p>
