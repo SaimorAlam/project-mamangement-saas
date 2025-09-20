@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
                 to="/login"
                 className="text-blue-500 bg-blue-100 hover:bg-blue-500 hover:text-white duration-300 px-3 py-2 rounded-md text-sm font-medium"
               >
-                Accoutnt
+                Account
               </Link>
             </div>
           </div>
