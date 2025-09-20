@@ -35,7 +35,7 @@ export function SupportTicketsChart() {
                   dataKey="value"
                 >
                   {supportTicketsData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${entry}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
               </PieChart>
