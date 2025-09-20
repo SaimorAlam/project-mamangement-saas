@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, CircleAlert } from 'lucide-react';
 
@@ -109,7 +109,9 @@ const [password, setPassword] = useState('');
             <div className="flex gap-4 items-baseline my-6 justify-between">
               <input type="checkbox" name="policy" id="policy" className="text-[#D0D5DD] rounded-3xl cursor-pointer"/>
               <p className="text-[#0F1325] w-[90%]">Remember me</p>
-              <h4 className="font-medium text-[#0151FF] w-[60%] cursor-pointer">Forgot Password?</h4>
+              <NavLink to="/forgot" className="font-medium text-[#0151FF] w-[60%] cursor-pointer">
+                  Forgot Password?
+              </NavLink>
             </div>
           </div>
 

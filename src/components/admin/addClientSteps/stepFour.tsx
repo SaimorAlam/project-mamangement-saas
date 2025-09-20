@@ -1,99 +1,303 @@
 import { useFormContext } from "react-hook-form"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { BarChart3, PieChart, Radar, Grid3x3 } from "lucide-react"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+} from "recharts"
+import type { FormData } from "@/types/form-types"
+import { CustomCheckBox } from "@/components/ui/CustomCheckBox"
 
-export default function StepFour() {
-  const { watch, setValue } = useFormContext()
-  const notifyDevTeam = watch("notifyDevTeam")
+const columnData = [
+  { name: "Mon", onTime: 60, absent: 20, late: 20 },
+  { name: "Tue", onTime: 80, absent: 10, late: 10 },
+  { name: "Wed", onTime: 70, absent: 15, late: 15 },
+  { name: "Thu", onTime: 90, absent: 5, late: 5 },
+  { name: "Fri", onTime: 85, absent: 8, late: 7 },
+  { name: "Sat", onTime: 75, absent: 12, late: 13 },
+  { name: "Sun", onTime: 65, absent: 18, late: 17 },
+]
 
-  const chartTypes = [
-    { name: "Column Chart", icon: BarChart3, status: "Working", employees: "576 employees" },
-    { name: "Bar Chart", icon: BarChart3, status: "Working", employees: "576 employees" },
-    { name: "Radar Chart", icon: Radar, status: "Working", employees: null },
-    { name: "Doughnut Pie Charts", icon: PieChart, status: "Working", employees: "520K Total Visitor" },
-    { name: "Heatmap chart", icon: Grid3x3, status: "Working", employees: "Total in Stock" },
-  ]
+const pieData = [
+  { name: "First timer", value: 65, color: "#3B82F6" },
+  { name: "Social traffic", value: 21, color: "#10B981" },
+  { name: "Organic traffic", value: 14, color: "#F59E0B" },
+]
+
+const radarData = [
+  { subject: "Quality", thisMonth: 120, previousMonth: 110 },
+  { subject: "Speed", thisMonth: 98, previousMonth: 130 },
+  { subject: "Efficiency", thisMonth: 86, previousMonth: 130 },
+  { subject: "Innovation", thisMonth: 99, previousMonth: 100 },
+  { subject: "Teamwork", thisMonth: 85, previousMonth: 90 },
+  { subject: "Communication", thisMonth: 65, previousMonth: 85 },
+]
+
+export function StepFour() {
+  const { watch, setValue } = useFormContext<FormData>()
+  const formData = watch()
 
   return (
     <div className="space-y-8">
+      {/* Library Assignment */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Library Assignment</h2>
-        <p className="text-gray-600 mb-6">
-          Enable custom chart library and validate scheduled chart types for this client's dashboards.
+        <h3 className="text-xl font-medium text-blue-600 mb-4">Library Assignment</h3>
+        <div className="flex items-center space-x-2 mb-4">
+          <CustomCheckBox
+            checked={formData.enableCustomChartLibrary || false}
+            onChange={(checked) => setValue("enableCustomChartLibrary", checked)}
+          />
+          <Label htmlFor="enableCustomChartLibrary">Enable Custom chart library</Label>
+        </div>
+        <p className="text-sm text-gray-600">
+          Enable this to accept and validate extended chart types for this client's dashboards.
         </p>
 
-        <div className="mb-6">
-          <Label className="text-sm font-medium">Select additional chart</Label>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
-            {chartTypes.map((chart, index) => (
-              <Card key={index} className="relative">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      <chart.icon className="h-5 w-5 text-gray-600" />
-                      <span className="font-medium text-sm">{chart.name}</span>
-                    </div>
-                    <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                      {chart.status}
-                    </Badge>
-                  </div>
-
-                  {chart.employees && <div className="text-xs text-gray-500">{chart.employees}</div>}
-
-                  {/* Mock chart visualization */}
-                  <div className="mt-3 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded flex items-center justify-center">
-                    <chart.icon className="h-8 w-8 text-blue-600 opacity-50" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+        <div className="mt-4">
+          <p className="text-sm font-medium mb-2">Select additional chart</p>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary">Column ×</Badge>
+            <Badge variant="secondary">Bar ×</Badge>
+            <Badge variant="secondary">Radar ×</Badge>
+            <Badge variant="secondary">Doughnut Pie ×</Badge>
+            <Badge variant="secondary">Heatmap ×</Badge>
+            <Badge variant="outline">Add more +</Badge>
           </div>
         </div>
       </div>
 
+      {/* Chart Render Testing */}
       <div>
         <h3 className="text-lg font-medium text-blue-600 mb-4">Chart render testing</h3>
+        <div className="grid grid-cols-2 gap-4">
+          {/* Column Chart */}
+          <Card className="border border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium">Column Chart</h4>
+                <Badge variant="secondary" className="text-green-600 bg-green-50">
+                  Working ✓
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>On time</span>
+                <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
+                <span>Absent</span>
+                <span className="w-2 h-2 bg-yellow-500 rounded-full ml-2"></span>
+                <span>Late</span>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">Total 576 employees</p>
+              <div className="h-32">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={columnData}>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
+                    <YAxis hide />
+                    <Bar dataKey="onTime" stackId="a" fill="#3B82F6" />
+                    <Bar dataKey="absent" stackId="a" fill="#10B981" />
+                    <Bar dataKey="late" stackId="a" fill="#F59E0B" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="notifyDevTeam"
-              checked={notifyDevTeam}
-              onCheckedChange={(checked) => setValue("notifyDevTeam", checked)}
-            />
-            <Label htmlFor="notifyDevTeam">Notify Dev / QA Team</Label>
-          </div>
+          {/* Bar Chart */}
+          <Card className="border border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium">Bar Chart</h4>
+                <Badge variant="secondary" className="text-green-600 bg-green-50">
+                  Working ✓
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>On time</span>
+                <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
+                <span>Absent</span>
+                <span className="w-2 h-2 bg-yellow-500 rounded-full ml-2"></span>
+                <span>Late</span>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">Total 576 employees</p>
+              <div className="h-32">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={columnData} layout="horizontal">
+                    <XAxis type="number" hide />
+                    <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
+                    <Bar dataKey="onTime" fill="#3B82F6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="space-y-2">
-            <Label>Select Team Member</Label>
+          {/* Radar Chart */}
+          <Card className="border border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium">Radar Chart</h4>
+                <Badge variant="secondary" className="text-green-600 bg-green-50">
+                  Working ✓
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>This Month</span>
+                <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
+                <span>Previous Month</span>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">Average Team Performance</p>
+              <div className="h-32">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart data={radarData}>
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="subject" tick={{ fontSize: 8 }} />
+                    <PolarRadiusAxis angle={90} domain={[0, 150]} tick={false} />
+                    <Radar name="This Month" dataKey="thisMonth" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
+                    <Radar
+                      name="Previous Month"
+                      dataKey="previousMonth"
+                      stroke="#10B981"
+                      fill="#10B981"
+                      fillOpacity={0.3}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Doughnut Pie Charts */}
+          <Card className="border border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium">Doughnut Pie Charts</h4>
+                <Badge variant="secondary" className="text-green-600 bg-green-50">
+                  Working ✓
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>First timer</span>
+                <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
+                <span>Social traffic</span>
+                <span className="w-2 h-2 bg-yellow-500 rounded-full ml-2"></span>
+                <span>Organic traffic</span>
+              </div>
+              <div className="h-40 relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-lg font-bold">520K</span>
+                  <span className="text-xs text-gray-500">Total Visitor</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Heatmap Chart */}
+          <Card className="col-span-2 border border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium">Heatmap chart</h4>
+                <Badge variant="secondary" className="text-green-600 bg-green-50">
+                  Working ✓
+                </Badge>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">Total in Stock</p>
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col gap-1 text-xs text-gray-500">
+                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                    <div key={day} className="h-4 flex items-center">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-12 gap-1">
+                  {Array.from({ length: 84 }, (_, i) => {
+                    const intensity = Math.floor(Math.random() * 4) + 1
+                    return (
+                      <div
+                        key={i}
+                        className="w-4 h-4 rounded-sm"
+                        style={{
+                          backgroundColor:
+                            intensity === 1
+                              ? "#E5E7EB"
+                              : intensity === 2
+                                ? "#A7F3D0"
+                                : intensity === 3
+                                  ? "#34D399"
+                                  : "#10B981",
+                        }}
+                        title={`Activity level: ${intensity}`}
+                      />
+                    )
+                  })}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Team Notification */}
+      <div>
+        <div className="flex items-center space-x-2 mb-4">
+          <CustomCheckBox
+            checked={formData.notifyDevQATeam || false}
+            onChange={(checked) => setValue("notifyDevQATeam", checked)}
+          />
+          <Label htmlFor="notifyDevQATeam">Notify Dev / QA Team</Label>
+        </div>
+
+        {formData.notifyDevQATeam && (
+          <div>
+            <Label htmlFor="selectedTeamMember">Select Team Member</Label>
             <Select
-              value={watch("selectedTeamMember")}
+              value={formData.selectedTeamMember || ""}
               onValueChange={(value) => setValue("selectedTeamMember", value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="mt-1 max-w-xs">
                 <SelectValue placeholder="Select an employee" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="john-doe">John Doe - Senior Developer</SelectItem>
-                <SelectItem value="jane-smith">Jane Smith - QA Engineer</SelectItem>
-                <SelectItem value="mike-johnson">Mike Johnson - DevOps Engineer</SelectItem>
-                <SelectItem value="sarah-wilson">Sarah Wilson - Frontend Developer</SelectItem>
+              <SelectContent className="bg-white">
+                <SelectItem value="john-doe">John Doe</SelectItem>
+                <SelectItem value="jane-smith">Jane Smith</SelectItem>
+                <SelectItem value="mike-johnson">Mike Johnson</SelectItem>
               </SelectContent>
             </Select>
           </div>
-        </div>
-      </div>
-
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <h4 className="font-medium text-blue-900 mb-2">Library Status</h4>
-        <p className="text-sm text-blue-700">
-          All chart libraries are currently working and ready for deployment. The system will automatically validate
-          chart rendering capabilities during the setup process.
-        </p>
+        )}
       </div>
     </div>
   )

@@ -12,7 +12,7 @@ const Breadcrumbs = () => {
                         <Link to="/">Home</Link>
                     </li>
                     {pathnames.map((name, index) => {
-                        const routeTo = `> ${pathnames.slice(0, index + 1).join('/')}`;
+                        const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
                         return (
                             <li key={name} className="flex items-center">
                                 <span style={{ margin: '0 8px' }}><ChevronRight className="w-4 h-4"/></span>
