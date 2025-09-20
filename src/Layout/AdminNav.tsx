@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router-dom";
 
 export default function SidebarNavigation() {
-    const getLinkClassName = ({ isActive }) => {
+    const getLinkClassName = ({ isActive }: { isActive: boolean }) => {
         const baseClasses = "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors";
         const activeClasses = "bg-blue-500 text-white";
         const inactiveClasses = "text-gray-700 hover:bg-gray-50";
@@ -117,9 +117,11 @@ export default function SidebarNavigation() {
                             <p className="text-sm text-gray-500">Admin</p>
                         </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-gray-500 hover:text-red-500">
-                        <Power className="w-4 h-4" />
-                    </Button>
+                    <NavLink to="/">
+                        <Button variant="ghost" size="icon" className="text-gray-500 hover:text-red-500  cursor-pointer">
+                          <Power className="w-4 h-4" />
+                        </Button>
+                    </NavLink>
                 </div>
             </div>
         </div>

@@ -177,7 +177,7 @@ const Signup = () => {
           </button>
           <div className="text-center mt-6">
             <div>
-              <NavLink to="/login" className="font-medium text-[#0151FF] ">
+              <NavLink to="/login" className="font-medium text-[#0151FF]">
                   Log In Now
               </NavLink>
             </div>

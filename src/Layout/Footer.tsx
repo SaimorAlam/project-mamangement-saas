@@ -90,8 +90,8 @@ const Footer: React.FC = () => {
             <form className="flex">
               <input
                 type="email"
-                placeholder="Your email"
-                className="p-2 mr-2 rounded-md border-1 border-black  text-black focus:outline-none"
+                placeholder="Enter your email"
+                className="p-2 mr-2 rounded-md border-1 border-gray-300  text-gray-500 focus:outline-none text-sm"
               />
               <button
                 type="submit"
