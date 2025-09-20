@@ -1,11 +1,11 @@
 import { useFormContext } from "react-hook-form"
 import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Globe, Server } from "lucide-react"
 import type { FormData } from "@/types/form-types"
+import { CustomCheckBox } from "@/components/ui/CustomCheckBox"
 
 export function StepThree() {
   const { control, watch } = useFormContext<FormData>()
@@ -16,22 +16,22 @@ export function StepThree() {
     <div className="space-y-8">
       {/* Company Configuration */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">Company Configuration</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">Company Configuration</h3>
         <div className="grid grid-cols-2 gap-6">
           <FormField
             control={control}
             name="subdomain"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Subdomain *</FormLabel>
+                <FormLabel className="text-md">Subdomain *</FormLabel>
                 <div className="flex items-center mt-1">
                   <Input
                     placeholder="Enter company name"
                     value={field.value}
                     onChange={field.onChange}
-                    className="rounded-r-none"
+                    className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 rounded-r-none"
                   />
-                  <div className="px-3 py-2 bg-gray-50 border border-l-0 rounded-r-md text-sm text-gray-600">
+                  <div className="px-3 py-2 bg-gray-50 rounded-r-md text-sm text-gray-600">
                     .thetaanalyzer.com
                   </div>
                 </div>
@@ -45,12 +45,12 @@ export function StepThree() {
             name="regionServerLocation"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Region/Server Location *</FormLabel>
+                <FormLabel className="text-md">Region/Server Location *</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1 border border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white border-none">
                     <SelectItem value="US-East">US-East</SelectItem>
                     <SelectItem value="US-West">US-West</SelectItem>
                     <SelectItem value="EU-Central">EU-Central</SelectItem>
@@ -67,12 +67,12 @@ export function StepThree() {
             name="timeZone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Time zone</FormLabel>
+                <FormLabel className="text-md">Time zone</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1 border border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white border-white">
                     <SelectItem value="[UTC-05:00] Eastern Time (US & Canada)">
                       [UTC-05:00] Eastern Time (US & Canada)
                     </SelectItem>
@@ -92,12 +92,12 @@ export function StepThree() {
             name="defaultLanguage"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Default Language</FormLabel>
+                <FormLabel className="text-md">Default Language</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1 border border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white border-none">
                     <SelectItem value="English">English</SelectItem>
                     <SelectItem value="Spanish">Spanish</SelectItem>
                     <SelectItem value="French">French</SelectItem>
@@ -113,7 +113,7 @@ export function StepThree() {
 
       {/* System Setup */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">System Setup</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">System Setup</h3>
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-4">
             <FormField
@@ -121,7 +121,7 @@ export function StepThree() {
               name="enableOnboardingGuide"
               render={({ field }) => (
                 <FormItem className="flex items-center space-x-2">
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <CustomCheckBox checked={field.value} onChange={field.onChange} />
                   <FormLabel>Enable Onboarding Guide</FormLabel>
                 </FormItem>
               )}
@@ -134,7 +134,7 @@ export function StepThree() {
               name="autoGenerateWelcomeDashboard"
               render={({ field }) => (
                 <FormItem className="flex items-center space-x-2">
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <CustomCheckBox checked={field.value} onChange={field.onChange} />
                   <FormLabel>Auto-Generate Welcome Dashboard</FormLabel>
                 </FormItem>
               )}
@@ -149,12 +149,12 @@ export function StepThree() {
             name="industryTemplate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Assign Industry Template *</FormLabel>
+                <FormLabel className="text-md">Assign Industry Template *</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="mt-1 max-w-xs">
+                  <SelectTrigger className="mt-3 max-w-xs border border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white cursor-pointer border-none">
                     <SelectItem value="Real Estate">Real Estate</SelectItem>
                     <SelectItem value="Healthcare">Healthcare</SelectItem>
                     <SelectItem value="Finance">Finance</SelectItem>
@@ -171,9 +171,9 @@ export function StepThree() {
 
       {/* Instance Preview */}
       <div>
-        <h3 className="text-lg font-medium text-blue-600 mb-4">Instance Preview</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">Instance Preview</h3>
         <div className="grid grid-cols-2 gap-6">
-          <Card>
+          <Card className="border border-gray-300">
             <CardContent className="p-4 flex items-center gap-3">
               <Globe className="w-8 h-8 text-blue-600" />
               <div>
@@ -182,7 +182,7 @@ export function StepThree() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-gray-300">
             <CardContent className="p-4 flex items-center gap-3">
               <Server className="w-8 h-8 text-blue-600" />
               <div>
