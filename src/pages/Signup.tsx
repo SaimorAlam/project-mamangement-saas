@@ -158,6 +158,15 @@ const Signup = () => {
             {errors.confirmPassword && (
               <p className="text-red-500 text-sm mt-[8px]">{errors.confirmPassword.message}</p>
             )}
+
+            {/* Privacy policy */}
+
+            <div className="flex items-start gap-2 my-6 w-[90%]">
+              <input type="checkbox" className="bg-gray-100 rounded-2xl w-5 h-5 cursor-pointer"/>
+              <div>
+                I agree to Theta Analyzer <span className="text-blue-500 underline cursor-pointer">Licence Agreement</span> and <span className="text-blue-500 underline cursor-pointer">Privacy policy</span>
+              </div>
+            </div>
           </div>
 
           <button
@@ -171,8 +180,6 @@ const Signup = () => {
               <NavLink to="/login" className="font-medium text-[#0151FF] ">
                   Log In Now
               </NavLink>
-            <NavLink to="/login" />
-
             </div>
           </div>
         </form>

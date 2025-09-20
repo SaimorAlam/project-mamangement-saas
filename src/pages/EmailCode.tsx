@@ -1,8 +1,13 @@
+import { NavLink } from "react-router-dom"
+import { toast } from "sonner";
+
+
 const EmailCode = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[40%]">
+        <img src="Logo.png" alt="Logo"/>
         <img className="w-full" src="login image.png" alt="" />
       </div>
       <div>
@@ -20,12 +25,10 @@ const EmailCode = () => {
 
           {/* Submit Button */}
           <div className="flex justify-center">
-            <button
-            type="submit"
-            className="w-[70%] cursor-pointer bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
-            >
-                Confirm
-            </button>
+            <NavLink to="/login" className="w-[70%] cursor-pointer bg-blue-500 text-center text-white p-2 rounded-md hover:bg-blue-600" onClick={()=> toast.success("Your Password Has been rested Successfully")}>
+              <button
+              type="submit">Confirm</button>
+            </NavLink>
           </div>
         </form>
       </div>
