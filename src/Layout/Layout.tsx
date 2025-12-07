@@ -4,7 +4,18 @@ import Navbar from "./Navbar";
 
 const Layout: React.FC = () => {
   const location = useLocation();
-  const isDashboardRoute = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/admin") || location.pathname.startsWith("/login") || location.pathname.startsWith("/signup") || location.pathname.startsWith("/forgot") || location.pathname.startsWith("/emailcode") || location.pathname.startsWith("/verification") || location.pathname.startsWith("/reset");
+  const isDashboardRoute = [
+    "/admin",
+    "/client",
+    "/dashboard",
+    "/login",
+    "/signup",
+    "/forgot",
+    "/emailcode",
+    "/verification",
+    "/reset",
+  ].some((route) => location.pathname.startsWith(route));
+
   return (
     <div>
       {!isDashboardRoute && <Navbar />}

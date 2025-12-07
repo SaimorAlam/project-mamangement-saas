@@ -4,8 +4,6 @@ import About from "../pages/About";
 import Contact from "../pages/Contact";
 import NotFound from "../pages/NotFound";
 import Home from "../pages/Home";
-import AdminRoute from "./AdminRoutes";
-import AdminDashboard from "@/pages/Admin/AdminDashboard";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Forgot from "@/pages/Forgot";
@@ -15,19 +13,15 @@ import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
 import Employees from "@/pages/Employees";
-import Help from "@/pages/Admin/Help";
-import Clients from "@/pages/Admin/Clients";
-import Analytics from "@/pages/Admin/Analytics";
-import SystemHealth from "@/pages/Admin/SystemHealth";
-import BillingsPlans from "@/pages/Admin/BillingsPlans";
-import APIIntegrations from "@/pages/Admin/APIIntegrations";
-import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
-import GlobalSettings from "@/pages/Admin/GlobalSettings";
-import { SingleClient } from "@/pages/Admin/SingleClient";
-import AddClientForm from "@/pages/Admin/AddClientForm/AddClientForm";
-import ManageBillings from "@/pages/Admin/ManageBillings";
-import PlatformAnalyticsOverview from "@/pages/Admin/Analytics";
+
+// Layout imports
+import AdminDashboardLayout from "@/Layout/admin/AdminDashboardLayout";
 // import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
+
+// Route list imports
+import { getAdminRoutes } from "./AdminRoutes";
+import ClientDashboardLayout from "./../Layout/client/ClientDashboardLayout";
+import { getClientRoutes } from "./ClientRoute";
 
 const routes = createBrowserRouter([
   {
@@ -82,61 +76,19 @@ const routes = createBrowserRouter([
         path: "/emailcode",
         element: <EmailCode />,
       },
+
+      // Super Admin routes
       {
         path: "/admin",
-        element: <AdminRoute />, // This will check if the user is an admin
-        children: [
-          {
-            index: true,
-            path: "",
-            element: <AdminDashboard />,
-          },
-          {
-            path: "clients",
-            element: <Clients />,
-          },
-          {
-            path: "clients/:id",
-            element: <SingleClient />,
-          },
-          {
-            path: "analytics",
-            element: <Analytics />,
-          },
-          {
-            path: "systemHealth",
-            element: <SystemHealth />,
-          },
-          {
-            path: "billings",
-            element: <BillingsPlans />,
-          },
-          {
-            path: "apiIntegration",
-            element: <APIIntegrations />,
-          },
-          {
-            path: "security",
-            element: <SecurityPrivacy />,
-          },
-          {
-            path: "help",
-            element: <Help />,
-          },
-          {
-            path: "globalSettings",
-            element: <GlobalSettings />,
-          },
-          {
-            path: "addClient",
-            element: <AddClientForm />,
-          },
-          { path: "manage-billings", element: <ManageBillings /> },
-          {
-            path: "Platform-Analytics-Overview",
-            element: <PlatformAnalyticsOverview />,
-          },
-        ],
+        element: <AdminDashboardLayout />,
+        children: getAdminRoutes(),
+      },
+
+      // Client Route
+      {
+        path: "/client",
+        element: <ClientDashboardLayout />,
+        children: getClientRoutes(),
       },
     ],
   },

@@ -1,7 +1,7 @@
-import { Navigate} from "react-router-dom";
+/* import { Navigate} from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store/store";
-import DashboardLayout from "@/Layout/DashboardLayout";
+import DashboardLayout from "@/Layout/admin/AdminDashboardLayout";
 
 const AdminRoute = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -15,3 +15,73 @@ const AdminRoute = () => {
 };
 
 export default AdminRoute;
+ */
+
+import AdminDashboard from "@/pages/Admin/AdminDashboard";
+import Help from "@/pages/Admin/Help";
+import Clients from "@/pages/Admin/Clients";
+import Analytics from "@/pages/Admin/Analytics";
+import SystemHealth from "@/pages/Admin/SystemHealth";
+import BillingsPlans from "@/pages/Admin/BillingsPlans";
+import APIIntegrations from "@/pages/Admin/APIIntegrations";
+import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
+import GlobalSettings from "@/pages/Admin/GlobalSettings";
+import { SingleClient } from "@/pages/Admin/SingleClient";
+import AddClientForm from "@/pages/Admin/AddClientForm/AddClientForm";
+import ManageBillings from "@/pages/Admin/ManageBillings";
+import PlatformAnalyticsOverview from "@/pages/Admin/Analytics";
+
+export function getAdminRoutes() {
+  return [
+    {
+      index: true,
+      path: "",
+      element: <AdminDashboard />,
+    },
+    {
+      path: "clients",
+      element: <Clients />,
+    },
+    {
+      path: "clients/:id",
+      element: <SingleClient />,
+    },
+    {
+      path: "analytics",
+      element: <Analytics />,
+    },
+    {
+      path: "systemHealth",
+      element: <SystemHealth />,
+    },
+    {
+      path: "billings",
+      element: <BillingsPlans />,
+    },
+    {
+      path: "apiIntegration",
+      element: <APIIntegrations />,
+    },
+    {
+      path: "security",
+      element: <SecurityPrivacy />,
+    },
+    {
+      path: "help",
+      element: <Help />,
+    },
+    {
+      path: "globalSettings",
+      element: <GlobalSettings />,
+    },
+    {
+      path: "addClient",
+      element: <AddClientForm />,
+    },
+    { path: "manage-billings", element: <ManageBillings /> },
+    {
+      path: "Platform-Analytics-Overview",
+      element: <PlatformAnalyticsOverview />,
+    },
+  ];
+}

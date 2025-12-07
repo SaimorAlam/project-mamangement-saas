@@ -1,8 +1,8 @@
-import SidebarNavigation from "@/Layout/AdminNav";
-import AdminTopBar from "@/Layout/AdminTopBar";
+import SidebarNavigation from "@/Layout/admin/AdminNav";
+import AdminTopBar from "@/Layout/admin/AdminTopBar";
 import { Outlet } from "react-router-dom";
 
-export default function DashboardLayout() {
+export default function AdminDashboardLayout() {
   return (
     <div className="flex min-h-screen">
       <aside className="w-64 bg-white shadow-lg">
