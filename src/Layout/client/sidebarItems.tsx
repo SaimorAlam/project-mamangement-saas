@@ -16,6 +16,8 @@ import {
   Store,
   Users,
   UserStar,
+  Ticket,
+  TicketPlus,
 } from "lucide-react";
 import { IoExtensionPuzzleOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -41,6 +43,7 @@ import ProjectBuilder from "@/pages/client/ProjectBuilder";
 import ActivityLog from "@/pages/client/ActivityLog";
 import Help from "@/pages/Admin/Help";
 import Support from "@/pages/client/Support";
+import Feedback from "@/pages/client/FeedBack";
 
 interface SidebarGroup {
   label: string;
@@ -156,7 +159,7 @@ export const getSidebarItems = (): SidebarGroup[] => {
           path: "/client-panel/project-builder",
           element: <ProjectBuilder />,
         },
-      ].filter((item) => !item.hidden), // here add this code .filter((item) => !item.hidden),
+      ].filter((item) => !item.hidden),
     },
     {
       label: "Support",
@@ -170,7 +173,7 @@ export const getSidebarItems = (): SidebarGroup[] => {
         {
           icon: <Info />,
           name: "Help",
-          path: "/help",
+          path: "/client-panel/help",
           element: <Help />,
           children: [
             {
@@ -179,28 +182,38 @@ export const getSidebarItems = (): SidebarGroup[] => {
               name: "Support",
               element: <Support />,
               children: [
-                { index: true, element: <SupportTickets /> },
-                { path: "create-tickets", element: <CreateTicket /> },
+                {
+                  index: true,
+                  icon: <Ticket />,
+                  name: "Support Ticket",
+                  element: <SupportTickets />,
+                },
+                {
+                  icon: <TicketPlus />,
+                  path: "create-tickets",
+                  name: "Create Ticket",
+                  element: <CreateTicket />,
+                },
               ],
             },
-            /* {
+            {
               icon: <UserStar />,
               path: "feedback",
               name: "Feedback",
               element: <Feedback />,
             },
-            {
-              icon: <Milestone />,
-              path: "product-tour",
-              name: "Product Tour",
-              element: <ProductTour />,
-            },
-            {
-              icon: <Phone />,
-              path: "contact-us",
-              name: "Contact US",
-              element: <ContactUs />,
-            }, */
+            // {
+            //   icon: <Milestone />,
+            //   path: "product-tour",
+            //   name: "Product Tour",
+            //   element: <ProductTour />,
+            // },
+            // {
+            //   icon: <Phone />,
+            //   path: "contact-us",
+            //   name: "Contact US",
+            //   element: <ContactUs />,
+            // },
           ],
         },
         {

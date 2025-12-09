@@ -14,6 +14,11 @@ import ProjectReview from "@/pages/client/ProjectReview";
 import ProjectBuilder from "@/pages/client/ProjectBuilder";
 import Settings from "@/pages/client/Settings";
 import ActivityLog from "@/pages/client/ActivityLog";
+import Help from "@/pages/client/Help";
+import Support from "@/pages/client/Support";
+import SupportTickets from "@/pages/client/SupportTickets";
+import CreateTicket from "@/pages/client/CreateTicket";
+import Feedback from "@/pages/client/FeedBack";
 
 export function getClientRoutes() {
   return [
@@ -37,23 +42,23 @@ export function getClientRoutes() {
     { path: "project-review", element: <ProjectReview /> },
     { path: "project-builder", element: <ProjectBuilder /> },
     { path: "activity-log", element: <ActivityLog /> },
-    // {
-    //   path: "help",
-    //   element: <Help />,
-    //   children: [
-    //     {
-    //       path: "support",
-    //       element: <Support />,
-    //       children: [
-    //         { index: true, element: <SupportTickets /> },
-    //         { path: "create-ticket", element: <CreateTicket /> },
-    //       ],
-    //     },
-    //     { path: "feedback", element: <Feedback /> },
-    //     { path: "product-tour", element: <ProductTour /> },
-    //     { path: "contact-us", element: <ContactUs /> },
-    //   ],
-    // },
+    {
+      path: "help",
+      element: <Help />,
+      children: [
+        {
+          path: "support",
+          element: <Support />,
+          children: [
+            { index: true, element: <SupportTickets /> },
+            { path: "create-tickets", element: <CreateTicket /> },
+          ],
+        },
+        { path: "feedback", element: <Feedback /> },
+        // { path: "product-tour", element: <ProductTour /> },
+        // { path: "contact-us", element: <ContactUs /> },
+      ],
+    },
     { path: "settings", element: <Settings /> },
     // { path: "work-in-progress", element: <WorkInProgress /> },
     // { path: "user-activity-log", element: <UserActivityLog /> },

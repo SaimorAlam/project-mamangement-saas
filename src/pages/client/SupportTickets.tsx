@@ -11,7 +11,7 @@ const SupportTickets = () => {
         <h4 className="">Support Tickets</h4>
         <div className="">
           <PrimaryButton
-            onClick={() => navigate("create-ticket")}
+            onClick={() => navigate("create-tickets")}
             type={"Primary"}
             leftIcon={<Plus />}
             title={"Create Ticket"}
