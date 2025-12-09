@@ -9,23 +9,13 @@ import {
 } from "lucide-react";
 import { JSX, useState } from "react";
 import { FaChartPie, FaUsers } from "react-icons/fa";
+import { IClientPanelStats } from "@/types";
 
-export interface ClientPanelCardProps {
-  title: string;
-  growth: string | null;
-  value: number | string;
-  growth_type: "up" | "down" | undefined | string;
-  description?: string;
-  link_text?: string;
-  icon?: string;
-  icon_bg_color?: string;
+interface IProps {
+  item: IClientPanelStats;
 }
 
-type Props = {
-  item: ClientPanelCardProps;
-};
-
-const ClientPanelStatsCard = ({ item }: Props) => {
+const ClientPanelStatsCard = ({ item }: IProps) => {
   const {
     title,
     value,

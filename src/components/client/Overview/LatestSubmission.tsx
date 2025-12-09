@@ -3,17 +3,7 @@ import { CardHeader } from "@/components/ui/card";
 import SubmissionTable from "../SubmissionTable";
 import DropdownSelect from "../common/DropdownSelect";
 import BoxContainer from "../common/BoxContainer";
-
-export interface Submission {
-  id: number;
-  submission: string;
-  submittedBy: {
-    name: string;
-    avatar: string;
-  };
-  date: string;
-  status: "approved" | "in_review" | "returned" | "draft";
-}
+import { ISubmission } from "@/types";
 
 const submissionsData = [
   {
@@ -239,11 +229,11 @@ const submissionsData = [
 ];
 
 const LatestSubmission = () => {
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [submissions, setSubmissions] = useState<ISubmission[]>([]);
   const [sortBy, setSortBy] = useState("date");
 
   useEffect(() => {
-    setSubmissions(submissionsData as Submission[]);
+    setSubmissions(submissionsData as ISubmission[]);
   }, []);
 
   const sortedSubmissions = [...submissions].sort((a, b) => {
