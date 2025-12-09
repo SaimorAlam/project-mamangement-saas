@@ -1,13 +1,14 @@
 import CreateTicket from "@/pages/client/CreateTicket";
 import SupportTickets from "@/pages/client/SupportTickets";
 import CarlyleHall from "@/data/AllDataTab/CarlyleHall";
-// import AlfalaBuilders from "@/pages/ClientPanel/Favorites/AlfalaBuilders";
-// import MarketingStrategy from "@/pages/ClientPanel/Favorites/MarketingStrategy";
-// import TimosSuperShop from "@/pages/ClientPanel/Favorites/TimosSuperShop";
+import AlfalaBuilders from "@/pages/client/AlfalaBuilders";
+import MarketingStrategy from "@/pages/client/MarketingStrategy";
+import TimosSuperShop from "@/pages/client/TimosSuperShop";
 import Employees from "@/pages/client/Employees";
 import Overview from "@/pages/Admin/Overview";
-// import Works from "@/pages/ClientPanel/MainMenu/Works";
+import Works from "@/pages/client/Works";
 import AllProgram from "@/pages/client/AllProgram";
+
 /* import AllHighway from "@/pages/ClientPanel/Program&Projects/HighwayExpansion/AllHighway";
 import HighwayExpansion from "@/pages/ClientPanel/Program&Projects/HighwayExpansion/HighwayExpansion";
 import ProgramBuilder from "@/pages/ClientPanel/Program&Projects/ProgramBuilder";
@@ -23,9 +24,9 @@ import Support from "@/pages/ClientPanel/Support/Help/Support";
 import Settings from "@/pages/ClientPanel/Support/Settings"; */
 
 import {
-  // Backpack,
+  Backpack,
   BriefcaseBusiness,
-  // Building2,
+  Building2,
   ChartPie,
   Clipboard,
   FileChartColumnIncreasing,
@@ -34,10 +35,10 @@ import {
   Headphones,
   Info,
   LayoutGrid,
-  // Megaphone,
+  Megaphone,
   Milestone,
   Phone,
-  // Store,
+  Store,
   Users,
   UserStar,
 } from "lucide-react";
@@ -64,7 +65,12 @@ export const getSidebarItems = (): SidebarGroup[] => {
           path: "/client-panel",
           element: <Overview />,
         },
-        // { icon: <Backpack />, name: "Works", path: "/works", element: <Works /> },
+        {
+          icon: <Backpack />,
+          name: "Works",
+          path: "/client-panel/works",
+          element: <Works />,
+        },
         {
           icon: <Users />,
           name: "Employees",
@@ -73,14 +79,29 @@ export const getSidebarItems = (): SidebarGroup[] => {
         },
       ],
     },
-    // {
-    //   label: "Favorites",
-    //   items: [
-    //     { icon: <Megaphone />, name: "Marketing Strategy", path: "/marketing-strategy", element: <MarketingStrategy /> },
-    //     { icon: <Building2 />, name: "Alfala Building", path: "/alfala-building", element: <AlfalaBuilders /> },
-    //     { icon: <Store />, name: "Timo's Super Shop", path: "/timos-super-shop", element: <TimosSuperShop /> },
-    //   ],
-    // },
+    {
+      label: "Favorites",
+      items: [
+        {
+          icon: <Megaphone />,
+          name: "Marketing Strategy",
+          path: "/client-panel/marketing-strategy",
+          element: <MarketingStrategy />,
+        },
+        {
+          icon: <Building2 />,
+          name: "Alfala Building",
+          path: "/client-panel/alfala-building",
+          element: <AlfalaBuilders />,
+        },
+        {
+          icon: <Store />,
+          name: "Timo's Super Shop",
+          path: "/client-panel/timos-super-shop",
+          element: <TimosSuperShop />,
+        },
+      ],
+    },
     {
       label: "Programs & Projects",
       items: [

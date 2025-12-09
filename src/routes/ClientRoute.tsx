@@ -1,15 +1,19 @@
 import Overview from "@/pages/client/Overview";
 import AllProgram from "@/pages/client/AllProgram";
 import Employees from "@/pages/client/Employees";
+import MarketingStrategy from "@/pages/client/MarketingStrategy";
+import Works from "@/pages/client/Works";
+import AlfalaBuilders from "@/pages/client/AlfalaBuilders";
+import TimosSuperShop from "@/pages/client/TimosSuperShop";
 
 export function getClientRoutes() {
   return [
     { index: true, element: <Overview /> },
-    // { path: "works", element: <Works /> },
+    { path: "works", element: <Works /> },
     { path: "employees", element: <Employees /> },
-    // { path: "marketing-strategy", element: <MarketingStrategy /> },
-    // { path: "alfala-building", element: <AlfalaBuilders /> },
-    // { path: "timos-super-shop", element: <TimosSuperShop /> },
+    { path: "marketing-strategy", element: <MarketingStrategy /> },
+    { path: "alfala-building", element: <AlfalaBuilders /> },
+    { path: "timos-super-shop", element: <TimosSuperShop /> },
     { path: "all-program", element: <AllProgram /> },
     // { path: "program-builder", element: <ProgramBuilder /> },
     // { path: "program-name", element: <ProgramName /> },

@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronRight } from "lucide-react";
-import { getSidebarItems } from "@/components/client/sidebarItems";
+import { getSidebarItems } from "@/Layout/client/sidebarItems";
 
 const AppSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);

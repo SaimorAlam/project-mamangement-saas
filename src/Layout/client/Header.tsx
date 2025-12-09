@@ -23,7 +23,7 @@ import PrimaryButton from "@/components/client/common/PrimaryButton";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import { motion, AnimatePresence } from "framer-motion";
 import NewProjectModal from "@/components/client/NewProjectModal";
-import { getSidebarItems } from "../../components/client/sidebarItems";
+import { getSidebarItems } from "./sidebarItems";
 
 const Header = ({ name }: { name: string }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
