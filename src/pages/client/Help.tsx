@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-export default function HighwayExpansion() {
+const Help = () => {
   return <Outlet />;
-}
+};
+export default Help;

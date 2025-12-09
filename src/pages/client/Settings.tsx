@@ -6,7 +6,7 @@ import CheckboxGroupComponent from "@/components/client/Settings/CheckboxGroupCo
 import BoxContainer from "@/components/client/common/BoxContainer";
 import DropdownSelect from "@/components/client/common/DropdownSelect";
 import PrimaryButton from "@/components/client/common/PrimaryButton";
-// import APIConnectionCardComponent from '../../../components/ClientPanel/Help/Settings/APIConnectionCardComponent';
+import APIConnectionCard from "@/components/client/Settings/APIConnectionCard";
 
 const Settings = () => {
   const [defaultLanguage, setDefaultLanguage] =
@@ -233,36 +233,36 @@ const Settings = () => {
             onChange={handleNotificationChange}
           />
 
-          {/* <div className="border border-gray-200 rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">API Connection</h2>
+          <div className="border border-gray-200 rounded-lg p-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">
+              API Connection
+            </h2>
 
-        
             <div className="flex flex-col sm:flex-row gap-4 mb-4">
-              <APIConnectionCardComponent
+              <APIConnectionCard
                 name="Slack"
                 status="Connected"
                 lastSynced="Today"
-                icon={icon}
+                icon="i"
               />
 
-              <APIConnectionCardComponent
+              <APIConnectionCard
                 name="Salesforce"
                 status="Connected"
                 lastSynced="Today"
-                icon={icon2}
+                icon="i"
               />
             </div>
 
-       
             <div>
-              <APIConnectionCardComponent
+              <APIConnectionCard
                 name="AWS S3"
                 status="Connected"
                 lastSynced="Today"
-                icon={icon3}
+                icon="i"
               />
             </div>
-          </div> */}
+          </div>
         </div>
 
         {/* Right Column */}

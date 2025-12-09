@@ -1,32 +1,3 @@
-import CreateTicket from "@/pages/client/CreateTicket";
-import SupportTickets from "@/pages/client/SupportTickets";
-import CarlyleHall from "@/pages/client/CarlyleHall";
-import AlfalaBuilders from "@/pages/client/AlfalaBuilders";
-import MarketingStrategy from "@/pages/client/MarketingStrategy";
-import TimosSuperShop from "@/pages/client/TimosSuperShop";
-import Employees from "@/pages/client/Employees";
-import Overview from "@/pages/Admin/Overview";
-import Works from "@/pages/client/Works";
-import AllProgram from "@/pages/client/AllProgram";
-import ProgramBuilder from "@/pages/client/ProgramBuilder";
-import ProgramName from "@/pages/client/ProgramName";
-import AllHighway from "@/pages/client/AllHighway";
-import Settings from "@/pages/client/Settings";
-
-/* import AllHighway from "@/pages/ClientPanel/Program&Projects/HighwayExpansion/AllHighway";
-import HighwayExpansion from "@/pages/ClientPanel/Program&Projects/HighwayExpansion/HighwayExpansion";
-import ProgramBuilder from "@/pages/ClientPanel/Program&Projects/ProgramBuilder";
-import ProgramName from "@/pages/ClientPanel/Program&Projects/ProgramName";
-import ProjectBuilder from "@/pages/ClientPanel/Program&Projects/ProjectBuilder";
-import ProjectReview from "@/pages/ClientPanel/Program&Projects/ProjectReview";
-import ActivityLog from "@/pages/ClientPanel/Support/ActivityLog";
-import ContactUs from "@/pages/ClientPanel/Support/Help/ContactUs";
-import Feedback from "@/pages/ClientPanel/Support/Help/Feedback";
-import Help from "@/pages/ClientPanel/Support/Help/Help";
-import ProductTour from "@/pages/ClientPanel/Support/Help/ProductTour";
-import Support from "@/pages/ClientPanel/Support/Help/Support";
-import Settings from "@/pages/ClientPanel/Support/Settings"; */
-
 import {
   Backpack,
   BriefcaseBusiness,
@@ -49,10 +20,27 @@ import {
 import { IoExtensionPuzzleOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { ISidebarItem } from "@/types";
+
+import CreateTicket from "@/pages/client/CreateTicket";
+import SupportTickets from "@/pages/client/SupportTickets";
+import CarlyleHall from "@/pages/client/CarlyleHall";
+import AlfalaBuilders from "@/pages/client/AlfalaBuilders";
+import MarketingStrategy from "@/pages/client/MarketingStrategy";
+import TimosSuperShop from "@/pages/client/TimosSuperShop";
+import Employees from "@/pages/client/Employees";
+import Overview from "@/pages/Admin/Overview";
+import Works from "@/pages/client/Works";
+import AllProgram from "@/pages/client/AllProgram";
+import ProgramBuilder from "@/pages/client/ProgramBuilder";
+import ProgramName from "@/pages/client/ProgramName";
+import AllHighway from "@/pages/client/AllHighway";
+import Settings from "@/pages/client/Settings";
 import HighwayExpansion from "@/pages/client/HighwayExpansion";
 import ProjectReview from "@/pages/client/ProjectReview";
 import ProjectBuilder from "@/pages/client/ProjectBuilder";
 import ActivityLog from "@/pages/client/ActivityLog";
+import Help from "@/pages/Admin/Help";
+import Support from "@/pages/client/Support";
 
 interface SidebarGroup {
   label: string;
@@ -168,7 +156,7 @@ export const getSidebarItems = (): SidebarGroup[] => {
           path: "/client-panel/project-builder",
           element: <ProjectBuilder />,
         },
-      ].filter((item) => item), // here add this code .filter((item) => !item.hidden),
+      ].filter((item) => !item.hidden), // here add this code .filter((item) => !item.hidden),
     },
     {
       label: "Support",
@@ -179,7 +167,7 @@ export const getSidebarItems = (): SidebarGroup[] => {
           path: "/client-panel/activity-log",
           element: <ActivityLog />,
         },
-        /* {
+        {
           icon: <Info />,
           name: "Help",
           path: "/help",
@@ -195,7 +183,7 @@ export const getSidebarItems = (): SidebarGroup[] => {
                 { path: "create-tickets", element: <CreateTicket /> },
               ],
             },
-            {
+            /* {
               icon: <UserStar />,
               path: "feedback",
               name: "Feedback",
@@ -212,9 +200,9 @@ export const getSidebarItems = (): SidebarGroup[] => {
               path: "contact-us",
               name: "Contact US",
               element: <ContactUs />,
-            },
+            }, */
           ],
-        }, */
+        },
         {
           icon: <IoSettingsOutline className="size-6" />,
           name: "Settings",
