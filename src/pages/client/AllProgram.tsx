@@ -1,93 +1,21 @@
-import React, { useState } from "react";
-import {
-  Flag,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { useState } from "react";
+import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
 
-interface Program {
-  id: number;
-  name: string;
-  projects: number;
-  assignManager: string[];
-  priority: "High" | "Medium" | "Low";
-  createdOn: string;
-  updatedOn: string;
-  deadline: string;
-  progress: number;
-}
+import { IProgram } from "@/types";
+import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 
-interface AllProgramTableProps {
+interface IProgramTableProps {
   title?: string;
-  programs?: Program[] | undefined;
+  programs?: IProgram[] | undefined;
   hideCreatedOn?: boolean;
 }
 
-// === PriorityDropdown Component ===
-const PriorityDropdown: React.FC<{
-  defaultPriority: "High" | "Medium" | "Low";
-}> = ({ defaultPriority }) => {
-  const [priority, setPriority] = useState<"High" | "Medium" | "Low">(
-    defaultPriority
-  );
-
-  const getColor = () => {
-    switch (priority) {
-      case "High":
-        return "text-red-600";
-      case "Medium":
-        return "text-orange-500";
-      case "Low":
-        return "text-green-600";
-      default:
-        return "text-gray-600";
-    }
-  };
-
-  const getFillColor = () => {
-    switch (priority) {
-      case "High":
-        return "text-red-600";
-      case "Medium":
-        return "text-orange-500";
-      case "Low":
-        return "text-green-600";
-      default:
-        return "text-gray-600";
-    }
-  };
-
-  return (
-    <div
-      className={`flex items-center gap-1 text-sm font-medium ${getColor()}`}
-    >
-      <Flag
-        size={14}
-        className={getFillColor()}
-        fill="currentColor"
-      />
-      <select
-        value={priority}
-        onChange={(e) =>
-          setPriority(e.target.value as "High" | "Medium" | "Low")
-        }
-        className="border border-gray-300 rounded-md text-sm text-gray-700 px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500"
-      >
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
-      </select>
-    </div>
-  );
-};
-
 // === AllProgramTable Component ===
-const AllProgram: React.FC<AllProgramTableProps> = ({
+const AllProgram = ({
   title = "All Program",
   programs: propPrograms,
   hideCreatedOn = false,
-}) => {
+}: IProgramTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPrograms = 300;
   const itemsPerPage = 11;

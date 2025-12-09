@@ -7,3 +7,6 @@ export * from "./overview/upcoming-deadline-card.type";
 
 // Employee Types
 export * from "./employees/employee.type";
+
+// All Programs Types
+export * from "./all-program/program.type";

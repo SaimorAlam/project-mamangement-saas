@@ -7,7 +7,7 @@ import {
   Plus,
   UserPlus,
 } from "lucide-react";
-import CreateProgramModal from "@/components/client/CreateProgramModal";
+import CreateProgramModal from "@/components/client/AllProgram/CreateProgramModal";
 import SuccessModal from "@/components/client/SuccessModal";
 import NotificationModal from "@/components/client/NotificationModal";
 import { useLocation, Link } from "react-router-dom";
@@ -20,7 +20,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import PrimaryButton from "@/components/client/common/PrimaryButton";
-import AddEmployeeModal from "@/components/client/AddEmployeeModal";
+import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import { motion, AnimatePresence } from "framer-motion";
 import NewProjectModal from "@/components/client/NewProjectModal";
 import { getSidebarItems } from "../../components/client/sidebarItems";
