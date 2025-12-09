@@ -10,6 +10,8 @@ import ProgramName from "@/pages/client/ProgramName";
 import HighwayExpansion from "@/pages/client/HighwayExpansion";
 import AllHighway from "@/pages/client/AllHighway";
 import CarlyleHall from "@/pages/client/CarlyleHall";
+import ProjectReview from "@/pages/client/ProjectReview";
+import ProjectBuilder from "@/pages/client/ProjectBuilder";
 
 export function getClientRoutes() {
   return [
@@ -30,8 +32,8 @@ export function getClientRoutes() {
         { path: "carlyle-hall", element: <CarlyleHall /> },
       ],
     },
-    // { path: "project-review", element: <ProjectReview /> },
-    // { path: "project-builder", element: <ProjectBuilder /> },
+    { path: "project-review", element: <ProjectReview /> },
+    { path: "project-builder", element: <ProjectBuilder /> },
     // { path: "activity-log", element: <ActivityLog /> },
     // {
     //   path: "help",

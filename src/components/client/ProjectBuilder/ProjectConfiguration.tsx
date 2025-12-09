@@ -1,0 +1,397 @@
+import React, { useState } from "react";
+import { X } from "lucide-react";
+
+const ProjectConfiguration: React.FC = () => {
+  const [widgetTitle, setWidgetTitle] = useState(
+    "Campaign Performance"
+  );
+  const [filter, setFilter] = useState<string>("");
+  const [showFilter, setShowFilter] = useState(true);
+  const [showLegend, setShowLegend] = useState(true);
+  const [color1, setColor1] = useState("#13A490");
+  const [color2, setColor2] = useState("#35B6EE");
+  const [color3, setColor3] = useState("#6F78F9");
+
+  return (
+    <div className="w-[40%] h-full max-w-md mx-auto bg-white border border-gray-100 rounded-lg shadow-lg">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Widget Configuration
+        </h2>
+        <button className="text-gray-500 hover:text-gray-700">
+          <X size={18} />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="px-4 py-4 space-y-4">
+        {/* Stacked BarChart Widget Details Link */}
+        <a href="#" className="text-xs text-blue-600 hover:underline">
+          Stacked BarChart Widget Details
+        </a>
+
+        {/* Widget Title */}
+        <div>
+          <label className="block text-xs font-medium text-gray-700 mb-1.5 mt-5">
+            Widget Title <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={widgetTitle}
+            onChange={(e) => setWidgetTitle(e.target.value)}
+            className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+          />
+        </div>
+
+        {/* Data Mapping for X-Axis Section */}
+        <div>
+          <h3 className="text-xs font-semibold text-blue-600 mb-3">
+            Data Mapping for X-Axis
+          </h3>
+
+          {/* Number of Data sets */}
+          <div className="flex items-center mb-3">
+            <label className="text-xs text-gray-700 flex-1">
+              Number of Data sets:
+            </label>
+            <input
+              type="text"
+              defaultValue="07"
+              className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* Input all field Data */}
+          <div className="mb-2">
+            <label className="block text-xs text-gray-700 mb-1.5">
+              Input all field Data:
+            </label>
+            <div className="space-y-2">
+              <input
+                type="text"
+                defaultValue="First field"
+                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+              />
+              <input
+                type="text"
+                defaultValue="Second field"
+                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+              />
+              <input
+                type="text"
+                defaultValue="Third field"
+                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+              />
+              <input
+                type="text"
+                defaultValue="Fourth field"
+                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+              />
+              <input
+                type="text"
+                defaultValue="Third field"
+                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+              />
+              <input
+                type="text"
+                defaultValue="Seventh field"
+                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Show Filter */}
+        <div className="flex items-center justify-between py-2">
+          <label className="text-xs font-medium text-gray-700">
+            Show Filter
+          </label>
+          <div className="relative inline-block w-10 h-5">
+            <input
+              type="checkbox"
+              checked={showFilter}
+              onChange={(e) => setShowFilter(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div
+              onClick={() => setShowFilter(!showFilter)}
+              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
+                showFilter ? "bg-blue-600" : "bg-gray-300"
+              }`}
+            >
+              <div
+                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
+                  showFilter ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Filter By */}
+        <div className="flex items-center">
+          <label className="text-xs text-gray-700 flex-1">
+            Filter By:
+          </label>
+          <div className="relative">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="w-full pr-12 pl-4 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none"
+            >
+              <option value="onTime">On time</option>
+              <option value="absent">Absent</option>
+              <option value="late">Late</option>
+            </select>
+
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Data Mapping for Y-Axis Section */}
+        <div>
+          <h3 className="text-xs font-semibold text-blue-600 mb-3">
+            Data Mapping for Y-Axis
+          </h3>
+
+          {/* Number of Data sets */}
+          <div className="flex items-center mb-3">
+            <label className="text-xs text-gray-700 flex-1">
+              Number of Data sets:
+            </label>
+            <input
+              type="text"
+              defaultValue="07"
+              className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* 1st field Data */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              1st field Data:
+            </label>
+            <input
+              type="text"
+              defaultValue="0"
+              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* Last field Data */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              Last field Data:
+            </label>
+            <input
+              type="text"
+              defaultValue="0"
+              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Display Settings Section */}
+        <div>
+          <h3 className="text-xs font-semibold text-blue-600 mb-3">
+            Display Settings
+          </h3>
+
+          {/* Show Legend */}
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-xs font-medium text-gray-700">
+              Show Legend
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="relative inline-block w-10 h-5">
+                <input
+                  type="checkbox"
+                  checked={showLegend}
+                  onChange={(e) => setShowLegend(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div
+                  onClick={() => setShowLegend(!showLegend)}
+                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
+                    showLegend ? "bg-blue-600" : "bg-gray-300"
+                  }`}
+                >
+                  <div
+                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
+                      showLegend ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </div>
+              </div>
+              <span className="text-xs text-gray-700">Yes</span>
+            </div>
+          </div>
+
+          {/* 1st Legend Name */}
+          <div className="flex items-center justify-between mb-2">
+            <label
+              className="text-xs text-gray-700"
+              style={{ width: "110px" }}
+            >
+              1st Legend Name:
+            </label>
+            <input
+              type="text"
+              defaultValue="On time"
+              className="w-[35%] px-2 py-1 text-xs border border-gray-300 rounded"
+            />
+          </div>
+
+          {/* 1st Legend Color */}
+          <div className="flex items-center mb-3">
+            <label
+              className="text-xs text-gray-700"
+              style={{ width: "110px" }}
+            >
+              1st Legend Color:
+            </label>
+            <div className="flex items-center justify-end gap-2 flex-1">
+              <input
+                type="text"
+                value={color1}
+                onChange={(e) => setColor1(e.target.value)}
+                className="text-xs text-gray-600 px-2 py-1 border border-gray-300 rounded w-20"
+              />
+              <input
+                type="color"
+                value={color1}
+                onChange={(e) => setColor1(e.target.value)}
+                className="w-14 h-6 rounded border border-gray-300 cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* 2nd Legend Name */}
+          <div className="flex items-center justify-between mb-2">
+            <label
+              className="text-xs text-gray-700"
+              style={{ width: "110px" }}
+            >
+              2nd Legend Name:
+            </label>
+            <input
+              type="text"
+              defaultValue="Absent"
+              className="w-[35%] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* 2nd Legend Color */}
+          <div className="flex items-center mb-3">
+            <label
+              className="text-xs text-gray-700"
+              style={{ width: "110px" }}
+            >
+              2nd Legend Color:
+            </label>
+            <div className="flex items-cente justify-end gap-2 flex-1">
+              <input
+                type="text"
+                value={color2}
+                onChange={(e) => setColor2(e.target.value)}
+                className="text-xs text-gray-600 px-2 py-1 border border-gray-300 rounded w-20"
+              />
+              <input
+                type="color"
+                value={color2}
+                onChange={(e) => setColor2(e.target.value)}
+                className="w-14 h-6 rounded border border-gray-300 cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* 3rd Legend Name */}
+          <div className="flex items-center justify-between mb-2">
+            <label
+              className="text-xs text-gray-700"
+              style={{ width: "110px" }}
+            >
+              3rd Legend Name:
+            </label>
+            <input
+              type="text"
+              defaultValue="Late"
+              className="w-[35%] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* 3rd Legend Color */}
+          <div className="flex items-center mb-3">
+            <label
+              className="text-xs text-gray-700"
+              style={{ width: "110px" }}
+            >
+              3rd Legend Color:
+            </label>
+            <div className="flex items-center justify-end gap-2 flex-1">
+              <input
+                type="text"
+                value={color3}
+                onChange={(e) => setColor3(e.target.value)}
+                className="text-xs text-gray-600 px-2 py-1 border border-gray-300 rounded w-20"
+              />
+              <input
+                type="color"
+                value={color3}
+                onChange={(e) => setColor3(e.target.value)}
+                className="w-14 h-6 rounded border border-gray-300 cursor-pointer"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Assigned By */}
+        <div>
+          <label className="block text-xs font-medium text-gray-700 mb-2">
+            Assigned by
+          </label>
+          <div className="flex items-center">
+            <img
+              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
+              alt="Kathryn Murphy"
+              className="w-8 h-8 rounded-full mr-2"
+            />
+            <div>
+              <p className="text-xs font-medium text-gray-900">
+                Kathryn Murphy
+              </p>
+              <p className="text-xs text-gray-500">Admin</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-gray-200">
+        <button className="px-4 py-1.5 text-xs font-medium border border-gray-200 rounded-md cursor-pointer text-gray-700 hover:text-gray-900">
+          Cancel
+        </button>
+        <button className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ProjectConfiguration;

@@ -49,6 +49,8 @@ import { IoExtensionPuzzleOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { ISidebarItem } from "@/types";
 import HighwayExpansion from "./../../pages/client/HighwayExpansion";
+import ProjectReview from "./../../pages/client/ProjectReview";
+import ProjectBuilder from "./../../pages/client/ProjectBuilder";
 
 interface SidebarGroup {
   label: string;
@@ -152,18 +154,18 @@ export const getSidebarItems = (): SidebarGroup[] => {
             },
           ],
         },
-        /* {
+        {
           icon: <FileChartColumnIncreasing />,
           name: "Project Review",
-          path: "/project-review",
+          path: "/client-panel/project-review",
           element: <ProjectReview />,
-        }, */
-        /* {
+        },
+        {
           icon: <Grid2x2 />,
           name: "Project Builder",
-          path: "/project-builder",
+          path: "/client-panel/project-builder",
           element: <ProjectBuilder />,
-        }, */
+        },
       ].filter((item) => item), // here add this code .filter((item) => !item.hidden),
     },
     {
