@@ -13,6 +13,7 @@ import CarlyleHall from "@/pages/client/CarlyleHall";
 import ProjectReview from "@/pages/client/ProjectReview";
 import ProjectBuilder from "@/pages/client/ProjectBuilder";
 import Settings from "@/pages/client/Settings";
+import ActivityLog from "@/pages/client/ActivityLog";
 
 export function getClientRoutes() {
   return [
@@ -35,7 +36,7 @@ export function getClientRoutes() {
     },
     { path: "project-review", element: <ProjectReview /> },
     { path: "project-builder", element: <ProjectBuilder /> },
-    // { path: "activity-log", element: <ActivityLog /> },
+    { path: "activity-log", element: <ActivityLog /> },
     // {
     //   path: "help",
     //   element: <Help />,

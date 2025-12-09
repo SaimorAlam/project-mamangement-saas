@@ -49,9 +49,10 @@ import {
 import { IoExtensionPuzzleOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { ISidebarItem } from "@/types";
-import HighwayExpansion from "./../../pages/client/HighwayExpansion";
-import ProjectReview from "./../../pages/client/ProjectReview";
-import ProjectBuilder from "./../../pages/client/ProjectBuilder";
+import HighwayExpansion from "@/pages/client/HighwayExpansion";
+import ProjectReview from "@/pages/client/ProjectReview";
+import ProjectBuilder from "@/pages/client/ProjectBuilder";
+import ActivityLog from "@/pages/client/ActivityLog";
 
 interface SidebarGroup {
   label: string;
@@ -172,12 +173,12 @@ export const getSidebarItems = (): SidebarGroup[] => {
     {
       label: "Support",
       items: [
-        /* {
+        {
           icon: <Clipboard />,
           name: "Activity Log",
-          path: "/activity-log",
+          path: "/client-panel/activity-log",
           element: <ActivityLog />,
-        }, */
+        },
         /* {
           icon: <Info />,
           name: "Help",
