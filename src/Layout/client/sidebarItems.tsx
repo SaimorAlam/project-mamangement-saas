@@ -44,6 +44,8 @@ import ActivityLog from "@/pages/client/ActivityLog";
 import Help from "@/pages/Admin/Help";
 import Support from "@/pages/client/Support";
 import Feedback from "@/pages/client/FeedBack";
+import ProductTour from "@/pages/client/ProductTour";
+import ContactUs from "@/pages/client/ContactUs";
 
 interface SidebarGroup {
   label: string;
@@ -202,18 +204,18 @@ export const getSidebarItems = (): SidebarGroup[] => {
               name: "Feedback",
               element: <Feedback />,
             },
-            // {
-            //   icon: <Milestone />,
-            //   path: "product-tour",
-            //   name: "Product Tour",
-            //   element: <ProductTour />,
-            // },
-            // {
-            //   icon: <Phone />,
-            //   path: "contact-us",
-            //   name: "Contact US",
-            //   element: <ContactUs />,
-            // },
+            {
+              icon: <Milestone />,
+              path: "product-tour",
+              name: "Product Tour",
+              element: <ProductTour />,
+            },
+            {
+              icon: <Phone />,
+              path: "contact-us",
+              name: "Contact US",
+              element: <ContactUs />,
+            },
           ],
         },
         {

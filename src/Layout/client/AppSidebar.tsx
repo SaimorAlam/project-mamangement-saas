@@ -30,24 +30,23 @@ const AppSidebar = () => {
   const location = useLocation();
   const groups = getSidebarItems();
 
-  /* ---------------------------------------------
-      ACTIVE MATCHING FIX
-      - exactActive → true only when EXACT route matches
-      - sectionActive → true if inside that parent's section
-  ---------------------------------------------- */
-  const isExactActive = (fullPath: string) => {
-    return location.pathname === fullPath;
+  // Active logic — active if route matches current path or any child route matches
+  const isRouteActive = (item: any, parentPath = ""): boolean => {
+    const fullPath = item.index
+      ? parentPath
+      : item.path?.startsWith("/")
+      ? item.path
+      : `${parentPath}/${item.path}`;
+
+    if (location.pathname === fullPath) return true;
+    if (item.children) {
+      return item.children.some((child: any) =>
+        isRouteActive(child, fullPath)
+      );
+    }
+    return false;
   };
 
-  const isSectionActive = (fullPath: string) => {
-    if (fullPath === "/") return location.pathname === "/";
-    return (
-      location.pathname === fullPath ||
-      location.pathname.startsWith(fullPath + "/")
-    );
-  };
-
-  /* --------------------------------------------- */
   const renderSidebarItem = (item: any, parentPath = "") => {
     const fullPath = item.index
       ? parentPath
@@ -55,14 +54,11 @@ const AppSidebar = () => {
       ? item.path
       : `${parentPath}/${item.path}`;
 
-    const exactActive = isExactActive(fullPath);
-    const sectionActive = isSectionActive(fullPath);
+    const active = isRouteActive(item, parentPath);
 
-    /* ---------------------------------------------
-        PARENT WITH CHILDREN (Dropdown)
-    ---------------------------------------------- */
+    // Dropdown (parent with children)
     if (item.children && item.children.length > 0) {
-      const [open, setOpen] = useState(sectionActive);
+      const [open, setOpen] = useState(active);
 
       return (
         <SidebarMenuItem key={fullPath}>
@@ -70,27 +66,21 @@ const AppSidebar = () => {
             <DropdownMenuTrigger className="w-full">
               <SidebarMenuButton
                 asChild
-                className={`
-                  self-stretch px-4 py-5 rounded-[10px] inline-flex justify-start items-center w-full
+                className={`self-stretch px-4 py-5 rounded-[10px] inline-flex justify-start items-center w-full
                   ${
-                    sectionActive
-                      ? "bg-blue-100 text-blue-700"
+                    active
+                      ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                       : "text-gray-900"
-                  }
-                `}
+                  }`}
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="flex items-center gap-2">
                     <span className="size-6">{item.icon}</span>
-                    <span className="text-base font-normal">
-                      {item.name}
-                    </span>
+                    <span className="text-base font-normal">{item.name}</span>
                   </span>
 
                   <ChevronRight
-                    className={`${
-                      open ? "rotate-90 duration-200" : ""
-                    }`}
+                    className={`${open ? "rotate-90 duration-200" : ""}`}
                   />
                 </div>
               </SidebarMenuButton>
@@ -106,9 +96,7 @@ const AppSidebar = () => {
                   asChild
                   className="p-0"
                 >
-                  <div className="w-full">
-                    {renderSidebarItem(child, fullPath)}
-                  </div>
+                  <div className="w-full">{renderSidebarItem(child, fullPath)}</div>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -117,36 +105,28 @@ const AppSidebar = () => {
       );
     }
 
-    /* ---------------------------------------------
-        NORMAL (NO CHILDREN) — Exact Active Only
-    ---------------------------------------------- */
+    // Normal link (leaf)
     return (
       <SidebarMenuItem key={fullPath}>
         <Link to={fullPath}>
           <SidebarMenuButton
             asChild
-            className={`
-              self-stretch px-4 py-5 rounded-[10px] inline-flex justify-start items-center w-full
+            className={`self-stretch px-4 py-5 rounded-[10px] inline-flex justify-start items-center w-full
               ${
-                exactActive
-                  ? "bg-gradient-to-b from-blue-500 to-blue-600/80 text-white hover:text-white"
+                active
+                  ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                   : "text-gray-900"
-              }
-            `}
+              }`}
           >
             <div className="flex items-center gap-2">
               <span className="size-6">{item.icon}</span>
-              <span className="text-base font-normal">
-                {item.name}
-              </span>
+              <span className="text-base font-normal">{item.name}</span>
             </div>
           </SidebarMenuButton>
         </Link>
       </SidebarMenuItem>
     );
   };
-
-  /* --------------------------------------------- */
 
   return (
     <Sidebar className="border-1 border-slate-200 px-2 py-8 space-y-8 bg-white overflow-y-auto">
@@ -167,9 +147,7 @@ const AppSidebar = () => {
                   </SidebarGroupLabel>
 
                   <SidebarMenu className="space-y-[10px]">
-                    {group.items.map((item) =>
-                      renderSidebarItem(item)
-                    )}
+                    {group.items.map((item) => renderSidebarItem(item))}
                   </SidebarMenu>
 
                   <hr className="w-56 text-slate-300 my-5" />

@@ -131,7 +131,7 @@ const EmployeeTable: React.FC<ITableProps> = ({
                     {employee.projects.map((project, index) => (
                       <span
                         key={index}
-                        className="text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded"
+                        className="text-xs border border-gray-200 text-[#1D2028] bg-gray-50 px-2 py-1 rounded-lg"
                       >
                         {project}
                       </span>

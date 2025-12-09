@@ -19,6 +19,10 @@ import Support from "@/pages/client/Support";
 import SupportTickets from "@/pages/client/SupportTickets";
 import CreateTicket from "@/pages/client/CreateTicket";
 import Feedback from "@/pages/client/FeedBack";
+import ProductTour from "@/pages/client/ProductTour";
+import ContactUs from "@/pages/client/ContactUs";
+import WorkInProgress from "@/pages/client/WorkInProgress";
+import UserActivityLog from "@/pages/client/UsersActivityLog";
 
 export function getClientRoutes() {
   return [
@@ -55,12 +59,12 @@ export function getClientRoutes() {
           ],
         },
         { path: "feedback", element: <Feedback /> },
-        // { path: "product-tour", element: <ProductTour /> },
-        // { path: "contact-us", element: <ContactUs /> },
+        { path: "product-tour", element: <ProductTour /> },
+        { path: "contact-us", element: <ContactUs /> },
       ],
     },
     { path: "settings", element: <Settings /> },
-    // { path: "work-in-progress", element: <WorkInProgress /> },
-    // { path: "user-activity-log", element: <UserActivityLog /> },
+    { path: "work-in-progress", element: <WorkInProgress /> },
+    { path: "user-activity-log", element: <UserActivityLog /> },
   ];
 }
