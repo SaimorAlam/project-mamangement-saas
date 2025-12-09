@@ -1,76 +1,74 @@
-import AllProgramProject from "@/components/client/AllProgramProject";
-import UpcomingDeadline from "@/components/client/UpcomingDeadline";
-import ActivityLog from "@/components/client/ActivityLog";
-import ApexDonutChart from "@/components/client/common/Charts/ApexDonutChart";
-import LatestSubmission from "@/components/client/LatestSubmission";
-import ApexBarChart from "@/components/client/common/Charts/ApexBarChart";
-import ApexColumnChart from "@/components/client/common/Charts/ApexColumnChart";
-import ClientPanelStatsCard from "@/components/client/ClientPanelStatsCard";
+import AllProgramProject from "@/components/client/Overview/AllProgramProject";
+import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
+import ActivityLog from "@/components/client/Overview/ActivityLog";
+import ApexDonutChart from "@/components/client/Charts/ApexDonutChart";
+import LatestSubmission from "@/components/client/Overview/LatestSubmission";
+import ApexBarChart from "@/components/client/Charts/ApexBarChart";
+import ApexColumnChart from "@/components/client/Charts/ApexColumnChart";
+import ClientPanelStatsCard from "@/components/client/Overview/ClientPanelStatsCard";
 
 const clientData = [
   {
-    "title": "Total Program",
-    "value": 56,
-    "growth": "+5%",
-    "growth_type": "up",
-    "description": "24 program Running this month",
-    "link_text": "View all",
-    "icon": "FolderIcon",
-    "icon_bg_color": "#069576"
-    
+    title: "Total Program",
+    value: 56,
+    growth: "+5%",
+    growth_type: "up",
+    description: "24 program Running this month",
+    link_text: "View all",
+    icon: "FolderIcon",
+    icon_bg_color: "#069576",
   },
   {
-    "title": "Total Project",
-    "value": 156,
-    "growth": "+5%",
-    "growth_type": "up",
-    "description": "24 project Running this month",
-    "link_text": "View all",
-    "icon": "FolderIcon",
-    "icon_bg_color": "#069576"
+    title: "Total Project",
+    value: 156,
+    growth: "+5%",
+    growth_type: "up",
+    description: "24 project Running this month",
+    link_text: "View all",
+    icon: "FolderIcon",
+    icon_bg_color: "#069576",
   },
   {
-    "title": "Live Project",
-    "value": 36,
-    "growth": "+2%",
-    "growth_type": "up",
-    "description": "150 New user joined",
-    "link_text": "View all",
-    "icon": "LiveProject",
-    "icon_bg_color": "#756CF5"
+    title: "Live Project",
+    value: 36,
+    growth: "+2%",
+    growth_type: "up",
+    description: "150 New user joined",
+    link_text: "View all",
+    icon: "LiveProject",
+    icon_bg_color: "#756CF5",
   },
   {
-    "title": "Project in draft",
-    "value": 15,
-    "growth": "+1.1%",
-    "growth_type": "up",
-    "description": "5 new clients joined",
-    "link_text": "View all",
-    "icon": "ProjectInDraft", 
-    "icon_bg_color": "#4881FF"
+    title: "Project in draft",
+    value: 15,
+    growth: "+1.1%",
+    growth_type: "up",
+    description: "5 new clients joined",
+    link_text: "View all",
+    icon: "ProjectInDraft",
+    icon_bg_color: "#4881FF",
   },
   {
-    "title": "Pending Review",
-    "value": 75,
-    "growth": "+5%",
-    "growth_type": "up",
-    "description": "25 score growth",
-    "link_text": "View all",
-    "icon": "PendingReview",
-    "icon_bg_color": "#069576"
+    title: "Pending Review",
+    value: 75,
+    growth: "+5%",
+    growth_type: "up",
+    description: "25 score growth",
+    link_text: "View all",
+    icon: "PendingReview",
+    icon_bg_color: "#069576",
   },
   {
-    "title": "Submission Overdue",
-    "value": "7.8%",
-    "growth": null,
-    "growth_type": "down",
-    "description": "50 Clients left",
-    "link_text": "View all",
-    "icon": "SubmissionOverdue",
-    "icon_bg_color": "#DA4352"
-  }
-]
-
+    title: "Submission Overdue",
+    value: "7.8%",
+    growth: null,
+    growth_type: "down",
+    description: "50 Clients left",
+    link_text: "View all",
+    icon: "SubmissionOverdue",
+    icon_bg_color: "#DA4352",
+  },
+];
 
 const Overview = () => {
   return (

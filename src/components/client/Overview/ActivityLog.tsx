@@ -1,7 +1,7 @@
 import { ArrowRight, Filter, List } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import BoxContainer from "./common/BoxContainer";
-import PrimaryButton from "./common/PrimaryButton";
+import BoxContainer from "../common/BoxContainer";
+import PrimaryButton from "../common/PrimaryButton";
 
 const activityLogData = [
   {

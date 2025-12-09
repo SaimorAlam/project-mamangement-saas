@@ -1,7 +1,7 @@
 import { ApexOptions } from "apexcharts";
-import  { useState } from "react";
+import { useState } from "react";
 import Chart from "react-apexcharts";
-import BoxContainer from "../BoxContainer";
+import BoxContainer from "../common/BoxContainer";
 interface ApexColumnChartState {
   series: {
     name: string;
@@ -109,7 +109,9 @@ const ApexColumnChart = () => {
 
   return (
     <BoxContainer>
-      <h2 className="text-2xl font-semibold mb-4">Project Timeline</h2>
+      <h2 className="text-2xl font-semibold mb-4">
+        Project Timeline
+      </h2>
       <Chart
         options={state.options}
         series={state.series}

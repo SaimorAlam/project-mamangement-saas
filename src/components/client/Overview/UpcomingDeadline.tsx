@@ -1,8 +1,8 @@
 import { ArrowRight, CalendarDays, Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import UpcomingDeadlineCard from "./UpcomingDeadlineCard";
-import PrimaryButton from "./common/PrimaryButton";
-import BoxContainer from "./common/BoxContainer";
+import UpcomingDeadlineCard from "../UpcomingDeadlineCard";
+import PrimaryButton from "../common/PrimaryButton";
+import BoxContainer from "../common/BoxContainer";
 import Calendar from "react-calendar";
 import { useState } from "react";
 import "react-calendar/dist/Calendar.css"; // important!

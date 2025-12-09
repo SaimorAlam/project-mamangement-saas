@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import Chart from "react-apexcharts";
-import BoxContainer from "../BoxContainer";
+import BoxContainer from "../common/BoxContainer";
 
 const ApexBarChart = () => {
   const [chartData, setChartData] = useState<any>({
@@ -13,10 +13,22 @@ const ApexBarChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       const data = [
-        { name: "Customer Feedback Report", value: 37, level: "Critical" },
-        { name: "Sales Forecast Revision", value: 33, level: "Critical" },
+        {
+          name: "Customer Feedback Report",
+          value: 37,
+          level: "Critical",
+        },
+        {
+          name: "Sales Forecast Revision",
+          value: 33,
+          level: "Critical",
+        },
         { name: "Product Launch Plan", value: 27, level: "Critical" },
-        { name: "Marketing Budget Review", value: 23, level: "Medium" },
+        {
+          name: "Marketing Budget Review",
+          value: 23,
+          level: "Medium",
+        },
         { name: "Website Redesign", value: 18, level: "Low" },
       ];
 
@@ -68,7 +80,12 @@ const ApexBarChart = () => {
           },
           yaxis: {
             labels: {
-              style: { fontSize: "13px", fontWeight: 500, white_space: "normal", text_wrap: "wrap" },
+              style: {
+                fontSize: "13px",
+                fontWeight: 500,
+                white_space: "normal",
+                text_wrap: "wrap",
+              },
             },
           },
           legend: {
@@ -80,7 +97,6 @@ const ApexBarChart = () => {
             position: "top",
             horizontalAlign: "left",
             customLegendItems: ["Low", "Medium", "Critical"],
-            
           },
           tooltip: {
             y: {
@@ -96,7 +112,9 @@ const ApexBarChart = () => {
 
   return (
     <BoxContainer>
-      <h2 className="text-2xl font-semibold mb-4">Top Overdue: 25 Project</h2>
+      <h2 className="text-2xl font-semibold mb-4">
+        Top Overdue: 25 Project
+      </h2>
       {chartData.series.length > 0 && (
         <Chart
           className=""

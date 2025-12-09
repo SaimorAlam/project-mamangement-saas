@@ -35,6 +35,7 @@ const AppSidebar = () => {
           <img src={Logo} alt="Logo" className="w-[176px] h-[50px]" />
         </Link>
       </SidebarHeader>
+      
 
       <SidebarContent
         style={{ scrollbarWidth: "none" }}
