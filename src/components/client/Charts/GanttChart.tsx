@@ -1,12 +1,19 @@
 import { useEffect, useRef } from "react";
-import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
-import gantt from "dhtmlx-gantt";
+import { gantt } from "dhtmlx-gantt";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
-import { Download, FileText, MessageSquareText, Paperclip, Printer, Share2, Undo2 } from "lucide-react";
+import {
+  Download,
+  FileText,
+  MessageSquareText,
+  Paperclip,
+  Printer,
+  Share2,
+  Undo2,
+} from "lucide-react";
 import { CiExport } from "react-icons/ci";
 
-
+import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
 
 const GanttChart: React.FC = () => {
   const ganttContainer = useRef<HTMLDivElement>(null);
@@ -18,12 +25,27 @@ const GanttChart: React.FC = () => {
     gantt.config.show_unscheduled = true;
     gantt.config.scale_height = 50;
     gantt.config.scroll_size = 18;
-    gantt.init(ganttContainer.current);
+    gantt.init(ganttContainer.current as HTMLDivElement);
     gantt.parse({
       data: [
-        { id: 1, text: "Task #1", start_date: "2025-10-24", duration: 30 },
-        { id: 2, text: "Task #2", start_date: "2025-11-01", duration: 20 },
-        { id: 3, text: "Task #3", start_date: "2025-12-01", duration: 15 },
+        {
+          id: 1,
+          text: "Task #1",
+          start_date: "2025-10-24",
+          duration: 30,
+        },
+        {
+          id: 2,
+          text: "Task #2",
+          start_date: "2025-11-01",
+          duration: 20,
+        },
+        {
+          id: 3,
+          text: "Task #3",
+          start_date: "2025-12-01",
+          duration: 15,
+        },
       ],
     });
     return () => gantt.clearAll();
@@ -38,7 +60,9 @@ const GanttChart: React.FC = () => {
   };
 
   // Import (🔥 modified part)
-  const importFromCSV = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const importFromCSV = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -124,7 +148,10 @@ const GanttChart: React.FC = () => {
 
       {/* Scrollable Container */}
       <div className="w-full h-[calc(100vh-140px)] border border-gray-200 rounded-lg overflow-auto bg-gray-50">
-        <div ref={ganttContainer} className="w-full h-full min-w-[800px]" />
+        <div
+          ref={ganttContainer}
+          className="w-full h-full min-w-[800px]"
+        />
       </div>
     </div>
   );

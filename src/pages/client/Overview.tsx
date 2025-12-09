@@ -5,7 +5,7 @@ import ApexDonutChart from "@/components/client/Charts/ApexDonutChart";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/components/client/Charts/ApexBarChart";
 import ApexColumnChart from "@/components/client/Charts/ApexColumnChart";
-import ClientPanelStatsCard from "@/components/client/Overview/ClientPanelStatsCard";
+import ClientPanelStatsCard from "@/common/ClientPanelStatsCard";
 
 const clientData = [
   {

@@ -1,0 +1,129 @@
+import {
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Copy, Trash2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+
+interface ChartData {
+  name: string;
+  value: number;
+  count: number;
+  color: string;
+  [key: string]: string | number;
+}
+
+interface DoughnutChartProps {
+  title: string;
+  data: ChartData[];
+  centerLabel: string;
+}
+
+export default function DoughnutChart({
+  title,
+  data,
+  centerLabel,
+}: DoughnutChartProps) {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(data));
+  };
+
+  const handleDelete = () => {
+    console.log("Delete action");
+  };
+
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+
+  return (
+    <Card className="w-full max-w-2xl bg-white p-6 shadow-sm border border-gray-200">
+      {/* Header with title and actions */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">
+          {title}
+        </h2>
+        <div className="flex gap-2">
+          <button
+            onClick={handleCopy}
+            className="p-2 border border-gray-200 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
+            aria-label="Copy chart data"
+          >
+            <Copy size={18} className="text-gray-600" />
+          </button>
+          <button
+            onClick={handleDelete}
+            className="p-2 border border-gray-200 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
+            aria-label="Delete chart"
+          >
+            <Trash2 size={18} className="text-gray-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-6 mb-8">
+        {data.map((item) => (
+          <div key={item.name} className="flex items-center gap-2">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: item.color }}
+            />
+            <div>
+              <p className="text-sm font-medium text-gray-600">
+                {item.name}
+              </p>
+              <p className="text-lg font-semibold text-gray-900">
+                {item.value}%
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Doughnut Chart with Center Content */}
+      <div className="flex justify-center items-center relative">
+        <ResponsiveContainer width="100%" height={350}>
+          <RechartsPieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              innerRadius={80}
+              outerRadius={130}
+              fill="#8884d8"
+              dataKey="value"
+              startAngle={90}
+              endAngle={-270}
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(value, _name, props) => {
+                const item = props.payload;
+                return [`${item.name} ${item.count} ${value}%`, ""];
+              }}
+              contentStyle={{
+                backgroundColor: "#fff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "0.5rem",
+                padding: "8px 12px",
+              }}
+            />
+          </RechartsPieChart>
+        </ResponsiveContainer>
+
+        {/* Center Content */}
+        <div className="absolute flex flex-col items-center justify-center">
+          <p className="text-sm font-medium text-gray-600">
+            {centerLabel}
+          </p>
+          <p className="text-4xl font-bold text-gray-900">{total}</p>
+        </div>
+      </div>
+    </Card>
+  );
+}

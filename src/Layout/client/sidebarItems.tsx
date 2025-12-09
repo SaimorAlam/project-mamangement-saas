@@ -1,6 +1,6 @@
 import CreateTicket from "@/pages/client/CreateTicket";
 import SupportTickets from "@/pages/client/SupportTickets";
-import CarlyleHall from "@/data/AllDataTab/CarlyleHall";
+import CarlyleHall from "@/pages/client/CarlyleHall";
 import AlfalaBuilders from "@/pages/client/AlfalaBuilders";
 import MarketingStrategy from "@/pages/client/MarketingStrategy";
 import TimosSuperShop from "@/pages/client/TimosSuperShop";
@@ -8,6 +8,9 @@ import Employees from "@/pages/client/Employees";
 import Overview from "@/pages/Admin/Overview";
 import Works from "@/pages/client/Works";
 import AllProgram from "@/pages/client/AllProgram";
+import ProgramBuilder from "@/pages/client/ProgramBuilder";
+import ProgramName from "@/pages/client/ProgramName";
+import AllHighway from "@/pages/client/AllHighway";
 
 /* import AllHighway from "@/pages/ClientPanel/Program&Projects/HighwayExpansion/AllHighway";
 import HighwayExpansion from "@/pages/ClientPanel/Program&Projects/HighwayExpansion/HighwayExpansion";
@@ -45,6 +48,7 @@ import {
 import { IoExtensionPuzzleOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { ISidebarItem } from "@/types";
+import HighwayExpansion from "./../../pages/client/HighwayExpansion";
 
 interface SidebarGroup {
   label: string;
@@ -111,26 +115,26 @@ export const getSidebarItems = (): SidebarGroup[] => {
           path: "/client-panel/all-program",
           element: <AllProgram />,
         },
-        /* {
+        {
           icon: <IoExtensionPuzzleOutline className="size-6" />,
           name: "Program Builder",
-          path: "/program-builder",
+          path: "/client-panel/program-builder",
           element: <ProgramBuilder />,
-        }, */
-        /* {
+        },
+        {
           icon: <BriefcaseBusiness />,
           name: "Program Name",
-          path: "/program-name",
+          path: "/client-panel/program-name",
           element: <ProgramName />,
           hidden: showHighwayExpansion,
-        }, */
-        /* {
+        },
+        {
           icon: <BriefcaseBusiness />,
           name: (
             <span className="text-[15px]">Highway Expansion</span>
           ),
           className: "text-sm",
-          path: "/highway-expansion",
+          path: "/client-panel/highway-expansion",
           element: <HighwayExpansion />,
           hidden: !showHighwayExpansion,
           children: [
@@ -147,7 +151,7 @@ export const getSidebarItems = (): SidebarGroup[] => {
               element: <CarlyleHall />,
             },
           ],
-        }, */
+        },
         /* {
           icon: <FileChartColumnIncreasing />,
           name: "Project Review",
