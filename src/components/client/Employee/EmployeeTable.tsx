@@ -1,25 +1,33 @@
 import React from "react";
 import { Eye, Edit, Trash2 } from "lucide-react";
-import { Employee } from "@/components/EmployeeData/EmployeeData";
+import { IEmployee } from "@/types/client-panel";
 
-interface TableDataProps {
-  employees: Employee[];
+interface ITableProps {
+  employees: IEmployee[];
   selectedEmployees: Set<string>;
   selectAll: boolean;
   visibleColumns?: string[]; // 👈 new prop
   handleSelectAll: () => void;
   handleSelectEmployee: (id: string) => void;
-  handleEditClick?: (employee: Employee) => void;
+  handleEditClick?: (employee: IEmployee) => void;
   handleDeleteEmployee?: (id: string) => void;
   getRoleBadgeColor: (role: string) => string;
   getStatusBadgeColor?: (level: string) => string;
 }
 
-const TableData: React.FC<TableDataProps> = ({
+const EmployeeTable: React.FC<ITableProps> = ({
   employees,
   selectedEmployees,
   selectAll,
-  visibleColumns = ["fileName", "email", "role", "projects", "lastActive", "level", "action"],
+  visibleColumns = [
+    "fileName",
+    "email",
+    "role",
+    "projects",
+    "lastActive",
+    "level",
+    "action",
+  ],
   handleSelectAll,
   handleSelectEmployee,
   handleEditClick,
@@ -54,7 +62,9 @@ const TableData: React.FC<TableDataProps> = ({
               <th className="px-6 py-3 text-left">Assign Project</th>
             )}
             {visibleColumns.includes("lastActive") && (
-              <th className="px-6 py-3 text-left w-36">Last Active</th>
+              <th className="px-6 py-3 text-left w-36">
+                Last Active
+              </th>
             )}
             {visibleColumns.includes("level") && (
               <th className="px-6 py-3 text-left">Level</th>
@@ -67,7 +77,10 @@ const TableData: React.FC<TableDataProps> = ({
 
         <tbody className="bg-white divide-y divide-gray-200">
           {employees.map((employee) => (
-            <tr key={employee.id} className="hover:bg-gray-50 transition-colors">
+            <tr
+              key={employee.id}
+              className="hover:bg-gray-50 transition-colors"
+            >
               <td className="px-6 py-4">
                 <input
                   type="checkbox"
@@ -81,15 +94,23 @@ const TableData: React.FC<TableDataProps> = ({
                 <td className="px-6 py-4">
                   <div className="flex items-center">
                     <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-lg mr-3">
-                      {employee.avatar}
+                      <img
+                        src={employee.avatar}
+                        alt="Employee Avater"
+                        className="rounded-full"
+                      />
                     </div>
-                    <span className="text-sm font-medium text-gray-900">{employee.name}</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {employee.name}
+                    </span>
                   </div>
                 </td>
               )}
 
               {visibleColumns.includes("email") && (
-                <td className="px-6 py-4 text-sm text-gray-600">{employee.email}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">
+                  {employee.email}
+                </td>
               )}
 
               {visibleColumns.includes("role") && (
@@ -120,29 +141,30 @@ const TableData: React.FC<TableDataProps> = ({
               )}
 
               {visibleColumns.includes("lastActive") && (
-                <td className="px-6 py-4 text-sm text-gray-600">{employee.lastActive}</td>
-              )}
-
-              {visibleColumns.includes("level") && getStatusBadgeColor && (
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
-                      employee.level
-                    )}`}
-                  >
-                    {employee.level}
-                  </span>
+                <td className="px-6 py-4 text-sm text-gray-600">
+                  {employee.lastActive}
                 </td>
               )}
+
+              {visibleColumns.includes("level") &&
+                getStatusBadgeColor && (
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
+                        employee.level
+                      )}`}
+                    >
+                      {employee.level}
+                    </span>
+                  </td>
+                )}
 
               {visibleColumns.includes("action") && (
                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-2">
-                    <button
-                        className="p-1 text-blue-500 cursor-pointer"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
+                    <button className="p-1 text-blue-500 cursor-pointer">
+                      <Eye className="w-4 h-4" />
+                    </button>
                     {handleEditClick && (
                       <button
                         className="p-1 text-green-600 cursor-pointer"
@@ -154,7 +176,9 @@ const TableData: React.FC<TableDataProps> = ({
                     {handleDeleteEmployee && (
                       <button
                         className="p-1 text-red-600 cursor-pointer"
-                        onClick={() => handleDeleteEmployee(employee.id)}
+                        onClick={() =>
+                          handleDeleteEmployee(employee.id)
+                        }
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -170,4 +194,4 @@ const TableData: React.FC<TableDataProps> = ({
   );
 };
 
-export default TableData;
+export default EmployeeTable;

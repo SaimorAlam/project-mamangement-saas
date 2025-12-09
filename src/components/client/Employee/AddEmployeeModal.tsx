@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Mail, Calendar, HelpCircle, Copy } from 'lucide-react';
+import React, { useState } from "react";
+import { X, Mail, Calendar, HelpCircle, Copy } from "lucide-react";
 
 interface Tag {
   id: number;
@@ -11,50 +11,61 @@ interface AddEmployeeModalProps {
   onClose: () => void;
 }
 
-const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) => {
-  const [employeeName, setEmployeeName] = useState('');
-  const [employeeEmail, setEmployeeEmail] = useState('');
-  const [employeeRole, setEmployeeRole] = useState('Viewer - Default');
-  const [joinedDate, setJoinedDate] = useState('Today');
-  const [description, setDescription] = useState('');
-  const [loginEmail, setLoginEmail] = useState('milus_smith@acme.com');
+const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
+  open,
+  onClose,
+}) => {
+  const [employeeName, setEmployeeName] = useState("");
+  const [employeeEmail, setEmployeeEmail] = useState("");
+  const [employeeRole, setEmployeeRole] = useState(
+    "Viewer - Default"
+  );
+  const [joinedDate, setJoinedDate] = useState("Today");
+  const [description, setDescription] = useState("");
+  const [loginEmail, setLoginEmail] = useState(
+    "milus_smith@acme.com"
+  );
   const [sendWelcomeEmail, setSendWelcomeEmail] = useState(true);
-  const [notifyProjectManager, setNotifyProjectManager] = useState(false);
+  const [notifyProjectManager, setNotifyProjectManager] =
+    useState(false);
 
   const [skillTags, setSkillTags] = useState<Tag[]>([
-    { id: 1, label: 'Civil Eng' },
-    { id: 2, label: 'Architect' }
+    { id: 1, label: "Civil Eng" },
+    { id: 2, label: "Architect" },
   ]);
 
   const [projectTags, setProjectTags] = useState<Tag[]>([
-    { id: 1, label: 'Carlyle Hall' },
-    { id: 2, label: 'Highway expedition' }
+    { id: 1, label: "Carlyle Hall" },
+    { id: 2, label: "Highway expedition" },
   ]);
 
   const removeSkillTag = (id: number) => {
-    setSkillTags(skillTags.filter(tag => tag.id !== id));
+    setSkillTags(skillTags.filter((tag) => tag.id !== id));
   };
 
   const removeProjectTag = (id: number) => {
-    setProjectTags(projectTags.filter(tag => tag.id !== id));
+    setProjectTags(projectTags.filter((tag) => tag.id !== id));
   };
 
   const addSkillTag = () => {
-    const newTag = prompt('Enter skill name:');
+    const newTag = prompt("Enter skill name:");
     if (newTag) {
       setSkillTags([...skillTags, { id: Date.now(), label: newTag }]);
     }
   };
 
   const addProjectTag = () => {
-    const newTag = prompt('Enter project name:');
+    const newTag = prompt("Enter project name:");
     if (newTag) {
-      setProjectTags([...projectTags, { id: Date.now(), label: newTag }]);
+      setProjectTags([
+        ...projectTags,
+        { id: Date.now(), label: newTag },
+      ]);
     }
   };
 
   const handleSubmit = () => {
-    console.log('Employee added:', {
+    console.log("Employee added:", {
       employeeName,
       employeeEmail,
       employeeRole,
@@ -64,7 +75,7 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) =>
       projectTags,
       loginEmail,
       sendWelcomeEmail,
-      notifyProjectManager
+      notifyProjectManager,
     });
     onClose();
   };
@@ -76,7 +87,9 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) =>
       <div className="bg-white rounded-lg shadow-xl w-full max-w-xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Add New Employee</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Add New Employee
+          </h2>
           <button
             onClick={() => onClose()}
             className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
@@ -87,14 +100,17 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) =>
 
         {/* Content */}
         <div className="px-6 py-5 overflow-y-auto max-h-[calc(90vh-140px)]">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Employee details</h3>
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">
+            Employee details
+          </h3>
 
           <div className="space-y-5">
             {/* Employee Name and Email Row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Employee Name <span className="text-red-500">*</span>
+                  Employee Name{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -106,10 +122,14 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) =>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Employee Email <span className="text-red-500">*</span>
+                  Employee Email{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                  <Mail
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    size={16}
+                  />
                   <input
                     type="email"
                     value={employeeEmail}
@@ -125,13 +145,18 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) =>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Employee Role <span className="text-red-500">*</span>
+                  Employee Role{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={employeeRole}
                   onChange={(e) => setEmployeeRole(e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none  bg-white appearance-none"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center' }}
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 0.75rem center",
+                  }}
                 >
                   <option>Viewer - Default</option>
                   <option>Admin</option>
@@ -140,9 +165,11 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) =>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Skill</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Skill
+                </label>
                 <div className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md min-h-[38px]">
-                  {skillTags.map(tag => (
+                  {skillTags.map((tag) => (
                     <span
                       key={tag.id}
                       className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
@@ -190,10 +217,12 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) =>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Project</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Project
+                </label>
                 <div className="relative">
                   <div className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md min-h-[38px]">
-                    {projectTags.map(tag => (
+                    {projectTags.map((tag) => (
                       <span
                         key={tag.id}
                         className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
@@ -215,8 +244,13 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) =>
                     </button>
                   </div>
                   <button className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                      <path d="M6 9L1 4h10z"/>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 12 12"
+                      fill="currentColor"
+                    >
+                      <path d="M6 9L1 4h10z" />
                     </svg>
                   </button>
                 </div>
@@ -253,25 +287,33 @@ const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ open, onClose }) =>
                     <Copy size={16} />
                   </button>
                 </div>
-                
+
                 <div className="mt-3 space-y-2">
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       checked={sendWelcomeEmail}
-                      onChange={(e) => setSendWelcomeEmail(e.target.checked)}
+                      onChange={(e) =>
+                        setSendWelcomeEmail(e.target.checked)
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span className="text-sm text-gray-700">Send Welcome Email With Login Link</span>
+                    <span className="text-sm text-gray-700">
+                      Send Welcome Email With Login Link
+                    </span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       checked={notifyProjectManager}
-                      onChange={(e) => setNotifyProjectManager(e.target.checked)}
+                      onChange={(e) =>
+                        setNotifyProjectManager(e.target.checked)
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span className="text-sm text-gray-700">Notify Project Manager</span>
+                    <span className="text-sm text-gray-700">
+                      Notify Project Manager
+                    </span>
                   </label>
                 </div>
               </div>

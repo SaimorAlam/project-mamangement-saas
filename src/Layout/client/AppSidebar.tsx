@@ -35,7 +35,6 @@ const AppSidebar = () => {
           <img src={Logo} alt="Logo" className="w-[176px] h-[50px]" />
         </Link>
       </SidebarHeader>
-      
 
       <SidebarContent
         style={{ scrollbarWidth: "none" }}
@@ -136,7 +135,7 @@ const AppSidebar = () => {
                                 asChild
                                 className={`self-stretch px-4 py-5 rounded-[10px] inline-flex justify-start items-center w-full ${
                                   isActive
-                                    ? "bg-gradient-to-b from-blue-500 to-blue-600/80 text-white"
+                                    ? "bg-gradient-to-b from-blue-500 to-blue-600/80 text-white hover:text-white"
                                     : "text-gray-900"
                                 }`}
                               >

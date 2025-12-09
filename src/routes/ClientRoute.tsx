@@ -1,6 +1,6 @@
 import Overview from "@/pages/client/Overview";
 import AllProgram from "@/pages/client/AllProgram";
-import Employees from "@/pages/Employees";
+import Employees from "@/pages/client/Employees";
 
 export function getClientRoutes() {
   return [

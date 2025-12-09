@@ -43,20 +43,11 @@ import {
 } from "lucide-react";
 import { IoExtensionPuzzleOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
-
-interface SidebarItem {
-  icon?: React.ReactElement;
-  name?: string | React.ReactElement;
-  path?: string;
-  element?: React.ReactNode;
-  hidden?: boolean;
-  children?: SidebarItem[];
-  index?: boolean;
-}
+import { ISidebarItem } from "@/types";
 
 interface SidebarGroup {
   label: string;
-  items: SidebarItem[];
+  items: ISidebarItem[];
 }
 
 export const getSidebarItems = (): SidebarGroup[] => {

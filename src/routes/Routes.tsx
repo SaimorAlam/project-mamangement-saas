@@ -12,7 +12,6 @@ import EmailCode from "@/pages/EmailCode";
 import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
-import Employees from "@/pages/Employees";
 
 // Layout imports
 import AdminDashboardLayout from "@/Layout/admin/AdminDashboardLayout";
@@ -47,10 +46,6 @@ const routes = createBrowserRouter([
       {
         path: "/form",
         element: <Form />,
-      },
-      {
-        path: "/Employees",
-        element: <Employees />,
       },
       {
         path: "/login",

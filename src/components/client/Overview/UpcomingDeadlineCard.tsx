@@ -5,25 +5,13 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { IUpcomingDeadlineProject } from "@/types";
 
-export interface AssignedStaff {
-  name: string;
-  avatar: string;
-}
-export interface UpcomingDeadlineProject {
-  id: string;
-  programName: string;
-  projectName: string;
-  dueDate: string;
-  daysLeft: number;
-  assignedStaff: AssignedStaff[];
+interface IProps {
+  deadlineData: IUpcomingDeadlineProject;
 }
 
-export interface DeadlineData {
-  deadlineData: UpcomingDeadlineProject;
-}
-
-const UpcomingDeadlineCard = ({ deadlineData }: DeadlineData) => {
+const UpcomingDeadlineCard = ({ deadlineData }: IProps) => {
   const {
     projectName,
     programName,
