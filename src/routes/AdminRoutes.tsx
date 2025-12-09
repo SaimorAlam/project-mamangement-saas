@@ -35,7 +35,6 @@ export function getAdminRoutes() {
   return [
     {
       index: true,
-      path: "",
       element: <AdminDashboard />,
     },
     {

@@ -70,14 +70,14 @@ export const getSidebarItems = (): SidebarGroup[] => {
         {
           icon: <ChartPie />,
           name: "Overview",
-          path: "/client",
+          path: "/client-panel",
           element: <Overview />,
         },
         // { icon: <Backpack />, name: "Works", path: "/works", element: <Works /> },
         {
           icon: <Users />,
           name: "Employees",
-          path: "/client/employees",
+          path: "/client-panel/employees",
           element: <Employees />,
         },
       ],
@@ -96,7 +96,7 @@ export const getSidebarItems = (): SidebarGroup[] => {
         {
           icon: <LayoutGrid />,
           name: "All Program",
-          path: "/client/all-program",
+          path: "/client-panel/all-program",
           element: <AllProgram />,
         },
         /* {

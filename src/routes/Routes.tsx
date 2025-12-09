@@ -86,7 +86,7 @@ const routes = createBrowserRouter([
 
       // Client Route
       {
-        path: "/client",
+        path: "/client-panel",
         element: <ClientDashboardLayout />,
         children: getClientRoutes(),
       },

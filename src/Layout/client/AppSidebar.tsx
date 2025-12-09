@@ -29,14 +29,17 @@ const AppSidebar = () => {
   const ClientSidebarGroups = getSidebarItems();
 
   return (
-    <Sidebar className="border-1 border-slate-200 px-6 py-8 space-y-8 bg-white overflow-y-auto">
-      <SidebarHeader>
+    <Sidebar className="border-1 border-slate-200 px-2 py-8 space-y-8 bg-white overflow-y-auto">
+      <SidebarHeader className="bg-white">
         <Link to="/">
           <img src={Logo} alt="Logo" className="w-[176px] h-[50px]" />
         </Link>
       </SidebarHeader>
 
-      <SidebarContent style={{ scrollbarWidth: "none" }}>
+      <SidebarContent
+        style={{ scrollbarWidth: "none" }}
+        className="bg-white"
+      >
         <SidebarGroup className="scrollbar-hidden">
           <SidebarGroupContent>
             <SidebarMenu className="overflow-hidden">
@@ -154,17 +157,18 @@ const AppSidebar = () => {
                   <hr className="w-56 text-slate-300 my-5" />
                 </div>
               ))}
-              {/* Profile */}
-              <UserProfile
-                name="Sofia Martin"
-                role="Team Leader"
-                avatar="https://randomuser.me/api/portraits/women/47.jpg"
-              />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter className="bg-white">
+        {/* Profile */}
+        <UserProfile
+          name="Sofia Martin"
+          role="Team Leader"
+          avatar="https://randomuser.me/api/portraits/women/47.jpg"
+        />
+      </SidebarFooter>
     </Sidebar>
   );
 };
