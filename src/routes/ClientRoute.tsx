@@ -12,6 +12,7 @@ import AllHighway from "@/pages/client/AllHighway";
 import CarlyleHall from "@/pages/client/CarlyleHall";
 import ProjectReview from "@/pages/client/ProjectReview";
 import ProjectBuilder from "@/pages/client/ProjectBuilder";
+import Settings from "@/pages/client/Settings";
 
 export function getClientRoutes() {
   return [
@@ -52,7 +53,7 @@ export function getClientRoutes() {
     //     { path: "contact-us", element: <ContactUs /> },
     //   ],
     // },
-    // { path: "settings", element: <Settings /> },
+    { path: "settings", element: <Settings /> },
     // { path: "work-in-progress", element: <WorkInProgress /> },
     // { path: "user-activity-log", element: <UserActivityLog /> },
   ];

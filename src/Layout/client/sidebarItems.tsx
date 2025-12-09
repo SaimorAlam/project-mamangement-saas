@@ -11,6 +11,7 @@ import AllProgram from "@/pages/client/AllProgram";
 import ProgramBuilder from "@/pages/client/ProgramBuilder";
 import ProgramName from "@/pages/client/ProgramName";
 import AllHighway from "@/pages/client/AllHighway";
+import Settings from "@/pages/client/Settings";
 
 /* import AllHighway from "@/pages/ClientPanel/Program&Projects/HighwayExpansion/AllHighway";
 import HighwayExpansion from "@/pages/ClientPanel/Program&Projects/HighwayExpansion/HighwayExpansion";
@@ -213,12 +214,12 @@ export const getSidebarItems = (): SidebarGroup[] => {
             },
           ],
         }, */
-        /* {
+        {
           icon: <IoSettingsOutline className="size-6" />,
           name: "Settings",
-          path: "/settings",
+          path: "/client-panel/settings",
           element: <Settings />,
-        }, */
+        },
       ],
     },
   ];
