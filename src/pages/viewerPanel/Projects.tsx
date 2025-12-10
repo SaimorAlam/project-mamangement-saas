@@ -1,4 +1,4 @@
-import CostOverview from "@/common/Charts/CostOverView";
+import CostOverview from "@/common/Charts/CostOverview";
 import PhasePlan from "@/common/Charts/PhasePlan";
 import ProgressChart from "@/common/Charts/Progress";
 import ProgressRing from "@/common/Charts/ProgressRing";
