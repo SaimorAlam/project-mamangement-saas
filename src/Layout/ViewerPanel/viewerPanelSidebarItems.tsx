@@ -1,13 +1,13 @@
 import {
-  // Building2,
+  Building2,
   ChartPie,
   Folder,
   Headphones,
   Info,
-  // Megaphone,
+  Megaphone,
   Milestone,
   Phone,
-  // Store,
+  Store,
   UserStar,
   Ticket,
   TicketPlus,
@@ -45,14 +45,26 @@ export const getViewerPanelSidebarItems = (): SidebarGroup[] => {
         },
       ],
     },
-    // {
-    //   label: "Favorites",
-    //   items: [
-    //     { icon: <Megaphone />, name: "Marketing Strategy", path: "/marketing-strategy", element: <MarketingStrategy /> },
-    //     { icon: <Building2 />, name: "Alfala Building", path: "/alfala-building", element: <AlfalaBuilders /> },
-    //     { icon: <Store />, name: "Timo's Super Shop", path: "/timos-super-shop", element: <TimosSuperShop /> },
-    //   ],
-    // },
+    {
+      label: "Favorites",
+      items: [
+        {
+          icon: <Megaphone />,
+          name: "Marketing Strategy",
+          path: "/viewer-panel/marketing-strategy",
+        },
+        {
+          icon: <Building2 />,
+          name: "Alfala Building",
+          path: "/viewer-panel/alfala-building",
+        },
+        {
+          icon: <Store />,
+          name: "Timo's Super Shop",
+          path: "/viewer-panel/timos-super-shop",
+        },
+      ],
+    },
     {
       label: "Support",
       items: [

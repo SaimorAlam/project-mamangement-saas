@@ -1,7 +1,7 @@
 import { ApexOptions } from "apexcharts";
 import { useState } from "react";
 import Chart from "react-apexcharts";
-import BoxContainer from "../../../common/BoxContainer";
+import BoxContainer from "@/common/BoxContainer";
 interface ApexColumnChartState {
   series: {
     name: string;

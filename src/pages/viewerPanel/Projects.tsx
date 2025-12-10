@@ -1,17 +1,17 @@
-import CostOverview from "@/components/Charts/CostOverview";
-import PhasePlan from "@/components/Charts/PhasePlan";
-import ProgressChart from "@/components/Charts/Progress";
-import TaskStatusChart from "@/components/Charts/ProgressRing";
-import ProjectCostChart from "@/components/Charts/ProjectCost";
-import ProjectInformation from "@/components/Charts/ProjectInfo";
-import EmployeeWorkloadChart from "@/components/Charts/WorkLoad";
+import CostOverview from "@/common/Charts/CostOverView";
+import PhasePlan from "@/common/Charts/PhasePlan";
+import ProgressChart from "@/common/Charts/Progress";
+import ProgressRing from "@/common/Charts/ProgressRing";
+import ProjectCostChart from "@/common/Charts/ProjectCost";
+import ProjectInformation from "@/common/Charts/ProjectInfo";
+import EmployeeWorkloadChart from "@/common/Charts/WorkLoad";
 
 const Projects = () => {
   return (
     <div>
       <div className="flex gap-6">
         <ProjectInformation />
-        <TaskStatusChart />
+        <ProgressRing />
         <EmployeeWorkloadChart />
       </div>
       <div className="flex gap-6 mt-6">

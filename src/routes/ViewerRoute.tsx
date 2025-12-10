@@ -16,7 +16,7 @@ import Feedback from "@/pages/client/FeedBack";
 import ProductTour from "@/pages/client/ProductTour";
 import ContactUs from "@/pages/client/ContactUs";
 import HighwayExpansion from "@/pages/client/HighwayExpansion";
-import Projects from "@/pages/staffManager/Projects";
+import Projects from "@/pages/viewerPanel/Projects";
 import CarlyleHall from "@/pages/client/CarlyleHall";
 import UserActivityLog from "@/pages/client/UsersActivityLog";
 

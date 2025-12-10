@@ -6,11 +6,11 @@ import {
   FileText,
   AlertTriangle,
 } from "lucide-react";
-import GanttTab from "../../data/AllDataTab/GanttTab";
-import SheetTab from "../../data/AllDataTab/SheetTab";
-import FileTab from "../../data/AllDataTab/FileTab";
-import RaidLogTab from "../../data/AllDataTab/RaidLogTab";
-import DashboardTab from "../../data/AllDataTab/DashboardTab";
+import GanttTab from "../../components/AllDataTab/GanttTab";
+import SheetTab from "../../components/AllDataTab/SheetTab";
+import FileTab from "../../components/AllDataTab/FileTab";
+import RaidLogTab from "../../components/AllDataTab/RaidLogTab";
+import DashboardTab from "../../components/AllDataTab/DashboardTab";
 
 const CarlyleHall: React.FC = () => {
   // Check localStorage for last active tab, default to 'gantt'

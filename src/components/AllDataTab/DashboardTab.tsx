@@ -1,8 +1,8 @@
-import ProgressChart from "@/components/client/Charts/Progress";
-import ProjectCostChart from "@/components/client/Charts/ProjectCost";
-import ProjectInformation from "@/components/client/Charts/ProjectInfo";
-import EmployeeWorkloadChart from "@/components/client/Charts/WorkLoad";
-import TaskStatusChart from "@/components/client/Charts/ProgressRing";
+import ProgressChart from "@/common/Charts/Progress";
+import ProjectCostChart from "@/common/Charts/ProjectCost";
+import ProjectInformation from "@/common/Charts/ProjectInfo";
+import EmployeeWorkloadChart from "@/common/Charts/WorkLoad";
+import TaskStatusChart from "@/common/Charts/ProgressRing";
 
 const DashboardTab = () => {
   return (

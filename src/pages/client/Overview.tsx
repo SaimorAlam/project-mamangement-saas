@@ -1,10 +1,10 @@
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
-import ApexDonutChart from "@/components/client/Charts/ApexDonutChart";
+import ApexDonutChart from "@/common/Charts/ApexDonutChart";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
-import ApexBarChart from "@/components/client/Charts/ApexBarChart";
-import ApexColumnChart from "@/components/client/Charts/ApexColumnChart";
+import ApexBarChart from "@/common/Charts/ApexBarChart";
+import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import ClientPanelStatsCard from "@/common/ClientPanelStatsCard";
 
 const clientData = [

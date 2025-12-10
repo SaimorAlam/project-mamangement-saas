@@ -8,6 +8,7 @@ const Layout: React.FC = () => {
     "/admin",
     "/client",
     "/staff-manager",
+    "/viewer-panel",
     "/dashboard",
     "/login",
     "/signup",

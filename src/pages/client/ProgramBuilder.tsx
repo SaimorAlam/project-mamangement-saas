@@ -1,15 +1,15 @@
 import { useState } from "react";
 
-import DoughnutChart from "@/components/client/Charts/DoughnutChart";
-import HeatmapChart from "@/components/client/Charts/HeatmapChart";
-import RadarChart from "@/components/client/Charts/RadarChart";
-import StackedBarChart from "@/components/client/Charts/StackedBarChart";
-import GanttChart from "@/components/client/Charts/GanttChart";
-import PieChart from "@/components/client/Charts/PieChart";
-import ProgressRing from "@/components/client/Charts/ProgressRing";
-import MultiAxisLineChart from "@/components/client/Charts/LineChart";
-import HorizontalBarChart from "@/components/client/Charts/HorizontalBarChart";
-import AreaChart from "@/components/client/Charts/AreaChart";
+import DoughnutChart from "@/common/Charts/DoughnutChart";
+import HeatmapChart from "@/common/Charts/HeatmapChart";
+import RadarChart from "@/common/Charts/RadarChart";
+import StackedBarChart from "@/common/Charts/StackedBarChart";
+import GanttChart from "@/common/Charts/GanttChart";
+import PieChart from "@/common/Charts/PieChart";
+import ProgressRing from "@/common/Charts/ProgressRing";
+import MultiAxisLineChart from "@/common/Charts/LineChart";
+import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
+import AreaChart from "@/common/Charts/AreaChart";
 
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
