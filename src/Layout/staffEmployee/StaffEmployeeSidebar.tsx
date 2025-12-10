@@ -24,11 +24,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { ChevronRight } from "lucide-react";
-import { getClientSidebarItems } from "./clientSidebarItems";
+import { getStaffManagerSidebarItems } from "../staffManagerPanel/staffManagerSidebarItem";
 
-const ClientSidebar = () => {
+const StaffEmployeeSidebar = () => {
   const location = useLocation();
-  const groups = getClientSidebarItems();
+  const groups = getStaffManagerSidebarItems();
 
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
@@ -92,13 +92,13 @@ const ClientSidebar = () => {
 
             <DropdownMenuContent
               align="end"
-              className="bg-white border border-[#CBD5E1] p-1 space-y-1 w-full"
+              className="bg-white border border-[#CBD5E1] p-1 space-y-1"
             >
               {item.children.map((child: any) => (
                 <DropdownMenuItem
                   key={`${fullPath}-${child.path}`}
                   asChild
-                  className="p-0 w-full"
+                  className="p-0"
                 >
                   <div className="w-full">
                     {renderSidebarItem(child, fullPath)}
@@ -137,7 +137,7 @@ const ClientSidebar = () => {
   };
 
   return (
-    <Sidebar className="border-1 border-slate-200 px-2 py-8 space-y-8 bg-white overflow-y-auto">
+    <Sidebar className="border-1 border-slate-200 px-2 py-8 space-y-8 !bg-white overflow-y-auto">
       <SidebarHeader className="!bg-white">
         <Link to="/">
           <img src={Logo} alt="Logo" className="w-[176px] h-[50px]" />
@@ -179,4 +179,4 @@ const ClientSidebar = () => {
   );
 };
 
-export default ClientSidebar;
+export default StaffEmployeeSidebar;

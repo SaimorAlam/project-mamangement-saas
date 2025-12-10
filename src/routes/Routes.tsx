@@ -27,6 +27,8 @@ import { getClientRoutes } from "./ClientRoute";
 import { getStaffManagerRoutes } from "./StaffManagerRoute";
 import ViewerPanelDashboardLayout from "./../Layout/ViewerPanel/ViewerPanelDashboardLayout";
 import getViewerPanelRoutes from "./ViewerRoute";
+import StaffEmployeeDashboardLayout from "./../Layout/staffEmployee/StaffEmployeeDashboardLayout";
+import getStaffEmployeeRoutes from "./StaffEmployeeRoute";
 
 const routes = createBrowserRouter([
   {
@@ -99,11 +101,18 @@ const routes = createBrowserRouter([
         children: getStaffManagerRoutes(),
       },
 
+      // Staff employee routes
+      {
+        path: "/staff-employee-panel",
+        element: <StaffEmployeeDashboardLayout />,
+        children: getStaffEmployeeRoutes(),
+      },
+
       // Viewer Panel routes
       {
         path: "/viewer-panel",
         element: <ViewerPanelDashboardLayout />,
-        children: getViewerPanelRoutes()
+        children: getViewerPanelRoutes(),
       },
     ],
   },
