@@ -1,4 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
+
+// Application route imports
 import App from "../App";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
@@ -14,15 +16,17 @@ import Form from "@/pages/Form";
 import Services from "@/pages/Services";
 
 // Layout imports
-import AdminDashboardLayout from "@/Layout/admin/AdminDashboardLayout";
-import ClientDashboardLayout from "./../Layout/client/ClientDashboardLayout";
+import AdminDashboardLayout from "@/Layout/adminPanel/AdminDashboardLayout";
+import ClientDashboardLayout from "@/Layout/clientPanel/ClientDashboardLayout";
+import StaffManagerDashboardLayout from "@/Layout/staffManagerPanel/StaffManagerDashboardLayout";
 // import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
 
 // Route list imports
 import { getAdminRoutes } from "./AdminRoutes";
 import { getClientRoutes } from "./ClientRoute";
-import StaffManagerDashboardLayout from "./../Layout/staffManager/StaffManagerDashboardLayout";
 import { getStaffManagerRoutes } from "./StaffManagerRoute";
+import ViewerPanelDashboardLayout from "./../Layout/ViewerPanel/ViewerPanelDashboardLayout";
+import getViewerPanelRoutes from "./ViewerRoute";
 
 const routes = createBrowserRouter([
   {
@@ -93,6 +97,13 @@ const routes = createBrowserRouter([
         path: "/staff-manager-panel",
         element: <StaffManagerDashboardLayout />,
         children: getStaffManagerRoutes(),
+      },
+
+      // Viewer Panel routes
+      {
+        path: "/viewer-panel",
+        element: <ViewerPanelDashboardLayout />,
+        children: getViewerPanelRoutes()
       },
     ],
   },

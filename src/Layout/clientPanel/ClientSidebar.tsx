@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { ChevronRight } from "lucide-react";
-import { getClientSidebarItems } from "@/Layout/client/clientSidebarItems";
+import { getClientSidebarItems } from "./clientSidebarItems";
 
 const ClientSidebar = () => {
   const location = useLocation();

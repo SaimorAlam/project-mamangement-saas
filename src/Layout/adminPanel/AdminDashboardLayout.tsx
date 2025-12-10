@@ -1,5 +1,5 @@
-import SidebarNavigation from "@/Layout/admin/AdminNav";
-import AdminTopBar from "@/Layout/admin/AdminTopBar";
+import SidebarNavigation from "./AdminNav";
+import AdminTopBar from "./AdminTopBar";
 import { Outlet } from "react-router-dom";
 
 export default function AdminDashboardLayout() {
