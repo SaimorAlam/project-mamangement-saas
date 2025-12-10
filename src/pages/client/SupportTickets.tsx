@@ -1,5 +1,5 @@
-import BoxContainer from "@/components/client/common/BoxContainer";
-import PrimaryButton from "@/components/client/common/PrimaryButton";
+import BoxContainer from "@/common/BoxContainer";
+import PrimaryButton from "@/common/PrimaryButton";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

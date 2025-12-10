@@ -24,11 +24,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { ChevronRight } from "lucide-react";
-import { getSidebarItems } from "@/Layout/client/sidebarItems";
+import { getClientSidebarItems } from "@/Layout/client/clientSidebarItems";
 
-const AppSidebar = () => {
+const ClientSidebar = () => {
   const location = useLocation();
-  const groups = getSidebarItems();
+  const groups = getClientSidebarItems();
 
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
@@ -76,11 +76,15 @@ const AppSidebar = () => {
                 <div className="flex items-center justify-between w-full">
                   <span className="flex items-center gap-2">
                     <span className="size-6">{item.icon}</span>
-                    <span className="text-base font-normal">{item.name}</span>
+                    <span className="text-base font-normal">
+                      {item.name}
+                    </span>
                   </span>
 
                   <ChevronRight
-                    className={`${open ? "rotate-90 duration-200" : ""}`}
+                    className={`${
+                      open ? "rotate-90 duration-200" : ""
+                    }`}
                   />
                 </div>
               </SidebarMenuButton>
@@ -88,15 +92,17 @@ const AppSidebar = () => {
 
             <DropdownMenuContent
               align="end"
-              className="bg-white border border-[#CBD5E1] p-1 space-y-1"
+              className="bg-white border border-[#CBD5E1] p-1 space-y-1 w-full"
             >
               {item.children.map((child: any) => (
                 <DropdownMenuItem
                   key={`${fullPath}-${child.path}`}
                   asChild
-                  className="p-0"
+                  className="p-0 w-full"
                 >
-                  <div className="w-full">{renderSidebarItem(child, fullPath)}</div>
+                  <div className="w-full">
+                    {renderSidebarItem(child, fullPath)}
+                  </div>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -120,7 +126,9 @@ const AppSidebar = () => {
           >
             <div className="flex items-center gap-2">
               <span className="size-6">{item.icon}</span>
-              <span className="text-base font-normal">{item.name}</span>
+              <span className="text-base font-normal">
+                {item.name}
+              </span>
             </div>
           </SidebarMenuButton>
         </Link>
@@ -147,7 +155,9 @@ const AppSidebar = () => {
                   </SidebarGroupLabel>
 
                   <SidebarMenu className="space-y-[10px]">
-                    {group.items.map((item) => renderSidebarItem(item))}
+                    {group.items.map((item) =>
+                      renderSidebarItem(item)
+                    )}
                   </SidebarMenu>
 
                   <hr className="w-56 text-slate-300 my-5" />
@@ -169,4 +179,4 @@ const AppSidebar = () => {
   );
 };
 
-export default AppSidebar;
+export default ClientSidebar;

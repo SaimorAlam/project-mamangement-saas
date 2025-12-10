@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
-import DropdownSelect from "../common/DropdownSelect";
+import DropdownSelect from "../../../common/DropdownSelect";
 
 export interface ProjectStatus {
   name: string;

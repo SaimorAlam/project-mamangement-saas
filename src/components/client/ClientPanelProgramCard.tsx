@@ -8,7 +8,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { ClipboardList, Star, Flag } from "lucide-react";
 import { Link } from "react-router-dom";
-import PrimaryButton from "./common/PrimaryButton";
+import PrimaryButton from "../../common/PrimaryButton";
 
 export interface StaffMember {
   name: string;

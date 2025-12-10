@@ -7,6 +7,7 @@ const Layout: React.FC = () => {
   const isDashboardRoute = [
     "/admin",
     "/client",
+    "/staff-manager",
     "/dashboard",
     "/login",
     "/signup",

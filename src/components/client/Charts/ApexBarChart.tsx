@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import Chart from "react-apexcharts";
-import BoxContainer from "../common/BoxContainer";
+import BoxContainer from "../../../common/BoxContainer";
 
 const ApexBarChart = () => {
   const [chartData, setChartData] = useState<any>({

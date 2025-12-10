@@ -19,13 +19,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import PrimaryButton from "@/components/client/common/PrimaryButton";
+import PrimaryButton from "@/common/PrimaryButton";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import { motion, AnimatePresence } from "framer-motion";
 import NewProjectModal from "@/components/client/NewProjectModal";
-import { getSidebarItems } from "./sidebarItems";
+import { getClientSidebarItems } from "./clientSidebarItems";
 
-const Header = ({ name }: { name: string }) => {
+const ClientDashboardHeader = ({ name }: { name: string }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<string | null>(null);
@@ -34,7 +34,7 @@ const Header = ({ name }: { name: string }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] =
     useState(false);
-  const ClientSidebarGroups = getSidebarItems();
+  const ClientSidebarGroups = getClientSidebarItems();
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const location = useLocation();
@@ -258,4 +258,4 @@ const Header = ({ name }: { name: string }) => {
   );
 };
 
-export default Header;
+export default ClientDashboardHeader;

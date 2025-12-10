@@ -3,9 +3,9 @@ import ToggleSwitchComponent from "@/components/client/Settings/ToggleSwitchComp
 import ColorPickerComponent from "@/components/client/Settings/ColorPickerComponent";
 import FileUploadComponent from "@/components/client/Settings/FileUploadComponent";
 import CheckboxGroupComponent from "@/components/client/Settings/CheckboxGroupComponent";
-import BoxContainer from "@/components/client/common/BoxContainer";
-import DropdownSelect from "@/components/client/common/DropdownSelect";
-import PrimaryButton from "@/components/client/common/PrimaryButton";
+import BoxContainer from "@/common/BoxContainer";
+import DropdownSelect from "@/common/DropdownSelect";
+import PrimaryButton from "@/common/PrimaryButton";
 import APIConnectionCard from "@/components/client/Settings/APIConnectionCard";
 
 const Settings = () => {

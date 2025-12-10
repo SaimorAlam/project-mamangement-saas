@@ -1,11 +1,12 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
+import StaffManagerSidebar from "./StaffManagerSidebar";
+import StaffManagerDashboardHeader from "./StaffManagerDashboardHeader";
+import { HeaderProvider } from "./StaffManagerHeaderContext";
 import { Outlet } from "react-router-dom";
-import ClientDashboardHeader from "./ClientDashboardHeader";
-import ClientSidebar from "./ClientSidebar";
 
-export default function ClientDashboardLayout() {
+const StaffManagerDashboardLayout = () => {
   return (
-    <>
+    <HeaderProvider>
       <SidebarProvider
         style={
           {
@@ -13,14 +14,16 @@ export default function ClientDashboardLayout() {
           } as React.CSSProperties
         }
       >
-        <ClientSidebar />
+        <StaffManagerSidebar />
         <main className="w-full px-8">
           <div className="pb-6">
-            <ClientDashboardHeader name="Timo" />
+            <StaffManagerDashboardHeader />
           </div>
           <Outlet />
         </main>
       </SidebarProvider>
-    </>
+    </HeaderProvider>
   );
-}
+};
+
+export default StaffManagerDashboardLayout;

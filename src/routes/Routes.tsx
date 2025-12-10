@@ -15,12 +15,14 @@ import Services from "@/pages/Services";
 
 // Layout imports
 import AdminDashboardLayout from "@/Layout/admin/AdminDashboardLayout";
+import ClientDashboardLayout from "./../Layout/client/ClientDashboardLayout";
 // import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
 
 // Route list imports
 import { getAdminRoutes } from "./AdminRoutes";
-import ClientDashboardLayout from "./../Layout/client/ClientDashboardLayout";
 import { getClientRoutes } from "./ClientRoute";
+import StaffManagerDashboardLayout from "./../Layout/staffManager/StaffManagerDashboardLayout";
+import { getStaffManagerRoutes } from "./StaffManagerRoute";
 
 const routes = createBrowserRouter([
   {
@@ -84,6 +86,13 @@ const routes = createBrowserRouter([
         path: "/client-panel",
         element: <ClientDashboardLayout />,
         children: getClientRoutes(),
+      },
+
+      // Staff manager routes
+      {
+        path: "/staff-manager-panel",
+        element: <StaffManagerDashboardLayout />,
+        children: getStaffManagerRoutes(),
       },
     ],
   },

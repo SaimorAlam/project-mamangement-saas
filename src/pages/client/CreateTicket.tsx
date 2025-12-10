@@ -1,7 +1,7 @@
-import BoxContainer from "@/components/client/common/BoxContainer";
-import PrimaryButton from "@/components/client/common/PrimaryButton";
-import DropdownSelect from "@/components/client/common/DropdownSelect";
-import DescriptionTextArea from "@/components/client/common/DescriptionTextArea";
+import BoxContainer from "@/common/BoxContainer";
+import PrimaryButton from "@/common/PrimaryButton";
+import DropdownSelect from "@/common/DropdownSelect";
+import DescriptionTextArea from "@/common/DescriptionTextArea";
 import { Send } from "lucide-react";
 
 const CreateTicket = () => {

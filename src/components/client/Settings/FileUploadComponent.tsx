@@ -1,4 +1,4 @@
-import PrimaryButton from "../common/PrimaryButton";
+import PrimaryButton from "../../../common/PrimaryButton";
 import { Upload } from "lucide-react";
 
 interface FileUploadProps {

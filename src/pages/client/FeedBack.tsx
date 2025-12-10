@@ -1,6 +1,6 @@
-import BoxContainer from "@/components/client/common/BoxContainer";
-import DescriptionTextArea from "@/components/client/common/DescriptionTextArea";
-import PrimaryButton from "@/components/client/common/PrimaryButton";
+import BoxContainer from "@/common/BoxContainer";
+import DescriptionTextArea from "@/common/DescriptionTextArea";
+import PrimaryButton from "@/common/PrimaryButton";
 import { Send } from "lucide-react";
 
 const Feedback = () => {

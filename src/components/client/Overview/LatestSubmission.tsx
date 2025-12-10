@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { CardHeader } from "@/components/ui/card";
 import SubmissionTable from "../SubmissionTable";
-import DropdownSelect from "../common/DropdownSelect";
-import BoxContainer from "../common/BoxContainer";
+import DropdownSelect from "../../../common/DropdownSelect";
+import BoxContainer from "../../../common/BoxContainer";
 import { ISubmission } from "@/types";
 
 const submissionsData = [

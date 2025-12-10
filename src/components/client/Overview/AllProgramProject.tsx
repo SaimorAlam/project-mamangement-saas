@@ -17,8 +17,8 @@ import AllProgramProjectGridView from "../AllProgramProjectGridView";
 import AllProgramProjectTableView from "../AllProgramProjectTableView";
 import Pagination from "../Pagination";
 import { Button } from "@/components/ui/button";
-import PrimaryButton from "../common/PrimaryButton";
-import DropdownSelect from "../common/DropdownSelect";
+import PrimaryButton from "../../../common/PrimaryButton";
+import DropdownSelect from "../../../common/DropdownSelect";
 
 const allProgramProjectData = [
   {
