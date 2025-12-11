@@ -6,6 +6,7 @@ export interface User {
   clientId: string;
   role: string;
   specialToken?: string;
+  name?: string;
   accessToken?: string;
   refreshToken?: string;
 }

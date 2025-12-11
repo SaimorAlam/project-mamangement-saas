@@ -164,7 +164,7 @@ const ClientDashboardHeader = ({ name }: { name: string }) => {
                         <button
                           key={index}
                           onClick={() => handleDropdownClick(item)}
-                          className="w-full text-left px-4 py-2 rounded-md hover:bg-gray-800 border border-gray-300 text-gray-700 hover:text-white mb-2 last:mb-0 cursor-pointer duration-300"
+                          className="w-full text-left px-4 py-2 rounded-md border border-gray-300 hover:border-black text-gray-700 mb-2 last:mb-0 cursor-pointer duration-300"
                         >
                           {item}
                         </button>

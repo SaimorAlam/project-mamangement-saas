@@ -138,13 +138,13 @@ const ClientSidebar = () => {
 
   return (
     <Sidebar className="border-1 border-slate-200 px-2 py-8 space-y-8 bg-white overflow-y-auto">
-      <SidebarHeader>
+      <SidebarHeader className="!bg-white">
         <Link to="/">
           <img src={Logo} alt="Logo" className="w-[176px] h-[50px]" />
         </Link>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="!bg-white">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -168,7 +168,7 @@ const ClientSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="!bg-white">
         <UserProfile
           name="Sofia Martin"
           role="Team Leader"

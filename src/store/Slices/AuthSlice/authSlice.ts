@@ -12,6 +12,7 @@ const initialState: AuthState = {
     phone: "",
     userEmail: "",
     userId: "",
+    name: "",
     clientId: "",
     role: "",
     specialToken: "",
@@ -36,6 +37,7 @@ const authSlice = createSlice({
         state.user!.role = decode.role;
         state.user!.accessToken = action.payload.accessToken;
         state.user!.refreshToken = action.payload.refreshToken;
+        state.user!.name = decode.name;
       } else {
         state.user!.email = action.payload.email;
         state.user!.phone = action.payload.phone;

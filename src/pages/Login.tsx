@@ -21,7 +21,9 @@ const Role = {
 };
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters"),
 });
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
@@ -80,7 +82,11 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[40%]">
         <img src="Logo.png" alt="logo" />
-        <img className="w-full" src="login image.png" alt="login-Image" />
+        <img
+          className="w-full"
+          src="login image.png"
+          alt="login-Image"
+        />
       </div>
       <div>
         <h2 className="text-[48px] leading-[56px] font-semibold text-center">
