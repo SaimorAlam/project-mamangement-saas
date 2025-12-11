@@ -60,7 +60,7 @@ export default function getStaffEmployeeRoutes() {
           children: [
             { index: true, element: <StaffEmployeeSupportTickets /> },
             {
-              path: "create-ticket",
+              path: "create-tickets",
               element: <StaffEmployeeCreateTicket />,
             },
           ],

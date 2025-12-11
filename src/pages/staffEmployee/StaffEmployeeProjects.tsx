@@ -1,6 +1,6 @@
-import SideManager from "@/components/staffManager/Projects/SideManager";
-import ProjectStats from "@/components/staffManager/Projects/ProjectStats";
-import UploadProject from "@/components/staffManager/Projects/UploadProject";
+import SideManager from "@/components/staffEmployee/Projects/SideManager";
+import ProjectStats from "@/components/staffEmployee/Projects/ProjectStats";
+import UploadProject from "@/components/staffEmployee/Projects/UploadProject";
 
 const StaffEmployeeProjects = () => {
   return (
