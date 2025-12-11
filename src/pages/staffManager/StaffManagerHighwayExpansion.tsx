@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
 
-export default function HighwayExpansion() {
+export default function StaffManagerHighwayExpansion() {
   return <Outlet />;
 }

@@ -21,12 +21,12 @@ import CarlyleHall from "@/pages/client/ClientCarlyleHall";
 import AllProjectReview from "@/components/client/ProjectReview/AllProjectReview";
 import ClientProjectReview from "@/pages/client/ClientProjectReview";
 import ClientProjectBuilder from "@/pages/client/ClientProjectBuilder";
-import Projects from "@/pages/staffManager/Projects";
+import StaffManagerProjects from "@/pages/staffManager/StaffManagerProjects";
 
 export function getStaffManagerRoutes() {
   return [
     { index: true, element: <ClientOverview /> },
-    { path: "projects", element: <Projects /> },
+    { path: "projects", element: <StaffManagerProjects /> },
     { path: "carlyle-hall", element: <CarlyleHall /> },
     { path: "employees", element: <Employees /> },
     {

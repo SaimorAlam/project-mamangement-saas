@@ -3,7 +3,7 @@ import DescriptionTextArea from "@/common/DescriptionTextArea";
 import PrimaryButton from "@/common/PrimaryButton";
 import { Send } from "lucide-react";
 
-const Feedback = () => {
+const StaffManagerFeedback = () => {
   const handleAttachment = () => {};
   const handleEmoji = () => {};
   return (
@@ -40,4 +40,4 @@ const Feedback = () => {
   );
 };
 
-export default Feedback;
+export default StaffManagerFeedback;

@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-const Help = () => {
+const StaffManagerHelp = () => {
   return <Outlet />;
 };
-export default Help;
+export default StaffManagerHelp;

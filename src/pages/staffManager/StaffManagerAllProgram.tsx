@@ -11,7 +11,7 @@ interface IProgramTableProps {
 }
 
 // === AllProgramTable Component ===
-const AllProgram = ({
+const StaffManagerAllProgram = ({
   title = "All Program",
   programs: propPrograms,
   hideCreatedOn = false,
@@ -245,4 +245,4 @@ const AllProgram = ({
   );
 };
 
-export default AllProgram;
+export default StaffManagerAllProgram;

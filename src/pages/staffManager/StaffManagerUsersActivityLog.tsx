@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import DateRangePicker from "@/components/client/DateRange";
+import SearchBar from "@/components/client/SearchBar";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import Pagination from "@/components/client/Pagination";
-import SearchBar from "@/components/client/SearchBar";
-import DateRange from "@/components/client/DateRange";
+import { useMemo, useState } from "react";
 import ActivityLogTable from "@/components/client/ActivityLog/ActivityLogTable";
+import Pagination from "@/components/client/Pagination";
 
 const activityLogData = [
   {
@@ -705,42 +705,37 @@ export interface ActivityLogEntry {
 // Flatten nested objects for table rendering
 const flattenEntry = (entry: ActivityLogEntry) => {
   return {
-    ...entry,
-    user: {
-      name: entry.user.name,
-      avatar: entry.user.avatar,
-    },
+    timeStamp: entry.timestamp,
     description: `${entry.description.action}${
       entry.description.details
         ? `: ${entry.description.details}`
         : ""
     }`,
+    projectName: entry.projectName,
   };
 };
 
-export default function EmployeesActivityLog() {
+const StaffManagerUserActivityLog = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
   const flattenedData = activityLogData.map(flattenEntry);
 
-  // Filter data
-  const filteredData = flattenedData.filter((entry) =>
-    Object.values(entry).some(
+  const filteredData = flattenedData.filter((item) => {
+    return Object.values(item).some(
       (value) =>
         value &&
         value
           .toString()
           .toLowerCase()
           .includes(searchTerm.toLowerCase())
-    )
-  );
+    );
+  });
+
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredData.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredData, currentPage]);
-
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const tableHeaders = Object.keys(paginatedData[0] || {});
 
@@ -769,14 +764,14 @@ export default function EmployeesActivityLog() {
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900">
-          All Employees Activity Log
+          User Activity Log
         </h2>
         <div className="flex items-center gap-3">
           <SearchBar
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
-          <DateRange />
+          <DateRangePicker />
           <Button
             variant="outline"
             onClick={handleExport}
@@ -804,4 +799,5 @@ export default function EmployeesActivityLog() {
       />
     </div>
   );
-}
+};
+export default StaffManagerUserActivityLog;

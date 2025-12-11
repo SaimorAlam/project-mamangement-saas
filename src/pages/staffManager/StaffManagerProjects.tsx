@@ -2,7 +2,7 @@ import SideManager from "@/components/staffManager/Projects/SideManager";
 import ProjectStats from "@/components/staffManager/Projects/ProjectStats";
 import UploadProject from "@/components/staffManager/Projects/UploadProject";
 
-const Projects = () => {
+const StaffManagerProjects = () => {
   return (
     <div>
       <ProjectStats />
@@ -13,4 +13,4 @@ const Projects = () => {
     </div>
   );
 };
-export default Projects;
+export default StaffManagerProjects;

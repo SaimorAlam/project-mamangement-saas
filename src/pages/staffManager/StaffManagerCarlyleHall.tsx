@@ -12,7 +12,7 @@ import FileTab from "../../components/AllDataTab/FileTab";
 import RaidLogTab from "../../components/AllDataTab/RaidLogTab";
 import DashboardTab from "../../components/AllDataTab/DashboardTab";
 
-const CarlyleHall: React.FC = () => {
+const StaffManagerCarlyleHall: React.FC = () => {
   // Check localStorage for last active tab, default to 'gantt'
   const [activeTab, setActiveTab] = useState<string>(() => {
     return localStorage.getItem("activeCarlyleTab") || "gantt";
@@ -70,4 +70,4 @@ const CarlyleHall: React.FC = () => {
   );
 };
 
-export default CarlyleHall;
+export default StaffManagerCarlyleHall;

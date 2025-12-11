@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Headphones, MapPin, Phone, Send } from "lucide-react";
 
-const ContactUs = () => {
+const StaffManagerContactUs = () => {
   const supportHours = {
     time: "8am-5pm",
     timezone: "Central Time, USA",
@@ -118,4 +118,4 @@ const ContactUs = () => {
   );
 };
 
-export default ContactUs;
+export default StaffManagerContactUs;

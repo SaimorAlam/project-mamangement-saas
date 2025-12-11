@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
 
-export default function Support() {
+export default function StaffManagerSupport() {
   return <Outlet />;
 }
