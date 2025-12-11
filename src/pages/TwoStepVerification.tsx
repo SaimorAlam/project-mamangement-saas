@@ -3,19 +3,29 @@ import { MessageSquareText, Mail } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useVerificationTypeMutation } from "@/store/Api/AuthApi/VerificationApi";
 
 const TwoStepVerification = () => {
   const { user } = useAppSelector((state) => state.auth);
+  const [verificationType] = useVerificationTypeMutation();
   const { email, phone } = user!;
   const navigate = useNavigate();
-  const handleOnClick = (type: string) => {
+  const handleOnClick = async (type: string) => {
     if (type === "email") {
-      navigate("/emailcode", { state: { type: "email" } });
-      toast.success(`we have sent a password reset code in your ${email}`);
+      const res = await verificationType(email as string).unwrap();
+      console.log(res);
+      if (res.success) {
+        navigate("/emailcode", { state: { type: "email" } });
+        toast.success(`we have sent a password reset code in your ${email}`);
+      }
     }
     if (type === "phone") {
-      navigate("/emailcode", { state: { type: "phone" } });
-      toast.success(`we have sent a password reset code in your ${phone}`);
+      const res = await verificationType(phone as string).unwrap();
+      console.log(res);
+      if (res.success) {
+        navigate("/emailcode", { state: { type: "phone" } });
+        toast.success(`we have sent a password reset code in your ${phone}`);
+      }
     }
   };
   return (

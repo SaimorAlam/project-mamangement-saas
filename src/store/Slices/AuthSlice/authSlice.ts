@@ -1,17 +1,9 @@
+import { User } from "@/types/Auth/Auth";
 import { createSlice } from "@reduxjs/toolkit";
 import { jwtDecode } from "jwt-decode";
-interface User {
-  email: string;
-  phone: string;
-  userEmail: string;
-  userId: string;
-  clientId: string;
-  role: string;
-  specialToken?: string;
-  accessToken?: string;
-}
+
 interface AuthState {
-  user: User | null;
+  user: Partial<User> | null;
 }
 
 const initialState: AuthState = {
@@ -24,6 +16,7 @@ const initialState: AuthState = {
     role: "",
     specialToken: "",
     accessToken: "",
+    refreshToken: "",
   },
 };
 
@@ -32,16 +25,22 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      const decode = jwtDecode(action?.payload?.specialToken as string) as User;
-      console.log(decode, "Decode");
-      state.user!.email = action.payload.email;
-      state.user!.phone = action.payload.phone;
-      state.user!.userEmail = decode.userEmail;
-      state.user!.userId = decode.userId;
-      state.user!.clientId = decode.clientId;
-      state.user!.role = decode.role;
-      state.user!.specialToken = decode.specialToken;
-      state.user!.accessToken = action.payload.accessToken;
+      const token = action.payload.accessToken
+        ? action.payload.accessToken
+        : action.payload.specialToken;
+      const decode = jwtDecode(token as string) as User;
+      if (action.payload.accessToken) {
+        state.user!.userEmail = decode.userEmail;
+        state.user!.userId = decode.userId;
+        state.user!.clientId = decode.clientId;
+        state.user!.role = decode.role;
+        state.user!.accessToken = action.payload.accessToken;
+        state.user!.refreshToken = action.payload.refreshToken;
+      } else {
+        state.user!.email = action.payload.email;
+        state.user!.phone = action.payload.phone;
+        state.user!.specialToken = decode.specialToken;
+      }
     },
     logOut: (state) => {
       state.user = null;

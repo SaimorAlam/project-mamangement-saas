@@ -8,7 +8,17 @@ import { useLoginMutation } from "@/store/Api/AuthApi/AuthApi";
 import { toast } from "sonner";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setUser } from "@/store/Slices/AuthSlice/authSlice";
+import { jwtDecode } from "jwt-decode";
 
+const Role = {
+  VIEWER: "viewer-panel",
+  EMPLOYEE: "employee",
+  SUPPORTER: "supporter",
+  MANAGER: "staff-manager-panel",
+  ADMIN: "admin",
+  CLIENT: "client-panel",
+  SUPERADMIN: "superadmin",
+};
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -40,14 +50,22 @@ const Login = () => {
       if (res.success) {
         dispatch(setUser(res?.data));
         toast.success("Logged in successfully", { id: toastId });
+        console.log(res);
         if (res.data.specialToken) {
           navigate("/verification");
         } else {
-          navigate("/admin");
+          const { role } = jwtDecode<{ role: keyof typeof Role }>(
+            res.data.accessToken
+          );
+          console.log(role);
+          console.log(Role[role]);
+          if (Role[role]) {
+            navigate(`/${Role[role]}`);
+          }
         }
       }
-    } catch (error) {
-      toast.error("Login Failed" + error, { id: toastId });
+    } catch {
+      toast.error("Login Failed", { id: toastId });
     }
   };
 

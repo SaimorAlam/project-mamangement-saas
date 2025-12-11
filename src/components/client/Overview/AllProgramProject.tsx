@@ -324,9 +324,7 @@ const allProgramProjectData = [
 ];
 
 const AllProgramProject = () => {
-  const [viewMode, setViewMode] = useState<"table" | "board">(
-    "board"
-  );
+  const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
@@ -365,8 +363,6 @@ const AllProgramProject = () => {
     { value: "Low", title: "Low" },
     { value: "Default", title: "Default" },
   ];
-
-  console.log(statusFilter);
 
   return (
     <div className="pb-6 min-h-[500px]">

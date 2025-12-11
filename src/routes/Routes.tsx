@@ -27,6 +27,8 @@ import { getClientRoutes } from "./ClientRoute";
 import { getStaffManagerRoutes } from "./StaffManagerRoute";
 import ViewerPanelDashboardLayout from "./../Layout/ViewerPanel/ViewerPanelDashboardLayout";
 import getViewerPanelRoutes from "./ViewerRoute";
+import ProtectedRoute from "./ProtectedRoute";
+import Unauthorized from "@/common/Unauthorized";
 
 const routes = createBrowserRouter([
   {
@@ -77,32 +79,47 @@ const routes = createBrowserRouter([
         path: "/emailcode",
         element: <EmailCode />,
       },
-
       // Super Admin routes
       {
         path: "/admin",
-        element: <AdminDashboardLayout />,
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <AdminDashboardLayout />
+          </ProtectedRoute>
+        ),
         children: getAdminRoutes(),
       },
 
       // Client Route
       {
         path: "/client-panel",
-        element: <ClientDashboardLayout />,
+        element: (
+          <ProtectedRoute allowedRoles={["CLIENT"]}>
+            <ClientDashboardLayout />
+          </ProtectedRoute>
+        ),
         children: getClientRoutes(),
       },
 
       // Staff manager routes
       {
         path: "/staff-manager-panel",
-        element: <StaffManagerDashboardLayout />,
+        element: (
+          <ProtectedRoute allowedRoles={["MANAGER"]}>
+            <StaffManagerDashboardLayout />
+          </ProtectedRoute>
+        ),
         children: getStaffManagerRoutes(),
       },
 
       // Viewer Panel routes
       {
         path: "/viewer-panel",
-        element: <ViewerPanelDashboardLayout />,
+        element: (
+          <ProtectedRoute allowedRoles={["VIEWER"]}>
+            <ViewerPanelDashboardLayout />
+          </ProtectedRoute>
+        ),
         children: getViewerPanelRoutes(),
       },
     ],
@@ -110,6 +127,10 @@ const routes = createBrowserRouter([
   {
     path: "*",
     element: <NotFound />,
+  },
+  {
+    path: "/unauthorized",
+    element: <Unauthorized />,
   },
 ]);
 

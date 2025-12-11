@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { logOut, setUser } from "@/store/Slices/AuthSlice/authSlice";
 import {
   BaseQueryFn,
@@ -9,7 +10,6 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_BASE_URL,
-  
 });
 
 const baseQueryWithReauth: BaseQueryFn<
@@ -19,21 +19,21 @@ const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
   if (result.error && result.error.status === 401) {
-    // try to get a new token
-    const refreshToken = Cookies.get("refreshToken");
+    const state = api.getState() as any;
+    const refreshToken =
+      Cookies.get("refreshToken") || state.auth.user?.refreshToken;
     if (!refreshToken) {
       api.dispatch(logOut());
       return result;
     }
     const refreshResult = await baseQuery(
-      { url: "/refresh-token", method: "POST", body: { refreshToken } },
+      { url: "/auth/refresh-token", method: "POST", body: { refreshToken } },
       api,
       extraOptions
     );
+    console.log(refreshResult);
     if (refreshResult.data) {
-      // store the new token
       api.dispatch(setUser(refreshResult.data));
-      // retry the initial query
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logOut());
