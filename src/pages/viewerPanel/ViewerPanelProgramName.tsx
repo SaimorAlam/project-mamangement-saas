@@ -1,6 +1,4 @@
-import React from 'react'
-
-export default function ViewerPanelProgramName() {
+export default function ProgramName() {
   return (
     <div>ProgramName</div>
   )
