@@ -8,13 +8,14 @@ const programApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Program"],
     }),
     getAllProgram: builder.query({
       query: () => ({
         url: "/program",
         method: "GET",
       }),
-      providesTags: ["PROGRAM"],
+      providesTags: ["Program"],
     }),
     getProgramById: builder.query({
       query: (id) => ({
@@ -34,6 +35,7 @@ const programApi = baseApi.injectEndpoints({
         method: "PUT",
         body: data,
       }),
+      invalidatesTags: ["Program"],
     }),
   }),
 });

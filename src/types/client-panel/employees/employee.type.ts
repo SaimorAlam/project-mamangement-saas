@@ -1,10 +1,15 @@
 export interface IEmployee {
-  id: string;
   name: string;
   email: string;
-  role: string;
-  projects: string[];
-  lastActive: string;
-  level: string;
-  avatar: string;
+  phoneNumber: string;
+  password?: string; // optional, only used when creating
+  skills: string[];
+  description: string;
+  joinedDate: string; // ISO date string
+  projects: string[]; // array of project IDs
+  sendWelcomeEmail: boolean;
+  notifyProjectManager: boolean;
+  role: "Viewer" | "Staff" | "Manager";
+  level: "Active" | "In Active";
+  id?: string; // optional unique identifier for existing employees
 }

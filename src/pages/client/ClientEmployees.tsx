@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-
 import EmployeeTable from "@/components/client/Employee/EmployeeTable";
 import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
 import DianneRussellTask from "@/components/client/Employee/DianneRussellTask";
-
 import EmployeeHeader from "@/components/client/Employee/EmployeeHeader";
 import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
 
@@ -15,12 +13,7 @@ const employees = [
     name: "Dianne Russell",
     email: "tanya.hill@example.com",
     role: "Manager",
-    projects: [
-      "Carlyle Hat",
-      "Carlyle Hat",
-      "Carlyle Hat",
-      "Carlyle Hat",
-    ],
+    projects: ["Carlyle Hat", "Carlyle Hat", "Carlyle Hat", "Carlyle Hat"],
     lastActive: "4/4/18",
     level: "Active",
     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
@@ -521,29 +514,21 @@ const ClientEmployees: React.FC = () => {
   const [searchTerm] = useState<string>("");
   const [filterBy, setFilterBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [showFilterDropdown, setShowFilterDropdown] =
-    useState<boolean>(false);
-  const [selectedEmployees, setSelectedEmployees] = useState<
-    Set<string>
-  >(new Set());
+  const [showFilterDropdown, setShowFilterDropdown] = useState<boolean>(false);
+  const [selectedEmployees, setSelectedEmployees] = useState<Set<string>>(
+    new Set()
+  );
   const [selectAll, setSelectAll] = useState<boolean>(false);
-  const [employeeList, setEmployeeList] =
-    useState<IEmployee[]>(employees);
+  const [employeeList, setEmployeeList] = useState<IEmployee[]>(employees);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editEmployee, setEditEmployee] = useState<IEmployee | null>(
-    null
-  );
-  const [activeTab, setActiveTab] = useState<"tables" | "task">(
-    "tables"
-  );
+  const [editEmployee, setEditEmployee] = useState<IEmployee | null>(null);
+  const [activeTab, setActiveTab] = useState<"tables" | "task">("tables");
 
   const itemsPerPage = 17;
 
   const filteredEmployees = employeeList.filter((employee) => {
     const matchesSearch =
-      employee.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
+      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter =
       filterBy === "all" ||
@@ -551,24 +536,17 @@ const ClientEmployees: React.FC = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const totalPages = Math.ceil(
-    filteredEmployees.length / itemsPerPage
-  );
+  const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentEmployees = filteredEmployees.slice(
-    startIndex,
-    endIndex
-  );
+  const currentEmployees = filteredEmployees.slice(startIndex, endIndex);
 
   const handleSelectAll = () => {
     if (selectAll) {
       setSelectedEmployees(new Set());
       setSelectAll(false);
     } else {
-      setSelectedEmployees(
-        new Set(currentEmployees.map((emp) => emp.id))
-      );
+      setSelectedEmployees(new Set(currentEmployees.map((emp) => emp.id)));
       setSelectAll(true);
     }
   };
@@ -588,9 +566,7 @@ const ClientEmployees: React.FC = () => {
   };
 
   const handleDeleteEmployee = (employeeId: string) => {
-    setEmployeeList((prev) =>
-      prev.filter((emp) => emp.id !== employeeId)
-    );
+    setEmployeeList((prev) => prev.filter((emp) => emp.id !== employeeId));
   };
 
   const handleEditClick = (employee: IEmployee) => {
@@ -609,9 +585,7 @@ const ClientEmployees: React.FC = () => {
   const handleEditSave = () => {
     if (!editEmployee) return;
     setEmployeeList((prev) =>
-      prev.map((emp) =>
-        emp.id === editEmployee.id ? editEmployee : emp
-      )
+      prev.map((emp) => (emp.id === editEmployee.id ? editEmployee : emp))
     );
     setEditModalOpen(false);
     setEditEmployee(null);
@@ -717,9 +691,7 @@ const ClientEmployees: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() =>
-                    setCurrentPage(Math.max(1, currentPage - 1))
-                  }
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
                   className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -727,41 +699,36 @@ const ClientEmployees: React.FC = () => {
                 </button>
 
                 {/* Page Numbers */}
-                {Array.from(
-                  { length: Math.min(5, totalPages) },
-                  (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={`px-3 py-1 text-sm rounded ${
-                          currentPage === pageNum
-                            ? "bg-blue-600 text-white"
-                            : "border border-gray-300 hover:bg-gray-50"
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
                   }
-                )}
+
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-3 py-1 text-sm rounded ${
+                        currentPage === pageNum
+                          ? "bg-blue-600 text-white"
+                          : "border border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
 
                 {totalPages > 5 && currentPage < totalPages - 2 && (
                   <>
-                    <span className="px-3 py-1 text-sm text-gray-500">
-                      ...
-                    </span>
+                    <span className="px-3 py-1 text-sm text-gray-500">...</span>
                     <button
                       onClick={() => setCurrentPage(totalPages)}
                       className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
@@ -773,9 +740,7 @@ const ClientEmployees: React.FC = () => {
 
                 <button
                   onClick={() =>
-                    setCurrentPage(
-                      Math.min(totalPages, currentPage + 1)
-                    )
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
                   }
                   disabled={currentPage === totalPages}
                   className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
