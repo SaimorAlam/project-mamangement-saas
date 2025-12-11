@@ -8,7 +8,7 @@ import DropdownSelect from "@/common/DropdownSelect";
 import PrimaryButton from "@/common/PrimaryButton";
 import APIConnectionCard from "@/components/client/Settings/APIConnectionCard";
 
-const Settings = () => {
+const StaffEmployeeSettings = () => {
   const [defaultLanguage, setDefaultLanguage] =
     useState("English (US)");
   const [defaultTimezone, setDefaultTimezone] = useState(
@@ -402,4 +402,4 @@ San Francisco, CA 94105"
   );
 };
 
-export default Settings;
+export default StaffEmployeeSettings;

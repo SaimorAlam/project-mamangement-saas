@@ -715,7 +715,7 @@ const flattenEntry = (entry: ActivityLogEntry) => {
   };
 };
 
-const UserActivityLog = () => {
+const StaffEmployeeUserActivityLog = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -800,4 +800,4 @@ const UserActivityLog = () => {
     </div>
   );
 };
-export default UserActivityLog;
+export default StaffEmployeeUserActivityLog;

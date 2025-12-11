@@ -718,7 +718,7 @@ const flattenEntry = (entry: ActivityLogEntry) => {
   };
 };
 
-export default function EmployeesActivityLog() {
+export default function StaffEmployeeActivityLog() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;

@@ -14,7 +14,7 @@ import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 import AreaChart from "@/common/Charts/AreaChart";
 import GanttChart from "@/common/Charts/GanttChart";
 
-const ProjectBuilder = () => {
+const StaffEmployeeProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
   const [activeWidget, setActiveWidget] = useState("KPI Widget");
 
@@ -136,4 +136,4 @@ const ProjectBuilder = () => {
     </div>
   );
 };
-export default ProjectBuilder;
+export default StaffEmployeeProjectBuilder;

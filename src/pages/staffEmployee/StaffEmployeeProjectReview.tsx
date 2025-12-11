@@ -1,7 +1,7 @@
 import AllProjectReview from "@/components/client/ProjectReview/AllProjectReview";
 import ProjectReviewStats from "@/components/client/ProjectReview/ProjectReviewStats";
 
-const ProjectReview = () => {
+const StaffEmployeeProjectReview = () => {
   return (
     <>
       <ProjectReviewStats />
@@ -9,4 +9,4 @@ const ProjectReview = () => {
     </>
   );
 };
-export default ProjectReview;
+export default StaffEmployeeProjectReview;

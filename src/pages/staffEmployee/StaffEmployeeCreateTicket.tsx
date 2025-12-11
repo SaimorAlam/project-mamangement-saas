@@ -4,7 +4,7 @@ import DropdownSelect from "@/common/DropdownSelect";
 import DescriptionTextArea from "@/common/DescriptionTextArea";
 import { Send } from "lucide-react";
 
-const CreateTicket = () => {
+const StaffEmployeeCreateTicket = () => {
   const selectItem = [
     { value: "light", title: "Light" },
     { value: "dark", title: "Dark" },
@@ -47,4 +47,4 @@ const CreateTicket = () => {
   );
 };
 
-export default CreateTicket;
+export default StaffEmployeeCreateTicket;
