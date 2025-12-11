@@ -1,12 +1,6 @@
 import React, { cloneElement, useEffect, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
-import {
-  Bell,
-  CalendarDays,
-  ChevronDown,
-  Plus,
-  UserPlus,
-} from "lucide-react";
+import { Bell, CalendarDays, ChevronDown, Plus, UserPlus } from "lucide-react";
 import CreateProgramModal from "@/components/client/AllProgram/CreateProgramModal";
 import SuccessModal from "@/components/client/SuccessModal";
 import NotificationModal from "@/components/client/NotificationModal";
@@ -32,20 +26,15 @@ const ClientDashboardHeader = ({ name }: { name: string }) => {
   const [successOpen, setSuccessOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isEmployeeModalOpen, setIsEmployeeModalOpen] =
-    useState(false);
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const ClientSidebarGroups = getClientSidebarItems();
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const allRoutes = ClientSidebarGroups.flatMap(
-    (group) => group.items
-  );
-  const currentRoute = allRoutes.find(
-    (route) => route.path === currentPath
-  );
+  const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
+  const currentRoute = allRoutes.find((route) => route.path === currentPath);
 
   const dropdownItems = ["Create Program"];
 
@@ -68,8 +57,7 @@ const ClientDashboardHeader = ({ name }: { name: string }) => {
   const isEmployeePage =
     currentPath.includes("/employee") || currentPath === "/employee";
   const isAllProgramPage =
-    currentPath.includes("/all-program") ||
-    currentPath === "/all-program";
+    currentPath.includes("/all-program") || currentPath === "/all-program";
   const isHighwayExpansionPage =
     currentPath.includes("/highway-expansion/all-highway") ||
     currentPath === "/highway-expansion/all-highway";
@@ -85,19 +73,14 @@ const ClientDashboardHeader = ({ name }: { name: string }) => {
       <div className="flex items-center py-5 justify-between">
         {/* Greeting */}
         <div>
-          <h1 className="text-[32px] font-semibold">
-            Good Morning 👋, {name}
-          </h1>
+          <h1 className="text-[32px] font-semibold">Good Morning 👋, {name}</h1>
           <p className="text-base text-gray-500">
             This is dashboard overview of Acme Corporation
           </p>
         </div>
 
         {/* Search */}
-        <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         {/* Right Controls */}
         <div className="flex items-center justify-between gap-6 relative">
@@ -107,10 +90,7 @@ const ClientDashboardHeader = ({ name }: { name: string }) => {
             type={"Outline"}
             onClick={() => setIsOpen(true)}
           />
-          <NotificationModal
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-          />
+          <NotificationModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
 
           {/* Date Filter */}
           <PrimaryButton
@@ -184,7 +164,7 @@ const ClientDashboardHeader = ({ name }: { name: string }) => {
                         <button
                           key={index}
                           onClick={() => handleDropdownClick(item)}
-                          className="w-full text-left px-4 py-2 rounded-md hover:bg-gray-800 border border-gray-300 text-gray-700 hover:text-white mb-2 last:mb-0 cursor-pointer duration-300"
+                          className="w-full text-left px-4 py-2 rounded-md border border-gray-300 hover:border-black text-gray-700 mb-2 last:mb-0 cursor-pointer duration-300"
                         >
                           {item}
                         </button>
@@ -234,8 +214,7 @@ const ClientDashboardHeader = ({ name }: { name: string }) => {
             {currentRoute ? (
               <BreadcrumbItem>
                 <BreadcrumbPage className="text-[#356DF0] flex items-center justify-center gap-1 ">
-                  {currentRoute.icon &&
-                  React.isValidElement(currentRoute.icon)
+                  {currentRoute.icon && React.isValidElement(currentRoute.icon)
                     ? cloneElement(
                         currentRoute.icon as React.ReactElement<{
                           className?: string;
