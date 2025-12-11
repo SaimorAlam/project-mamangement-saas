@@ -103,7 +103,7 @@ const routes = createBrowserRouter([
       {
         path: "/viewer-panel",
         element: <ViewerPanelDashboardLayout />,
-        children: getViewerPanelRoutes()
+        children: getViewerPanelRoutes(),
       },
     ],
   },
