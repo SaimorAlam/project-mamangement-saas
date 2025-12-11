@@ -1,63 +1,78 @@
-import AlfalaBuilders from "@/pages/client/ClientAlfalaBuilders";
-import ClientMarketingStrategy from "@/pages/client/ClientMarketingStrategy";
-import ClientTimosSuperShop from "@/pages/client/ClientTimosSuperShop";
-import Employees from "@/pages/client/ClientEmployees";
-import ClientOverview from "@/pages/client/ClientOverview";
-import AllProgram from "@/pages/client/ClientAllProgram";
-import ClientProgramName from "@/pages/client/ClientProgramName";
-import ActivityLog from "@/components/client/Overview/ActivityLog";
-import ClientHelp from "@/pages/client/ClientHelp";
-import ClientSettings from "@/pages/client/ClientSettings";
-import ClientWorkInProgress from "@/pages/client/ClientWorkInProgress";
-import ClientSupport from "@/pages/client/ClientSupport";
-import ClientSupportTickets from "@/pages/client/ClientSupportTickets";
-import CreateTicket from "@/pages/client/ClientCreateTicket";
-import ClientFeedback from "@/pages/client/ClientFeedBack";
-import ClientProductTour from "@/pages/client/ClientProductTour";
-import ContactUs from "@/pages/client/ClientContactUs";
-import ClientHighwayExpansion from "@/pages/client/ClientHighwayExpansion";
-import Projects from "@/pages/viewerPanel/Projects";
-import CarlyleHall from "@/pages/client/ClientCarlyleHall";
-import ClientUserActivityLog from "@/pages/client/ClientUsersActivityLog";
+import ViewerPanelOverview from "@/pages/viewerPanel/ViewerPanelOverview";
+import ViewerPanelProjects from "@/pages/viewerPanel/ViewerPanelProjects";
+import ViewerPanelMarketingStrategy from "@/pages/viewerPanel/ViewerPanelMarketingStrategy";
+import ViewerPanelTimosSuperShop from "@/pages/viewerPanel/ViewerPanelTimosSuperShop";
+import ViewerPanelProgramName from "@/pages/viewerPanel/ViewerPanelProgramName";
+import ViewerPanelHighwayExpansion from "@/pages/viewerPanel/ViewerPanelHighwayExpansion";
+import ViewerPanelHelp from "@/pages/viewerPanel/ViewerPanelHelp";
+import ViewerPanelSupport from "@/pages/viewerPanel/ViewerPanelSupport";
+import ViewerPanelSupportTickets from "@/pages/viewerPanel/ViewerPanelSupportTickets";
+import ViewerPanelFeedback from "@/pages/viewerPanel/ViewerPanelFeedBack";
+import ViewerPanelProductTour from "@/pages/viewerPanel/ViewerPanelProductTour";
+import ViewerPanelSettings from "@/pages/viewerPanel/ViewerPanelSettings";
+import ViewerPanelUserActivityLog from "@/pages/viewerPanel/ViewerPanelUsersActivityLog";
+import ViewerPanelWorkInProgress from "@/pages/viewerPanel/ViewerPanelWorkInProgress";
+import ViewerPanelActivityLog from "@/pages/viewerPanel/ViewerPanelActivityLog";
+import ViewerPanelCreateTicket from "@/pages/viewerPanel/ViewerPanelCreateTicket";
+import ViewerPanelContactUs from "@/pages/viewerPanel/ViewerPanelContactUs";
+import ViewerPanelCarlyleHall from "@/pages/viewerPanel/ViewerPanelCarlyleHall";
+import ViewerPanelEmployees from "@/pages/viewerPanel/ViewerPanelEmployees";
+import ViewerPanelAlfalaBuilders from "@/pages/viewerPanel/ViewerPanelAlfalaBuilders";
+import ViewerPanelAllProgram from "@/pages/viewerPanel/ViewerPanelAllProgram";
 
 export default function getViewerPanelRoutes() {
   return [
-    { index: true, element: <ClientOverview /> },
-    { path: "projects", element: <Projects /> },
-    { path: "carlyle-hall", element: <CarlyleHall /> },
-    { path: "employees", element: <Employees /> },
+    { index: true, element: <ViewerPanelOverview /> },
+    { path: "projects", element: <ViewerPanelProjects /> },
+    { path: "carlyle-hall", element: <ViewerPanelCarlyleHall /> },
+    { path: "employees", element: <ViewerPanelEmployees /> },
     {
       path: "marketing-strategy",
-      element: <ClientMarketingStrategy />,
+      element: <ViewerPanelMarketingStrategy />,
     },
-    { path: "alfala-building", element: <AlfalaBuilders /> },
-    { path: "timos-super-shop", element: <ClientTimosSuperShop /> },
-    { path: "all-program", element: <AllProgram /> },
-    { path: "program-name", element: <ClientProgramName /> },
+    {
+      path: "alfala-building",
+      element: <ViewerPanelAlfalaBuilders />,
+    },
+    {
+      path: "timos-super-shop",
+      element: <ViewerPanelTimosSuperShop />,
+    },
+    { path: "all-program", element: <ViewerPanelAllProgram /> },
+    { path: "program-name", element: <ViewerPanelProgramName /> },
     {
       path: "highway-expansion",
-      element: <ClientHighwayExpansion />,
+      element: <ViewerPanelHighwayExpansion />,
     },
-    { path: "activity-log", element: <ActivityLog /> },
+    { path: "activity-log", element: <ViewerPanelActivityLog /> },
     {
       path: "help",
-      element: <ClientHelp />,
+      element: <ViewerPanelHelp />,
       children: [
         {
           path: "support",
-          element: <ClientSupport />,
+          element: <ViewerPanelSupport />,
           children: [
-            { index: true, element: <ClientSupportTickets /> },
-            { path: "create-tickets", element: <CreateTicket /> },
+            { index: true, element: <ViewerPanelSupportTickets /> },
+            {
+              path: "create-tickets",
+              element: <ViewerPanelCreateTicket />,
+            },
           ],
         },
-        { path: "feedback", element: <ClientFeedback /> },
-        { path: "product-tour", element: <ClientProductTour /> },
-        { path: "contact-us", element: <ContactUs /> },
+        { path: "feedback", element: <ViewerPanelFeedback /> },
+        { path: "product-tour", element: <ViewerPanelProductTour /> },
+        { path: "contact-us", element: <ViewerPanelContactUs /> },
       ],
     },
-    { path: "settings", element: <ClientSettings /> },
-    { path: "work-in-progress", element: <ClientWorkInProgress /> },
-    { path: "user-activity-log", element: <ClientUserActivityLog /> },
+    { path: "settings", element: <ViewerPanelSettings /> },
+    {
+      path: "work-in-progress",
+      element: <ViewerPanelWorkInProgress />,
+    },
+    {
+      path: "user-activity-log",
+      element: <ViewerPanelUserActivityLog />,
+    },
   ];
 }

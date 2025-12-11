@@ -517,7 +517,7 @@ const employees = [
   },
 ];
 
-const Employees: React.FC = () => {
+const ViewerPanelEmployees: React.FC = () => {
   const [searchTerm] = useState<string>("");
   const [filterBy, setFilterBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -806,4 +806,4 @@ const Employees: React.FC = () => {
   );
 };
 
-export default Employees;
+export default ViewerPanelEmployees;

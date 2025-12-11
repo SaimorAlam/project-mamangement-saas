@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-const Help = () => {
+const ViewerPanelHelp = () => {
   return <Outlet />;
 };
-export default Help;
+export default ViewerPanelHelp;

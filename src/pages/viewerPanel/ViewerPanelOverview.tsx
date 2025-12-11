@@ -70,7 +70,7 @@ const clientData = [
   },
 ];
 
-const Overview = () => {
+const ViewerPanelOverview = () => {
   return (
     <div className="">
       {/* Icon and Home */}
@@ -102,4 +102,4 @@ const Overview = () => {
     </div>
   );
 };
-export default Overview;
+export default ViewerPanelOverview;

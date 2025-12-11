@@ -1,11 +1,11 @@
-import AllProjectReview from "@/components/client/ProjectReview/AllProjectReview";
 import ProjectReviewStats from "@/components/client/ProjectReview/ProjectReviewStats";
+import { Outlet } from "react-router-dom";
 
 const StaffManagerProjectReview = () => {
   return (
     <>
       <ProjectReviewStats />
-      <AllProjectReview />
+      <Outlet />
     </>
   );
 };
