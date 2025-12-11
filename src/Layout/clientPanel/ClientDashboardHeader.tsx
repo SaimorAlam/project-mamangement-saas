@@ -43,9 +43,18 @@ const ClientDashboardHeader = ({ name }: { name: string }) => {
   const allRoutes = ClientSidebarGroups.flatMap(
     (group) => group.items
   );
-  const currentRoute = allRoutes.find(
-    (route) => route.path === currentPath
-  );
+
+  const currentRoute = allRoutes.find((route) => {
+    console.log(route)
+    if (route.children) {
+      return route.children.find(
+        (child) => `${route.path}/${child.path}` === currentPath
+      );
+    }
+    return route.path === currentPath;
+  });
+
+  console.log(currentRoute);
 
   const dropdownItems = ["Create Program"];
 
