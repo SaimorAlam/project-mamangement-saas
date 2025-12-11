@@ -15,7 +15,7 @@ interface IProps {
   item: IClientPanelStats;
 }
 
-const ClientPanelStatsCard = ({ item }: IProps) => {
+const DashboardPanelStatsCard = ({ item }: IProps) => {
   const {
     title,
     value,
@@ -103,4 +103,4 @@ const ClientPanelStatsCard = ({ item }: IProps) => {
     </div>
   );
 };
-export default ClientPanelStatsCard;
+export default DashboardPanelStatsCard;

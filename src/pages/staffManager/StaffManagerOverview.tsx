@@ -5,7 +5,7 @@ import ApexDonutChart from "@/common/Charts/ApexDonutChart";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/common/Charts/ApexBarChart";
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
-import ClientPanelStatsCard from "@/common/ClientPanelStatsCard";
+import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 
 const clientData = [
   {
@@ -77,7 +77,7 @@ const StaffManagerOverview = () => {
 
       <div className="grid grid-cols-4 gap-6 my-6">
         {clientData.map((item) => (
-          <ClientPanelStatsCard key={item.title} item={item} />
+          <DashboardPanelStatsCard key={item.title} item={item} />
         ))}
       </div>
 

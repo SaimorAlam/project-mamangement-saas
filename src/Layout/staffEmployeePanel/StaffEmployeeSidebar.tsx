@@ -24,11 +24,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { ChevronRight } from "lucide-react";
-import { getStaffManagerSidebarItems } from "../staffManagerPanel/staffManagerSidebarItem";
+import { getStaffEmployeeSidebarItems } from "./staffEmployeeSidebarMenuItems";
 
 const StaffEmployeeSidebar = () => {
   const location = useLocation();
-  const groups = getStaffManagerSidebarItems();
+  const groups = getStaffEmployeeSidebarItems();
 
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
