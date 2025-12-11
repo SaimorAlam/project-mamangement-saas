@@ -1,70 +1,76 @@
-import Overview from "@/pages/client/Overview";
-import AllProgram from "@/pages/client/AllProgram";
-import Employees from "@/pages/client/Employees";
-import MarketingStrategy from "@/pages/client/MarketingStrategy";
-import Works from "@/pages/client/Works";
-import AlfalaBuilders from "@/pages/client/AlfalaBuilders";
-import TimosSuperShop from "@/pages/client/TimosSuperShop";
-import ProgramBuilder from "@/pages/client/ProgramBuilder";
-import ProgramName from "@/pages/client/ProgramName";
-import HighwayExpansion from "@/pages/client/HighwayExpansion";
-import AllHighway from "@/pages/client/AllHighway";
-import CarlyleHall from "@/pages/client/CarlyleHall";
-import ProjectReview from "@/pages/client/ProjectReview";
-import ProjectBuilder from "@/pages/client/ProjectBuilder";
-import Settings from "@/pages/client/Settings";
-import ActivityLog from "@/pages/client/ActivityLog";
-import Help from "@/pages/client/Help";
-import Support from "@/pages/client/Support";
-import SupportTickets from "@/pages/client/SupportTickets";
-import CreateTicket from "@/pages/client/CreateTicket";
-import Feedback from "@/pages/client/FeedBack";
-import ProductTour from "@/pages/client/ProductTour";
-import ContactUs from "@/pages/client/ContactUs";
-import WorkInProgress from "@/pages/client/WorkInProgress";
-import UserActivityLog from "@/pages/client/UsersActivityLog";
+import ClientOverview from "@/pages/client/ClientOverview";
+import ClientAllProgram from "@/pages/client/ClientAllProgram";
+import ClientEmployees from "@/pages/client/ClientEmployees";
+import ClientMarketingStrategy from "@/pages/client/ClientMarketingStrategy";
+import ClientWorks from "@/pages/client/ClientWorks";
+import ClientAlfalaBuilders from "@/pages/client/ClientAlfalaBuilders";
+import ClientTimosSuperShop from "@/pages/client/ClientTimosSuperShop";
+import ClientProgramBuilder from "@/pages/client/ClientProgramBuilder";
+import ClientProgramName from "@/pages/client/ClientProgramName";
+import ClientHighwayExpansion from "@/pages/client/ClientHighwayExpansion";
+import ClientAllHighway from "@/pages/client/ClientAllHighway";
+import ClientCarlyleHall from "@/pages/client/ClientCarlyleHall";
+import ClientProjectReview from "@/pages/client/ClientProjectReview";
+import ClientProjectBuilder from "@/pages/client/ClientProjectBuilder";
+import ClientSettings from "@/pages/client/ClientSettings";
+import ClientActivityLog from "@/pages/client/ClientActivityLog";
+import ClientHelp from "@/pages/client/ClientHelp";
+import ClientSupport from "@/pages/client/ClientSupport";
+import ClientSupportTickets from "@/pages/client/ClientSupportTickets";
+import ClientCreateTicket from "@/pages/client/ClientCreateTicket";
+import ClientFeedback from "@/pages/client/ClientFeedBack";
+import ClientProductTour from "@/pages/client/ClientProductTour";
+import ClientContactUs from "@/pages/client/ClientContactUs";
+import ClientWorkInProgress from "@/pages/client/ClientWorkInProgress";
+import ClientUserActivityLog from "@/pages/client/ClientUsersActivityLog";
 
 export function getClientRoutes() {
   return [
-    { index: true, element: <Overview /> },
-    { path: "works", element: <Works /> },
-    { path: "employees", element: <Employees /> },
-    { path: "marketing-strategy", element: <MarketingStrategy /> },
-    { path: "alfala-building", element: <AlfalaBuilders /> },
-    { path: "timos-super-shop", element: <TimosSuperShop /> },
-    { path: "all-program", element: <AllProgram /> },
-    { path: "program-builder", element: <ProgramBuilder /> },
-    { path: "program-name", element: <ProgramName /> },
+    { index: true, element: <ClientOverview /> },
+    { path: "works", element: <ClientWorks /> },
+    { path: "employees", element: <ClientEmployees /> },
+    {
+      path: "marketing-strategy",
+      element: <ClientMarketingStrategy />,
+    },
+    { path: "alfala-building", element: <ClientAlfalaBuilders /> },
+    { path: "timos-super-shop", element: <ClientTimosSuperShop /> },
+    { path: "all-program", element: <ClientAllProgram /> },
+    { path: "program-builder", element: <ClientProgramBuilder /> },
+    { path: "program-name", element: <ClientProgramName /> },
     {
       path: "highway-expansion",
-      element: <HighwayExpansion />,
+      element: <ClientHighwayExpansion />,
       children: [
-        { path: "all-highway", element: <AllHighway /> },
-        { path: "carlyle-hall", element: <CarlyleHall /> },
+        { path: "all-highway", element: <ClientAllHighway /> },
+        { path: "carlyle-hall", element: <ClientCarlyleHall /> },
       ],
     },
-    { path: "project-review", element: <ProjectReview /> },
-    { path: "project-builder", element: <ProjectBuilder /> },
-    { path: "activity-log", element: <ActivityLog /> },
+    { path: "project-review", element: <ClientProjectReview /> },
+    { path: "project-builder", element: <ClientProjectBuilder /> },
+    { path: "activity-log", element: <ClientActivityLog /> },
     {
       path: "help",
-      element: <Help />,
+      element: <ClientHelp />,
       children: [
         {
           path: "support",
-          element: <Support />,
+          element: <ClientSupport />,
           children: [
-            { index: true, element: <SupportTickets /> },
-            { path: "create-tickets", element: <CreateTicket /> },
+            { index: true, element: <ClientSupportTickets /> },
+            {
+              path: "create-tickets",
+              element: <ClientCreateTicket />,
+            },
           ],
         },
-        { path: "feedback", element: <Feedback /> },
-        { path: "product-tour", element: <ProductTour /> },
-        { path: "contact-us", element: <ContactUs /> },
+        { path: "feedback", element: <ClientFeedback /> },
+        { path: "product-tour", element: <ClientProductTour /> },
+        { path: "contact-us", element: <ClientContactUs /> },
       ],
     },
-    { path: "settings", element: <Settings /> },
-    { path: "work-in-progress", element: <WorkInProgress /> },
-    { path: "user-activity-log", element: <UserActivityLog /> },
+    { path: "settings", element: <ClientSettings /> },
+    { path: "work-in-progress", element: <ClientWorkInProgress /> },
+    { path: "user-activity-log", element: <ClientUserActivityLog /> },
   ];
 }

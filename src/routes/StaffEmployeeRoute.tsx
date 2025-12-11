@@ -1,59 +1,65 @@
-import AlfalaBuilders from "@/pages/client/AlfalaBuilders";
-import MarketingStrategy from "@/pages/client/MarketingStrategy";
-import TimosSuperShop from "@/pages/client/TimosSuperShop";
-import Employees from "@/pages/client/Employees";
-import Overview from "@/pages/client/Overview";
-import AllProgram from "@/pages/client/AllProgram";
-import ProgramName from "@/pages/client/ProgramName";
-import ProjectReview from "@/pages/client/ProjectReview";
+import AlfalaBuilders from "@/pages/client/ClientAlfalaBuilders";
+import ClientMarketingStrategy from "@/pages/client/ClientMarketingStrategy";
+import ClientTimosSuperShop from "@/pages/client/ClientTimosSuperShop";
+import Employees from "@/pages/client/ClientEmployees";
+import ClientOverview from "@/pages/client/ClientOverview";
+import AllProgram from "@/pages/client/ClientAllProgram";
+import ClientProgramName from "@/pages/client/ClientProgramName";
+import ClientProjectReview from "@/pages/client/ClientProjectReview";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
-import Help from "@/pages/client/Help";
-import Settings from "@/pages/client/Settings";
-import WorkInProgress from "@/pages/client/WorkInProgress";
-import UserActivityLog from "@/pages/client/UsersActivityLog";
-import Support from "@/pages/client/Support";
-import SupportTickets from "@/pages/client/SupportTickets";
-import CreateTicket from "@/pages/client/CreateTicket";
-import Feedback from "@/pages/client/FeedBack";
-import ProductTour from "@/pages/client/ProductTour";
-import ContactUs from "@/pages/client/ContactUs";
-import HighwayExpansion from "@/pages/client/HighwayExpansion";
+import ClientHelp from "@/pages/client/ClientHelp";
+import ClientSettings from "@/pages/client/ClientSettings";
+import ClientWorkInProgress from "@/pages/client/ClientWorkInProgress";
+import ClientUserActivityLog from "@/pages/client/ClientUsersActivityLog";
+import ClientSupport from "@/pages/client/ClientSupport";
+import ClientSupportTickets from "@/pages/client/ClientSupportTickets";
+import CreateTicket from "@/pages/client/ClientCreateTicket";
+import ClientFeedback from "@/pages/client/ClientFeedBack";
+import ClientProductTour from "@/pages/client/ClientProductTour";
+import ContactUs from "@/pages/client/ClientContactUs";
+import ClientHighwayExpansion from "@/pages/client/ClientHighwayExpansion";
 import Projects from "@/pages/staffManager/Projects";
-import CarlyleHall from "@/pages/client/CarlyleHall";
+import CarlyleHall from "@/pages/client/ClientCarlyleHall";
 
 export default function getStaffEmployeeRoutes() {
   return [
-    { index: true, element: <Overview /> },
+    { index: true, element: <ClientOverview /> },
     { path: "projects", element: <Projects /> },
     { path: "carlyle-hall", element: <CarlyleHall /> },
     { path: "employees", element: <Employees /> },
-    { path: "marketing-strategy", element: <MarketingStrategy /> },
+    {
+      path: "marketing-strategy",
+      element: <ClientMarketingStrategy />,
+    },
     { path: "alfala-building", element: <AlfalaBuilders /> },
-    { path: "timos-super-shop", element: <TimosSuperShop /> },
+    { path: "timos-super-shop", element: <ClientTimosSuperShop /> },
     { path: "all-program", element: <AllProgram /> },
-    { path: "program-name", element: <ProgramName /> },
-    { path: "highway-expansion", element: <HighwayExpansion /> },
-    { path: "project-review", element: <ProjectReview /> },
+    { path: "program-name", element: <ClientProgramName /> },
+    {
+      path: "highway-expansion",
+      element: <ClientHighwayExpansion />,
+    },
+    { path: "project-review", element: <ClientProjectReview /> },
     { path: "activity-log", element: <ActivityLog /> },
     {
       path: "help",
-      element: <Help />,
+      element: <ClientHelp />,
       children: [
         {
           path: "support",
-          element: <Support />,
+          element: <ClientSupport />,
           children: [
-            { index: true, element: <SupportTickets /> },
+            { index: true, element: <ClientSupportTickets /> },
             { path: "create-ticket", element: <CreateTicket /> },
           ],
         },
-        { path: "feedback", element: <Feedback /> },
-        { path: "product-tour", element: <ProductTour /> },
+        { path: "feedback", element: <ClientFeedback /> },
+        { path: "product-tour", element: <ClientProductTour /> },
         { path: "contact-us", element: <ContactUs /> },
       ],
     },
-    { path: "settings", element: <Settings /> },
-    { path: "work-in-progress", element: <WorkInProgress /> },
-    { path: "user-activity-log", element: <UserActivityLog /> },
+    { path: "settings", element: <ClientSettings /> },
+    { path: "work-in-progress", element: <ClientWorkInProgress /> },
+    { path: "user-activity-log", element: <ClientUserActivityLog /> },
   ];
 }

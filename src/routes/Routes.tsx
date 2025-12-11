@@ -27,7 +27,7 @@ import { getClientRoutes } from "./ClientRoute";
 import { getStaffManagerRoutes } from "./StaffManagerRoute";
 import ViewerPanelDashboardLayout from "./../Layout/ViewerPanel/ViewerPanelDashboardLayout";
 import getViewerPanelRoutes from "./ViewerRoute";
-import StaffEmployeeDashboardLayout from "./../Layout/staffEmployee/StaffEmployeeDashboardLayout";
+import StaffEmployeeDashboardLayout from "../Layout/staffEmployeePanel/StaffEmployeeDashboardLayout";
 import getStaffEmployeeRoutes from "./StaffEmployeeRoute";
 
 const routes = createBrowserRouter([

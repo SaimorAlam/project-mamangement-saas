@@ -1,4 +1,4 @@
-import AllProgram from "@/pages/client/AllProgram";
+import AllProgram from "@/pages/client/ClientAllProgram";
 
 const AllPorject = () => {
   const myPrograms = [

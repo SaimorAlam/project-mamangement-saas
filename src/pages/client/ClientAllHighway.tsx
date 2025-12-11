@@ -3,7 +3,7 @@ import HighwayStats from "@/components/client/AllHighway/HighwayStats";
 import HighwayMap from "@/components/client/AllHighway/HighwayMap";
 import ProgramManager from "@/components/client/AllHighway/ProgramManage";
 
-const AllHighway = () => {
+const ClientAllHighway = () => {
   return (
     <div>
       <HighwayStats />
@@ -16,4 +16,4 @@ const AllHighway = () => {
   );
 };
 
-export default AllHighway;
+export default ClientAllHighway;

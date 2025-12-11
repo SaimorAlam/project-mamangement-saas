@@ -2,20 +2,19 @@ import { useState } from "react";
 
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
-import RadarChart from "@/common/Charts/RadarChart";
+import RadarCharts from "@/common/Charts/RadarChart";
+import ProjectConfiguration from "@/components/client/ProjectBuilder/ProjectConfiguration";
+import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
+import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
 import StackedBarChart from "@/common/Charts/StackedBarChart";
-import GanttChart from "@/common/Charts/GanttChart";
-import PieChart from "@/common/Charts/PieChart";
 import ProgressRing from "@/common/Charts/ProgressRing";
+import PieChart from "@/common/Charts/PieChart";
 import MultiAxisLineChart from "@/common/Charts/LineChart";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 import AreaChart from "@/common/Charts/AreaChart";
+import GanttChart from "@/common/Charts/GanttChart";
 
-import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
-import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
-import WidgetConfiguration from "@/components/client/ProgramBuilder/WidgetConfiguration";
-
-const ProgramBuilder = () => {
+const ClientProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
   const [activeWidget, setActiveWidget] = useState("KPI Widget");
 
@@ -31,7 +30,7 @@ const ProgramBuilder = () => {
 
   return (
     <div className="flex gap-6">
-      <WidgetLibrary onWidgetSelect={handleWidgetSelect} />
+      <ProjectWidget onWidgetSelect={handleWidgetSelect} />
       <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10">
         <ProjectStats activeWidget={activeWidget} />
 
@@ -39,7 +38,7 @@ const ProgramBuilder = () => {
           <>
             <StackedBarChart />
             <div className="flex gap-4">
-              <RadarChart />
+              <RadarCharts />
               <DoughnutChart
                 title="Doughnut Pie"
                 centerLabel="Total Visitor"
@@ -133,8 +132,8 @@ const ProgramBuilder = () => {
 
         {selectedWidget === "area-chart" && <AreaChart />}
       </div>
-      <WidgetConfiguration />
+      <ProjectConfiguration />
     </div>
   );
 };
-export default ProgramBuilder;
+export default ClientProjectBuilder;
