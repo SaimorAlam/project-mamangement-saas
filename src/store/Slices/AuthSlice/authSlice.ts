@@ -30,16 +30,22 @@ const authSlice = createSlice({
         : action.payload.specialToken;
       const decode = jwtDecode(token as string) as User;
       if (action?.payload?.accessToken) {
-        state.user!.userEmail = decode.userEmail;
-        state.user!.userId = decode.userId;
-        state.user!.clientId = decode.clientId;
-        state.user!.role = decode.role;
-        state.user!.accessToken = action.payload.accessToken;
-        state.user!.refreshToken = action.payload.refreshToken;
+        state.user = {
+          ...state.user,
+          userEmail: decode.userEmail,
+          userId: decode.userId,
+          clientId: decode.clientId,
+          role: decode.role,
+          accessToken: action.payload.accessToken,
+          refreshToken: action.payload.refreshToken,
+        };
       } else if (action?.payload?.specialToken) {
-        state.user!.email = action.payload.email;
-        state.user!.phone = action.payload.phone;
-        state.user!.specialToken = decode.specialToken;
+        state.user = {
+          ...state.user,
+          email: action.payload.email,
+          phone: action.payload.phone,
+          specialToken: decode.specialToken,
+        };
       }
     },
     logOut: (state) => {
