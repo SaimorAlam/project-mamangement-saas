@@ -16,6 +16,8 @@ export default function EditEmployeeModal({
   handleEditSave,
   handleEditCancel,
 }: IEditEmployeeModalProps) {
+
+  
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-[rgba(255,255,255,0.5)] bg-opacity-50 backdrop-filter backdrop-blur-sm z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
