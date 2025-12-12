@@ -158,7 +158,7 @@ export default function StackedBarChart() {
           <Bar
             dataKey="late"
             stackId="a"
-            fill="#14b8a6"
+            fill="#89c1a0"
             radius={[4, 4, 0, 0]}
           />
         </BarChart>

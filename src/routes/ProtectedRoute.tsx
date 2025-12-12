@@ -16,12 +16,17 @@ interface ProtectedRouteProps {
   allowedRoles?: role[];
 }
 
-const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
+const ProtectedRoute = ({
+  children,
+  allowedRoles,
+}: ProtectedRouteProps) => {
   const user = useAppSelector((state) => state?.auth?.user);
   const location = useLocation();
   console.log(user);
   if (!user || !user?.accessToken) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <Navigate to="/login" state={{ from: location }} replace />
+    );
   }
 
   if (allowedRoles && !allowedRoles.includes(user?.role as role)) {
