@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Search, Bell, Download, ChevronDown, X, Plus } from "lucide-react";
+import {
+  Search,
+  Bell,
+  Download,
+  ChevronDown,
+  X,
+  Plus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -59,7 +66,8 @@ const AdminTopBar = () => {
   ];
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] =
+    useState(mockNotifications);
   const [selectedPeriod, setSelectedPeriod] = useState("Last 1 Week");
 
   const handleSearch = (e: React.FormEvent) => {
@@ -97,7 +105,8 @@ const AdminTopBar = () => {
       }
     });
   };
-  const isSingleClientRoute = location.pathname.startsWith("/admin/clients");
+  const isSingleClientRoute =
+    location.pathname.startsWith("/admin/clients");
   return (
     <>
       <div className="space-y-6">
@@ -105,7 +114,7 @@ const AdminTopBar = () => {
           {user ? (
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">
-                Good Morning, {user?.name} 👋
+                Good Morning, {user.name} 👋
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 This is dashboard overview of your Theta analyzers
@@ -137,7 +146,9 @@ const AdminTopBar = () => {
                 variant="ghost"
                 size="icon"
                 className="relative cursor-pointer"
-                onClick={() => setShowNotifications(!showNotifications)}
+                onClick={() =>
+                  setShowNotifications(!showNotifications)
+                }
               >
                 <Bell className="h-5 w-5 text-gray-600" />
                 {unreadCount > 0 && (

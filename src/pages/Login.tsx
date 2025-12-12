@@ -4,21 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, CircleAlert } from "lucide-react";
-import { useLoginMutation } from "@/store/Api/AuthApi/AuthApi";
-import { toast } from "sonner";
-import { useAppDispatch } from "@/hooks/useRedux";
-import { setUser } from "@/store/Slices/AuthSlice/authSlice";
-import { jwtDecode } from "jwt-decode";
 
-const Role = {
-  VIEWER: "viewer-panel",
-  EMPLOYEE: "employee",
-  SUPPORTER: "supporter",
-  MANAGER: "staff-manager-panel",
-  ADMIN: "admin",
-  CLIENT: "client-panel",
-  SUPERADMIN: "superadmin",
-};
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -27,18 +13,12 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const [login] = useLoginMutation();
-  const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "sakibsoftvence@gmail.com",
-      password: "123456789",
-    },
   });
 
   const navigate = useNavigate();
@@ -66,7 +46,7 @@ const Login = () => {
     }
   };
 
-  const [password, setPassword] = useState("123456789");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -95,7 +75,9 @@ const Login = () => {
 
             <div
               className={`flex items-center border ${
-                errors.password ? "border-red-500" : "border-[#94A3B8]"
+                errors.password
+                  ? "border-red-500"
+                  : "border-[#94A3B8]"
               } bg-[#F5F8FA] rounded-md focus:outline-none relative`}
             >
               <Mail className="ml-[17px] w-[5%]" />
@@ -125,7 +107,9 @@ const Login = () => {
             </label>
             <div
               className={`flex items-center border ${
-                errors.password ? "border-red-500" : "border-[#94A3B8]"
+                errors.password
+                  ? "border-red-500"
+                  : "border-[#94A3B8]"
               } bg-[#F5F8FA] rounded-md focus:outline-none relative`}
             >
               <input
@@ -144,7 +128,9 @@ const Login = () => {
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800 transition-colors"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={
+                  showPassword ? "Hide password" : "Show password"
+                }
               >
                 {showPassword ? (
                   <Eye className="w-5 h-5" />
@@ -167,7 +153,12 @@ const Login = () => {
                 id="policy"
                 className="text-[#D0D5DD] rounded-3xl cursor-pointer"
               />
-              <p className="text-[#0F1325] w-[90%]">Remember me</p>
+              <label
+                htmlFor="policy"
+                className="text-[#0F1325] w-[90%]"
+              >
+                Remember me
+              </label>
               <NavLink
                 to="/forgot"
                 className="font-medium text-[#0151FF] w-[60%] cursor-pointer"

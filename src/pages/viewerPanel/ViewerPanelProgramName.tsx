@@ -1,4 +1,6 @@
-export default function ProgramName() {
+
+
+export default function ViewerPanelProgramName() {
   return (
     <div>ProgramName</div>
   )

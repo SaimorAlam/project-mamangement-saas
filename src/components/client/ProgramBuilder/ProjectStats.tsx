@@ -1,4 +1,4 @@
-import ClientPanelStatsCard from "@/common/ClientPanelStatsCard";
+import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 
 interface ProjectStatsProps {
   activeWidget: string;
@@ -68,7 +68,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 cursor-pointer">
       {visibleStats.map((item, index) => (
-        <ClientPanelStatsCard key={index} item={item} />
+        <DashboardPanelStatsCard key={index} item={item} />
       ))}
     </div>
   );

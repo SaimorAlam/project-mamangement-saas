@@ -23,6 +23,7 @@ import ClientProductTour from "@/pages/client/ClientProductTour";
 import ClientContactUs from "@/pages/client/ClientContactUs";
 import ClientWorkInProgress from "@/pages/client/ClientWorkInProgress";
 import ClientUserActivityLog from "@/pages/client/ClientUsersActivityLog";
+import ClientSingleProject from "./../pages/client/ClientSingleProject";
 
 export function getClientRoutes() {
   return [
@@ -47,6 +48,10 @@ export function getClientRoutes() {
       ],
     },
     { path: "project-review", element: <ClientProjectReview /> },
+    {
+      path: "single-project",
+      element: <ClientSingleProject />,
+    },
     { path: "project-builder", element: <ClientProjectBuilder /> },
     { path: "activity-log", element: <ClientActivityLog /> },
     {

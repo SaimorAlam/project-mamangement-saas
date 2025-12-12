@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "@/assets/client/logo.png";
 import UserProfile from "@/components/client/UserProfile";
-
 import {
   Sidebar,
   SidebarContent,
@@ -16,14 +15,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { ChevronRight } from "lucide-react";
 import { getClientSidebarItems } from "./clientSidebarItems";
 
@@ -31,7 +28,6 @@ const ClientSidebar = () => {
   const location = useLocation();
   const groups = getClientSidebarItems();
   const [open, setOpen] = useState(false);
-
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
     const fullPath = item.index
@@ -67,7 +63,7 @@ const ClientSidebar = () => {
                 className={`self-stretch px-4 py-5 rounded-[10px] inline-flex justify-start items-center w-full
                   ${
                     active
-                      ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                      ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                       : "text-gray-900"
                   }`}
               >
