@@ -49,6 +49,7 @@ const Login = () => {
       const res = await login(data).unwrap();
       if (res.success) {
         dispatch(setUser(res?.data));
+        console.log(res,"res");
         toast.success("Logged in successfully", { id: toastId });
         if (res.data.specialToken) {
           navigate("/verification");
@@ -56,6 +57,8 @@ const Login = () => {
           const { role } = jwtDecode<{ role: keyof typeof Role }>(
             res.data.accessToken
           );
+          console.log(role);
+          console.log(Role[role]);
           if (Role[role]) {
             navigate(`/${Role[role]}`);
           }
