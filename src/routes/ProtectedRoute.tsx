@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAppSelector } from "@/hooks/useRedux";
+import { useGetProfileQuery } from "@/store/Api/UserApi/UserApi";
+import { FaSpinner } from "react-icons/fa";
 
 type role =
   | "VIEWER"
@@ -17,9 +18,18 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const user = useAppSelector((state) => state?.auth?.user);
+  const { data, isLoading } = useGetProfileQuery({});
+  console.log("ProtectedRoute", data);
   const location = useLocation();
-  if (!user || !user?.accessToken) {
+  if (isLoading)
+    return (
+      <>
+        <FaSpinner className="animate-spin" size={24} />
+      </>
+    );
+  const user = data?.data;
+  console.log(user)
+  if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
