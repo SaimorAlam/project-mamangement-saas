@@ -33,7 +33,7 @@ interface SidebarGroup {
 export const getClientSidebarItems = (): SidebarGroup[] => {
   const showHighwayExpansion =
     true || localStorage.getItem("showHighwayExpansion") === "true";
-    // You can replace 'true' with actual logic to determine visibility
+  // You can replace 'true' with actual logic to determine visibility
 
   return [
     {
