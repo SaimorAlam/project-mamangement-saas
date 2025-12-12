@@ -15,7 +15,6 @@ import { toast } from "sonner";
 import { logOut } from "@/store/Slices/AuthSlice/authSlice";
 
 interface UserProfileButtonProps {
-  onLogout?: () => void;
   onProfileClick?: () => void;
   onSettingsClick?: () => void;
 }
