@@ -115,7 +115,6 @@ const userApi = baseApi.injectEndpoints({
 export const {
   useGetAllUsersQuery,
   useUpdateUsersMutation,
-  useUserProfileQuery,
   useGetAllManagersQuery,
   useGetAllEmployeesQuery,
   useGetProfileQuery,
