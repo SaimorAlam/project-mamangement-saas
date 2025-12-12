@@ -528,7 +528,7 @@ const StaffEmployeeEmployees: React.FC = () => {
   >(new Set());
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [employeeList, setEmployeeList] =
-    useState<IEmployee[]>(employees);
+    useState<IEmployee[]>(employees as IEmployee[]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState<IEmployee | null>(
     null
@@ -567,7 +567,7 @@ const StaffEmployeeEmployees: React.FC = () => {
       setSelectAll(false);
     } else {
       setSelectedEmployees(
-        new Set(currentEmployees.map((emp) => emp.id))
+        new Set(currentEmployees.map((emp) => emp.id as string))
       );
       setSelectAll(true);
     }
@@ -583,7 +583,7 @@ const StaffEmployeeEmployees: React.FC = () => {
     setSelectedEmployees(newSelected);
     setSelectAll(
       newSelected.size === currentEmployees.length &&
-        currentEmployees.every((emp) => newSelected.has(emp.id))
+        currentEmployees.every((emp) => newSelected.has(emp.id as string))
     );
   };
 
@@ -623,7 +623,7 @@ const StaffEmployeeEmployees: React.FC = () => {
   };
   const handleDeleteSelected = () => {
     setEmployeeList((prev) =>
-      prev.filter((emp) => !selectedEmployees.has(emp.id))
+      prev.filter((emp) => !selectedEmployees.has(emp.id as string))
     );
     setSelectedEmployees(new Set());
     setSelectAll(false);

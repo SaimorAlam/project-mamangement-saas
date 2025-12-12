@@ -1,5 +1,6 @@
 export interface IEmployee {
   name: string;
+  avatar?: string;
   email: string;
   phoneNumber: string;
   password?: string; // optional, only used when creating
@@ -12,4 +13,5 @@ export interface IEmployee {
   role: "Viewer" | "Staff" | "Manager";
   level: "Active" | "In Active";
   id?: string; // optional unique identifier for existing employees
+  lastActive?: string;
 }

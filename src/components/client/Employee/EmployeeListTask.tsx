@@ -10,9 +10,7 @@ const EmployeeListTask: React.FC<IEmployeeProps> = ({
 }) => {
   const data = propEmployees || [];
 
-  const [selectedEmployees, setSelectedEmployees] = useState<
-    string[]
-  >([]);
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const allSelected =
     data.length > 0 && selectedEmployees.length === data.length;
 
@@ -20,15 +18,13 @@ const EmployeeListTask: React.FC<IEmployeeProps> = ({
     if (allSelected) {
       setSelectedEmployees([]);
     } else {
-      setSelectedEmployees(data.map((emp) => emp.id));
+      setSelectedEmployees(data.map((emp) => emp.id as string));
     }
   };
 
   const handleSelectEmployee = (id: string) => {
     setSelectedEmployees((prev) =>
-      prev.includes(id)
-        ? prev.filter((empId) => empId !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((empId) => empId !== id) : [...prev, id]
     );
   };
 
@@ -62,16 +58,14 @@ const EmployeeListTask: React.FC<IEmployeeProps> = ({
                 <tr
                   key={emp.id}
                   className={`hover:bg-gray-50 transition-colors border-b border-gray-100 ${
-                    selectedEmployees.includes(emp.id)
-                      ? "bg-gray-100"
-                      : ""
+                    selectedEmployees.includes(emp.id as string) ? "bg-gray-100" : ""
                   }`}
                 >
                   <td className="px-6 py-3 flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      checked={selectedEmployees.includes(emp.id)}
-                      onChange={() => handleSelectEmployee(emp.id)}
+                      checked={selectedEmployees.includes(emp.id as string)}
+                      onChange={() => handleSelectEmployee(emp.id as string)}
                       className="accent-black cursor-pointer"
                     />
                     <span className="text-xl">
@@ -85,12 +79,8 @@ const EmployeeListTask: React.FC<IEmployeeProps> = ({
                       {emp.name}
                     </span>
                   </td>
-                  <td className="px-6 py-3  text-gray-600">
-                    {emp.role}
-                  </td>
-                  <td className="px-6 py-3 text-gray-500">
-                    {emp.lastActive}
-                  </td>
+                  <td className="px-6 py-3  text-gray-600">{emp.role}</td>
+                  <td className="px-6 py-3 text-gray-500">{emp.lastActive}</td>
                 </tr>
               ))}
             </tbody>

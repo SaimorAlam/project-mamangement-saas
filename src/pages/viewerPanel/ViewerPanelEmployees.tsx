@@ -521,7 +521,9 @@ const ViewerPanelEmployees: React.FC = () => {
     new Set()
   );
   const [selectAll, setSelectAll] = useState<boolean>(false);
-  const [employeeList, setEmployeeList] = useState<IEmployee[]>(employees);
+  const [employeeList, setEmployeeList] = useState<IEmployee[]>(
+    employees as IEmployee[]
+  );
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState<IEmployee | null>(null);
   const [activeTab, setActiveTab] = useState<"tables" | "task">("tables");

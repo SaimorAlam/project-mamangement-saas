@@ -22,9 +22,7 @@ export default function EditEmployeeModal({
         <h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Name
-            </label>
+            <label className="block text-sm font-medium mb-1">Name</label>
             <input
               name="name"
               value={editEmployee.name}
@@ -33,9 +31,7 @@ export default function EditEmployeeModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Email
-            </label>
+            <label className="block text-sm font-medium mb-1">Email</label>
             <input
               name="email"
               value={editEmployee.email}
@@ -44,9 +40,7 @@ export default function EditEmployeeModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Role
-            </label>
+            <label className="block text-sm font-medium mb-1">Role</label>
             <select
               name="role"
               value={editEmployee.role}
@@ -59,9 +53,7 @@ export default function EditEmployeeModal({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Level
-            </label>
+            <label className="block text-sm font-medium mb-1">Level</label>
             <select
               name="level"
               value={editEmployee.level}

@@ -84,8 +84,8 @@ const EmployeeTable: React.FC<ITableProps> = ({
               <td className="px-6 py-4">
                 <input
                   type="checkbox"
-                  checked={selectedEmployees.has(employee.id)}
-                  onChange={() => handleSelectEmployee(employee.id)}
+                  checked={selectedEmployees.has(employee.id as string)}
+                  onChange={() => handleSelectEmployee(employee.id as string)}
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                 />
               </td>
@@ -177,7 +177,7 @@ const EmployeeTable: React.FC<ITableProps> = ({
                       <button
                         className="p-1 text-red-600 cursor-pointer"
                         onClick={() =>
-                          handleDeleteEmployee(employee.id)
+                          handleDeleteEmployee(employee.id as string)
                         }
                       >
                         <Trash2 className="w-4 h-4" />

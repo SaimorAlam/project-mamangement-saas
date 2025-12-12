@@ -519,7 +519,7 @@ const ClientEmployees: React.FC = () => {
     new Set()
   );
   const [selectAll, setSelectAll] = useState<boolean>(false);
-  const [employeeList, setEmployeeList] = useState<IEmployee[]>(employees);
+  const [employeeList, setEmployeeList] = useState<IEmployee[]>(employees as IEmployee[]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState<IEmployee | null>(null);
   const [activeTab, setActiveTab] = useState<"tables" | "task">("tables");
@@ -546,7 +546,7 @@ const ClientEmployees: React.FC = () => {
       setSelectedEmployees(new Set());
       setSelectAll(false);
     } else {
-      setSelectedEmployees(new Set(currentEmployees.map((emp) => emp.id)));
+      setSelectedEmployees(new Set(currentEmployees.map((emp) => emp.id as string)));
       setSelectAll(true);
     }
   };
@@ -561,7 +561,7 @@ const ClientEmployees: React.FC = () => {
     setSelectedEmployees(newSelected);
     setSelectAll(
       newSelected.size === currentEmployees.length &&
-        currentEmployees.every((emp) => newSelected.has(emp.id))
+        currentEmployees.every((emp) => newSelected.has(emp.id as string))
     );
   };
 
@@ -597,7 +597,7 @@ const ClientEmployees: React.FC = () => {
   };
   const handleDeleteSelected = () => {
     setEmployeeList((prev) =>
-      prev.filter((emp) => !selectedEmployees.has(emp.id))
+      prev.filter((emp) => !selectedEmployees.has(emp.id as string))
     );
     setSelectedEmployees(new Set());
     setSelectAll(false);
