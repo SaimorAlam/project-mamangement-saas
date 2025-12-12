@@ -9,7 +9,13 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
-
+    userProfile: builder.query({
+      query: () => ({
+        url: "/users/profile",
+        method: "GET",
+      }),
+      providesTags: ["Users"],
+    }),
     updateUsers: builder.mutation({
       query: (data) => ({
         url: "/users",
@@ -109,6 +115,7 @@ const userApi = baseApi.injectEndpoints({
 export const {
   useGetAllUsersQuery,
   useUpdateUsersMutation,
+  useUserProfileQuery,
   useGetAllManagersQuery,
   useGetAllEmployeesQuery,
   useGetAllViewersQuery,

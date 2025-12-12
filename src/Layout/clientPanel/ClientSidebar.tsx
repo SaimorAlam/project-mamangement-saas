@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "@/assets/client/logo.png";
 import UserProfile from "@/components/client/UserProfile";
-
 import {
   Sidebar,
   SidebarContent,
@@ -15,21 +15,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { ChevronRight } from "lucide-react";
 import { getClientSidebarItems } from "./clientSidebarItems";
 
 const ClientSidebar = () => {
   const location = useLocation();
   const groups = getClientSidebarItems();
-
+  const [open, setOpen] = useState(false);
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
     const fullPath = item.index
@@ -40,9 +38,7 @@ const ClientSidebar = () => {
 
     if (location.pathname === fullPath) return true;
     if (item.children) {
-      return item.children.some((child: any) =>
-        isRouteActive(child, fullPath)
-      );
+      return item.children.some((child: any) => isRouteActive(child, fullPath));
     }
     return false;
   };
@@ -58,8 +54,6 @@ const ClientSidebar = () => {
 
     // Dropdown (parent with children)
     if (item.children && item.children.length > 0) {
-      const [open, setOpen] = useState(active);
-
       return (
         <SidebarMenuItem key={fullPath}>
           <DropdownMenu onOpenChange={(v) => setOpen(v)}>
@@ -69,22 +63,18 @@ const ClientSidebar = () => {
                 className={`self-stretch px-4 py-5 rounded-[10px] inline-flex justify-start items-center w-full
                   ${
                     active
-                      ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                      ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                       : "text-gray-900"
                   }`}
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="flex items-center gap-2">
                     <span className="size-6">{item.icon}</span>
-                    <span className="text-base font-normal">
-                      {item.name}
-                    </span>
+                    <span className="text-base font-normal">{item.name}</span>
                   </span>
 
                   <ChevronRight
-                    className={`${
-                      open ? "rotate-90 duration-200" : ""
-                    }`}
+                    className={`${open ? "rotate-90 duration-200" : ""}`}
                   />
                 </div>
               </SidebarMenuButton>
@@ -126,9 +116,7 @@ const ClientSidebar = () => {
           >
             <div className="flex items-center gap-2">
               <span className="size-6">{item.icon}</span>
-              <span className="text-base font-normal">
-                {item.name}
-              </span>
+              <span className="text-base font-normal">{item.name}</span>
             </div>
           </SidebarMenuButton>
         </Link>
@@ -155,9 +143,7 @@ const ClientSidebar = () => {
                   </SidebarGroupLabel>
 
                   <SidebarMenu className="space-y-[10px]">
-                    {group.items.map((item) =>
-                      renderSidebarItem(item)
-                    )}
+                    {group.items.map((item) => renderSidebarItem(item))}
                   </SidebarMenu>
 
                   <hr className="w-56 text-slate-300 my-5" />
