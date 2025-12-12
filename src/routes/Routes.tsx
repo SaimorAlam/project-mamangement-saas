@@ -27,9 +27,7 @@ import { getClientRoutes } from "./ClientRoute";
 import { getStaffManagerRoutes } from "./StaffManagerRoute";
 import ViewerPanelDashboardLayout from "./../Layout/ViewerPanel/ViewerPanelDashboardLayout";
 import getViewerPanelRoutes from "./ViewerRoute";
-import ProtectedRoute from "./ProtectedRoute";
-import Unauthorized from "@/common/Unauthorized";
-import StaffEmployeeDashboardLayout from "@/Layout/staffEmployeePanel/StaffEmployeeDashboardLayout";
+import StaffEmployeeDashboardLayout from "../Layout/staffEmployeePanel/StaffEmployeeDashboardLayout";
 import getStaffEmployeeRoutes from "./StaffEmployeeRoute";
 
 const routes = createBrowserRouter([
@@ -81,58 +79,39 @@ const routes = createBrowserRouter([
         path: "/emailcode",
         element: <EmailCode />,
       },
+
       // Super Admin routes
       {
         path: "/admin",
-        element: (
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
-            <AdminDashboardLayout />
-          </ProtectedRoute>
-        ),
+        element: <AdminDashboardLayout />,
         children: getAdminRoutes(),
       },
 
       // Client Route
       {
         path: "/client-panel",
-        element: (
-          <ProtectedRoute allowedRoles={["CLIENT"]}>
-            <ClientDashboardLayout />
-          </ProtectedRoute>
-        ),
+        element: <ClientDashboardLayout />,
         children: getClientRoutes(),
       },
 
       // Staff manager routes
       {
         path: "/staff-manager-panel",
-        element: (
-          <ProtectedRoute allowedRoles={["MANAGER"]}>
-            <StaffManagerDashboardLayout />
-          </ProtectedRoute>
-        ),
+        element: <StaffManagerDashboardLayout />,
         children: getStaffManagerRoutes(),
       },
 
       // Staff employee routes
       {
         path: "/staff-employee-panel",
-        element: (
-          <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
-            <StaffEmployeeDashboardLayout />
-          </ProtectedRoute>
-        ),
+        element: <StaffEmployeeDashboardLayout />,
         children: getStaffEmployeeRoutes(),
       },
 
       // Viewer Panel routes
       {
         path: "/viewer-panel",
-        element: (
-          <ProtectedRoute allowedRoles={["VIEWER"]}>
-            <ViewerPanelDashboardLayout />
-          </ProtectedRoute>
-        ),
+        element: <ViewerPanelDashboardLayout />,
         children: getViewerPanelRoutes(),
       },
     ],
@@ -140,10 +119,6 @@ const routes = createBrowserRouter([
   {
     path: "*",
     element: <NotFound />,
-  },
-  {
-    path: "/unauthorized",
-    element: <Unauthorized />,
   },
 ]);
 

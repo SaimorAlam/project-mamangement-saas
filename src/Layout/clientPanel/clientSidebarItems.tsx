@@ -19,10 +19,7 @@ import {
   Ticket,
   TicketPlus,
 } from "lucide-react";
-import {
-  IoExtensionPuzzleOutline,
-  IoSettingsOutline,
-} from "react-icons/io5";
+import { IoExtensionPuzzleOutline, IoSettingsOutline } from "react-icons/io5";
 import { ISidebarItem } from "@/types";
 
 interface SidebarGroup {
@@ -31,8 +28,8 @@ interface SidebarGroup {
 }
 
 export const getClientSidebarItems = (): SidebarGroup[] => {
-  const showHighwayExpansion =
-    localStorage.getItem("showHighwayExpansion") === "true";
+  const showHighwayExpansion = true;
+  // You can replace 'true' with actual logic to determine visibility
 
   return [
     {
@@ -96,9 +93,7 @@ export const getClientSidebarItems = (): SidebarGroup[] => {
         },
         {
           icon: <BriefcaseBusiness />,
-          name: (
-            <span className="text-[15px]">Highway Expansion</span>
-          ),
+          name: <span className="text-[15px]">Highway Expansion</span>,
           className: "text-sm",
           path: "/client-panel/highway-expansion",
           hidden: !showHighwayExpansion,

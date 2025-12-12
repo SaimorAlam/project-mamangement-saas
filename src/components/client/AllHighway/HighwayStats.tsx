@@ -1,4 +1,4 @@
-import ClientPanelStatsCard from "@/common/ClientPanelStatsCard";
+import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 
 const HighwayStats = () => {
   const stats = [
@@ -47,7 +47,7 @@ const HighwayStats = () => {
   return (
     <div className="grid grid-cols- sm:grid-cols-2 lg:grid-cols-4 gap-6 cursor-pointer">
       {stats.map((item, index) => (
-        <ClientPanelStatsCard key={index} item={item} />
+        <DashboardPanelStatsCard key={index} item={item} />
       ))}
     </div>
   );

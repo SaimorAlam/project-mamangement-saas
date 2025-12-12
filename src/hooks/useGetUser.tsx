@@ -2,10 +2,9 @@ import { useGetProfileQuery } from "@/store/Api/UserApi/UserApi";
 import { User } from "@/types/Auth/Auth";
 
 export const useGetUser = () => {
-  const { data, isLoading, isError } = useGetProfileQuery({});
-
-  const user = data?.data as User | undefined;
-
+  const { data } = useGetProfileQuery({});
+  const user = data?.data;
+  const { name, role, profileImage, email, id, status } = user as User;
   return {
     loading: isLoading,
     error: isError,

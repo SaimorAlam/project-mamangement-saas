@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid, Table, Filter } from "lucide-react";
 import BoardCustomerInsight from "../boardCustomerInsight/boardCustomerInsight";
@@ -8,13 +8,11 @@ import { ClientData } from "@/types/client";
 export function CustomerInsights() {
     const [customers, setCustomers] = useState<ClientData[]>([]);
 
- useEffect(() => {
     fetch("/customerData.json")
         .then(res => res.json())
         .then(data => {
             setCustomers(data)
         })
- }, [])
     const [viewMode, setViewMode] = useState("Boards");
 
     // Pagination states

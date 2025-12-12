@@ -133,6 +133,7 @@ const ClientProgramBuilder = () => {
 
         {selectedWidget === "area-chart" && <AreaChart />}
       </div>
+      
       <WidgetConfiguration />
     </div>
   );
