@@ -1,11 +1,12 @@
 export interface IProgram {
-  id: number;
-  name: string;
-  projects: number;
-  assignManager: string[];
-  priority: "High" | "Medium" | "Low";
-  createdOn: string;
-  updatedOn: string;
-  deadline: string;
+  id: string;
+  userId: string;
+  programName: string;
+  datetime: string; // ISO date string
+  programDescription: string;
+  priority: "LOW" | "MEDIUM" | "HIGH";
+  deadline: string; // ISO date string
   progress: number;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
 }
