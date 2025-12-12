@@ -9,7 +9,7 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
-    userProfile: builder.query({
+    getProfile: builder.query({
       query: () => ({
         url: "/users/profile",
         method: "GET",
@@ -118,6 +118,7 @@ export const {
   useUserProfileQuery,
   useGetAllManagersQuery,
   useGetAllEmployeesQuery,
+  useGetProfileQuery,
   useGetAllViewersQuery,
   useGetUserByIdQuery,
   useDeleteUserMutation,

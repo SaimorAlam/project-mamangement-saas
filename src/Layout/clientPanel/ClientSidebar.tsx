@@ -155,11 +155,7 @@ const ClientSidebar = () => {
       </SidebarContent>
 
       <SidebarFooter className="!bg-white">
-        <UserProfile
-          name="Sofia Martin"
-          role="Team Leader"
-          avatar="https://randomuser.me/api/portraits/women/47.jpg"
-        />
+        <UserProfile />
       </SidebarFooter>
     </Sidebar>
   );

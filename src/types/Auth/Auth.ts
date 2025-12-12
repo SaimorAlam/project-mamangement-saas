@@ -9,6 +9,9 @@ export interface User {
   name?: string;
   accessToken?: string;
   refreshToken?: string;
+  profileImage?: string;
+  status?: string;
+  id?: string;
 }
 
 export interface Role {

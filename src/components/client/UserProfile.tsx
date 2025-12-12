@@ -9,27 +9,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link, useNavigate } from "react-router-dom";
-import { useUserProfileQuery } from "@/store/Api/UserApi/UserApi";
+import { useGetUser } from "@/hooks/useGetUser";
 
 interface UserProfileButtonProps {
-  name?: string;
-  role?: string;
-  avatar?: string;
   onLogout?: () => void;
   onProfileClick?: () => void;
   onSettingsClick?: () => void;
 }
 
 export default function UserProfile({
-  name,
-  role,
-  avatar,
   onProfileClick,
   onSettingsClick,
 }: UserProfileButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: userProfile } = useUserProfileQuery({});
-  console.log(userProfile);
+  const { name, role, profileImage } = useGetUser();
+  console.log(name);
   const navigate = useNavigate();
 
   const onLogout = () => {
@@ -48,7 +42,7 @@ export default function UserProfile({
             {/* Profile Avatar */}
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
               <img
-                src={avatar || "/placeholder.svg"}
+                src={profileImage || "/placeholder.svg"}
                 alt={name}
                 className="w-full h-full object-cover"
               />
@@ -88,7 +82,7 @@ export default function UserProfile({
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
               <img
-                src={avatar || "/placeholder.svg"}
+                src={profileImage || "/placeholder.svg"}
                 alt={name}
                 className="w-full h-full object-cover"
               />

@@ -7,9 +7,7 @@ import { Eye, EyeOff, Mail, CircleAlert } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
@@ -25,9 +23,27 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const onSubmit = (data: LoginFormInputs) => {
-    console.log("Login Data:", data);
-    navigate("/admin");
+  const onSubmit = async (data: LoginFormInputs) => {
+    const toastId = toast.loading("Logging in...");
+    try {
+      const res = await login(data).unwrap();
+      if (res.success) {
+        dispatch(setUser(res?.data));
+        toast.success("Logged in successfully", { id: toastId });
+        if (res.data.specialToken) {
+          navigate("/verification");
+        } else {
+          const { role } = jwtDecode<{ role: keyof typeof Role }>(
+            res.data.accessToken
+          );
+          if (Role[role]) {
+            navigate(`/${Role[role]}`);
+          }
+        }
+      }
+    } catch {
+      toast.error("Login Failed", { id: toastId });
+    }
   };
 
   const [password, setPassword] = useState("");
@@ -41,11 +57,7 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[40%]">
         <img src="Logo.png" alt="logo" />
-        <img
-          className="w-full"
-          src="login image.png"
-          alt="login-Image"
-        />
+        <img className="w-full" src="login image.png" alt="login-Image" />
       </div>
       <div>
         <h2 className="text-[48px] leading-[56px] font-semibold text-center">
