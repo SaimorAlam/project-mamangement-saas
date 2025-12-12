@@ -9,26 +9,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link, useNavigate } from "react-router-dom";
+import { useGetUser } from "@/hooks/useGetUser";
 
 interface UserProfileButtonProps {
-  name?: string
-  role?: string
-  avatar?: string
-  onLogout?: () => void
-  onProfileClick?: () => void
-  onSettingsClick?: () => void
+  onLogout?: () => void;
+  onProfileClick?: () => void;
+  onSettingsClick?: () => void;
 }
 
-export default function UserProfile({name,role,avatar,  onProfileClick, onSettingsClick,}: UserProfileButtonProps) {
+export default function UserProfile({
+  onProfileClick,
+  onSettingsClick,
+}: UserProfileButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-
+  const { name, role, profileImage } = useGetUser();
+  console.log(name);
   const navigate = useNavigate();
 
   const onLogout = () => {
-  // Je kono extra logout logic thakle ekhane add korte paro
-  navigate("/login");
-};
-
+    // Je kono extra logout logic thakle ekhane add korte paro
+    navigate("/login");
+  };
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -41,7 +42,7 @@ export default function UserProfile({name,role,avatar,  onProfileClick, onSettin
             {/* Profile Avatar */}
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
               <img
-                src={avatar || "/placeholder.svg"}
+                src={profileImage || "/placeholder.svg"}
                 alt={name}
                 className="w-full h-full object-cover"
               />
@@ -70,12 +71,18 @@ export default function UserProfile({name,role,avatar,  onProfileClick, onSettin
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-56   mt-2 border border-[#E2E8F0] bg-white space-y-2 focus:outline-none focus-visible:outline-none">
-        <DropdownMenuItem onClick={onProfileClick} className="cursor-pointer focus:outline-none focus-visible:outline-none">
+      <DropdownMenuContent
+        align="end"
+        className="w-56   mt-2 border border-[#E2E8F0] bg-white space-y-2 focus:outline-none focus-visible:outline-none"
+      >
+        <DropdownMenuItem
+          onClick={onProfileClick}
+          className="cursor-pointer focus:outline-none focus-visible:outline-none"
+        >
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
               <img
-                src={avatar || "/placeholder.svg"}
+                src={profileImage || "/placeholder.svg"}
                 alt={name}
                 className="w-full h-full object-cover"
               />
@@ -87,23 +94,21 @@ export default function UserProfile({name,role,avatar,  onProfileClick, onSettin
           </div>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator  className="border border-[#E2E8F0] h-px"/>
+        <DropdownMenuSeparator className="border border-[#E2E8F0] h-px" />
 
         <DropdownMenuItem onClick={onSettingsClick} className="cursor-pointer">
           Settings
         </DropdownMenuItem>
-                
+
         <DropdownMenuItem onClick={onProfileClick} className="cursor-pointer">
           Profile
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={onProfileClick} className="cursor-pointer">
-          <Link to="/user-activity-log">
-          Activity Log
-         </Link>
+          <Link to="/user-activity-log">Activity Log</Link>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator className="border border-[#E2E8F0] "/>
+        <DropdownMenuSeparator className="border border-[#E2E8F0] " />
 
         <DropdownMenuItem
           onClick={onLogout}

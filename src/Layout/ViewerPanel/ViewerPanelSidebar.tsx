@@ -40,9 +40,7 @@ const ViewerPanelSidebar = () => {
 
     if (location.pathname === fullPath) return true;
     if (item.children) {
-      return item.children.some((child: any) =>
-        isRouteActive(child, fullPath)
-      );
+      return item.children.some((child: any) => isRouteActive(child, fullPath));
     }
     return false;
   };
@@ -76,15 +74,11 @@ const ViewerPanelSidebar = () => {
                 <div className="flex items-center justify-between w-full">
                   <span className="flex items-center gap-2">
                     <span className="size-6">{item.icon}</span>
-                    <span className="text-base font-normal">
-                      {item.name}
-                    </span>
+                    <span className="text-base font-normal">{item.name}</span>
                   </span>
 
                   <ChevronRight
-                    className={`${
-                      open ? "rotate-90 duration-200" : ""
-                    }`}
+                    className={`${open ? "rotate-90 duration-200" : ""}`}
                   />
                 </div>
               </SidebarMenuButton>
@@ -126,9 +120,7 @@ const ViewerPanelSidebar = () => {
           >
             <div className="flex items-center gap-2">
               <span className="size-6">{item.icon}</span>
-              <span className="text-base font-normal">
-                {item.name}
-              </span>
+              <span className="text-base font-normal">{item.name}</span>
             </div>
           </SidebarMenuButton>
         </Link>
@@ -155,9 +147,7 @@ const ViewerPanelSidebar = () => {
                   </SidebarGroupLabel>
 
                   <SidebarMenu className="space-y-[10px]">
-                    {group.items.map((item) =>
-                      renderSidebarItem(item)
-                    )}
+                    {group.items.map((item) => renderSidebarItem(item))}
                   </SidebarMenu>
 
                   <hr className="w-56 text-slate-300 my-5" />
@@ -169,11 +159,7 @@ const ViewerPanelSidebar = () => {
       </SidebarContent>
 
       <SidebarFooter className="!bg-white">
-        <UserProfile
-          name="Sofia Martin"
-          role="Team Leader"
-          avatar="https://randomuser.me/api/portraits/women/47.jpg"
-        />
+        <UserProfile />
       </SidebarFooter>
     </Sidebar>
   );
