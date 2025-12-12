@@ -548,7 +548,9 @@ const ViewerPanelEmployees: React.FC = () => {
       setSelectedEmployees(new Set());
       setSelectAll(false);
     } else {
-      setSelectedEmployees(new Set(currentEmployees.map((emp) => emp.id)));
+      setSelectedEmployees(
+        new Set(currentEmployees.map((emp: IEmployee) => emp.id as string))
+      );
       setSelectAll(true);
     }
   };
@@ -563,7 +565,7 @@ const ViewerPanelEmployees: React.FC = () => {
     setSelectedEmployees(newSelected);
     setSelectAll(
       newSelected.size === currentEmployees.length &&
-        currentEmployees.every((emp) => newSelected.has(emp.id))
+        currentEmployees.every((emp) => newSelected.has(emp.id as string))
     );
   };
 
@@ -599,7 +601,7 @@ const ViewerPanelEmployees: React.FC = () => {
   };
   const handleDeleteSelected = () => {
     setEmployeeList((prev) =>
-      prev.filter((emp) => !selectedEmployees.has(emp.id))
+      prev.filter((emp) => !selectedEmployees.has(emp.id as string))
     );
     setSelectedEmployees(new Set());
     setSelectAll(false);
