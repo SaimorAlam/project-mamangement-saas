@@ -30,6 +30,7 @@ import { getClientSidebarItems } from "./clientSidebarItems";
 const ClientSidebar = () => {
   const location = useLocation();
   const groups = getClientSidebarItems();
+  const [open, setOpen] = useState(false);
 
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
@@ -57,8 +58,6 @@ const ClientSidebar = () => {
 
     // Dropdown (parent with children)
     if (item.children && item.children.length > 0) {
-      const [open, setOpen] = useState(active);
-
       return (
         <SidebarMenuItem key={fullPath}>
           <DropdownMenu onOpenChange={(v) => setOpen(v)}>

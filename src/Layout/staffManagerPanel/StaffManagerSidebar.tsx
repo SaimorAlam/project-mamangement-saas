@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "@/assets/client/logo.png";
@@ -29,6 +30,7 @@ import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
 const StaffManagerSidebar = () => {
   const location = useLocation();
   const groups = getStaffManagerSidebarItems();
+  const [open, setOpen] = useState(false);
 
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
@@ -58,7 +60,6 @@ const StaffManagerSidebar = () => {
 
     // Dropdown (parent with children)
     if (item.children && item.children.length > 0) {
-      const [open, setOpen] = useState(active);
 
       return (
         <SidebarMenuItem key={fullPath}>
