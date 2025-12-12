@@ -6,11 +6,13 @@ export const useGetUser = () => {
   const user = data?.data;
   const { name, role, profileImage, email, id, status } = user as User;
   return {
-    name,
-    role,
-    profileImage,
-    email,
-    id,
-    status,
+    loading: isLoading,
+    error: isError,
+    name: user?.name || "",
+    role: user?.role || "",
+    profileImage: user?.profileImage || "",
+    email: user?.email || "",
+    id: user?.id || "",
+    status: user?.status || "",
   };
 };

@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, useNavigate } from "react-router-dom";
 import { useGetUser } from "@/hooks/useGetUser";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { toast } from "sonner";
+import { logOut } from "@/store/Slices/AuthSlice/authSlice";
 
 interface UserProfileButtonProps {
-  onLogout?: () => void;
   onProfileClick?: () => void;
   onSettingsClick?: () => void;
 }
@@ -23,12 +25,17 @@ export default function UserProfile({
 }: UserProfileButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { name, role, profileImage } = useGetUser();
-  console.log(name);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const onLogout = () => {
-    // Je kono extra logout logic thakle ekhane add korte paro
-    navigate("/login");
+    try {
+      dispatch(logOut());
+      toast.success("Logout successful");
+      navigate("/login");
+    } catch {
+      toast.error("Logout failed");
+    }
   };
 
   return (
