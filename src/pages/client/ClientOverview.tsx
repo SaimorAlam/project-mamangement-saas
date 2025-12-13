@@ -6,6 +6,7 @@ import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/common/Charts/ApexBarChart";
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
+import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 
 const clientData = [
   {
@@ -71,12 +72,20 @@ const clientData = [
 ];
 
 const ClientOverview = () => {
+  const { data: allPrograms } = useGetAllProgramQuery({});
+  const updatedClientData = clientData.map((item) => {
+    if (item.title === "Total Program") {
+      item.value = allPrograms?.data?.data?.length;
+    }
+    return item;
+  });
+
   return (
     <div className="">
       {/* Icon and Home */}
 
       <div className="grid grid-cols-4 gap-6 my-6">
-        {clientData.map((item) => (
+        {updatedClientData.map((item) => (
           <DashboardPanelStatsCard key={item.title} item={item} />
         ))}
       </div>

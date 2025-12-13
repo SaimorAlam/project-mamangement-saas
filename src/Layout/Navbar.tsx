@@ -1,7 +1,10 @@
+import { useGetUser } from "@/hooks/useGetUser";
 import React from "react";
 import { Link } from "react-router-dom";
 
 const Navbar: React.FC = () => {
+  const { currentRoute } = useGetUser();
+
   return (
     <nav className="bg-white shadow-sm fixed w-full">
       <div className=" mx-auto py-2 px-4 sm:px-6 lg:px-8">
@@ -17,7 +20,7 @@ const Navbar: React.FC = () => {
             {/* Dashboard */}
             <div className="hidden md:flex space-x-4">
               <Link
-                to="/admin"
+                to={currentRoute}
                 className="text-blue-500 bg-blue-100 hover:bg-blue-500 hover:text-white duration-300 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Dashboard

@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useNavigate } from "react-router-dom";
 
 interface IProgramTableProps {
   title?: string;
@@ -28,15 +29,13 @@ const ClientAllProgram = ({
   title = "All Program",
   hideCreatedOn = false,
 }: IProgramTableProps) => {
-  /* =======================
-     State Management
-  ======================== */
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<
     "ALL" | "HIGH" | "MEDIUM" | "LOW"
   >("ALL");
+  const navigate = useNavigate();
 
   const [sortColumn, setSortColumn] = useState<keyof IProgram | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -67,9 +66,17 @@ const ClientAllProgram = ({
   };
 
   const sortedPrograms = useMemo(() => {
-    return [...programs].sort((a, b) => {
-      if (!sortColumn) return 0;
+    const list = [...programs];
 
+    if (!sortColumn) {
+      // Default: sort by createdAt descending
+      return list.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    }
+
+    return list.sort((a, b) => {
       const valA = a[sortColumn];
       const valB = b[sortColumn];
 
@@ -105,11 +112,19 @@ const ClientAllProgram = ({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-10">
+      <div className="flex items-center justify-center py-10 h-[60vh]">
         <FaSpinner size={24} className="animate-spin" />
       </div>
     );
   }
+
+  // Ensure always 10 rows
+  const totalRows = 10;
+  const emptyRowsCount = totalRows - sortedPrograms.length;
+  const tableRows = [
+    ...sortedPrograms,
+    ...Array.from({ length: emptyRowsCount }).map(() => null),
+  ];
 
   return (
     <div className="min-h-screen py-6">
@@ -155,36 +170,40 @@ const ClientAllProgram = ({
 
         {/* Table */}
         <div className="overflow-x-auto">
-          {sortedPrograms.length > 0 ? (
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  {[
-                    "programName",
-                    "priority",
-                    !hideCreatedOn && "createdAt",
-                    "updatedAt",
-                    "deadline",
-                    "progress",
-                  ].map(
-                    (col) =>
-                      col && (
-                        <th
-                          key={col}
-                          onClick={() => handleSort(col as keyof IProgram)}
-                          className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
-                        >
-                          {col.toString().replace(/([A-Z])/g, " $1")}
-                          {sortColumn === col &&
-                            (sortOrder === "asc" ? " ▲" : " ▼")}
-                        </th>
-                      )
-                  )}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {sortedPrograms.map((program) => (
-                  <tr key={program.id} className="hover:bg-gray-50">
+          <table className="w-full table-fixed">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                {[
+                  "programName",
+                  "priority",
+                  !hideCreatedOn && "createdAt",
+                  "updatedAt",
+                  "deadline",
+                  "progress",
+                ].map(
+                  (col) =>
+                    col && (
+                      <th
+                        key={col}
+                        onClick={() => handleSort(col as keyof IProgram)}
+                        className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
+                      >
+                        {col.toString().replace(/([A-Z])/g, " $1")}
+                        {sortColumn === col &&
+                          (sortOrder === "asc" ? " ▲" : " ▼")}
+                      </th>
+                    )
+                )}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {tableRows.map((program, idx) =>
+                program ? (
+                  <tr
+                    key={program.id}
+                    className="hover:bg-gray-50 h-[60px] cursor-pointer"
+                    onClick={() => navigate(`/client-panel/program-overview/${program.id}`)}
+                  >
                     <td className="px-6 py-4 text-sm">{program.programName}</td>
 
                     <td className="px-6 py-4">
@@ -221,10 +240,33 @@ const ClientAllProgram = ({
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
+                ) : (
+                  <tr key={`empty-${idx}`} className="h-[60px]">
+                    {[
+                      "programName",
+                      "priority",
+                      !hideCreatedOn && "createdAt",
+                      "updatedAt",
+                      "deadline",
+                      "progress",
+                    ].map(
+                      (col, i) =>
+                        col && (
+                          <td
+                            key={i}
+                            className="px-6 py-4 text-sm text-gray-200"
+                          >
+                            &nbsp;
+                          </td>
+                        )
+                    )}
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
+
+          {sortedPrograms.length === 0 && (
             <div className="w-full h-[60vh] flex items-center justify-center">
               <h2 className="text-center text-5xl font-semibold text-gray-200 uppercase">
                 No Program Data Available
