@@ -62,9 +62,7 @@ const EmployeeTable = ({
               <th className="px-6 py-3 text-left">Assign Project</th>
             )}
             {visibleColumns.includes("lastActive") && (
-              <th className="px-6 py-3 text-left w-36">
-                Last Active
-              </th>
+              <th className="px-6 py-3 text-left w-36">Last Active</th>
             )}
             {visibleColumns.includes("level") && (
               <th className="px-6 py-3 text-left">Level</th>
@@ -84,12 +82,8 @@ const EmployeeTable = ({
               <td className="px-6 py-4">
                 <input
                   type="checkbox"
-                  checked={selectedEmployees.has(
-                    employee.id as string
-                  )}
-                  onChange={() =>
-                    handleSelectEmployee(employee.id as string)
-                  }
+                  checked={selectedEmployees.has(employee.id as string)}
+                  onChange={() => handleSelectEmployee(employee.id as string)}
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                 />
               </td>
@@ -146,24 +140,21 @@ const EmployeeTable = ({
 
               {visibleColumns.includes("lastActive") && (
                 <td className="px-6 py-4 text-sm text-gray-600">
-                  {new Date(
-                    employee.user.updatedAt
-                  ).toLocaleDateString()}
+                  {new Date(employee.user.updatedAt).toLocaleDateString()}
                 </td>
               )}
 
-              {visibleColumns.includes("level") &&
-                getStatusBadgeColor && (
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
-                        employee.user.status ? "Active" : "In Active"
-                      )}`}
-                    >
-                      {employee.user.status ? "Active" : "In Active"}
-                    </span>
-                  </td>
-                )}
+              {visibleColumns.includes("level") && getStatusBadgeColor && (
+                <td className="px-6 py-4">
+                  <span
+                    className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
+                      employee.user.status ? "Active" : "In Active"
+                    )}`}
+                  >
+                    {employee.user.status ? "Active" : "In Active"}
+                  </span>
+                </td>
+              )}
 
               {visibleColumns.includes("action") && (
                 <td className="px-6 py-4">

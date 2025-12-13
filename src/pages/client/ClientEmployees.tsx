@@ -34,20 +34,15 @@ const ClientEmployees: React.FC = () => {
   const [searchTerm] = useState<string>("");
   const [filterBy, setFilterBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [showFilterDropdown, setShowFilterDropdown] =
-    useState<boolean>(false);
-  const [selectedEmployees, setSelectedEmployees] = useState<
-    Set<string>
-  >(new Set());
+  const [showFilterDropdown, setShowFilterDropdown] = useState<boolean>(false);
+  const [selectedEmployees, setSelectedEmployees] = useState<Set<string>>(
+    new Set()
+  );
   const [selectAll, setSelectAll] = useState<boolean>(false);
   
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editEmployee, setEditEmployee] = useState<IEmployee | null>(
-    null
-  );
-  const [activeTab, setActiveTab] = useState<"tables" | "task">(
-    "tables"
-  );
+  const [editEmployee, setEditEmployee] = useState<IEmployee | null>(null);
+  const [activeTab, setActiveTab] = useState<"tables" | "task">("tables");
 
   const itemsPerPage = 10;
 
@@ -179,49 +174,44 @@ const ClientEmployees: React.FC = () => {
             <div className="px-6 py-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-500">
-                  Showing {startIndex} to {endIndex} of{" "}
-                  {employeeMeta?.total} Files
+                  Showing {startIndex} to {endIndex} of {employeeMeta?.total}{" "}
+                  Files
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() =>
-                      setCurrentPage(Math.max(1, currentPage - 1))
-                    }
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
                     className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Prev
                   </button>
 
-                  {Array.from(
-                    { length: Math.min(5, totalPages) },
-                    (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setCurrentPage(pageNum)}
-                          className={`px-3 py-1 text-sm rounded ${
-                            currentPage === pageNum
-                              ? "bg-blue-600 text-white"
-                              : "border border-gray-300 hover:bg-gray-50"
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
                     }
-                  )}
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`px-3 py-1 text-sm rounded ${
+                          currentPage === pageNum
+                            ? "bg-blue-600 text-white"
+                            : "border border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
 
                   {totalPages > 5 && currentPage < totalPages - 2 && (
                     <>
@@ -239,9 +229,7 @@ const ClientEmployees: React.FC = () => {
 
                   <button
                     onClick={() =>
-                      setCurrentPage(
-                        Math.min(totalPages, currentPage + 1)
-                      )
+                      setCurrentPage(Math.min(totalPages, currentPage + 1))
                     }
                     disabled={currentPage === totalPages}
                     className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
