@@ -1,16 +1,18 @@
-import React, { useState } from "react";
-import { IEmployee } from "@/types";
+import { useState } from "react";
+import { IEmployeeProfile } from "@/types";
 
 interface IEmployeeProps {
-  employees?: IEmployee[];
+  employees?: IEmployeeProfile[];
 }
 
-const EmployeeListTask: React.FC<IEmployeeProps> = ({
+const EmployeeListTask = ({
   employees: propEmployees,
-}) => {
+}: IEmployeeProps) => {
   const data = propEmployees || [];
 
-  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
+  const [selectedEmployees, setSelectedEmployees] = useState<
+    string[]
+  >([]);
   const allSelected =
     data.length > 0 && selectedEmployees.length === data.length;
 
@@ -24,7 +26,9 @@ const EmployeeListTask: React.FC<IEmployeeProps> = ({
 
   const handleSelectEmployee = (id: string) => {
     setSelectedEmployees((prev) =>
-      prev.includes(id) ? prev.filter((empId) => empId !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((empId) => empId !== id)
+        : [...prev, id]
     );
   };
 
@@ -43,7 +47,7 @@ const EmployeeListTask: React.FC<IEmployeeProps> = ({
                     onChange={handleSelectAll}
                     className="accent-black cursor-pointer mr-2"
                   />{" "}
-                  File Name
+                  Employee Name
                 </th>
                 <th className="px-6 py-3 text-lg font-semibold text-gray-700">
                   Role
@@ -58,29 +62,39 @@ const EmployeeListTask: React.FC<IEmployeeProps> = ({
                 <tr
                   key={emp.id}
                   className={`hover:bg-gray-50 transition-colors border-b border-gray-100 ${
-                    selectedEmployees.includes(emp.id as string) ? "bg-gray-100" : ""
+                    selectedEmployees.includes(emp.id as string)
+                      ? "bg-gray-100"
+                      : ""
                   }`}
                 >
                   <td className="px-6 py-3 flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      checked={selectedEmployees.includes(emp.id as string)}
-                      onChange={() => handleSelectEmployee(emp.id as string)}
+                      checked={selectedEmployees.includes(
+                        emp.id as string
+                      )}
+                      onChange={() =>
+                        handleSelectEmployee(emp.id as string)
+                      }
                       className="accent-black cursor-pointer"
                     />
                     <span className="text-xl">
                       <img
                         className="size-10 rounded-full"
-                        src={emp.avatar}
+                        src={emp.user.profileImage || ""}
                         alt="Employee Avater"
                       />
                     </span>
                     <span className="text-gray-800 font-medium">
-                      {emp.name}
+                      {emp.user.name}
                     </span>
                   </td>
-                  <td className="px-6 py-3  text-gray-600">{emp.role}</td>
-                  <td className="px-6 py-3 text-gray-500">{emp.lastActive}</td>
+                  <td className="px-6 py-3  text-gray-600">
+                    {emp.user.role}
+                  </td>
+                  <td className="px-6 py-3 text-gray-500">
+                    {emp.user.lastActive ? "Active" : "Inactive"}
+                  </td>
                 </tr>
               ))}
             </tbody>

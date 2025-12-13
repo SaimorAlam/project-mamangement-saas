@@ -1,26 +1,25 @@
-import React from "react";
 import { Eye, Edit, Trash2 } from "lucide-react";
-import { IEmployee } from "@/types/client-panel";
+import { IEmployeeProfile } from "@/types/client-panel";
 
 interface ITableProps {
-  employees: IEmployee[];
+  employees: IEmployeeProfile[];
   selectedEmployees: Set<string>;
   selectAll: boolean;
   visibleColumns?: string[]; // 👈 new prop
   handleSelectAll: () => void;
   handleSelectEmployee: (id: string) => void;
-  handleEditClick?: (employee: IEmployee) => void;
+  handleEditClick?: (employee: IEmployeeProfile) => void;
   handleDeleteEmployee?: (id: string) => void;
   getRoleBadgeColor: (role: string) => string;
   getStatusBadgeColor?: (level: string) => string;
 }
 
-const EmployeeTable: React.FC<ITableProps> = ({
+const EmployeeTable = ({
   employees,
   selectedEmployees,
   selectAll,
   visibleColumns = [
-    "fileName",
+    "employeeName",
     "email",
     "role",
     "projects",
@@ -34,13 +33,14 @@ const EmployeeTable: React.FC<ITableProps> = ({
   handleDeleteEmployee,
   getRoleBadgeColor,
   getStatusBadgeColor,
-}) => {
+}: ITableProps) => {
+  console.log(employees[0]);
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3">
+            <th className="px-6 py-3 text-left">
               <input
                 type="checkbox"
                 checked={selectAll}
@@ -49,8 +49,8 @@ const EmployeeTable: React.FC<ITableProps> = ({
               />
             </th>
 
-            {visibleColumns.includes("fileName") && (
-              <th className="px-6 py-3 text-left">File Name</th>
+            {visibleColumns.includes("employeeName") && (
+              <th className="px-6 py-3 text-left">Employee Name</th>
             )}
             {visibleColumns.includes("email") && (
               <th className="px-6 py-3 text-left">Email</th>
@@ -76,7 +76,7 @@ const EmployeeTable: React.FC<ITableProps> = ({
         </thead>
 
         <tbody className="bg-white divide-y divide-gray-200">
-          {employees.map((employee) => (
+          {employees?.map((employee) => (
             <tr
               key={employee.id}
               className="hover:bg-gray-50 transition-colors"
@@ -84,24 +84,28 @@ const EmployeeTable: React.FC<ITableProps> = ({
               <td className="px-6 py-4">
                 <input
                   type="checkbox"
-                  checked={selectedEmployees.has(employee.id as string)}
-                  onChange={() => handleSelectEmployee(employee.id as string)}
+                  checked={selectedEmployees.has(
+                    employee.id as string
+                  )}
+                  onChange={() =>
+                    handleSelectEmployee(employee.id as string)
+                  }
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                 />
               </td>
 
-              {visibleColumns.includes("fileName") && (
+              {visibleColumns.includes("employeeName") && (
                 <td className="px-6 py-4">
                   <div className="flex items-center">
                     <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-lg mr-3">
                       <img
-                        src={employee.avatar}
+                        src={employee.user.profileImage || ""}
                         alt="Employee Avater"
                         className="rounded-full"
                       />
                     </div>
                     <span className="text-sm font-medium text-gray-900">
-                      {employee.name}
+                      {employee.user.name}
                     </span>
                   </div>
                 </td>
@@ -109,7 +113,7 @@ const EmployeeTable: React.FC<ITableProps> = ({
 
               {visibleColumns.includes("email") && (
                 <td className="px-6 py-4 text-sm text-gray-600">
-                  {employee.email}
+                  {employee.user.email}
                 </td>
               )}
 
@@ -117,10 +121,10 @@ const EmployeeTable: React.FC<ITableProps> = ({
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getRoleBadgeColor(
-                      employee.role
+                      employee.user.role
                     )}`}
                   >
-                    {employee.role}
+                    {employee.user.role}
                   </span>
                 </td>
               )}
@@ -128,7 +132,7 @@ const EmployeeTable: React.FC<ITableProps> = ({
               {visibleColumns.includes("projects") && (
                 <td className="px-6 py-4">
                   <div className="grid grid-cols-3 gap-2">
-                    {employee.projects.map((project, index) => (
+                    {employee?.projects?.map((project, index) => (
                       <span
                         key={index}
                         className="text-xs border border-gray-200 text-[#1D2028] bg-gray-50 px-2 py-1 rounded-lg"
@@ -142,7 +146,9 @@ const EmployeeTable: React.FC<ITableProps> = ({
 
               {visibleColumns.includes("lastActive") && (
                 <td className="px-6 py-4 text-sm text-gray-600">
-                  {employee.lastActive}
+                  {new Date(
+                    employee.user.updatedAt
+                  ).toLocaleDateString()}
                 </td>
               )}
 
@@ -151,10 +157,10 @@ const EmployeeTable: React.FC<ITableProps> = ({
                   <td className="px-6 py-4">
                     <span
                       className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
-                        employee.level
+                        employee.user.status ? "Active" : "In Active"
                       )}`}
                     >
-                      {employee.level}
+                      {employee.user.status ? "Active" : "In Active"}
                     </span>
                   </td>
                 )}

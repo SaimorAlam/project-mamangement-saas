@@ -15,3 +15,32 @@ export interface IEmployee {
   id?: string; // optional unique identifier for existing employees
   lastActive?: string;
 }
+
+type IUser = {
+  id: string;
+  email: string;
+  phoneNumber: string;
+  name: string;
+  role: "Viewer" | "Staff" | "Manager";
+  profileImage: string | null;
+  language: string;
+  timezone: string | null;
+  verification2FA: boolean;
+  status: boolean;
+  lastActive: boolean;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  userStatus: "ACTIVE" | "INACTIVE";
+};
+
+export type IEmployeeProfile = {
+  id: string;
+  userId: string;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  description: string;
+  joinedDate: string; // YYYY-MM-DD
+  skills: string[];
+  projects?: string[]; // array of project IDs
+  user: IUser;
+};
