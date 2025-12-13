@@ -1,15 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
+import { FaSpinner } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
-import { FaSpinner } from "react-icons/fa";
-import { IProgram } from "@/types";
 import Pagination from "@/common/Pagination";
+import { IProgram } from "@/types";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { useDebounce } from "@/hooks/useDebounce";
+
 interface IProgramTableProps {
   title?: string;
   hideCreatedOn?: boolean;
@@ -25,20 +28,34 @@ const ClientAllProgram = ({
   title = "All Program",
   hideCreatedOn = false,
 }: IProgramTableProps) => {
-  const { data, isLoading } = useGetAllProgramQuery({});
+  /* =======================
+     State Management
+  ======================== */
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [limit] = useState(10);
+  const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<
     "ALL" | "HIGH" | "MEDIUM" | "LOW"
   >("ALL");
 
-  const programsMeta = useMemo(() => data?.data?.meta, [data]);
-  const programs = useMemo(() => data?.data?.data || [], [data]);
-  const totalPrograms = programsMeta?.total || programs.length;
-  const itemsPerPage = programsMeta?.limit || 10;
+  const [sortColumn, setSortColumn] = useState<keyof IProgram | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data, isLoading } = useGetAllProgramQuery({
+    page: currentPage,
+    limit,
+    programName: debouncedSearch || undefined,
+    priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
+  });
+
+  const programs = useMemo(() => data?.data?.data ?? [], [data]);
+  const meta = data?.data?.meta;
+
+  const totalPrograms = meta?.total ?? programs.length;
+  const itemsPerPage = meta?.limit ?? limit;
   const totalPages =
-    programsMeta?.totalPages || Math.ceil(totalPrograms / itemsPerPage);
+    meta?.totalPages ?? Math.ceil(totalPrograms / itemsPerPage);
 
   const handleSort = (column: keyof IProgram) => {
     if (sortColumn === column) {
@@ -49,15 +66,8 @@ const ClientAllProgram = ({
     }
   };
 
-  // Apply filter
-  const filteredPrograms = useMemo(() => {
-    if (priorityFilter === "ALL") return programs;
-    return programs.filter((p: IProgram) => p.priority === priorityFilter);
-  }, [programs, priorityFilter]);
-
-  // Apply sorting
   const sortedPrograms = useMemo(() => {
-    return [...filteredPrograms].sort((a, b) => {
+    return [...programs].sort((a, b) => {
       if (!sortColumn) return 0;
 
       const valA = a[sortColumn];
@@ -81,15 +91,8 @@ const ClientAllProgram = ({
 
       return 0;
     });
-  }, [filteredPrograms, sortColumn, sortOrder]);
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-6">
-        <FaSpinner size={24} className="animate-spin" />
-      </div>
-    );
-  }
-  // Format date
+  }, [programs, sortColumn, sortOrder]);
+
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
@@ -100,124 +103,119 @@ const ClientAllProgram = ({
     });
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-10">
+        <FaSpinner size={24} className="animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen py-6">
-      {sortedPrograms.length > 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row items-center justify-between px-6 py-4 border-b border-gray-200 gap-2">
-            <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
-            <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 min-w-32">
-                  {priorityFilter === "ALL" ? "All Priorities" : priorityFilter}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setPriorityFilter("ALL")}>
-                    ALL Priorities
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setPriorityFilter("HIGH")}>
-                    HIGH
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setPriorityFilter("MEDIUM")}>
-                    MEDIUM
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setPriorityFilter("LOW")}>
-                    LOW
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
+      <div className="bg-white rounded-lg border border-gray-200">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-center justify-between px-6 py-4 border-b border-gray-200 gap-3">
+          <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
+          <div className="flex items-center gap-3">
+            {/* Search */}
+            <input
+              type="text"
+              placeholder="Search by program name..."
+              value={search}
+              onChange={(e) => {
+                setCurrentPage(1);
+                setSearch(e.target.value);
+              }}
+              className="px-4 py-2 text-sm border border-gray-300 rounded-md w-64"
+            />
+
+            {/* Priority Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="px-4 py-2 text-sm border border-gray-300 rounded-md min-w-32">
+                {priorityFilter === "ALL" ? "All Priorities" : priorityFilter}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
+                  <DropdownMenuItem
+                    key={p}
+                    onClick={() => {
+                      setCurrentPage(1);
+                      setPriorityFilter(p as any);
+                    }}
+                  >
+                    {p}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          {sortedPrograms.length > 0 ? (
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
-                    onClick={() => handleSort("programName")}
-                  >
-                    Program{" "}
-                    {sortColumn === "programName" &&
-                      (sortOrder === "asc" ? "▲" : "▼")}
-                  </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
-                    onClick={() => handleSort("priority")}
-                  >
-                    Priority{" "}
-                    {sortColumn === "priority" &&
-                      (sortOrder === "asc" ? "▲" : "▼")}
-                  </th>
-                  {!hideCreatedOn && (
-                    <th
-                      className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
-                      onClick={() => handleSort("createdAt")}
-                    >
-                      Created On{" "}
-                      {sortColumn === "createdAt" &&
-                        (sortOrder === "asc" ? "▲" : "▼")}
-                    </th>
+                  {[
+                    "programName",
+                    "priority",
+                    !hideCreatedOn && "createdAt",
+                    "updatedAt",
+                    "deadline",
+                    "progress",
+                  ].map(
+                    (col) =>
+                      col && (
+                        <th
+                          key={col}
+                          onClick={() => handleSort(col as keyof IProgram)}
+                          className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
+                        >
+                          {col.toString().replace(/([A-Z])/g, " $1")}
+                          {sortColumn === col &&
+                            (sortOrder === "asc" ? " ▲" : " ▼")}
+                        </th>
+                      )
                   )}
-                  <th
-                    className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
-                    onClick={() => handleSort("updatedAt")}
-                  >
-                    Updated On{" "}
-                    {sortColumn === "updatedAt" &&
-                      (sortOrder === "asc" ? "▲" : "▼")}
-                  </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
-                    onClick={() => handleSort("deadline")}
-                  >
-                    Deadline{" "}
-                    {sortColumn === "deadline" &&
-                      (sortOrder === "asc" ? "▲" : "▼")}
-                  </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
-                    onClick={() => handleSort("progress")}
-                  >
-                    Progress{" "}
-                    {sortColumn === "progress" &&
-                      (sortOrder === "asc" ? "▲" : "▼")}
-                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {sortedPrograms?.map((program: IProgram) => (
+                {sortedPrograms.map((program) => (
                   <tr key={program.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {program.programName}
-                    </td>
+                    <td className="px-6 py-4 text-sm">{program.programName}</td>
+
                     <td className="px-6 py-4">
                       <PriorityDropdown defaultPriority={program.priority} />
                     </td>
+
                     {!hideCreatedOn && (
                       <td className="px-6 py-4 text-sm text-gray-600">
                         {formatDate(program.createdAt)}
                       </td>
                     )}
+
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {formatDate(program.updatedAt)}
                     </td>
+
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {formatDate(program.deadline)}
                     </td>
+
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex-1 max-w-[120px]">
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-blue-600 rounded-full transition-all duration-300"
-                              style={{ width: `${program.progress}%` }}
-                            />
-                          </div>
+                        <div className="flex-1 max-w-[120px] h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-600 transition-all"
+                            style={{
+                              width: `${program.progress}%`,
+                            }}
+                          />
                         </div>
-                        <span className="text-sm text-gray-600 min-w-[35px]">
+                        <span className="text-sm text-gray-600">
                           {program.progress}%
                         </span>
                       </div>
@@ -226,24 +224,24 @@ const ClientAllProgram = ({
                 ))}
               </tbody>
             </table>
-          </div>
+          ) : (
+            <div className="w-full h-[60vh] flex items-center justify-center">
+              <h2 className="text-center text-5xl font-semibold text-gray-200 uppercase">
+                No Program Data Available
+              </h2>
+            </div>
+          )}
+        </div>
 
-          {/* Pagination */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            itemsPerPage={itemsPerPage}
-            totalPrograms={totalPrograms}
-            onPageChange={setCurrentPage}
-          />
-        </div>
-      ) : (
-        <div className="w-full h-[60vh] flex items-center justify-center">
-          <h2 className="w-[80vw] h-[60vh] flex items-center justify-center text-5xl font-semibold text-[#e8ecf0] uppercase">
-            No Program Data Available
-          </h2>
-        </div>
-      )}
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          totalPrograms={totalPrograms}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </div>
   );
 };

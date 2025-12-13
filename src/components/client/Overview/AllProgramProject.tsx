@@ -324,9 +324,7 @@ const allProgramProjectData = [
 ];
 
 const AllProgramProject = () => {
-  const [viewMode, setViewMode] = useState<"table" | "board">(
-    "board"
-  );
+  const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
