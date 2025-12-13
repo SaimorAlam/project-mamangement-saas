@@ -5,14 +5,10 @@ interface IEmployeeProps {
   employees?: IEmployeeProfile[];
 }
 
-const EmployeeListTask = ({
-  employees: propEmployees,
-}: IEmployeeProps) => {
+const EmployeeListTask = ({ employees: propEmployees }: IEmployeeProps) => {
   const data = propEmployees || [];
 
-  const [selectedEmployees, setSelectedEmployees] = useState<
-    string[]
-  >([]);
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const allSelected =
     data.length > 0 && selectedEmployees.length === data.length;
 
@@ -26,9 +22,7 @@ const EmployeeListTask = ({
 
   const handleSelectEmployee = (id: string) => {
     setSelectedEmployees((prev) =>
-      prev.includes(id)
-        ? prev.filter((empId) => empId !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((empId) => empId !== id) : [...prev, id]
     );
   };
 
@@ -70,12 +64,8 @@ const EmployeeListTask = ({
                   <td className="px-6 py-3 flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      checked={selectedEmployees.includes(
-                        emp.id as string
-                      )}
-                      onChange={() =>
-                        handleSelectEmployee(emp.id as string)
-                      }
+                      checked={selectedEmployees.includes(emp.id as string)}
+                      onChange={() => handleSelectEmployee(emp.id as string)}
                       className="accent-black cursor-pointer"
                     />
                     <span className="text-xl">
@@ -89,9 +79,7 @@ const EmployeeListTask = ({
                       {emp.user.name}
                     </span>
                   </td>
-                  <td className="px-6 py-3  text-gray-600">
-                    {emp.user.role}
-                  </td>
+                  <td className="px-6 py-3  text-gray-600">{emp.user.role}</td>
                   <td className="px-6 py-3 text-gray-500">
                     {emp.user.lastActive ? "Active" : "Inactive"}
                   </td>
