@@ -1,22 +1,61 @@
+import { User } from "@/types/Auth/Auth";
 import { createSlice } from "@reduxjs/toolkit";
+import { jwtDecode } from "jwt-decode";
 
 interface AuthState {
-  user: { name: string, role: string } | null;
+  user: Partial<User> | null;
 }
 
 const initialState: AuthState = {
-  user: { name: "Amitav Roy Chowdhury", role: "admin" },
+  user: {
+    email: "",
+    phone: "",
+    userEmail: "",
+    userId: "",
+    clientId: "",
+    role: "",
+    specialToken: "",
+    accessToken: "",
+    refreshToken: "",
+  },
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout: (state) => {
+    setUser: (state, action) => {
+      console.log(action.payload);
+      const token = action.payload.accessToken
+        ? action.payload.accessToken
+        : action.payload.specialToken;
+
+      const decode = jwtDecode(token as string) as User;
+      console.log(decode);
+      if (action?.payload?.accessToken) {
+        state.user = {
+          ...state.user,
+          userEmail: decode.userEmail,
+          userId: decode.userId,
+          clientId: decode.clientId,
+          role: decode.role,
+          accessToken: action.payload.accessToken,
+          refreshToken: action.payload.refreshToken,
+        };
+      } else if (action?.payload?.specialToken) {
+        state.user = {
+          ...state.user,
+          email: action.payload.email,
+          phone: action.payload.phone,
+          accessToken: action.payload.specialToken,
+        };
+      }
+    },
+    logOut: (state) => {
       state.user = null;
     },
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logOut, setUser } = authSlice.actions;
 export default authSlice.reducer;

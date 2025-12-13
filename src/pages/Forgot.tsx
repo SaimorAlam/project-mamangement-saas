@@ -1,8 +1,9 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
 import { Mail, CircleAlert } from "lucide-react";
+import { toast } from "sonner";
+import { useForgotPasswordMutation } from "@/store/Api/AuthApi/AuthApi";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -18,12 +19,22 @@ const Forgot = () => {
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
+  const [forgotPassword] = useForgotPasswordMutation();
 
-  const navigate = useNavigate();
-
-  const onSubmit = (data: LoginFormInputs) => {
-    console.log("Login Data:", data);
-    navigate("/verification");
+  const onSubmit = async (data: LoginFormInputs) => {
+    const toastId = toast.loading("Sending reset link...");
+    try {
+      const res = await forgotPassword(data).unwrap();
+      if (res.success) {
+        toast.success("A reset link has been sent to your email.", {
+          id: toastId,
+        });
+      }
+    } catch {
+      toast.error("Email Verification Failed", {
+        id: toastId,
+      });
+    }
   };
 
   return (
@@ -63,7 +74,9 @@ const Forgot = () => {
               )}
             </div>
             {errors.email && (
-              <p className="text-red-500 text-sm mt-2">{errors.email.message}</p>
+              <p className="text-red-500 text-sm mt-2">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -72,7 +85,7 @@ const Forgot = () => {
             type="submit"
             className="w-full cursor-pointer bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
-               Send Reset Password Link
+            Send Reset Password Link
           </button>
         </form>
       </div>

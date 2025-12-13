@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const Navbar: React.FC = () => {
-
   return (
     <nav className="bg-white shadow-sm fixed w-full">
       <div className=" mx-auto py-2 px-4 sm:px-6 lg:px-8">
@@ -15,7 +14,7 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
-              {/* Dashboard */}
+            {/* Dashboard */}
             <div className="hidden md:flex space-x-4">
               <Link
                 to="/admin"

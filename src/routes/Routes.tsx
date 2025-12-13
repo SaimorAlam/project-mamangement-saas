@@ -1,11 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
+
+// Application route imports
 import App from "../App";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
 import NotFound from "../pages/NotFound";
 import Home from "../pages/Home";
-import AdminRoute from "./AdminRoutes";
-import AdminDashboard from "@/pages/Admin/AdminDashboard";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Forgot from "@/pages/Forgot";
@@ -14,20 +14,23 @@ import EmailCode from "@/pages/EmailCode";
 import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
-import Employees from "@/pages/Employees";
-import Help from "@/pages/Admin/Help";
-import Clients from "@/pages/Admin/Clients";
-import Analytics from "@/pages/Admin/Analytics";
-import SystemHealth from "@/pages/Admin/SystemHealth";
-import BillingsPlans from "@/pages/Admin/BillingsPlans";
-import APIIntegrations from "@/pages/Admin/APIIntegrations";
-import SecurityPrivacy from "@/pages/Admin/SecurityPrivacy";
-import GlobalSettings from "@/pages/Admin/GlobalSettings";
-import { SingleClient } from "@/pages/Admin/SingleClient";
-import AddClientForm from "@/pages/Admin/AddClientForm/AddClientForm";
-import ManageBillings from "@/pages/Admin/ManageBillings";
-import PlatformAnalyticsOverview from "@/pages/Admin/Analytics";
+
+// Layout imports
+import AdminDashboardLayout from "@/Layout/adminPanel/AdminDashboardLayout";
+import ClientDashboardLayout from "@/Layout/clientPanel/ClientDashboardLayout";
+import StaffManagerDashboardLayout from "@/Layout/staffManagerPanel/StaffManagerDashboardLayout";
 // import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
+
+// Route list imports
+import { getAdminRoutes } from "./AdminRoutes";
+import { getClientRoutes } from "./ClientRoute";
+import { getStaffManagerRoutes } from "./StaffManagerRoute";
+import ViewerPanelDashboardLayout from "./../Layout/ViewerPanel/ViewerPanelDashboardLayout";
+import getViewerPanelRoutes from "./ViewerRoute";
+import ProtectedRoute from "./ProtectedRoute";
+import Unauthorized from "@/common/Unauthorized";
+import StaffEmployeeDashboardLayout from "@/Layout/staffEmployeePanel/StaffEmployeeDashboardLayout";
+import getStaffEmployeeRoutes from "./StaffEmployeeRoute";
 
 const routes = createBrowserRouter([
   {
@@ -55,10 +58,6 @@ const routes = createBrowserRouter([
         element: <Form />,
       },
       {
-        path: "/Employees",
-        element: <Employees />,
-      },
-      {
         path: "/login",
         element: <Login />,
       },
@@ -82,67 +81,69 @@ const routes = createBrowserRouter([
         path: "/emailcode",
         element: <EmailCode />,
       },
+      // Super Admin routes
       {
         path: "/admin",
-        element: <AdminRoute />, // This will check if the user is an admin
-        children: [
-          {
-            index: true,
-            path: "",
-            element: <AdminDashboard />,
-          },
-          {
-            path: "clients",
-            element: <Clients />,
-          },
-          {
-            path: "clients/:id",
-            element: <SingleClient />,
-          },
-          {
-            path: "analytics",
-            element: <Analytics />,
-          },
-          {
-            path: "systemHealth",
-            element: <SystemHealth />,
-          },
-          {
-            path: "billings",
-            element: <BillingsPlans />,
-          },
-          {
-            path: "apiIntegration",
-            element: <APIIntegrations />,
-          },
-          {
-            path: "security",
-            element: <SecurityPrivacy />,
-          },
-          {
-            path: "help",
-            element: <Help />,
-          },
-          {
-            path: "globalSettings",
-            element: <GlobalSettings />,
-          },
-          {
-            path: "addClient",
-            element: <AddClientForm />,
-          },
-          { path: "manage-billings", element: <ManageBillings /> },
-          {
-            path: "Platform-Analytics-Overview",
-            element: <PlatformAnalyticsOverview />,
-          },
-        ],
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <AdminDashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: getAdminRoutes(),
+      },
+
+      // Client Route
+      {
+        path: "/client-panel",
+        element: (
+          <ProtectedRoute allowedRoles={["CLIENT"]}>
+            <ClientDashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: getClientRoutes(),
+      },
+
+      // Staff manager routes
+      {
+        path: "/staff-manager-panel",
+        element: (
+          <ProtectedRoute allowedRoles={["MANAGER"]}>
+            <StaffManagerDashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: getStaffManagerRoutes(),
+      },
+
+      // Staff employee routes
+      {
+        path: "/staff-employee-panel",
+        element: (
+          <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
+            <StaffEmployeeDashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: getStaffEmployeeRoutes(),
+      },
+
+      // Viewer Panel routes
+      {
+        path: "/viewer-panel",
+        element: (
+          <ProtectedRoute allowedRoles={["VIEWER"]}>
+            <ViewerPanelDashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: getViewerPanelRoutes(),
       },
     ],
   },
   {
     path: "*",
     element: <NotFound />,
+  },
+  {
+    path: "/unauthorized",
+    element: <Unauthorized />,
   },
 ]);
 
