@@ -39,9 +39,7 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
     Chart: <FaChartPie />,
   };
 
-  const IconElement = Object.keys(IconCollection).includes(
-    iconType as string
-  )
+  const IconElement = Object.keys(IconCollection).includes(iconType as string)
     ? IconCollection[iconType as string]
     : null;
 
@@ -64,16 +62,12 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
               {IconElement}
             </div>
 
-            <h3 className="text-gray-700 font-semibold text-lg">
-              {title}
-            </h3>
+            <h3 className="text-gray-700 font-semibold text-lg">{title}</h3>
           </div>
 
           {/* Value and growth */}
           <div className="flex items-center justify-between ">
-            <span className="text-4xl font-medium text-gray-900">
-              {value}
-            </span>
+            <span className="text-4xl font-medium text-gray-900">{value}</span>
 
             {growth && (
               <span
@@ -92,10 +86,7 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
         {/* Description & Link */}
         <div className="flex items-center justify-between text-sm text-gray-700 px-6 py-4">
           <span className="">{description}</span>
-          <a
-            href="/work-in-progress"
-            className="text-blue-500 hover:underline"
-          >
+          <a href="/work-in-progress" className="text-blue-500 hover:underline">
             {link_text} &rarr;
           </a>
         </div>
