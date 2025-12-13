@@ -47,7 +47,6 @@ const Login = () => {
     const toastId = toast.loading("Logging in...");
     try {
       const res = await login(data).unwrap();
-      console.log(res, "res");
       if (res.success) {
         dispatch(setUser(res?.data));
         toast.success("Logged in successfully", { id: toastId });
