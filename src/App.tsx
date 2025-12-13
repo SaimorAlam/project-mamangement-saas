@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       <Layout />
-      <Toaster />
+      <Toaster position="top-right" />
     </>
   );
 }

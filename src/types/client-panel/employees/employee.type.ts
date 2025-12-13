@@ -16,7 +16,7 @@ export interface IEmployee {
   lastActive?: string;
 }
 
-type IUser = {
+interface IUser {
   id: string;
   email: string;
   phoneNumber: string;
@@ -31,7 +31,7 @@ type IUser = {
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
   userStatus: "ACTIVE" | "INACTIVE";
-};
+}
 
 export type IEmployeeProfile = {
   id: string;
@@ -44,3 +44,16 @@ export type IEmployeeProfile = {
   projects?: string[]; // array of project IDs
   user: IUser;
 };
+
+export interface IAddEmployeePayload {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  description: string;
+  joinedDate: string;
+  sendWelcomeEmail: boolean;
+  notifyProjectManager: boolean;
+  skills: string[];
+  projects: string[];
+}

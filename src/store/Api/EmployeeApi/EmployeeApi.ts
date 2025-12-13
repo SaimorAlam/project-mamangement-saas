@@ -1,5 +1,7 @@
 import baseApi from "../BaseApi/BaseApi";
 
+import { IAddEmployeePayload } from "@/types";
+
 const employeeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllEmployees: builder.query({
@@ -7,9 +9,22 @@ const employeeApi = baseApi.injectEndpoints({
         `/employees?page=${page}&limit=${limit}`,
       providesTags: ["Employees"],
     }),
+
+    addEmployee: builder.mutation({
+      query: ({
+        projects,
+        ...employeeData
+      }: IAddEmployeePayload) => ({
+        url: "/users/employees/create-employee",
+        method: "POST",
+        body: employeeData,
+      }),
+      invalidatesTags: ["Employees"],
+    }),
   }),
 });
 
-export const { useGetAllEmployeesQuery } = employeeApi;
+export const { useGetAllEmployeesQuery, useAddEmployeeMutation } =
+  employeeApi;
 
 export default employeeApi;

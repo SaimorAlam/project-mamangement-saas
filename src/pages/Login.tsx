@@ -21,7 +21,9 @@ const Role = {
 };
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters"),
 });
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
@@ -77,7 +79,11 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[40%]">
         <img src="Logo.png" alt="logo" />
-        <img className="w-full" src="login image.png" alt="login-Image" />
+        <img
+          className="w-full"
+          src="login image.png"
+          alt="login-Image"
+        />
       </div>
       <div>
         <h2 className="text-[48px] leading-[56px] font-semibold text-center">
@@ -95,7 +101,9 @@ const Login = () => {
 
             <div
               className={`flex items-center border ${
-                errors.password ? "border-red-500" : "border-[#94A3B8]"
+                errors.password
+                  ? "border-red-500"
+                  : "border-[#94A3B8]"
               } bg-[#F5F8FA] rounded-md focus:outline-none relative`}
             >
               <Mail className="ml-[17px] w-[5%]" />
@@ -125,7 +133,9 @@ const Login = () => {
             </label>
             <div
               className={`flex items-center border ${
-                errors.password ? "border-red-500" : "border-[#94A3B8]"
+                errors.password
+                  ? "border-red-500"
+                  : "border-[#94A3B8]"
               } bg-[#F5F8FA] rounded-md focus:outline-none relative`}
             >
               <input
@@ -144,7 +154,9 @@ const Login = () => {
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800 transition-colors"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={
+                  showPassword ? "Hide password" : "Show password"
+                }
               >
                 {showPassword ? (
                   <Eye className="w-5 h-5" />
