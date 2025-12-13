@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { Mail, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
-import { useVerifyEmailMutation } from "@/store/Api/AuthApi/VerificationApi";
+import { useForgotPasswordMutation } from "@/store/Api/AuthApi/AuthApi";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -20,17 +20,18 @@ const Forgot = () => {
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
-  const [verifyEmail] = useVerifyEmailMutation();
+  const [forgotPassword] = useForgotPasswordMutation();
   const navigate = useNavigate();
 
   const onSubmit = async (data: LoginFormInputs) => {
     console.log("Login Data:", data);
     try {
       console.log(data);
-      const res = await verifyEmail(data).unwrap();
+      const res = await forgotPassword(data).unwrap();
+      console.log(res);
       if (res.success) {
-        toast.success("A verification code has been sent to your email.");
-        navigate("/verification");
+        toast.success("A reset link has been sent to your email.");
+        navigate("/reset", { state: { type: "email" } });
       }
     } catch {
       toast.error("Email Verification Failed");
