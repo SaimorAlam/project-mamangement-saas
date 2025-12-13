@@ -7,13 +7,13 @@ import { useVerificationTypeMutation } from "@/store/Api/AuthApi/VerificationApi
 
 const TwoStepVerification = () => {
   const { user } = useAppSelector((state) => state.auth);
+  console.log(user)
   const [verificationType] = useVerificationTypeMutation();
   const { email, phone } = user!;
   const navigate = useNavigate();
   const handleOnClick = async (type: string) => {
     if (type === "email") {
       const res = await verificationType(email as string).unwrap();
-      console.log(res);
       if (res.success) {
         navigate("/emailcode", { state: { type: "email", email } });
         toast.success(`we have sent a password reset code in your ${email}`);
@@ -21,7 +21,6 @@ const TwoStepVerification = () => {
     }
     if (type === "phone") {
       const res = await verificationType(phone as string).unwrap();
-      console.log(res);
       if (res.success) {
         navigate("/emailcode", { state: { type: "phone", phone } });
         toast.success(`we have sent a password reset code in your ${phone}`);

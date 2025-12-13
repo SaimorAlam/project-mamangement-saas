@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ const Forgot = () => {
   });
   const [resetPassword] = useResetPasswordMutation();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -32,13 +33,12 @@ const Forgot = () => {
   const onSubmit = async (data: ForgotFormInputs) => {
     try {
       const res = await resetPassword({
-        token: "",
+        token: params?.get("token") as string,
         credentials: {
-          id: "",
+          id: params?.get("id") as string,
           newPassword: data.password,
         },
       }).unwrap();
-      console.log(res);
       if (res.success) {
         toast.success("Password Reset Successfully");
         navigate("/login");

@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
 import { Mail, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { useForgotPasswordMutation } from "@/store/Api/AuthApi/AuthApi";
@@ -21,20 +20,20 @@ const Forgot = () => {
     resolver: zodResolver(loginSchema),
   });
   const [forgotPassword] = useForgotPasswordMutation();
-  const navigate = useNavigate();
 
   const onSubmit = async (data: LoginFormInputs) => {
-    console.log("Login Data:", data);
+    const toastId = toast.loading("Sending reset link...");
     try {
-      console.log(data);
       const res = await forgotPassword(data).unwrap();
-      console.log(res);
       if (res.success) {
-        toast.success("A reset link has been sent to your email.");
-        navigate("/reset", { state: { type: "email" } });
+        toast.success("A reset link has been sent to your email.", {
+          id: toastId,
+        });
       }
     } catch {
-      toast.error("Email Verification Failed");
+      toast.error("Email Verification Failed", {
+        id: toastId,
+      });
     }
   };
 

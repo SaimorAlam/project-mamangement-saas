@@ -31,9 +31,7 @@ const ViewerPanelAllProgram = ({
       createdOn: "15-6-2024",
       updatedOn: "15-6-2024",
       deadline: "24-7-2024",
-      progress: [35, 50, 0, 60, 80, 80, 80, 0, 80, 80, 35, 50][
-        i % 12
-      ],
+      progress: [35, 50, 0, 60, 80, 80, 80, 0, 80, 80, 35, 50][i % 12],
     }));
 
   const totalPages = Math.ceil(totalPrograms / itemsPerPage);
@@ -43,9 +41,7 @@ const ViewerPanelAllProgram = ({
       <div className="bg-white rounded-lg border border-gray-200">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h1 className="text-lg font-semibold text-gray-900">
-            {title}
-          </h1>
+          <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
           <button className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
             <Filter size={16} />
             Filter By
@@ -91,31 +87,27 @@ const ViewerPanelAllProgram = ({
               {programs.map((program) => (
                 <tr key={program.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {program.name}
+                    {program.title}
                   </td>
                   {!hideCreatedOn && (
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {program.projects}{" "}
-                      {program.projects === 1
-                        ? "Project"
-                        : "Projects"}
+                      {program.projects === 1 ? "Project" : "Projects"}
                     </td>
                   )}
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="flex -space-x-2">
-                        {program.assignManager
-                          .slice(0, 3)
-                          .map((_, idx) => (
-                            <img
-                              key={idx}
-                              src={`https://i.pravatar.cc/150?img=${
-                                program.id * 3 + idx
-                              }`}
-                              alt="Manager"
-                              className="w-8 h-8 rounded-full border-2 border-white"
-                            />
-                          ))}
+                        {program.assignManager.slice(0, 3).map((_, idx) => (
+                          <img
+                            key={idx}
+                            src={`https://i.pravatar.cc/150?img=${
+                              program.id * 3 + idx
+                            }`}
+                            alt="Manager"
+                            className="w-8 h-8 rounded-full border-2 border-white"
+                          />
+                        ))}
                         <div className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs font-medium text-blue-700">
                           +3
                         </div>
@@ -125,9 +117,7 @@ const ViewerPanelAllProgram = ({
 
                   {/* Priority dropdown with dynamic color */}
                   <td className="px-6 py-4">
-                    <PriorityDropdown
-                      defaultPriority={program.priority}
-                    />
+                    <PriorityDropdown defaultPriority={program.priority} />
                   </td>
 
                   {!hideCreatedOn && (
@@ -167,14 +157,11 @@ const ViewerPanelAllProgram = ({
           <div className="text-sm text-gray-600">
             Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
             {Math.min(currentPage * itemsPerPage, totalPrograms)} of{" "}
-            <span className="font-semibold">{totalPrograms}</span>{" "}
-            Programs
+            <span className="font-semibold">{totalPrograms}</span> Programs
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() =>
-                setCurrentPage(Math.max(1, currentPage - 1))
-              }
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
               className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
