@@ -1,4 +1,10 @@
-import React, { useState, useEffect, cloneElement, ReactElement } from "react";
+import React, {
+  useState,
+  useEffect,
+  cloneElement,
+  ReactElement,
+  isValidElement,
+} from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "@/components/client/SearchBar";
@@ -30,19 +36,32 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 }) => {
   const location = useLocation();
   const currentPath = location.pathname;
-
+  console.log(currentPath.startsWith("/client-panel/program-overview/"));
   const ClientSidebarGroups = getClientSidebarItems();
   const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
 
-  const currentRoute = allRoutes.find((route) => {
+  // Determine current route
+  let currentRoute = allRoutes.find((route) => {
+    // Match exact path or any child path
     if (route.children) {
-      return route.children.find(
+      return route.children.some(
         (child) => `${route.path}/${child.path}` === currentPath
       );
     }
     return route.path === currentPath;
   });
 
+  // Special case for Program Overview: map to All Program
+  const showProgramOverviewBreadcrumb = currentPath.startsWith(
+    "/client-panel/all-program/program-overview/"
+  );
+  if (showProgramOverviewBreadcrumb) {
+    currentRoute = allRoutes.find(
+      (r) => r.path === "/client-panel/all-program"
+    );
+  }
+
+  console.log(currentRoute);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<string | null>(null);
@@ -51,13 +70,16 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-
   const isEmployeePage = currentPath.includes("/employee");
-  const isAllProgramPage = currentPath.includes("/all-program");
   const isHighwayExpansionPage = currentPath.includes(
     "/highway-expansion/all-highway"
   );
+  const isAllProgramPage = currentPath.startsWith("/client-panel/all-program");
+  const isProgramOverviewPage = currentPath.startsWith(
+    "/client-panel/program-overview/"
+  );
 
+  console.log(isProgramOverviewPage);
   useEffect(() => {
     setIsEmployeeModalOpen(false);
     setIsDropdownOpen(false);
@@ -100,7 +122,26 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           onClick={() => setActiveModal("Create Program")}
         />
       );
-
+    if (isProgramOverviewPage)
+      return (
+        <>
+          <PrimaryButton
+            title="Add Project"
+            leftIcon={<Plus />}
+            type="Primary"
+            onClick={() => setIsProjectModalOpen(true)}
+          />
+          <NewProjectModal
+            open={isProjectModalOpen}
+            onClose={() => setIsProjectModalOpen(false)}
+            onSuccess={(projectName: string) => {
+              setIsProjectModalOpen(false);
+              setSuccessData(projectName || "New Project");
+              setSuccessOpen(true);
+            }}
+          />
+        </>
+      );
     if (isHighwayExpansionPage)
       return (
         <>
@@ -229,19 +270,37 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           {currentRoute && (
-            <BreadcrumbItem>
-              <BreadcrumbPage className="text-[#356DF0] flex items-center justify-center gap-1">
-                {currentRoute.icon && React.isValidElement(currentRoute.icon)
-                  ? cloneElement(
-                      currentRoute.icon as ReactElement<{
-                        className?: string;
-                      }>,
-                      { className: "w-4 h-4" }
-                    )
-                  : null}
-                {currentRoute.name}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
+            <>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link
+                    to={currentRoute.path as string}
+                    className="text-[#356DF0] font-semibold flex items-center gap-1"
+                  >
+                    {currentRoute.icon &&
+                      isValidElement(currentRoute.icon) &&
+                      cloneElement(
+                        currentRoute.icon as ReactElement<{
+                          className?: string;
+                        }>,
+                        { className: "w-4 h-4" }
+                      )}
+                    {currentRoute.name}
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+
+              {showProgramOverviewBreadcrumb && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage className="text-[#356DF0]">
+                      Program Overview
+                    </BreadcrumbPage>
+                  </BreadcrumbItem>
+                </>
+              )}
+            </>
           )}
         </BreadcrumbList>
       </Breadcrumb>

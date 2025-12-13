@@ -24,6 +24,8 @@ import ClientContactUs from "@/pages/client/ClientContactUs";
 import ClientWorkInProgress from "@/pages/client/ClientWorkInProgress";
 import ClientUserActivityLog from "@/pages/client/ClientUsersActivityLog";
 import ClientSingleProject from "./../pages/client/ClientSingleProject";
+import ProgramOverview from "@/pages/client/ProgramOverview";
+import ClientAllProgramContainer from "@/pages/client/ClientAllProgramContainer";
 
 export function getClientRoutes() {
   return [
@@ -36,7 +38,14 @@ export function getClientRoutes() {
     },
     { path: "alfala-building", element: <ClientAlfalaBuilders /> },
     { path: "timos-super-shop", element: <ClientTimosSuperShop /> },
-    { path: "all-program", element: <ClientAllProgram /> },
+    {
+      path: "all-program",
+      element: <ClientAllProgramContainer />,
+      children: [
+        { index: true, element: <ClientAllProgram /> },
+      ],
+    },
+    { path: "program-overview/:id", element: <ProgramOverview /> },
     { path: "program-builder", element: <ClientProgramBuilder /> },
     { path: "program-name", element: <ClientProgramName /> },
     {

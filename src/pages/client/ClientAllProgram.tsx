@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useNavigate } from "react-router-dom";
 
 interface IProgramTableProps {
   title?: string;
@@ -34,6 +35,7 @@ const ClientAllProgram = ({
   const [priorityFilter, setPriorityFilter] = useState<
     "ALL" | "HIGH" | "MEDIUM" | "LOW"
   >("ALL");
+  const navigate = useNavigate();
 
   const [sortColumn, setSortColumn] = useState<keyof IProgram | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -197,7 +199,11 @@ const ClientAllProgram = ({
             <tbody className="divide-y divide-gray-200">
               {tableRows.map((program, idx) =>
                 program ? (
-                  <tr key={program.id} className="hover:bg-gray-50 h-[60px]">
+                  <tr
+                    key={program.id}
+                    className="hover:bg-gray-50 h-[60px] cursor-pointer"
+                    onClick={() => navigate(`/client-panel/program-overview/${program.id}`)}
+                  >
                     <td className="px-6 py-4 text-sm">{program.programName}</td>
 
                     <td className="px-6 py-4">
