@@ -21,10 +21,21 @@ const employeeApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Employees"],
     }),
+
+    updateEmployee: builder.mutation({
+      query: (employeeData) => ({
+        url: `/employees/${employeeData.id}`,
+        method: "PATCH",
+        body: employeeData,
+      }),
+    }),
   }),
 });
 
-export const { useGetAllEmployeesQuery, useAddEmployeeMutation } =
-  employeeApi;
+export const {
+  useGetAllEmployeesQuery,
+  useAddEmployeeMutation,
+  useUpdateEmployeeMutation,
+} = employeeApi;
 
 export default employeeApi;

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { X, Calendar, HelpCircle } from "lucide-react";
-import { IEmployeeProfile } from "@/types";
+import { IEmployeeProfile, IAddEmployeePayload } from "@/types";
+import { useAddEmployeeMutation } from "@/store/Api/EmployeeApi/EmployeeApi";
 
 interface IEditEmployeeModalProps {
   open: boolean;
@@ -14,6 +15,7 @@ const EditEmployeeModal = ({
   onClose,
   employee,
 }: IEditEmployeeModalProps) => {
+  console.log;
   const {
     register,
     handleSubmit,
@@ -31,6 +33,8 @@ const EditEmployeeModal = ({
 
   const [skillInput, setSkillInput] = useState("");
   const [projectInput, setProjectInput] = useState("");
+
+  const [updateEmployee, { isLoading }] = useAddEmployeeMutation();
 
   // Reset form when modal opens or employee changes
   useEffect(() => {
@@ -97,14 +101,16 @@ const EditEmployeeModal = ({
     }
   };
 
-  const onSubmit = (data: IEmployeeProfile) => {
+  const onSubmit = async (data: IAddEmployeePayload) => {
     if (!skills.length) {
       alert("Please add at least one skill and one project");
       return;
     }
 
+    updateEmployee(data);
+
     console.log("Submitted Data:", data);
-    onClose();
+    // onClose();
   };
 
   if (!open) return null;
