@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  cloneElement,
-  ReactElement,
-} from "react";
+import React, { useState, useEffect, cloneElement, ReactElement } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "@/components/client/SearchBar";
@@ -13,13 +8,7 @@ import SuccessModal from "@/components/client/SuccessModal";
 import NotificationModal from "@/components/client/NotificationModal";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import NewProjectModal from "@/components/client/NewProjectModal";
-import {
-  Bell,
-  CalendarDays,
-  ChevronDown,
-  Plus,
-  UserPlus,
-} from "lucide-react";
+import { Bell, CalendarDays, ChevronDown, Plus, UserPlus } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -43,9 +32,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const currentPath = location.pathname;
 
   const ClientSidebarGroups = getClientSidebarItems();
-  const allRoutes = ClientSidebarGroups.flatMap(
-    (group) => group.items
-  );
+  const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
 
   const currentRoute = allRoutes.find((route) => {
     if (route.children) {
@@ -62,8 +49,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [successOpen, setSuccessOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isEmployeeModalOpen, setIsEmployeeModalOpen] =
-    useState(false);
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const isEmployeePage = currentPath.includes("/employee");
@@ -175,18 +161,13 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       {/* Header */}
       <div className="flex items-center py-5 justify-between">
         <div>
-          <h1 className="text-[32px] font-semibold">
-            Good Morning 👋, {name}
-          </h1>
+          <h1 className="text-[32px] font-semibold">Good Morning 👋, {name}</h1>
           <p className="text-base text-gray-500">
             This is dashboard overview of Acme Corporation
           </p>
         </div>
 
-        <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         <div className="flex items-center justify-between gap-6 relative">
           <PrimaryButton
@@ -250,8 +231,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           {currentRoute && (
             <BreadcrumbItem>
               <BreadcrumbPage className="text-[#356DF0] flex items-center justify-center gap-1">
-                {currentRoute.icon &&
-                React.isValidElement(currentRoute.icon)
+                {currentRoute.icon && React.isValidElement(currentRoute.icon)
                   ? cloneElement(
                       currentRoute.icon as ReactElement<{
                         className?: string;
