@@ -40,6 +40,7 @@ const ClientEmployees: React.FC = () => {
     Set<string>
   >(new Set());
   const [selectAll, setSelectAll] = useState<boolean>(false);
+  
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState<IEmployee | null>(
     null
@@ -61,12 +62,33 @@ const ClientEmployees: React.FC = () => {
 
   const employeeData = employeeResponse?.data || {};
 
-  const employeeList = employeeData.data || [];
-  const employeeMeta = employeeData.meta || {};
+  const employeeList = employeeData?.data || [];
+  const employeeMeta = employeeData?.meta || {};
 
   const totalPages = employeeMeta?.totalPages;
-  const startIndex = (employeeMeta.page - 1) * itemsPerPage + 1;
-  const endIndex = employeeList.length;
+  const startIndex = (employeeMeta?.page - 1) * itemsPerPage + 1;
+  const endIndex = employeeList?.length;
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedEmployees(new Set());
+    setSelectAll(false);
+  }, [searchTerm, filterBy]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const dropdown = document.getElementById("filter-dropdown");
+      if (dropdown && !dropdown.contains(e.target as Node)) {
+        setShowFilterDropdown(false);
+      }
+    };
+    if (showFilterDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showFilterDropdown]);
 
   const handleSelectAll = () => {};
 
@@ -98,32 +120,11 @@ const ClientEmployees: React.FC = () => {
     setEditModalOpen(false);
     setEditEmployee(null);
   };
+
   const handleDeleteSelected = () => {
     setSelectedEmployees(new Set());
     setSelectAll(false);
   };
-
-  // Reset to first page when search or filter changes
-  useEffect(() => {
-    setCurrentPage(1);
-    setSelectedEmployees(new Set());
-    setSelectAll(false);
-  }, [searchTerm, filterBy]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const dropdown = document.getElementById("filter-dropdown");
-      if (dropdown && !dropdown.contains(e.target as Node)) {
-        setShowFilterDropdown(false);
-      }
-    };
-    if (showFilterDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showFilterDropdown]);
 
   if (isLoading) {
     return <FullScreenMessage type="loading" />;
