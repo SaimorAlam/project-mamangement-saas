@@ -36,8 +36,8 @@ const Login = () => {
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "sakibsoftvence@gmail.com",
-      password: "123456789",
+      email: "mdkazinaim0018@gmail.com",
+      password: "123456",
     },
   });
 
@@ -47,9 +47,9 @@ const Login = () => {
     const toastId = toast.loading("Logging in...");
     try {
       const res = await login(data).unwrap();
+      console.log(res, "res");
       if (res.success) {
         dispatch(setUser(res?.data));
-        console.log(res,"res");
         toast.success("Logged in successfully", { id: toastId });
         if (res.data.specialToken) {
           navigate("/verification");
@@ -57,8 +57,6 @@ const Login = () => {
           const { role } = jwtDecode<{ role: keyof typeof Role }>(
             res.data.accessToken
           );
-          console.log(role);
-          console.log(Role[role]);
           if (Role[role]) {
             navigate(`/${Role[role]}`);
           }

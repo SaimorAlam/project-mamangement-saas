@@ -22,7 +22,6 @@ const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const user = useAppSelector((state) => state?.auth?.user);
   const location = useLocation();
-
   if (!user || !user?.accessToken) {
     return (
       <Navigate to="/login" state={{ from: location }} replace />
