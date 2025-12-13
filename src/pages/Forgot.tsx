@@ -3,6 +3,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { Mail, CircleAlert } from "lucide-react";
+import { toast } from "sonner";
+import { useVerifyEmailMutation } from "@/store/Api/AuthApi/VerificationApi";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -18,12 +20,21 @@ const Forgot = () => {
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
-
+  const [verifyEmail] = useVerifyEmailMutation();
   const navigate = useNavigate();
 
-  const onSubmit = (data: LoginFormInputs) => {
+  const onSubmit = async (data: LoginFormInputs) => {
     console.log("Login Data:", data);
-    navigate("/verification");
+    try {
+      console.log(data);
+      const res = await verifyEmail(data).unwrap();
+      if (res.success) {
+        toast.success("A verification code has been sent to your email.");
+        navigate("/verification");
+      }
+    } catch {
+      toast.error("Email Verification Failed");
+    }
   };
 
   return (
@@ -63,7 +74,9 @@ const Forgot = () => {
               )}
             </div>
             {errors.email && (
-              <p className="text-red-500 text-sm mt-2">{errors.email.message}</p>
+              <p className="text-red-500 text-sm mt-2">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -72,7 +85,7 @@ const Forgot = () => {
             type="submit"
             className="w-full cursor-pointer bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
-               Send Reset Password Link
+            Send Reset Password Link
           </button>
         </form>
       </div>
