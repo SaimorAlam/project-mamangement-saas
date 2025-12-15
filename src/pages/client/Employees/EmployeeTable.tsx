@@ -1,15 +1,24 @@
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { IEmployeeProfile } from "@/types/client-panel";
 
 interface ITableProps {
   employees: IEmployeeProfile[];
   selectedEmployees: Set<string>;
   selectAll: boolean;
-  visibleColumns?: string[]; // 👈 new prop
+
+  visibleColumns?: string[];
+
   handleSelectAll: () => void;
   handleSelectEmployee: (id: string) => void;
+
   handleEditClick?: (employee: IEmployeeProfile) => void;
   handleDeleteEmployee?: (id: string) => void;
+
+  /* 🔑 Sorting (API-driven) */
+  handleSort?: (field: string) => void;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+
   getRoleBadgeColor: (role: string) => string;
   getStatusBadgeColor?: (level: string) => string;
 }
@@ -31,10 +40,33 @@ const EmployeeTable = ({
   handleSelectEmployee,
   handleEditClick,
   handleDeleteEmployee,
+  handleSort,
+  sortBy,
+  sortOrder,
   getRoleBadgeColor,
   getStatusBadgeColor,
 }: ITableProps) => {
-  console.log(employees[0]);
+  const renderSortIcon = (field: string) => {
+    if (sortBy !== field) return null;
+    return sortOrder === "asc" ? (
+      <ArrowUp className="w-3 h-3 ml-1 inline" />
+    ) : (
+      <ArrowDown className="w-3 h-3 ml-1 inline" />
+    );
+  };
+
+  const sortableHeader = (label: string, field: string, className = "") => (
+    <th
+      onClick={() => handleSort?.(field)}
+      className={`px-6 py-3 text-left cursor-pointer select-none ${className}`}
+    >
+      <span className="inline-flex items-center text-sm font-medium">
+        {label}
+        {renderSortIcon(field)}
+      </span>
+    </th>
+  );
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -45,28 +77,28 @@ const EmployeeTable = ({
                 type="checkbox"
                 checked={selectAll}
                 onChange={handleSelectAll}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
               />
             </th>
 
-            {visibleColumns.includes("employeeName") && (
-              <th className="px-6 py-3 text-left">Employee Name</th>
-            )}
-            {visibleColumns.includes("email") && (
-              <th className="px-6 py-3 text-left">Email</th>
-            )}
-            {visibleColumns.includes("role") && (
-              <th className="px-6 py-3 text-left">Role</th>
-            )}
+            {visibleColumns.includes("employeeName") &&
+              sortableHeader("Employee Name", "name")}
+
+            {visibleColumns.includes("email") &&
+              sortableHeader("Email", "email")}
+
+            {visibleColumns.includes("role") && sortableHeader("Role", "role")}
+
             {visibleColumns.includes("projects") && (
               <th className="px-6 py-3 text-left">Assign Project</th>
             )}
-            {visibleColumns.includes("lastActive") && (
-              <th className="px-6 py-3 text-left w-36">Last Active</th>
-            )}
-            {visibleColumns.includes("level") && (
-              <th className="px-6 py-3 text-left">Level</th>
-            )}
+
+            {visibleColumns.includes("lastActive") &&
+              sortableHeader("Last Active", "updatedAt", "w-36")}
+
+            {visibleColumns.includes("level") &&
+              sortableHeader("Level", "status")}
+
             {visibleColumns.includes("action") && (
               <th className="px-6 py-3 text-left">Action</th>
             )}
@@ -74,7 +106,7 @@ const EmployeeTable = ({
         </thead>
 
         <tbody className="bg-white divide-y divide-gray-200">
-          {employees?.map((employee) => (
+          {employees.map((employee) => (
             <tr
               key={employee.id}
               className="hover:bg-gray-50 transition-colors"
@@ -84,20 +116,18 @@ const EmployeeTable = ({
                   type="checkbox"
                   checked={selectedEmployees.has(employee.id as string)}
                   onChange={() => handleSelectEmployee(employee.id as string)}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
                 />
               </td>
 
               {visibleColumns.includes("employeeName") && (
                 <td className="px-6 py-4">
                   <div className="flex items-center">
-                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-lg mr-3">
-                      <img
-                        src={employee.user.profileImage || ""}
-                        alt="Employee Avater"
-                        className="rounded-full"
-                      />
-                    </div>
+                    <img
+                      src={employee.user.profileImage || ""}
+                      alt="Employee Avatar"
+                      className="w-10 h-10 rounded-full mr-3 bg-gray-100"
+                    />
                     <span className="text-sm font-medium text-gray-900">
                       {employee.user.name}
                     </span>
@@ -126,10 +156,10 @@ const EmployeeTable = ({
               {visibleColumns.includes("projects") && (
                 <td className="px-6 py-4">
                   <div className="grid grid-cols-3 gap-2">
-                    {employee?.projects?.map((project, index) => (
+                    {employee.projects?.map((project, index) => (
                       <span
                         key={index}
-                        className="text-xs border border-gray-200 text-[#1D2028] bg-gray-50 px-2 py-1 rounded-lg"
+                        className="text-xs border bg-gray-50 px-2 py-1 rounded-lg"
                       >
                         {project}
                       </span>
@@ -160,21 +190,23 @@ const EmployeeTable = ({
 
               {visibleColumns.includes("action") && (
                 <td className="px-6 py-4">
-                  <div className="flex items-center space-x-2">
-                    <button className="p-1 text-blue-500 cursor-pointer">
+                  <div className="flex gap-2">
+                    <button className="p-1 text-blue-500">
                       <Eye className="w-4 h-4" />
                     </button>
+
                     {handleEditClick && (
                       <button
-                        className="p-1 text-green-600 cursor-pointer"
+                        className="p-1 text-green-600"
                         onClick={() => handleEditClick(employee)}
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                     )}
+
                     {handleDeleteEmployee && (
                       <button
-                        className="p-1 text-red-600 cursor-pointer"
+                        className="p-1 text-red-600"
                         onClick={() =>
                           handleDeleteEmployee(employee.id as string)
                         }

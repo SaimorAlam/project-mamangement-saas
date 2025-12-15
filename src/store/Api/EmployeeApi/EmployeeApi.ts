@@ -1,33 +1,66 @@
 import baseApi from "../BaseApi/BaseApi";
 
-import { IAddEmployeePayload } from "@/types";
-
 const employeeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllEmployees: builder.query({
-      query: ({ page, limit }) =>
-        `/employees?page=${page}&limit=${limit}`,
-      providesTags: ["Employees"],
+      query: ({
+        page,
+        limit,
+        search,
+        status,
+        joinedDateFrom,
+        joinedDateTo,
+        sortBy,
+        sortOrder,
+      }) => {
+        const params = new URLSearchParams();
+
+        params.append("page", String(page));
+        params.append("limit", String(limit));
+
+        if (search) params.append("search", search);
+        if (status) params.append("status", status);
+        if (joinedDateFrom) params.append("joinedDateFrom", joinedDateFrom);
+        if (joinedDateTo) params.append("joinedDateTo", joinedDateTo);
+        if (sortBy) params.append("sortBy", sortBy);
+        if (sortOrder) params.append("sortOrder", sortOrder);
+        return {
+          url: `/employees`,
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: (result) =>
+        result?.data
+          ? [
+              { type: "Employees", id: "LIST" },
+              ...result.data.map((employee: { id: string }) => ({
+                type: "Employees",
+                id: employee.id,
+              })),
+            ]
+          : [{ type: "Employees", id: "LIST" }],
     }),
 
     addEmployee: builder.mutation({
-      query: ({
-        projects,
-        ...employeeData
-      }: IAddEmployeePayload) => ({
+      query: (employeeData) => ({
         url: "/users/employees/create-employee",
         method: "POST",
         body: employeeData,
       }),
-      invalidatesTags: ["Employees"],
+      invalidatesTags: [{ type: "Employees", id: "LIST" }],
     }),
 
     updateEmployee: builder.mutation({
-      query: (employeeData) => ({
-        url: `/employees/${employeeData.id}`,
+      query: ({ id, ...employeeData }) => ({
+        url: `/employees/${id}`,
         method: "PATCH",
         body: employeeData,
       }),
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "Employees", id },
+        { type: "Employees", id: "LIST" },
+      ],
     }),
   }),
 });
