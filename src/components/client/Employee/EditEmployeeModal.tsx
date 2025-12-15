@@ -110,8 +110,6 @@ const EditEmployeeModal = ({
       return;
     }
 
-    console.log(data)
-
     try {
       await updateEmployee(data).unwrap();
 
@@ -356,9 +354,14 @@ const EditEmployeeModal = ({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              disabled={isLoading}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
+                isLoading
+                  ? "bg-blue-400 text-white cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
             >
-              Save
+              {isLoading ? "Saving..." : "Save"}
             </button>
           </div>
         </form>

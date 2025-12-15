@@ -62,6 +62,12 @@ const employeeApi = baseApi.injectEndpoints({
         { type: "Employees", id: "LIST" },
       ],
     }),
+
+    deleteEmployee: builder.mutation({
+      query: () => ({
+        url: `/`
+      })
+    })
   }),
 });
 
