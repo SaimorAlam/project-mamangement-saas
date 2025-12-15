@@ -17,6 +17,7 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 // import { useNavigate } from "react-router-dom";
 import EditProgramModal from "./EditProgramModal";
+import { useNavigate } from "react-router-dom";
 
 interface IProgramTableProps {
   title?: string;
@@ -61,6 +62,7 @@ const ClientAllProgram = ({
 
   const programs = useMemo(() => data?.data?.data ?? [], [data]);
   const meta = data?.data?.meta;
+  const navigate = useNavigate();
 
   const totalPrograms = meta?.total ?? programs.length;
   const itemsPerPage = meta?.limit ?? limit;
@@ -145,6 +147,9 @@ const ClientAllProgram = ({
     ...sortedPrograms,
     ...Array.from({ length: emptyRowsCount }).map(() => null),
   ];
+  const handleRowClick = (programId: string) => {
+    navigate(`/client-panel/program-overview/${programId}`);
+  };
 
   return (
     <div className="min-h-screen py-6">
@@ -222,7 +227,11 @@ const ClientAllProgram = ({
             <tbody className="divide-y divide-gray-200">
               {tableRows.map((program, idx) =>
                 program ? (
-                  <tr key={program.id} className="hover:bg-gray-50 h-[60px]">
+                  <tr
+                    key={program.id}
+                    onClick={() => handleRowClick(program.id)}
+                    className="hover:bg-gray-50 h-[60px] cursor-pointer"
+                  >
                     <td className="px-6 py-4 text-sm">{program.programName}</td>
                     <td className="px-6 py-4">
                       <PriorityDropdown defaultPriority={program.priority} />
@@ -252,7 +261,12 @@ const ClientAllProgram = ({
                       </div>
                     </td>
                     <td className="px-6 py-4 flex gap-2">
-                      <button onClick={() => handleEditClick(program)}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick(program);
+                        }}
+                      >
                         <FaEdit className="text-blue-600" />
                       </button>
                       {/* <button onClick={() => handleDeleteClick(program.id)}>

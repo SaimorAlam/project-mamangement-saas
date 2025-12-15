@@ -63,7 +63,7 @@ const ClientUserActivityLog = lazy(
 const ClientSingleProject = lazy(
   () => import("@/pages/client/ClientSingleProject")
 );
-const ProgramOverview = lazy(() => import("@/pages/client/ProgramOverview"));
+const ProgramOverview = lazy(() => import("@/pages/client/Program/ProgramOverview"));
 const ClientAllProgramContainer = lazy(
   () => import("@/pages/client/ClientAllProgramContainer")
 );

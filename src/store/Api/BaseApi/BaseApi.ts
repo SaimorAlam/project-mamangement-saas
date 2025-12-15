@@ -7,6 +7,7 @@ import {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
 import { createApi } from "@reduxjs/toolkit/query/react";
+
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_BASE_URL,
   prepareHeaders: (headers, { getState }) => {
@@ -24,7 +25,6 @@ const baseQueryWithReauth: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  console.log("API call args:", args);
   let result = await baseQuery(args, api, extraOptions);
   if (result.error && result.error.status === 401) {
     const state = api.getState() as any;
@@ -56,6 +56,14 @@ const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithReauth,
   endpoints: () => ({}),
-  tagTypes: ["Program", "Users", "Manager", "Employee", "Viewer", "Employees"],
+  tagTypes: [
+    "Program",
+    "Users",
+    "Manager",
+    "Employee",
+    "Viewer",
+    "Employees",
+    "Project",
+  ],
 });
 export default baseApi;

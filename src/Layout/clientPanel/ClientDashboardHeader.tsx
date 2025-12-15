@@ -5,7 +5,7 @@ import React, {
   ReactElement,
   isValidElement,
 } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
@@ -24,6 +24,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { getClientSidebarItems } from "./clientSidebarItems";
+import CreateProjectModal from "./CreateProjectModal";
 
 interface ClientDashboardHeaderProps {
   name: string;
@@ -34,6 +35,7 @@ const DROPDOWN_ITEMS = ["Create Program"];
 const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   name,
 }) => {
+  const { id: programId } = useParams();
   const location = useLocation();
   const currentPath = location.pathname;
   const ClientSidebarGroups = getClientSidebarItems();
@@ -62,7 +64,10 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [successData, setSuccessData] = useState();
+  const [successData, setSuccessData] = useState<{
+    programName: string;
+    id: string;
+  }>({ programName: "", id: "" });
   const [successOpen, setSuccessOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -86,9 +91,15 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
     setIsDropdownOpen(false);
   };
 
-  const handleProgramSuccess = (programName: string) => {
+  const handleProgramSuccess = ({
+    programName,
+    id,
+  }: {
+    programName: string;
+    id: string;
+  }) => {
     setActiveModal(null);
-    setSuccessData(programName);
+    setSuccessData({ programName, id });
     setSuccessOpen(true);
   };
 
@@ -127,14 +138,22 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             type="Primary"
             onClick={() => setIsProjectModalOpen(true)}
           />
-          <NewProjectModal
+          {/* <NewProjectModal
             open={isProjectModalOpen}
             onClose={() => setIsProjectModalOpen(false)}
             onSuccess={(projectName: string) => {
               setIsProjectModalOpen(false);
-              setSuccessData(projectName || "New Project");
+              setSuccessData({
+                programName: projectName || "New Project",
+                id: "",
+              });
               setSuccessOpen(true);
             }}
+          /> */}
+          <CreateProjectModal
+            open={isProjectModalOpen}
+            programId={programId as string}
+            onClose={() => setIsProjectModalOpen(false)}
           />
         </>
       );
@@ -152,7 +171,10 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             onClose={() => setIsProjectModalOpen(false)}
             onSuccess={(projectName: string) => {
               setIsProjectModalOpen(false);
-              setSuccessData(projectName || "New Project");
+              setSuccessData({
+                programName: projectName || "New Project",
+                id: "",
+              });
               setSuccessOpen(true);
             }}
           />
@@ -239,12 +261,8 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             <SuccessModal
               open={successOpen}
               onOpenChange={setSuccessOpen}
-              programName={successData}
-              redirectPath={
-                isHighwayExpansionPage
-                  ? "/program-overview/:id"
-                  : "/all-program"
-              }
+              programName={successData.programName}
+              redirectPath={`/client-panel/program-overview/${successData?.id}`}
             />
           )}
         </div>
