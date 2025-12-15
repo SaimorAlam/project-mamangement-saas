@@ -3,7 +3,10 @@ import DianneRussellTask from "@/components/client/Employee/DianneRussellTask";
 import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
 import { useGetAllEmployeesQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 import Pagination from "@/common/Pagination";
-import { IEmployeeProfile } from "@/types/client-panel";
+import {
+  IEmployeeProfile,
+  IEditEmployeePayload,
+} from "@/types/client-panel";
 import EmployeeTableHeader from "./EmployeeTableHeader";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -41,57 +44,67 @@ const ClientEmployees: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
-    undefined
-  );
-  const [joinedDateFrom, setJoinedDateFrom] = useState<string | undefined>(
-    undefined
-  );
-  const [joinedDateTo, setJoinedDateTo] = useState<string | undefined>(
-    undefined
-  );
+  const [sortOrder, setSortOrder] = useState<
+    "asc" | "desc" | undefined
+  >(undefined);
+  const [joinedDateFrom, setJoinedDateFrom] = useState<
+    string | undefined
+  >(undefined);
+  const [joinedDateTo, setJoinedDateTo] = useState<
+    string | undefined
+  >(undefined);
 
   /* ---------- Pagination ---------- */
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   /* ---------- UI State ---------- */
-  const [activeTab, setActiveTab] = useState<"tables" | "task">("tables");
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const [selectedEmployees, setSelectedEmployees] = useState<Set<string>>(
-    new Set()
+  const [activeTab, setActiveTab] = useState<"tables" | "task">(
+    "tables"
   );
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [selectedEmployees, setSelectedEmployees] = useState<
+    Set<string>
+  >(new Set());
   const [selectAll, setSelectAll] = useState(false);
 
   /* ---------- Modal ---------- */
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editEmployee, setEditEmployee] = useState<IEmployeeProfile | null>(
-    null
-  );
+  const [editEmployee, setEditEmployee] =
+    useState<IEditEmployeePayload | null>(null);
 
   /* ---------- API ---------- */
-  const { data: employeeResponse, isFetching } = useGetAllEmployeesQuery({
-    page: currentPage,
-    limit: itemsPerPage,
-    search: searchTerm || undefined,
-    status,
-    joinedDateFrom,
-    joinedDateTo,
-    sortBy,
-    sortOrder,
-  });
+  const { data: employeeResponse, isFetching } =
+    useGetAllEmployeesQuery({
+      page: currentPage,
+      limit: itemsPerPage,
+      search: searchTerm || undefined,
+      status,
+      joinedDateFrom,
+      joinedDateTo,
+      sortBy,
+      sortOrder,
+    });
 
-  const employeeList = employeeResponse?.data.data || [];
+  const employeeList: IEmployeeProfile[] =
+    employeeResponse?.data?.data || [];
   const meta = employeeResponse?.data?.meta || {};
   const totalPages = meta?.totalPages || 1;
-  const totalPrograms = meta?.total || 0;
+  const totalEmployees = meta?.total || 0;
 
   /* ---------- Effects ---------- */
   useEffect(() => {
     setCurrentPage(1);
     setSelectedEmployees(new Set());
     setSelectAll(false);
-  }, [searchTerm, status, sortBy, sortOrder, joinedDateFrom, joinedDateTo]);
+  }, [
+    searchTerm,
+    status,
+    sortBy,
+    sortOrder,
+    joinedDateFrom,
+    joinedDateTo,
+  ]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -104,7 +117,8 @@ const ClientEmployees: React.FC = () => {
     if (showFilterDropdown) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [showFilterDropdown]);
 
   /* ---------- Handlers ---------- */
@@ -114,7 +128,20 @@ const ClientEmployees: React.FC = () => {
   };
 
   const handleEditClick = (employee: IEmployeeProfile) => {
-    setEditEmployee(employee);
+    const payload: IEditEmployeePayload = {
+      id: employee.id,
+      name: employee.user.name,
+      email: employee.user.email,
+      phoneNumber: employee.user.phoneNumber,
+      joinedDate: employee.joinedDate,
+      skills: employee.skills,
+      projects: [],
+      description: employee.description,
+      profileImage: employee.user.profileImage,
+      userStatus: "ACTIVE",
+    };
+
+    setEditEmployee(payload);
     setEditModalOpen(true);
   };
 
@@ -127,9 +154,7 @@ const ClientEmployees: React.FC = () => {
     if (selectAll) {
       setSelectedEmployees(new Set());
     } else {
-      const ids = employeeList.map(
-        (employee: IEmployeeProfile) => employee.id as string
-      );
+      const ids = employeeList.map((e) => e.id as string);
       setSelectedEmployees(new Set(ids));
     }
     setSelectAll(!selectAll);
@@ -146,9 +171,22 @@ const ClientEmployees: React.FC = () => {
     setSelectAll(updated.size === employeeList.length);
   };
 
+  const handleDeleteEmployee = (id: string) => {
+    console.log("Deleting employee:", id);
+
+    // later:
+    // deleteEmployeeMutation(id)
+  };
+
   const handleDeleteSelected = () => {
     if (selectedEmployees.size === 0) return;
-    console.log("Deleting selected employees:", Array.from(selectedEmployees));
+
+    const ids = Array.from(selectedEmployees);
+    console.log("Deleting selected employees:", ids);
+
+    // later:
+    // bulkDeleteEmployeesMutation(ids)
+
     setSelectedEmployees(new Set());
     setSelectAll(false);
   };
@@ -179,7 +217,11 @@ const ClientEmployees: React.FC = () => {
               <Suspense
                 fallback={
                   <div className="p-6">
-                    <Skeleton count={5} height={40} className="mb-2" />
+                    <Skeleton
+                      count={5}
+                      height={40}
+                      className="mb-2"
+                    />
                   </div>
                 }
               >
@@ -190,6 +232,7 @@ const ClientEmployees: React.FC = () => {
                   handleSelectAll={handleSelectAll}
                   handleSelectEmployee={handleSelectEmployee}
                   handleEditClick={handleEditClick}
+                  handleDeleteEmployee={handleDeleteEmployee}
                   handleSort={handleSort}
                   getRoleBadgeColor={getRoleBadgeColor}
                   getStatusBadgeColor={getStatusBadgeColor}
@@ -199,12 +242,11 @@ const ClientEmployees: React.FC = () => {
               <EmployeeListTask employees={employeeList} />
             )}
 
-            {/* Pagination */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               itemsPerPage={itemsPerPage}
-              totalPrograms={totalPrograms}
+              totalPrograms={totalEmployees}
               onPageChange={(page) => setCurrentPage(page)}
             />
           </div>
@@ -219,7 +261,7 @@ const ClientEmployees: React.FC = () => {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Edit Modal */}
       {editModalOpen && editEmployee && (
         <EditEmployeeModal
           open={editModalOpen}

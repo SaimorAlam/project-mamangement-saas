@@ -1,8 +1,12 @@
 // src/routes/clientRoutes.tsx
 import { lazy } from "react";
 
-const ClientOverview = lazy(() => import("@/pages/client/ClientOverview"));
-const ClientAllProgram = lazy(() => import("@/pages/client/ClientAllProgram"));
+const ClientOverview = lazy(
+  () => import("@/pages/client/ClientOverview")
+);
+const ClientAllProgram = lazy(
+  () => import("@/pages/client/ClientAllProgram")
+);
 const ClientEmployees = lazy(
   () => import("@/pages/client/Employees/ClientEmployees")
 );
@@ -25,7 +29,9 @@ const ClientProgramName = lazy(
 const ClientHighwayExpansion = lazy(
   () => import("@/pages/client/ClientHighwayExpansion")
 );
-const ClientAllHighway = lazy(() => import("@/pages/client/ClientAllHighway"));
+const ClientAllHighway = lazy(
+  () => import("@/pages/client/ClientAllHighway")
+);
 const ClientCarlyleHall = lazy(
   () => import("@/pages/client/ClientCarlyleHall")
 );
@@ -35,23 +41,31 @@ const ClientProjectReview = lazy(
 const ClientProjectBuilder = lazy(
   () => import("@/pages/client/ClientProjectBuilder")
 );
-const ClientSettings = lazy(() => import("@/pages/client/ClientSettings"));
+const ClientSettings = lazy(
+  () => import("@/pages/client/ClientSettings")
+);
 const ClientActivityLog = lazy(
   () => import("@/pages/client/ClientActivityLog")
 );
 const ClientHelp = lazy(() => import("@/pages/client/ClientHelp"));
-const ClientSupport = lazy(() => import("@/pages/client/ClientSupport"));
+const ClientSupport = lazy(
+  () => import("@/pages/client/ClientSupport")
+);
 const ClientSupportTickets = lazy(
   () => import("@/pages/client/ClientSupportTickets")
 );
 const ClientCreateTicket = lazy(
   () => import("@/pages/client/ClientCreateTicket")
 );
-const ClientFeedback = lazy(() => import("@/pages/client/ClientFeedBack"));
+const ClientFeedback = lazy(
+  () => import("@/pages/client/ClientFeedBack")
+);
 const ClientProductTour = lazy(
   () => import("@/pages/client/ClientProductTour")
 );
-const ClientContactUs = lazy(() => import("@/pages/client/ClientContactUs"));
+const ClientContactUs = lazy(
+  () => import("@/pages/client/ClientContactUs")
+);
 const ClientWorkInProgress = lazy(
   () => import("@/pages/client/ClientWorkInProgress")
 );
@@ -61,7 +75,9 @@ const ClientUserActivityLog = lazy(
 const ClientSingleProject = lazy(
   () => import("@/pages/client/ClientSingleProject")
 );
-const ProgramOverview = lazy(() => import("@/pages/client/ProgramOverview"));
+const ProgramOverview = lazy(
+  () => import("@/pages/client/ProgramOverview")
+);
 const ClientAllProgramContainer = lazy(
   () => import("@/pages/client/ClientAllProgramContainer")
 );

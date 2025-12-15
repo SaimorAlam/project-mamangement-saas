@@ -52,7 +52,7 @@ const employeeApi = baseApi.injectEndpoints({
     }),
 
     updateEmployee: builder.mutation({
-      query: ({ id, ...employeeData }) => ({
+      query: ({ projects,id, ...employeeData }) => ({
         url: `/employees/${id}`,
         method: "PATCH",
         body: employeeData,
