@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 import { useGetSingleEmployeeQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
-import GlobalLoader from "@/common/GlobalLoader";
 
 interface IViewEmployeeModalProps {
   employeeId: string;

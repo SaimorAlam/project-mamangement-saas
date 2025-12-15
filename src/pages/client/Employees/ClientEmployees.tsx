@@ -12,7 +12,7 @@ import {
 
 import Pagination from "@/common/Pagination";
 import EmployeeTableHeader from "./EmployeeTableHeader";
-import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
+// import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
 import DianneRussellTask from "@/components/client/Employee/DianneRussellTask";
 import ViewEmployeeModal from "@/components/client/Employee/ViewEmployeeModal";
 import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
@@ -296,7 +296,8 @@ const ClientEmployees: React.FC = () => {
                 />
               </Suspense>
             ) : (
-              <EmployeeListTask employees={employeeList} />
+              <></>
+              // <EmployeeListTask employees={employeeList} />
             )}
 
             <Pagination
