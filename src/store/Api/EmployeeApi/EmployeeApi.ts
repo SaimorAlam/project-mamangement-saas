@@ -30,6 +30,12 @@ const employeeApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Employees"],
     }),
+
+    deleteEmployee: builder.mutation({
+      query: () => ({
+        url: `/`
+      })
+    })
   }),
 });
 

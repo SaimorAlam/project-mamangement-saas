@@ -96,7 +96,6 @@ const ClientEmployees: React.FC = () => {
   const handleDeleteEmployee = (employeeId: string) => {};
 
   const handleEditClick = (employee: IEmployeeProfile) => {
-
     const updateEmployeeData: IEditEmployeePayload = {
       id: employee.id,
       name: employee.user.name,
