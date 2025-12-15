@@ -11,8 +11,7 @@ const ProjectConfiguration: React.FC = () => {
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
 
-
-
+  // --------------------
 
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(true);
@@ -21,6 +20,7 @@ const ProjectConfiguration: React.FC = () => {
   const [color2, setColor2] = useState("#35B6EE");
   const [color3, setColor3] = useState("#6F78F9");
 
+  // all handler functions 
   const handleSetNumOfXAxisDataSet = (e) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -100,7 +100,7 @@ const ProjectConfiguration: React.FC = () => {
                       type="text"
                       key={index}
                       required
-                      placeholder="Enter this field value here"
+                      placeholder="Enter this field value here..."
                       className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
                     />
                   )
