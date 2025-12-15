@@ -12,7 +12,10 @@ interface IAddEmployeeModalProps {
 
 const today = new Date().toISOString().split("T")[0];
 
-const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
+const AddEmployeeModal = ({
+  open,
+  onClose,
+}: IAddEmployeeModalProps) => {
   const {
     register,
     handleSubmit,
@@ -85,7 +88,9 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
     );
   };
 
-  const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSkillKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === "Enter") {
       e.preventDefault();
       addSkillTag();
@@ -95,7 +100,9 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
     }
   };
 
-  const handleProjectKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleProjectKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === "Enter") {
       e.preventDefault();
       addProjectTag();
@@ -118,9 +125,11 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
       onClose();
     } catch (err: unknown) {
       if (err && typeof err === "object" && "data" in err) {
-        const errorData = (err as { data?: { message?: string } }).data;
+        const errorData = (err as { data?: { message?: string } })
+          .data;
         toast.error(
-          errorData?.message || "Failed to add employee. Please try again."
+          errorData?.message ||
+            "Failed to add employee. Please try again."
         );
       } else {
         toast.error("Something went wrong. Please try again.");
@@ -225,7 +234,8 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Employee Password <span className="text-red-500">*</span>
+                Employee Password{" "}
+                <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Mail
@@ -238,7 +248,8 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
                     required: "Password is required",
                     minLength: {
                       value: 6,
-                      message: "Password must be at least 6 characters",
+                      message:
+                        "Password must be at least 6 characters",
                     },
                   })}
                   placeholder="Enter employee password"
@@ -268,7 +279,8 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
                 return (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Joined Date <span className="text-red-500">*</span>
+                      Joined Date{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <input

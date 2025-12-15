@@ -1,16 +1,26 @@
 import React, { useEffect, useState, Suspense, lazy } from "react";
-import DianneRussellTask from "@/components/client/Employee/DianneRussellTask";
-import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
-import { useGetAllEmployeesQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
+import Swal from "sweetalert2";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import { toast } from "sonner";
+
+import {
+  useGetAllEmployeesQuery,
+  useDeleteEmployeeMutation,
+  useBulkDeleteEmployeeMutation,
+} from "@/store/Api/EmployeeApi/EmployeeApi";
+
 import Pagination from "@/common/Pagination";
+import EmployeeTableHeader from "./EmployeeTableHeader";
+import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
+import DianneRussellTask from "@/components/client/Employee/DianneRussellTask";
+import ViewEmployeeModal from "@/components/client/Employee/ViewEmployeeModal";
+import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
+
 import {
   IEmployeeProfile,
   IEditEmployeePayload,
 } from "@/types/client-panel";
-import EmployeeTableHeader from "./EmployeeTableHeader";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
-import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
 
 // Lazy-load EmployeeTable
 const EmployeeTable = lazy(() => import("./EmployeeTable"));
@@ -18,41 +28,38 @@ const EmployeeTable = lazy(() => import("./EmployeeTable"));
 /* ------------------------------
    Badge Utilities
 --------------------------------*/
-const getRoleBadgeColor = (role: string): string => {
-  switch (role) {
-    case "Manager":
-      return "bg-purple-100 text-purple-800 border-purple-200";
-    case "Staff":
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    case "Viewer":
-      return "bg-gray-100 text-gray-800 border-gray-200";
-    default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
-  }
-};
+const getRoleBadgeColor = (role: string) =>
+  ({
+    Manager: "bg-purple-100 text-purple-800 border-purple-200",
+    Staff: "bg-blue-100 text-blue-800 border-blue-200",
+    Viewer: "bg-gray-100 text-gray-800 border-gray-200",
+  }[role] ?? "bg-gray-100 text-gray-800 border-gray-200");
 
-const getStatusBadgeColor = (status: string): string =>
+const getStatusBadgeColor = (status: string) =>
   status === "Active"
     ? "bg-green-100 text-green-800 border-green-200"
     : "bg-red-100 text-red-800 border-red-200";
 
 /* ------------------------------
+   Skeleton Loader
+--------------------------------*/
+const TableSkeleton = () => (
+  <div className="p-6">
+    <Skeleton count={5} height={40} className="mb-2" />
+  </div>
+);
+
+/* ------------------------------
    Component
 --------------------------------*/
 const ClientEmployees: React.FC = () => {
-  /* ---------- Query State ---------- */
+  /* ---------- Query & Filter State ---------- */
   const [searchTerm, setSearchTerm] = useState("");
-  const [status, setStatus] = useState<string | undefined>(undefined);
-  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<
-    "asc" | "desc" | undefined
-  >(undefined);
-  const [joinedDateFrom, setJoinedDateFrom] = useState<
-    string | undefined
-  >(undefined);
-  const [joinedDateTo, setJoinedDateTo] = useState<
-    string | undefined
-  >(undefined);
+  const [status, setStatus] = useState<string | undefined>();
+  const [sortBy, setSortBy] = useState<string | undefined>();
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">();
+  const [joinedDateFrom, setJoinedDateFrom] = useState<string>();
+  const [joinedDateTo, setJoinedDateTo] = useState<string>();
 
   /* ---------- Pagination ---------- */
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,10 +75,12 @@ const ClientEmployees: React.FC = () => {
   >(new Set());
   const [selectAll, setSelectAll] = useState(false);
 
-  /* ---------- Modal ---------- */
+  /* ---------- Modal State ---------- */
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editEmployee, setEditEmployee] =
     useState<IEditEmployeePayload | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewModalId, setViewModalId] = useState("");
 
   /* ---------- API ---------- */
   const { data: employeeResponse, isFetching } =
@@ -85,6 +94,9 @@ const ClientEmployees: React.FC = () => {
       sortBy,
       sortOrder,
     });
+
+  const [deleteEmployee] = useDeleteEmployeeMutation();
+  const [bulkDelete] = useBulkDeleteEmployeeMutation();
 
   const employeeList: IEmployeeProfile[] =
     employeeResponse?.data?.data || [];
@@ -109,14 +121,12 @@ const ClientEmployees: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const dropdown = document.getElementById("filter-dropdown");
-      if (dropdown && !dropdown.contains(e.target as Node)) {
+      if (dropdown && !dropdown.contains(e.target as Node))
         setShowFilterDropdown(false);
-      }
     };
 
-    if (showFilterDropdown) {
+    if (showFilterDropdown)
       document.addEventListener("mousedown", handleClickOutside);
-    }
     return () =>
       document.removeEventListener("mousedown", handleClickOutside);
   }, [showFilterDropdown]);
@@ -127,8 +137,13 @@ const ClientEmployees: React.FC = () => {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
   };
 
+  const handleViewClick = (employeeId: string) => {
+    setViewModalId(employeeId);
+    setViewModalOpen(true);
+  };
+
   const handleEditClick = (employee: IEmployeeProfile) => {
-    const payload: IEditEmployeePayload = {
+    setEditEmployee({
       id: employee.id,
       name: employee.user.name,
       email: employee.user.email,
@@ -139,63 +154,96 @@ const ClientEmployees: React.FC = () => {
       description: employee.description,
       profileImage: employee.user.profileImage,
       userStatus: "ACTIVE",
-    };
-
-    setEditEmployee(payload);
+    });
     setEditModalOpen(true);
   };
 
-  const handleEditCancel = () => {
+  const handleCloseModals = () => {
     setEditModalOpen(false);
     setEditEmployee(null);
+    setViewModalOpen(false);
+    setViewModalId("");
   };
 
   const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedEmployees(new Set());
-    } else {
-      const ids = employeeList.map((e) => e.id as string);
-      setSelectedEmployees(new Set(ids));
-    }
+    if (selectAll) setSelectedEmployees(new Set());
+    else setSelectedEmployees(new Set(employeeList.map((e) => e.id)));
     setSelectAll(!selectAll);
   };
 
   const handleSelectEmployee = (id: string) => {
     const updated = new Set(selectedEmployees);
-    if (updated.has(id)) {
-      updated.delete(id);
-    } else {
-      updated.add(id);
-    }
+    updated.has(id) ? updated.delete(id) : updated.add(id);
     setSelectedEmployees(updated);
     setSelectAll(updated.size === employeeList.length);
   };
 
-  const handleDeleteEmployee = (id: string) => {
-    console.log("Deleting employee:", id);
+  const handleDeleteEmployee = async (id: string) => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+      });
 
-    // later:
-    // deleteEmployeeMutation(id)
+      if (result.isConfirmed) {
+        await deleteEmployee(id).unwrap();
+        Swal.fire(
+          "Deleted!",
+          "Employee has been deleted.",
+          "success"
+        );
+      }
+    } catch (err: any) {
+      Swal.fire(
+        "Error",
+        err?.data?.message || "Something went wrong",
+        "error"
+      );
+    }
   };
 
-  const handleDeleteSelected = () => {
-    if (selectedEmployees.size === 0) return;
+  const handleDeleteSelected = async () => {
+    if (!selectedEmployees.size) return;
 
-    const ids = Array.from(selectedEmployees);
-    console.log("Deleting selected employees:", ids);
+    // Show confirmation modal
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `This will delete ${selectedEmployees.size} employee(s)! This action cannot be undone.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete them!",
+      cancelButtonText: "Cancel",
+    });
 
-    // later:
-    // bulkDeleteEmployeesMutation(ids)
+    if (!result.isConfirmed) return;
 
-    setSelectedEmployees(new Set());
-    setSelectAll(false);
+    try {
+      const ids = Array.from(selectedEmployees);
+      await bulkDelete({ employeeIds: ids }).unwrap();
+
+      setSelectedEmployees(new Set());
+      setSelectAll(false);
+      toast.success("Selected employees deleted successfully");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Bulk delete failed");
+    }
   };
 
   /* ---------- Render ---------- */
   return (
     <div className="my-10 flex gap-5 flex-col">
       <div className="w-full">
-        {employeeList.length > 0 ? (
+        {isFetching ? (
+          <TableSkeleton />
+        ) : employeeList.length > 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <EmployeeTableHeader
               activeTab={activeTab}
@@ -214,23 +262,14 @@ const ClientEmployees: React.FC = () => {
             />
 
             {activeTab === "tables" ? (
-              <Suspense
-                fallback={
-                  <div className="p-6">
-                    <Skeleton
-                      count={5}
-                      height={40}
-                      className="mb-2"
-                    />
-                  </div>
-                }
-              >
+              <Suspense fallback={<TableSkeleton />}>
                 <EmployeeTable
                   employees={employeeList}
                   selectedEmployees={selectedEmployees}
                   selectAll={selectAll}
                   handleSelectAll={handleSelectAll}
                   handleSelectEmployee={handleSelectEmployee}
+                  handleViewClick={handleViewClick}
                   handleEditClick={handleEditClick}
                   handleDeleteEmployee={handleDeleteEmployee}
                   handleSort={handleSort}
@@ -247,12 +286,8 @@ const ClientEmployees: React.FC = () => {
               totalPages={totalPages}
               itemsPerPage={itemsPerPage}
               totalPrograms={totalEmployees}
-              onPageChange={(page) => setCurrentPage(page)}
+              onPageChange={setCurrentPage}
             />
-          </div>
-        ) : isFetching ? (
-          <div className="p-6">
-            <Skeleton count={5} height={40} className="mb-2" />
           </div>
         ) : (
           <div className="h-[60vh] flex items-center justify-center text-5xl text-gray-200 uppercase">
@@ -261,12 +296,19 @@ const ClientEmployees: React.FC = () => {
         )}
       </div>
 
-      {/* Edit Modal */}
+      {/* Modals */}
       {editModalOpen && editEmployee && (
         <EditEmployeeModal
-          open={editModalOpen}
+          open={true}
           employee={editEmployee}
-          onClose={handleEditCancel}
+          onClose={handleCloseModals}
+        />
+      )}
+      {viewModalOpen && viewModalId && (
+        <ViewEmployeeModal
+          open={true}
+          employeeId={viewModalId}
+          onClose={handleCloseModals}
         />
       )}
 

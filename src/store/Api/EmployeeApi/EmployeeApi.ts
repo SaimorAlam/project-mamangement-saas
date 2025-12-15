@@ -20,7 +20,8 @@ const employeeApi = baseApi.injectEndpoints({
 
         if (search) params.append("search", search);
         if (status) params.append("status", status);
-        if (joinedDateFrom) params.append("joinedDateFrom", joinedDateFrom);
+        if (joinedDateFrom)
+          params.append("joinedDateFrom", joinedDateFrom);
         if (joinedDateTo) params.append("joinedDateTo", joinedDateTo);
         if (sortBy) params.append("sortBy", sortBy);
         if (sortOrder) params.append("sortOrder", sortOrder);
@@ -42,8 +43,12 @@ const employeeApi = baseApi.injectEndpoints({
           : [{ type: "Employees", id: "LIST" }],
     }),
 
+    getSingleEmployee: builder.query({
+      query: (id) => `/employees/${id}`,
+    }),
+
     addEmployee: builder.mutation({
-      query: (employeeData) => ({
+      query: ({ projects, ...employeeData }) => ({
         url: "/users/employees/create-employee",
         method: "POST",
         body: employeeData,
@@ -52,29 +57,39 @@ const employeeApi = baseApi.injectEndpoints({
     }),
 
     updateEmployee: builder.mutation({
-      query: ({ projects,id, ...employeeData }) => ({
+      query: ({ projects, id, ...employeeData }) => ({
         url: `/employees/${id}`,
         method: "PATCH",
         body: employeeData,
       }),
-      invalidatesTags: (_result, _error, { id }) => [
-        { type: "Employees", id },
-        { type: "Employees", id: "LIST" },
-      ],
+      invalidatesTags: [{ type: "Employees", id: "LIST" }],
     }),
 
     deleteEmployee: builder.mutation({
-      query: () => ({
-        url: `/`
-      })
-    })
+      query: (id) => ({
+        url: `/employees/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Employees", id: "LIST" }],
+    }),
+
+    bulkDeleteEmployee: builder.mutation({
+      query: (data) => ({
+        url: "/employees/bulk/delete",
+        method: "DELETE",
+        body: data,
+      }),
+    }),
   }),
 });
 
 export const {
   useGetAllEmployeesQuery,
+  useGetSingleEmployeeQuery,
   useAddEmployeeMutation,
   useUpdateEmployeeMutation,
+  useDeleteEmployeeMutation,
+  useBulkDeleteEmployeeMutation,
 } = employeeApi;
 
 export default employeeApi;
