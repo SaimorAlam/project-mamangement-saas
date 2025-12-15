@@ -71,12 +71,12 @@ export default function CreateProgramModal({
       const res = await createProgramMutation(payload).unwrap();
       if (res.success) {
         toast.success("Program created successfully");
+        onSuccess(data.programName);
       }
     } catch (error) {
       console.log(error);
       toast.error("Failed to create program");
     }
-    onSuccess(data.programName);
     reset();
   };
 

@@ -3,10 +3,7 @@ import { X, Calendar, Info, Lock, Plus } from "lucide-react";
 
 type UploadCycle = "Weekly" | "By Weekly" | "Monthly";
 type UploadDate = "3 Days" | "4 Days" | "5 Days";
-type ShareWith =
-  | "Only Me"
-  | "Invite Stuff"
-  | "Follow Template Settings";
+type ShareWith = "Only Me" | "Invite Stuff" | "Follow Template Settings";
 
 interface FormData {
   projectName: string;
@@ -112,8 +109,7 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-gray-700 mb-2">
-                    Project Name{" "}
-                    <span className="text-red-500">*</span>
+                    Project Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -150,10 +146,7 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
                         <Info size={16} className="text-gray-400" />
                       </button>
                       <button className="p-1 hover:bg-gray-100 rounded">
-                        <Calendar
-                          size={16}
-                          className="text-gray-400"
-                        />
+                        <Calendar size={16} className="text-gray-400" />
                       </button>
                     </div>
                   </div>
@@ -164,33 +157,26 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
                     Data Uploading Cycle
                   </label>
                   <div className="flex gap-4">
-                    {(
-                      [
-                        "Weekly",
-                        "By Weekly",
-                        "Monthly",
-                      ] as UploadCycle[]
-                    ).map((cycle) => (
-                      <label
-                        key={cycle}
-                        className="flex items-center"
-                      >
-                        <input
-                          type="radio"
-                          checked={formData.uploadCycle === cycle}
-                          onChange={() =>
-                            setFormData({
-                              ...formData,
-                              uploadCycle: cycle,
-                            })
-                          }
-                          className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">
-                          {cycle}
-                        </span>
-                      </label>
-                    ))}
+                    {(["Weekly", "By Weekly", "Monthly"] as UploadCycle[]).map(
+                      (cycle) => (
+                        <label key={cycle} className="flex items-center">
+                          <input
+                            type="radio"
+                            checked={formData.uploadCycle === cycle}
+                            onChange={() =>
+                              setFormData({
+                                ...formData,
+                                uploadCycle: cycle,
+                              })
+                            }
+                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          />
+                          <span className="ml-2 text-sm text-gray-700">
+                            {cycle}
+                          </span>
+                        </label>
+                      )
+                    )}
                   </div>
                 </div>
 
@@ -237,26 +223,26 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
                     Data Upload Date
                   </label>
                   <div className="flex gap-4">
-                    {(
-                      ["3 Days", "4 Days", "5 Days"] as UploadDate[]
-                    ).map((days) => (
-                      <label key={days} className="flex items-center">
-                        <input
-                          type="radio"
-                          checked={formData.uploadDate === days}
-                          onChange={() =>
-                            setFormData({
-                              ...formData,
-                              uploadDate: days,
-                            })
-                          }
-                          className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">
-                          {days}
-                        </span>
-                      </label>
-                    ))}
+                    {(["3 Days", "4 Days", "5 Days"] as UploadDate[]).map(
+                      (days) => (
+                        <label key={days} className="flex items-center">
+                          <input
+                            type="radio"
+                            checked={formData.uploadDate === days}
+                            onChange={() =>
+                              setFormData({
+                                ...formData,
+                                uploadDate: days,
+                              })
+                            }
+                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          />
+                          <span className="ml-2 text-sm text-gray-700">
+                            {days}
+                          </span>
+                        </label>
+                      )
+                    )}
                   </div>
                 </div>
 
@@ -279,10 +265,7 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
                         "Follow Template Settings",
                       ] as ShareWith[]
                     ).map((option) => (
-                      <label
-                        key={option}
-                        className="flex items-center"
-                      >
+                      <label key={option} className="flex items-center">
                         <input
                           type="radio"
                           checked={formData.shareWith === option}
@@ -297,10 +280,7 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
                         <span className="ml-2 text-sm text-gray-700 flex items-center gap-1">
                           {option}
                           {option === "Only Me" && (
-                            <Lock
-                              size={14}
-                              className="text-gray-400"
-                            />
+                            <Lock size={14} className="text-gray-400" />
                           )}
                         </span>
                       </label>
@@ -487,10 +467,7 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
                         <Info size={16} className="text-gray-400" />
                       </button>
                       <button className="p-1 hover:bg-gray-100 rounded">
-                        <Calendar
-                          size={16}
-                          className="text-gray-400"
-                        />
+                        <Calendar size={16} className="text-gray-400" />
                       </button>
                     </div>
                   </div>
@@ -539,10 +516,7 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
                         <Info size={16} className="text-gray-400" />
                       </button>
                       <button className="p-1 hover:bg-gray-100 rounded">
-                        <Calendar
-                          size={16}
-                          className="text-gray-400"
-                        />
+                        <Calendar size={16} className="text-gray-400" />
                       </button>
                     </div>
                   </div>

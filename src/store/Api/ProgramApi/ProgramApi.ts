@@ -60,7 +60,7 @@ const programApi = baseApi.injectEndpoints({
     updateProgramName: builder.mutation({
       query: ({ id, ...body }) => ({
         url: `/program/${id}/name`,
-        method: "PUT",
+        method: "PATCH",
         body,
       }),
       invalidatesTags: (_result, _error, { id }) => [

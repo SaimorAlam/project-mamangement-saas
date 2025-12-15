@@ -43,7 +43,7 @@ const employeeApi = baseApi.injectEndpoints({
     }),
 
     addEmployee: builder.mutation({
-      query: (employeeData) => ({
+      query: ({ projects, ...employeeData }) => ({
         url: "/users/employees/create-employee",
         method: "POST",
         body: employeeData,
@@ -52,7 +52,7 @@ const employeeApi = baseApi.injectEndpoints({
     }),
 
     updateEmployee: builder.mutation({
-      query: ({ projects,id, ...employeeData }) => ({
+      query: ({ projects, id, ...employeeData }) => ({
         url: `/employees/${id}`,
         method: "PATCH",
         body: employeeData,
@@ -65,9 +65,9 @@ const employeeApi = baseApi.injectEndpoints({
 
     deleteEmployee: builder.mutation({
       query: () => ({
-        url: `/`
-      })
-    })
+        url: `/`,
+      }),
+    }),
   }),
 });
 

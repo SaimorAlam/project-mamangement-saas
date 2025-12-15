@@ -36,7 +36,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 }) => {
   const location = useLocation();
   const currentPath = location.pathname;
-  console.log(currentPath.startsWith("/client-panel/program-overview/"));
   const ClientSidebarGroups = getClientSidebarItems();
   const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
 
@@ -61,10 +60,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
     );
   }
 
-  console.log(currentRoute);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [successData, setSuccessData] = useState<string | null>(null);
+  const [successData, setSuccessData] = useState();
   const [successOpen, setSuccessOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -78,8 +76,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const isProgramOverviewPage = currentPath.startsWith(
     "/client-panel/program-overview/"
   );
-
-  console.log(isProgramOverviewPage);
   useEffect(() => {
     setIsEmployeeModalOpen(false);
     setIsDropdownOpen(false);
@@ -246,7 +242,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
               programName={successData}
               redirectPath={
                 isHighwayExpansionPage
-                  ? "/highway-expansion/all-highway"
+                  ? "/program-overview/:id"
                   : "/all-program"
               }
             />
