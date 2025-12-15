@@ -74,7 +74,7 @@ export default function CreateProjectModal({
     useForm<CreateProjectForm>({
       defaultValues: {
         programId,
-        managerId:"",
+        managerId: "",
         repeatEvery: "WEEKLY",
         repeatOnDays: ["MONDAY"],
         repeatOnDates: [],
