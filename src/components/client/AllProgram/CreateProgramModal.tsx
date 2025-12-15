@@ -16,7 +16,7 @@ import { toast } from "sonner";
 interface ICreateProgramModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: (programName: string) => void;
+  onSuccess: ({ programName, id }: { programName: string; id: string }) => void;
   title: string;
 }
 
@@ -69,14 +69,18 @@ export default function CreateProgramModal({
     };
     try {
       const res = await createProgramMutation(payload).unwrap();
+      console.log(res);
       if (res.success) {
         toast.success("Program created successfully");
+        onSuccess({
+          programName: res?.data?.programName as string,
+          id: res?.data?.id as string,
+        });
       }
     } catch (error) {
       console.log(error);
       toast.error("Failed to create program");
     }
-    onSuccess(data.programName);
     reset();
   };
 

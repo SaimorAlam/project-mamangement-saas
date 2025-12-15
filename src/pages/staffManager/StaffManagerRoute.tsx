@@ -3,7 +3,7 @@ import ClientMarketingStrategy from "@/pages/client/ClientMarketingStrategy";
 import ClientTimosSuperShop from "@/pages/client/ClientTimosSuperShop";
 import Employees from "@/pages/client/Employees/ClientEmployees";
 import ClientOverview from "@/pages/client/ClientOverview";
-import AllProgram from "@/pages/client/ClientAllProgram";
+import AllProgram from "@/pages/client/Program/ClientAllProgram";
 import ClientProgramName from "@/pages/client/ClientProgramName";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
 import ClientHelp from "@/pages/client/ClientHelp";

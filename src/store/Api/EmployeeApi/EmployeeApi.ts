@@ -20,8 +20,7 @@ const employeeApi = baseApi.injectEndpoints({
 
         if (search) params.append("search", search);
         if (status) params.append("status", status);
-        if (joinedDateFrom)
-          params.append("joinedDateFrom", joinedDateFrom);
+        if (joinedDateFrom) params.append("joinedDateFrom", joinedDateFrom);
         if (joinedDateTo) params.append("joinedDateTo", joinedDateTo);
         if (sortBy) params.append("sortBy", sortBy);
         if (sortOrder) params.append("sortOrder", sortOrder);
