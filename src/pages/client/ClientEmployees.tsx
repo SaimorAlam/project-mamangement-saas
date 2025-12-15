@@ -3,11 +3,12 @@ import EmployeeTable from "@/components/client/Employee/EmployeeTable";
 import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
 import DianneRussellTask from "@/components/client/Employee/DianneRussellTask";
 import EmployeeHeader from "@/components/client/Employee/EmployeeHeader";
-import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
+// import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
 
 import { useGetAllEmployeesQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 
 import FullScreenMessage from "@/common/FullScreenMessage";
+import EditEmployeeModal from "./../../components/client/Employee/EditEmployeeModal";
 import {
   IEmployeeProfile,
   IEditEmployeePayload,
