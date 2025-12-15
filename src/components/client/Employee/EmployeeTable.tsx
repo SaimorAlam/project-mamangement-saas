@@ -34,7 +34,6 @@ const EmployeeTable = ({
   getRoleBadgeColor,
   getStatusBadgeColor,
 }: ITableProps) => {
-  console.log(employees[0]);
   return (
     <div className="overflow-x-auto">
       <table className="w-full">

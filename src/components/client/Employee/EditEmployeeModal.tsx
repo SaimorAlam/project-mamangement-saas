@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { X, Calendar, HelpCircle } from "lucide-react";
-import { IEmployeeProfile, IAddEmployeePayload } from "@/types";
-import { useAddEmployeeMutation } from "@/store/Api/EmployeeApi/EmployeeApi";
+import {
+  IEditEmployeePayload,
+} from "@/types";
+import { useUpdateEmployeeMutation } from "@/store/Api/EmployeeApi/EmployeeApi";
+import { toast } from "sonner";
 
 interface IEditEmployeeModalProps {
   open: boolean;
   onClose: () => void;
-  employee: IEmployeeProfile;
+  employee: IEditEmployeePayload;
 }
 
 const EditEmployeeModal = ({
@@ -15,7 +18,7 @@ const EditEmployeeModal = ({
   onClose,
   employee,
 }: IEditEmployeeModalProps) => {
-  console.log;
+
   const {
     register,
     handleSubmit,
@@ -24,7 +27,7 @@ const EditEmployeeModal = ({
     control,
     reset,
     formState: { errors },
-  } = useForm<IEmployeeProfile>({
+  } = useForm<IEditEmployeePayload>({
     defaultValues: employee,
   });
 
@@ -34,7 +37,7 @@ const EditEmployeeModal = ({
   const [skillInput, setSkillInput] = useState("");
   const [projectInput, setProjectInput] = useState("");
 
-  const [updateEmployee, { isLoading }] = useAddEmployeeMutation();
+  const [updateEmployee, { isLoading }] = useUpdateEmployeeMutation();
 
   // Reset form when modal opens or employee changes
   useEffect(() => {
@@ -42,7 +45,7 @@ const EditEmployeeModal = ({
       reset({
         ...employee,
         skills: employee.skills || [],
-        projects: employee.projects || [],
+        projects: employee?.projects || [],
       });
       setSkillInput("");
       setProjectInput("");
@@ -101,15 +104,32 @@ const EditEmployeeModal = ({
     }
   };
 
-  const onSubmit = async (data: IAddEmployeePayload) => {
+  const onSubmit = async (data: IEditEmployeePayload) => {
     if (!skills.length) {
       alert("Please add at least one skill and one project");
       return;
     }
 
-    updateEmployee(data);
+    console.log(data)
 
-    console.log("Submitted Data:", data);
+    try {
+      await updateEmployee(data).unwrap();
+
+      toast.success("Employee update successfully!");
+      onClose();
+    } catch (err: unknown) {
+      if (err && typeof err === "object" && "data" in err) {
+        const errorData = (err as { data?: { message?: string } })
+          .data;
+        toast.error(
+          errorData?.message ||
+            "Failed to add employee. Please try again."
+        );
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    }
+
     // onClose();
   };
 
@@ -141,15 +161,15 @@ const EditEmployeeModal = ({
                 Name <span className="text-red-500">*</span>
               </label>
               <input
-                {...register("user.name", {
+                {...register("name", {
                   required: "Name is required",
                 })}
                 placeholder="Enter employee name"
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none"
               />
-              {errors.user?.name && (
+              {errors?.name && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.user.name.message}
+                  {errors.name.message}
                 </p>
               )}
             </div>
@@ -159,15 +179,15 @@ const EditEmployeeModal = ({
                 Email <span className="text-red-500">*</span>
               </label>
               <input
-                {...register("user.email", {
+                {...register("email", {
                   required: "Email is required",
                 })}
                 placeholder="Enter employee email"
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none"
               />
-              {errors.user?.email && (
+              {errors?.email && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.user.email.message}
+                  {errors.email.message}
                 </p>
               )}
             </div>
@@ -179,31 +199,17 @@ const EditEmployeeModal = ({
                 Phone <span className="text-red-500">*</span>
               </label>
               <input
-                {...register("user.phoneNumber", {
+                {...register("phoneNumber", {
                   required: "Phone is required",
                 })}
                 placeholder="Enter employee phone"
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none"
               />
-              {errors.user?.phoneNumber && (
+              {errors?.phoneNumber && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.user.phoneNumber.message}
+                  {errors.phoneNumber.message}
                 </p>
               )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Role <span className="text-red-500">*</span>
-              </label>
-              <select
-                {...register("user.role")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              >
-                <option value="Manager">Manager</option>
-                <option value="Staff">Staff</option>
-                <option value="Viewer">Viewer</option>
-              </select>
             </div>
           </div>
 
@@ -234,7 +240,7 @@ const EditEmployeeModal = ({
                           inputRef.current = e;
                         }}
                         onClick={openPicker}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none pr-16 cursor-pointer"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none pr-16 cursor-pointer no-date-icon"
                       />
                       <button
                         type="button"
