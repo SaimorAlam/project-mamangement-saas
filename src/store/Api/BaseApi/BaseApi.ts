@@ -7,6 +7,7 @@ import {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
 import { createApi } from "@reduxjs/toolkit/query/react";
+
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_BASE_URL,
   prepareHeaders: (headers, { getState }) => {
@@ -41,7 +42,6 @@ const baseQueryWithReauth: BaseQueryFn<
       api,
       extraOptions
     );
-    console.log(refreshResult);
     if (refreshResult.data) {
       api.dispatch(setUser(refreshResult.data));
       result = await baseQuery(args, api, extraOptions);
@@ -63,6 +63,7 @@ const baseApi = createApi({
     "Employee",
     "Viewer",
     "Employees",
+    "Project",
   ],
 });
 export default baseApi;

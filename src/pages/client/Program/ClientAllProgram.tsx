@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaSpinner } from "react-icons/fa";
+import { FaSpinner, FaEdit } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
-import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import {
+  useGetAllProgramQuery,
+  useUpdateProgramNameMutation,
+} from "@/store/Api/ProgramApi/ProgramApi";
 import Pagination from "@/common/Pagination";
 import { IProgram } from "@/types";
 import {
@@ -12,6 +15,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useDebounce } from "@/hooks/useDebounce";
+// import { useNavigate } from "react-router-dom";
+import EditProgramModal from "./EditProgramModal";
 import { useNavigate } from "react-router-dom";
 
 interface IProgramTableProps {
@@ -35,12 +40,17 @@ const ClientAllProgram = ({
   const [priorityFilter, setPriorityFilter] = useState<
     "ALL" | "HIGH" | "MEDIUM" | "LOW"
   >("ALL");
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [sortColumn, setSortColumn] = useState<keyof IProgram | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const debouncedSearch = useDebounce(search, 500);
 
+  // Edit modal
+  const [editProgram, setEditProgram] = useState<IProgram | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  // API calls
   const { data, isLoading } = useGetAllProgramQuery({
     page: currentPage,
     limit,
@@ -48,8 +58,11 @@ const ClientAllProgram = ({
     priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
   });
 
+  const [updateProgram] = useUpdateProgramNameMutation();
+
   const programs = useMemo(() => data?.data?.data ?? [], [data]);
   const meta = data?.data?.meta;
+  const navigate = useNavigate();
 
   const totalPrograms = meta?.total ?? programs.length;
   const itemsPerPage = meta?.limit ?? limit;
@@ -69,7 +82,6 @@ const ClientAllProgram = ({
     const list = [...programs];
 
     if (!sortColumn) {
-      // Default: sort by createdAt descending
       return list.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -110,6 +122,17 @@ const ClientAllProgram = ({
     });
   };
 
+  const handleEditClick = (program: IProgram) => {
+    setEditProgram(program);
+    setEditModalOpen(true);
+  };
+
+  // const handleDeleteClick = async (programId: string) => {
+  //   if (confirm("Are you sure you want to delete this program?")) {
+  //     await deleteProgram(programId);
+  //   }
+  // };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-10 h-[60vh]">
@@ -118,13 +141,15 @@ const ClientAllProgram = ({
     );
   }
 
-  // Ensure always 10 rows
   const totalRows = 10;
   const emptyRowsCount = totalRows - sortedPrograms.length;
   const tableRows = [
     ...sortedPrograms,
     ...Array.from({ length: emptyRowsCount }).map(() => null),
   ];
+  const handleRowClick = (programId: string) => {
+    navigate(`/client-panel/program-overview/${programId}`);
+  };
 
   return (
     <div className="min-h-screen py-6">
@@ -132,9 +157,7 @@ const ClientAllProgram = ({
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between px-6 py-4 border-b border-gray-200 gap-3">
           <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
-
           <div className="flex items-center gap-3">
-            {/* Search */}
             <input
               type="text"
               placeholder="Search by program name..."
@@ -145,8 +168,6 @@ const ClientAllProgram = ({
               }}
               className="px-4 py-2 text-sm border border-gray-300 rounded-md w-64"
             />
-
-            {/* Priority Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger className="px-4 py-2 text-sm border border-gray-300 rounded-md min-w-32">
                 {priorityFilter === "ALL" ? "All Priorities" : priorityFilter}
@@ -180,13 +201,20 @@ const ClientAllProgram = ({
                   "updatedAt",
                   "deadline",
                   "progress",
+                  "actions",
                 ].map(
                   (col) =>
                     col && (
                       <th
                         key={col}
-                        onClick={() => handleSort(col as keyof IProgram)}
-                        className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
+                        onClick={
+                          col !== "actions"
+                            ? () => handleSort(col as keyof IProgram)
+                            : undefined
+                        }
+                        className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 ${
+                          col !== "actions" ? "cursor-pointer" : ""
+                        }`}
                       >
                         {col.toString().replace(/([A-Z])/g, " $1")}
                         {sortColumn === col &&
@@ -201,43 +229,49 @@ const ClientAllProgram = ({
                 program ? (
                   <tr
                     key={program.id}
+                    onClick={() => handleRowClick(program.id)}
                     className="hover:bg-gray-50 h-[60px] cursor-pointer"
-                    onClick={() => navigate(`/client-panel/program-overview/${program.id}`)}
                   >
                     <td className="px-6 py-4 text-sm">{program.programName}</td>
-
                     <td className="px-6 py-4">
                       <PriorityDropdown defaultPriority={program.priority} />
                     </td>
-
                     {!hideCreatedOn && (
                       <td className="px-6 py-4 text-sm text-gray-600">
                         {formatDate(program.createdAt)}
                       </td>
                     )}
-
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {formatDate(program.updatedAt)}
                     </td>
-
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {formatDate(program.deadline)}
                     </td>
-
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="flex-1 max-w-[120px] h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-blue-600 transition-all"
-                            style={{
-                              width: `${program.progress}%`,
-                            }}
+                            style={{ width: `${program.progress}%` }}
                           />
                         </div>
                         <span className="text-sm text-gray-600">
                           {program.progress}%
                         </span>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick(program);
+                        }}
+                      >
+                        <FaEdit className="text-blue-600" />
+                      </button>
+                      {/* <button onClick={() => handleDeleteClick(program.id)}>
+                        <FaTrash className="text-red-600" />
+                      </button> */}
                     </td>
                   </tr>
                 ) : (
@@ -249,17 +283,14 @@ const ClientAllProgram = ({
                       "updatedAt",
                       "deadline",
                       "progress",
-                    ].map(
-                      (col, i) =>
-                        col && (
-                          <td
-                            key={i}
-                            className="px-6 py-4 text-sm text-gray-200"
-                          >
-                            &nbsp;
-                          </td>
-                        )
-                    )}
+                      "actions",
+                    ]
+                      .filter(Boolean)
+                      .map((_, i) => (
+                        <td key={i} className="px-6 py-4 text-sm text-gray-200">
+                          &nbsp;
+                        </td>
+                      ))}
                   </tr>
                 )
               )}
@@ -284,6 +315,19 @@ const ClientAllProgram = ({
           onPageChange={setCurrentPage}
         />
       </div>
+
+      {/* Edit Modal */}
+      {editModalOpen && editProgram && (
+        <EditProgramModal
+          open={editModalOpen}
+          program={editProgram}
+          onClose={() => setEditModalOpen(false)}
+          onSave={async (updatedData: Partial<IProgram>) => {
+            await updateProgram({ id: editProgram.id, ...updatedData });
+            setEditModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };
