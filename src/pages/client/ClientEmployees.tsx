@@ -8,7 +8,10 @@ import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
 import { useGetAllEmployeesQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 
 import FullScreenMessage from "@/common/FullScreenMessage";
-import { IEmployeeProfile } from "@/types/client-panel";
+import {
+  IEmployeeProfile,
+  IEditEmployeePayload,
+} from "@/types/client-panel";
 
 const getRoleBadgeColor = (role: string): string => {
   switch (role) {
@@ -42,7 +45,7 @@ const ClientEmployees: React.FC = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editEmployee, setEditEmployee] =
-    useState<IEmployeeProfile | null>(null);
+    useState<IEditEmployeePayload | null>(null);
   const [activeTab, setActiveTab] = useState<"tables" | "task">(
     "tables"
   );
@@ -93,7 +96,21 @@ const ClientEmployees: React.FC = () => {
   const handleDeleteEmployee = (employeeId: string) => {};
 
   const handleEditClick = (employee: IEmployeeProfile) => {
-    setEditEmployee(employee);
+
+    const updateEmployeeData: IEditEmployeePayload = {
+      id: employee.id,
+      name: employee.user.name,
+      email: employee.user.email,
+      phoneNumber: employee.user.phoneNumber,
+      joinedDate: employee.joinedDate,
+      skills: employee.skills,
+      projects: [],
+      description: employee.description,
+      profileImage: employee.user.profileImage,
+      userStatus: "ACTIVE",
+    };
+
+    setEditEmployee(updateEmployeeData);
     setEditModalOpen(true);
   };
 
