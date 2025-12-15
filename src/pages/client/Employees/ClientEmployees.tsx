@@ -55,6 +55,8 @@ const TableSkeleton = () => (
 const ClientEmployees: React.FC = () => {
   /* ---------- Query & Filter State ---------- */
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
   const [status, setStatus] = useState<string | undefined>();
   const [sortBy, setSortBy] = useState<string | undefined>();
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">();
@@ -87,7 +89,7 @@ const ClientEmployees: React.FC = () => {
     useGetAllEmployeesQuery({
       page: currentPage,
       limit: itemsPerPage,
-      search: searchTerm || undefined,
+      search: debouncedSearch || undefined,
       status,
       joinedDateFrom,
       joinedDateTo,
@@ -98,13 +100,26 @@ const ClientEmployees: React.FC = () => {
   const [deleteEmployee] = useDeleteEmployeeMutation();
   const [bulkDelete] = useBulkDeleteEmployeeMutation();
 
+  console.log(employeeResponse);
+
   const employeeList: IEmployeeProfile[] =
-    employeeResponse?.data?.data || [];
-  const meta = employeeResponse?.data?.meta || {};
+    employeeResponse?.data || [];
+  const meta = employeeResponse?.meta || {};
   const totalPages = meta?.totalPages || 1;
   const totalEmployees = meta?.total || 0;
 
   /* ---------- Effects ---------- */
+
+  console.log(debouncedSearch);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 1500);
+
+    return () => clearInterval(timer);
+  }, [searchTerm]);
+
   useEffect(() => {
     setCurrentPage(1);
     setSelectedEmployees(new Set());
@@ -241,26 +256,29 @@ const ClientEmployees: React.FC = () => {
   return (
     <div className="my-10 flex gap-5 flex-col">
       <div className="w-full">
+        <div className="bg-white rounded-lg shadow rounded-b-none border border-b-0 border-gray-200">
+          <EmployeeTableHeader
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            handleDeleteSelected={handleDeleteSelected}
+            showFilterDropdown={showFilterDropdown}
+            setShowFilterDropdown={setShowFilterDropdown}
+            selectedEmployees={selectedEmployees}
+            filterBy={status || "all"}
+            setFilterBy={(value) =>
+              setStatus(value === "all" ? undefined : value)
+            }
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            setJoinedDateFrom={setJoinedDateFrom}
+            setJoinedDateTo={setJoinedDateTo}
+          />
+        </div>
+
         {isFetching ? (
           <TableSkeleton />
         ) : employeeList.length > 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <EmployeeTableHeader
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              handleDeleteSelected={handleDeleteSelected}
-              showFilterDropdown={showFilterDropdown}
-              setShowFilterDropdown={setShowFilterDropdown}
-              selectedEmployees={selectedEmployees}
-              filterBy={status || "all"}
-              setFilterBy={(value) =>
-                setStatus(value === "all" ? undefined : value)
-              }
-              setSearchTerm={setSearchTerm}
-              setJoinedDateFrom={setJoinedDateFrom}
-              setJoinedDateTo={setJoinedDateTo}
-            />
-
+          <div className="bg-white rounded-t-none rounded-lg shadow-sm border border-t-0 border-gray-200">
             {activeTab === "tables" ? (
               <Suspense fallback={<TableSkeleton />}>
                 <EmployeeTable
@@ -290,7 +308,7 @@ const ClientEmployees: React.FC = () => {
             />
           </div>
         ) : (
-          <div className="h-[60vh] flex items-center justify-center text-5xl text-gray-200 uppercase">
+          <div className="h-[60vh] flex items-center justify-center text-5xl text-gray-200 uppercase bg-white rounded-t-none rounded-lg shadow-sm border border-t-0 border-gray-200">
             No Employees Data Available
           </div>
         )}

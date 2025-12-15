@@ -79,6 +79,7 @@ const employeeApi = baseApi.injectEndpoints({
         method: "DELETE",
         body: data,
       }),
+      invalidatesTags: [{ type: "Employees", id: "LIST" }],
     }),
   }),
 });

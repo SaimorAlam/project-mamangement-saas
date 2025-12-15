@@ -16,6 +16,7 @@ interface IEmployeeHeaderProps {
   setShowFilterDropdown: (show: boolean) => void;
   filterBy: string;
   setFilterBy: (filter: string) => void;
+  searchTerm: string;
   setSearchTerm: Dispatch<SetStateAction<string>>;
   setJoinedDateFrom: Dispatch<SetStateAction<string | undefined>>;
   setJoinedDateTo: Dispatch<SetStateAction<string | undefined>>;
@@ -30,12 +31,11 @@ export default function EmployeeTableHeader({
   setShowFilterDropdown,
   filterBy,
   setFilterBy,
+  searchTerm,
   setSearchTerm,
   setJoinedDateFrom,
   setJoinedDateTo,
 }: IEmployeeHeaderProps) {
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
   return (
     <div className="px-6 py-4 border-b border-gray-200">
       <div className="flex items-center justify-between">
@@ -71,9 +71,9 @@ export default function EmployeeTableHeader({
             <div className="relative">
               <Search className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
               <input
-                ref={searchInputRef}
+                value={searchTerm}
                 type="text"
-                placeholder="Search Project..."
+                placeholder="Search By name..."
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:outline-none"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -108,7 +108,9 @@ export default function EmployeeTableHeader({
           {/* Filter Dropdown */}
           <div className="relative">
             <button
-              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              onClick={() =>
+                setShowFilterDropdown(!showFilterDropdown)
+              }
               className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
             >
               <Filter className="w-4 h-4" />
@@ -133,7 +135,9 @@ export default function EmployeeTableHeader({
                     >
                       <input
                         type="checkbox"
-                        onChange={() => setFilterBy(role.toLowerCase())}
+                        onChange={() =>
+                          setFilterBy(role.toLowerCase())
+                        }
                         checked={filterBy === role.toLowerCase()}
                       />
                       <p className="text-sm text-gray-900">{role}</p>
@@ -151,20 +155,28 @@ export default function EmployeeTableHeader({
                       type="checkbox"
                       checked={filterBy === "active"}
                       onChange={(e) =>
-                        setFilterBy(e.target.checked ? "active" : "all")
+                        setFilterBy(
+                          e.target.checked ? "active" : "all"
+                        )
                       }
                     />
-                    <p className="text-sm text-gray-900">Active Only</p>
+                    <p className="text-sm text-gray-900">
+                      Active Only
+                    </p>
                   </div>
                   <div className="flex items-center gap-2 pl-6 py-1">
                     <input
                       type="checkbox"
                       checked={filterBy === "in active"}
                       onChange={(e) =>
-                        setFilterBy(e.target.checked ? "in active" : "all")
+                        setFilterBy(
+                          e.target.checked ? "in active" : "all"
+                        )
                       }
                     />
-                    <p className="text-sm text-gray-900">Inactive Only</p>
+                    <p className="text-sm text-gray-900">
+                      Inactive Only
+                    </p>
                   </div>
                 </div>
 
@@ -176,7 +188,9 @@ export default function EmployeeTableHeader({
                   <input
                     type="date"
                     className="border border-gray-300 rounded px-2 py-1 mb-2 w-full"
-                    onChange={(e) => setJoinedDateFrom(e.target.value)}
+                    onChange={(e) =>
+                      setJoinedDateFrom(e.target.value)
+                    }
                   />
                   <input
                     type="date"
