@@ -1,16 +1,38 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import { el } from "date-fns/locale";
 
 const ProjectConfiguration: React.FC = () => {
   const [widgetTitle, setWidgetTitle] = useState(
     "Campaign Performance"
   );
+
+  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1)
+  const [xAxisValues, setXAxisValues] = useState<string[]>([]);
+
+
+
+
+
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(true);
   const [showLegend, setShowLegend] = useState(true);
   const [color1, setColor1] = useState("#13A490");
   const [color2, setColor2] = useState("#35B6EE");
   const [color3, setColor3] = useState("#6F78F9");
+
+  const handleSetNumOfXAxisDataSet = (e) => {
+    const value = parseInt(e.target.value, 10);
+    if (isNaN(value)) {
+      setNumOfXAxisDataSet(1);
+    }
+    else if (value >= 1 && value <= 7) {
+      setNumOfXAxisDataSet(value);
+    }else{
+      setNumOfXAxisDataSet(1);
+      alert("Please enter a number between 1 and 7");
+    }
+  }
 
   return (
     <div className="w-[40%] h-full max-w-md mx-auto bg-white border border-gray-100 rounded-lg shadow-lg">
@@ -56,8 +78,11 @@ const ProjectConfiguration: React.FC = () => {
               Number of Data sets:
             </label>
             <input
-              type="text"
-              defaultValue="07"
+              type="number"
+              min={1}
+              max={7}
+              defaultValue={numOfXAxisDataSet}
+              onChange={handleSetNumOfXAxisDataSet}
               className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
@@ -68,36 +93,21 @@ const ProjectConfiguration: React.FC = () => {
               Input all field Data:
             </label>
             <div className="space-y-2">
-              <input
-                type="text"
-                defaultValue="First field"
-                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
-              />
-              <input
-                type="text"
-                defaultValue="Second field"
-                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
-              />
-              <input
-                type="text"
-                defaultValue="Third field"
-                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
-              />
-              <input
-                type="text"
-                defaultValue="Fourth field"
-                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
-              />
-              <input
-                type="text"
-                defaultValue="Third field"
-                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
-              />
-              <input
-                type="text"
-                defaultValue="Seventh field"
-                className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
-              />
+              {
+                numOfXAxisDataSet >= 1 && (
+                  [...Array(numOfXAxisDataSet)].map((_, index) => (
+                    <input
+                      type="text"
+                      key={index}
+                      required
+                      placeholder="Enter this field value here"
+                      className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+                    />
+                  )
+                  )
+                )
+              }
+
             </div>
           </div>
         </div>
@@ -116,14 +126,12 @@ const ProjectConfiguration: React.FC = () => {
             />
             <div
               onClick={() => setShowFilter(!showFilter)}
-              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
-                showFilter ? "bg-blue-600" : "bg-gray-300"
-              }`}
+              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showFilter ? "bg-blue-600" : "bg-gray-300"
+                }`}
             >
               <div
-                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
-                  showFilter ? "translate-x-5" : "translate-x-0"
-                }`}
+                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showFilter ? "translate-x-5" : "translate-x-0"
+                  }`}
               />
             </div>
           </div>
@@ -227,14 +235,12 @@ const ProjectConfiguration: React.FC = () => {
                 />
                 <div
                   onClick={() => setShowLegend(!showLegend)}
-                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
-                    showLegend ? "bg-blue-600" : "bg-gray-300"
-                  }`}
+                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showLegend ? "bg-blue-600" : "bg-gray-300"
+                    }`}
                 >
                   <div
-                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
-                      showLegend ? "translate-x-5" : "translate-x-0"
-                    }`}
+                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showLegend ? "translate-x-5" : "translate-x-0"
+                      }`}
                   />
                 </div>
               </div>

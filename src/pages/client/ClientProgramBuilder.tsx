@@ -13,7 +13,8 @@ import AreaChart from "@/common/Charts/AreaChart";
 
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
-import WidgetConfiguration from "@/components/client/ProgramBuilder/WidgetConfiguration";
+// import WidgetConfiguration from "@/components/client/ProgramBuilder/WidgetConfiguration";
+import ProjectConfiguration from "@/components/client/ProjectBuilder/ProjectConfiguration";
 
 const ClientProgramBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -134,7 +135,8 @@ const ClientProgramBuilder = () => {
         {selectedWidget === "area-chart" && <AreaChart />}
       </div>
       
-      <WidgetConfiguration />
+      {/* <WidgetConfiguration /> */}
+      <ProjectConfiguration />
     </div>
   );
 };
