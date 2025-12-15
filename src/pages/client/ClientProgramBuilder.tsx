@@ -15,6 +15,7 @@ import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
 // import WidgetConfiguration from "@/components/client/ProgramBuilder/WidgetConfiguration";
 import ProjectConfiguration from "@/components/client/ProjectBuilder/ProjectConfiguration";
+import WidgetConfiguration from "@/components/client/ProgramBuilder/WidgetConfiguration";
 
 const ClientProgramBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -134,9 +135,18 @@ const ClientProgramBuilder = () => {
 
         {selectedWidget === "area-chart" && <AreaChart />}
       </div>
-      
-      {/* <WidgetConfiguration /> */}
-      <ProjectConfiguration />
+
+      {selectedWidget === "KPI Widget" && <WidgetConfiguration />}
+      {selectedWidget === "bar-chart" && <ProjectConfiguration />}
+      {selectedWidget === "progress-ring" && <WidgetConfiguration />}
+      {selectedWidget === "pie-chart" && <WidgetConfiguration />}
+      {selectedWidget === "line-chart" && <WidgetConfiguration />}
+      {selectedWidget === "data-table" && <WidgetConfiguration />}
+      {selectedWidget === "gantt-chart" && <WidgetConfiguration />}
+      {selectedWidget === "picture-video" && <WidgetConfiguration />}
+      {selectedWidget === "horizontal-bar-chart" && <WidgetConfiguration />}
+      {selectedWidget === "heat-map-chart" && <WidgetConfiguration />}
+      {selectedWidget === "area-chart" && <WidgetConfiguration />}
     </div>
   );
 };

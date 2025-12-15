@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { el } from "date-fns/locale";
+
+type LegendValue = {
+  label: string;
+  field: string;
+  color: string;
+};
 
 const ProjectConfiguration: React.FC = () => {
   const [widgetTitle, setWidgetTitle] = useState(
@@ -10,29 +15,131 @@ const ProjectConfiguration: React.FC = () => {
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1)
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
 
-  // --------------------
+  const [legendValues, setLegendValues] = useState<LegendValue[]>([
+    { label: "", field: "", color: "#13A490" },
+    { label: "", field: "", color: "#35B6EE" },
+    { label: "", field: "", color: "#6F78F9" },
+  ]);
+  const [startingRange, setStartingRange] = useState<number>(0);
+  const [endingRange, setEndingRange] = useState<number>(100);
+
 
   const [filter, setFilter] = useState<string>("");
-  const [showFilter, setShowFilter] = useState(true);
+  const [showFilter, setShowFilter] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
-  const [color1, setColor1] = useState("#13A490");
-  const [color2, setColor2] = useState("#35B6EE");
-  const [color3, setColor3] = useState("#6F78F9");
+
+  // for showing user info below
+  const assignedBy={
+    name: "Alexis Burg",
+    role: "Admin",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
+  }
+
 
   // all handler functions 
-  const handleSetNumOfXAxisDataSet = (e) => {
+
+  // handler for x-axis inputs
+  const minXaxisField = 1;
+  const maxXaxisField = 7;
+  const handleSetNumOfXAxisDataSet = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
       setNumOfXAxisDataSet(1);
     }
-    else if (value >= 1 && value <= 7) {
+    else if (value >= minXaxisField && value <= maxXaxisField) {
       setNumOfXAxisDataSet(value);
-    }else{
+    } else {
       setNumOfXAxisDataSet(1);
-      alert("Please enter a number between 1 and 7");
+      alert(`Please enter a number between ${minXaxisField} and ${maxXaxisField}`);
     }
+
+    setXAxisValues((prev) => {
+      const updated = [...prev];
+      // Adding empty values if increased
+      while (updated.length < value) {
+        updated.push("");
+      }
+      // Removing extra values if decreased
+      return updated.slice(0, value);
+    });
   }
+
+  const handleXAxisValueChange = (
+    index: number,
+    value: string
+  ) => {
+    setXAxisValues((prev) => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
+
+  // handler for Legend inputs
+  const minLegend = 3;
+  const maxLegend = 5;
+  const handleSetNumOfLegendDataSet = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = parseInt(e.target.value, 10);
+
+    if (isNaN(value) || value < minLegend || value > maxLegend) {
+      alert(`Please enter a number between ${minLegend} and ${maxLegend}`);
+      return;
+    }
+
+    setNumOfLegendDataSet(value);
+
+    setLegendValues((prev) => {
+      const updated = [...prev];
+
+      while (updated.length < value) {
+        updated.push({
+          label: "",
+          field: "",
+          color: "#000000",
+        });
+      }
+
+      return updated.slice(0, value);
+    });
+  };
+
+  const handleLegendLabelChange = (
+    index: number,
+    value: string
+  ) => {
+    setLegendValues((prev) => {
+      const updated = [...prev];
+      updated[index].label = value;
+
+      // auto-generate field (camelCase)
+      updated[index].field = value
+        .toLowerCase()
+        .replace(/\s+/g, "");
+
+      return updated;
+    });
+
+
+  };
+
+  const handleLegendColorChange = (
+    index: number,
+    color: string
+  ) => {
+    setLegendValues((prev) => {
+      const updated = [...prev];
+      updated[index].color = color;
+      return updated;
+    });
+  };
+
+
+
+
 
   return (
     <div className="w-[40%] h-full max-w-md mx-auto bg-white border border-gray-100 rounded-lg shadow-lg">
@@ -90,23 +197,22 @@ const ProjectConfiguration: React.FC = () => {
           {/* Input all field Data */}
           <div className="mb-2">
             <label className="block text-xs text-gray-700 mb-1.5">
-              Input all field Data:
+              Input {numOfXAxisDataSet >= 2 && "all"} field Data:
             </label>
             <div className="space-y-2">
-              {
-                numOfXAxisDataSet >= 1 && (
-                  [...Array(numOfXAxisDataSet)].map((_, index) => (
-                    <input
-                      type="text"
-                      key={index}
-                      required
-                      placeholder="Enter this field value here..."
-                      className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
-                    />
-                  )
-                  )
-                )
-              }
+              {Array.from({ length: numOfXAxisDataSet }).map((_, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  required
+                  placeholder="Enter this field value here..."
+                  value={xAxisValues[index] || ""}
+                  onChange={(e) =>
+                    handleXAxisValueChange(index, e.target.value)
+                  }
+                  className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+                />
+              ))}
 
             </div>
           </div>
@@ -138,38 +244,40 @@ const ProjectConfiguration: React.FC = () => {
         </div>
 
         {/* Filter By */}
-        <div className="flex items-center">
-          <label className="text-xs text-gray-700 flex-1">
-            Filter By:
-          </label>
-          <div className="relative">
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="w-full pr-12 pl-4 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none"
-            >
-              <option value="onTime">On time</option>
-              <option value="absent">Absent</option>
-              <option value="late">Late</option>
-            </select>
-
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg
-                className="w-4 h-4 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        {showFilter && (
+          <div className="flex items-center">
+            <label className="text-xs text-gray-700 flex-1">
+              Filter By:
+            </label>
+            <div className="relative">
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="w-full pr-12 pl-4 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+                <option value="onTime">On time</option>
+                <option value="absent">Absent</option>
+                <option value="late">Late</option>
+              </select>
+
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Data Mapping for Y-Axis Section */}
         <div>
@@ -183,8 +291,11 @@ const ProjectConfiguration: React.FC = () => {
               Number of Data sets:
             </label>
             <input
-              type="text"
-              defaultValue="07"
+              type="number"
+              min={3}
+              max={5}
+              defaultValue={numOfLegendDataSet}
+              onChange={handleSetNumOfLegendDataSet}
               className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
@@ -195,8 +306,9 @@ const ProjectConfiguration: React.FC = () => {
               1st field Data:
             </label>
             <input
-              type="text"
-              defaultValue="0"
+              type="number"
+              onChange={(e) => setStartingRange(Number(e.target.value))}
+              defaultValue={startingRange}
               className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
@@ -207,8 +319,9 @@ const ProjectConfiguration: React.FC = () => {
               Last field Data:
             </label>
             <input
-              type="text"
-              defaultValue="0"
+              type="number"
+              onChange={(e) => setEndingRange(Number(e.target.value))}
+              defaultValue={endingRange}
               className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
@@ -248,122 +361,76 @@ const ProjectConfiguration: React.FC = () => {
             </div>
           </div>
 
-          {/* 1st Legend Name */}
-          <div className="flex items-center justify-between mb-2">
-            <label
-              className="text-xs text-gray-700"
-              style={{ width: "110px" }}
-            >
-              1st Legend Name:
-            </label>
-            <input
-              type="text"
-              defaultValue="On time"
-              className="w-[35%] px-2 py-1 text-xs border border-gray-300 rounded"
-            />
-          </div>
+          {Array.from({ length: numOfLegendDataSet }).map((_, index) => (
+            <div key={index}>
+              {/* Legend Name */}
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  className="text-xs text-gray-700"
+                  style={{ width: "110px" }}
+                >
+                  {index + 1}
+                  {index === 0
+                    ? "st"
+                    : index === 1
+                      ? "nd"
+                      : index === 2
+                        ? "rd"
+                        : "th"}{" "}
+                  Legend Name:
+                </label>
 
-          {/* 1st Legend Color */}
-          <div className="flex items-center mb-3">
-            <label
-              className="text-xs text-gray-700"
-              style={{ width: "110px" }}
-            >
-              1st Legend Color:
-            </label>
-            <div className="flex items-center justify-end gap-2 flex-1">
-              <input
-                type="text"
-                value={color1}
-                onChange={(e) => setColor1(e.target.value)}
-                className="text-xs text-gray-600 px-2 py-1 border border-gray-300 rounded w-20"
-              />
-              <input
-                type="color"
-                value={color1}
-                onChange={(e) => setColor1(e.target.value)}
-                className="w-14 h-6 rounded border border-gray-300 cursor-pointer"
-              />
+                <input
+                  type="text"
+                  placeholder="Enter name here"
+                  value={legendValues[index]?.label || ""}
+                  onChange={(e) =>
+                    handleLegendLabelChange(index, e.target.value)
+                  }
+                  className="w-[50%] px-2 py-1 text-xs border border-gray-300 rounded"
+                />
+              </div>
+
+              {/* Legend Color */}
+              <div className="flex items-center mb-3">
+                <label
+                  className="text-xs text-gray-700"
+                  style={{ width: "110px" }}
+                >
+                  {index + 1}
+                  {index === 0
+                    ? "st"
+                    : index === 1
+                      ? "nd"
+                      : index === 2
+                        ? "rd"
+                        : "th"}{" "}
+                  Legend Color:
+                </label>
+
+                <div className="flex items-center justify-end gap-2 flex-1">
+                  <input
+                    type="text"
+                    value={legendValues[index]?.color || "#000000"}
+                    onChange={(e) =>
+                      handleLegendColorChange(index, e.target.value)
+                    }
+                    className="text-xs px-2 py-1 border border-gray-200 rounded w-22"
+                  />
+
+                  <input
+                    type="color"
+                    value={legendValues[index]?.color || "#000000"}
+                    onChange={(e) =>
+                      handleLegendColorChange(index, e.target.value)
+                    }
+                    className="w-14 h-6 rounded border border-gray-200 cursor-pointer"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
 
-          {/* 2nd Legend Name */}
-          <div className="flex items-center justify-between mb-2">
-            <label
-              className="text-xs text-gray-700"
-              style={{ width: "110px" }}
-            >
-              2nd Legend Name:
-            </label>
-            <input
-              type="text"
-              defaultValue="Absent"
-              className="w-[35%] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none"
-            />
-          </div>
-
-          {/* 2nd Legend Color */}
-          <div className="flex items-center mb-3">
-            <label
-              className="text-xs text-gray-700"
-              style={{ width: "110px" }}
-            >
-              2nd Legend Color:
-            </label>
-            <div className="flex items-cente justify-end gap-2 flex-1">
-              <input
-                type="text"
-                value={color2}
-                onChange={(e) => setColor2(e.target.value)}
-                className="text-xs text-gray-600 px-2 py-1 border border-gray-300 rounded w-20"
-              />
-              <input
-                type="color"
-                value={color2}
-                onChange={(e) => setColor2(e.target.value)}
-                className="w-14 h-6 rounded border border-gray-300 cursor-pointer"
-              />
-            </div>
-          </div>
-
-          {/* 3rd Legend Name */}
-          <div className="flex items-center justify-between mb-2">
-            <label
-              className="text-xs text-gray-700"
-              style={{ width: "110px" }}
-            >
-              3rd Legend Name:
-            </label>
-            <input
-              type="text"
-              defaultValue="Late"
-              className="w-[35%] px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none"
-            />
-          </div>
-
-          {/* 3rd Legend Color */}
-          <div className="flex items-center mb-3">
-            <label
-              className="text-xs text-gray-700"
-              style={{ width: "110px" }}
-            >
-              3rd Legend Color:
-            </label>
-            <div className="flex items-center justify-end gap-2 flex-1">
-              <input
-                type="text"
-                value={color3}
-                onChange={(e) => setColor3(e.target.value)}
-                className="text-xs text-gray-600 px-2 py-1 border border-gray-300 rounded w-20"
-              />
-              <input
-                type="color"
-                value={color3}
-                onChange={(e) => setColor3(e.target.value)}
-                className="w-14 h-6 rounded border border-gray-300 cursor-pointer"
-              />
-            </div>
-          </div>
         </div>
 
         {/* Assigned By */}
@@ -373,15 +440,15 @@ const ProjectConfiguration: React.FC = () => {
           </label>
           <div className="flex items-center">
             <img
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
+              src={assignedBy.image}
               alt="Kathryn Murphy"
               className="w-8 h-8 rounded-full mr-2"
             />
             <div>
               <p className="text-xs font-medium text-gray-900">
-                Kathryn Murphy
+                {assignedBy.name}
               </p>
-              <p className="text-xs text-gray-500">Admin</p>
+              <p className="text-xs text-gray-500">{assignedBy.role}</p>
             </div>
           </div>
         </div>
