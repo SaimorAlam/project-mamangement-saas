@@ -1,18 +1,21 @@
 import { useState } from "react";
 
-import AreaChart from "@/common/Charts/AreaChart";
+// import AreaChart from "@/common/Charts/AreaChart";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
-import MultiAxisLineChart from "@/common/Charts/LineChart";
+// import MultiAxisLineChart from "@/common/Charts/LineChart";
 import PieChart from "@/common/Charts/PieChart";
 import ProgressRing from "@/common/Charts/ProgressRing";
 import RadarCharts from "@/common/Charts/RadarChart";
-import StackedBarChart from "@/common/Charts/StackedBarChart";
-import ProjectConfiguration from "@/components/client/ProjectBuilder/ProjectConfiguration";
+// import StackedBarChart from "@/common/Charts/StackedBarChart";
+// import ProjectConfiguration from "@/components/client/ProjectBuilder/ProjectConfiguration";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
+import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
+import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
+import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 
 const ClientProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -36,7 +39,7 @@ const ClientProjectBuilder = () => {
 
         {!selectedWidget && (
           <>
-            <StackedBarChart />
+            {/* <StackedBarChart /> */}
             <div className="flex gap-4">
               <RadarCharts />
               <DoughnutChart
@@ -68,7 +71,7 @@ const ClientProjectBuilder = () => {
           </>
         )}
 
-        {selectedWidget === "bar-chart" && <StackedBarChart />}
+        {selectedWidget === "bar-chart" && <StackedBarChartModule />}
         {selectedWidget === "progress-ring" && (
           <ProgressRing
             title="Project Progress"
@@ -104,7 +107,7 @@ const ClientProjectBuilder = () => {
 
         {selectedWidget === "pie-chart" && <PieChart />}
 
-        {selectedWidget === "line-chart" && <MultiAxisLineChart />}
+        {selectedWidget === "line-chart" && <LineChartModule />}
 
         {selectedWidget === "data-table" && (
           <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
@@ -130,9 +133,9 @@ const ClientProjectBuilder = () => {
 
         {selectedWidget === "heat-map-chart" && <HeatmapChart />}
 
-        {selectedWidget === "area-chart" && <AreaChart />}
+        {selectedWidget === "area-chart" && <ChartModuleOne chartName="area-chart" />}
       </div>
-      <ProjectConfiguration />
+      {/* <ProjectConfiguration /> */}
     </div>
   );
 };

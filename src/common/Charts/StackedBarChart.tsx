@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -38,11 +38,12 @@ export default function StackedBarChart({
   startingRange,
   endingRange,
 }: Props) {
+  const [noOfLegendDataSet] = useState(numOfLegendDataSet || 1);
   /*    DERIVED DATA (KEY FIX)    */
   const data: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
-    return generateChartData(xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange);
-  }, [xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange]);
+    return generateChartData(xAxisValues, legendValues, noOfLegendDataSet, startingRange, endingRange);
+  }, [xAxisValues, legendValues, noOfLegendDataSet, startingRange, endingRange]);
 
   /*    TOTAL    */
   const totalEmployees = useMemo(() => {

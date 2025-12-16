@@ -60,7 +60,6 @@ const LineChartModule = () => {
                 widgetTitle={widgetTitle}
                 xAxisValues={xAxisValues}
                 legendValues={legendValues}
-                numOfLegendDataSet={numOfLegendDataSet}
                 startingRange={startingRange}
                 endingRange={endingRange}
             />

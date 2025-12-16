@@ -3,7 +3,7 @@ import { useState } from "react";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
 import RadarChart from "@/common/Charts/RadarChart";
-import StackedBarChart from "@/common/Charts/StackedBarChart";
+// import StackedBarChart from "@/common/Charts/StackedBarChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import PieChart from "@/common/Charts/PieChart";
 import ProgressRing from "@/common/Charts/ProgressRing";
@@ -45,7 +45,7 @@ const ClientProgramBuilder = () => {
         {!selectedWidget && (
           <>
           <ProjectStats activeWidget={activeWidget} />
-            <StackedBarChart />
+            {/* <StackedBarChart /> */}
             <div className="flex gap-4">
               <RadarChart />
               <DoughnutChart

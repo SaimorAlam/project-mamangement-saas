@@ -3,16 +3,15 @@ import { useState } from "react";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
 import RadarCharts from "@/common/Charts/RadarChart";
-import ProjectConfiguration from "@/components/client/ProjectBuilder/ProjectConfiguration";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
-import StackedBarChart from "@/common/Charts/StackedBarChart";
 import ProgressRing from "@/common/Charts/ProgressRing";
 import PieChart from "@/common/Charts/PieChart";
-import MultiAxisLineChart from "@/common/Charts/LineChart";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
-import AreaChart from "@/common/Charts/AreaChart";
 import GanttChart from "@/common/Charts/GanttChart";
+import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
+import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
+import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -36,7 +35,7 @@ const StaffManagerProjectBuilder = () => {
 
         {!selectedWidget && (
           <>
-            <StackedBarChart />
+            {/* <StackedBarChart /> */}
             <div className="flex gap-4">
               <RadarCharts />
               <DoughnutChart
@@ -68,7 +67,7 @@ const StaffManagerProjectBuilder = () => {
           </>
         )}
 
-        {selectedWidget === "bar-chart" && <StackedBarChart />}
+        {selectedWidget === "bar-chart" && <StackedBarChartModule />}
         {selectedWidget === "progress-ring" && (
           <ProgressRing
             title="Project Progress"
@@ -104,7 +103,7 @@ const StaffManagerProjectBuilder = () => {
 
         {selectedWidget === "pie-chart" && <PieChart />}
 
-        {selectedWidget === "line-chart" && <MultiAxisLineChart />}
+        {selectedWidget === "line-chart" && <LineChartModule />}
 
         {selectedWidget === "data-table" && (
           <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
@@ -130,9 +129,9 @@ const StaffManagerProjectBuilder = () => {
 
         {selectedWidget === "heat-map-chart" && <HeatmapChart />}
 
-        {selectedWidget === "area-chart" && <AreaChart />}
+        {selectedWidget === "area-chart" && <ChartModuleOne chartName="area-chart" />}
       </div>
-      <ProjectConfiguration />
+      {/* <ProjectConfiguration /> */}
     </div>
   );
 };
