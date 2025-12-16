@@ -16,20 +16,25 @@ export const handleDownloadCSV = (csvTemplate : string, widgetTitle: string) => 
     URL.revokeObjectURL(url);
   };
 
-const getRandomValue = (min = 0, max = 100) =>
+const getRandomValue = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
 export const generateChartData = (
   xAxis: string[],
   legend: LegendValue[],
-  min: number = 0,
-  max: number = 100,
+  numOfLegendDataSet: number,
+  min: number,
+  max: number,
 ): ChartData[] => {
   return xAxis.map((label) => {
     const item: ChartData = { name: label };
 
     legend.forEach((l) => {
-      item[l.field] = getRandomValue(min, max);
+      const r =Math.floor(getRandomValue(min, max)/numOfLegendDataSet);
+      console.log("numOfLegendDataSet: ", numOfLegendDataSet);
+      console.log("Random number generated: ", r);
+      
+      item[l.field] = r;
     });
 
     return item;

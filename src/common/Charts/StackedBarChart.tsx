@@ -23,8 +23,9 @@ type Props = {
   widgetTitle?: string;
   xAxisValues?: string[];
   legendValues?: LegendValue[];
-  startingRange: number,
-  endingRange: number,
+  numOfLegendDataSet?: number;
+  startingRange: number;
+  endingRange: number;
 };
 
 /*   COMPONENT   */
@@ -33,13 +34,14 @@ export default function StackedBarChart({
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
+  numOfLegendDataSet,
   startingRange,
   endingRange,
 }: Props) {
   /*    DERIVED DATA (KEY FIX)    */
   const data: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
-    return generateChartData(xAxisValues, legendValues, startingRange, endingRange);
+    return generateChartData(xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange);
   }, [xAxisValues, legendValues,startingRange,endingRange]);
 
   /*    TOTAL    */
