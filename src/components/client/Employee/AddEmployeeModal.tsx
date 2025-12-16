@@ -42,7 +42,6 @@ const AddEmployeeModal = ({
   const [projectInput, setProjectInput] = useState("");
 
   const [addEmployee, { isLoading }] = useAddEmployeeMutation();
-
   // Reset form when modal closes
   useEffect(() => {
     if (!open) {

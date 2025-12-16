@@ -99,9 +99,7 @@ export default function EmployeeHeader({
           {/* Filter Dropdown */}
           <div className="relative">
             <button
-              onClick={() =>
-                setShowFilterDropdown(!showFilterDropdown)
-              }
+              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
               className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
             >
               <Filter className="w-4 h-4" />
@@ -119,31 +117,18 @@ export default function EmployeeHeader({
                     By Role:
                   </h3>
                   <div className="flex items-center gap-2 pl-6 py-1">
-                    <input
-                      type="checkbox"
-                      className="cursor-pointer"
-                    />
-                    <p className="text-sm text-website-color-black">
-                      Editor
-                    </p>
+                    <input type="checkbox" className="cursor-pointer" />
+                    <p className="text-sm text-website-color-black">Editor</p>
                   </div>
                   <div className="flex items-center gap-2 pl-6 py-1">
-                    <input
-                      type="checkbox"
-                      className="cursor-pointer"
-                    />
+                    <input type="checkbox" className="cursor-pointer" />
                     <p className="text-sm text-website-color-black">
                       Moderator
                     </p>
                   </div>
                   <div className="flex items-center gap-2 pl-6 py-1">
-                    <input
-                      type="checkbox"
-                      className="cursor-pointer"
-                    />
-                    <p className="text-sm text-website-color-black">
-                      Viewer
-                    </p>
+                    <input type="checkbox" className="cursor-pointer" />
+                    <p className="text-sm text-website-color-black">Viewer</p>
                   </div>
                 </div>
                 <div className="py-2">
@@ -155,9 +140,7 @@ export default function EmployeeHeader({
                       type="checkbox"
                       checked={filterBy === "active"}
                       onChange={(e) => {
-                        setFilterBy(
-                          e.target.checked ? "active" : "all"
-                        );
+                        setFilterBy(e.target.checked ? "active" : "all");
                       }}
                       className="cursor-pointer"
                     />
@@ -170,9 +153,7 @@ export default function EmployeeHeader({
                       type="checkbox"
                       checked={filterBy === "in active"}
                       onChange={(e) => {
-                        setFilterBy(
-                          e.target.checked ? "in active" : "all"
-                        );
+                        setFilterBy(e.target.checked ? "in active" : "all");
                       }}
                       className="cursor-pointer"
                     />

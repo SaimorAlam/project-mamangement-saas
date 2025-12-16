@@ -39,14 +39,17 @@ const programApi = baseApi.injectEndpoints({
     }),
 
     getProgramById: builder.query({
-      query: (id) => ({
-        url: `/program/${id}`,
-        method: "GET",
-      }),
+      query: (id) => {
+        console.log(id);
+        return {
+          url: `/program/${id}`,
+          method: "GET",
+        };
+      },
       providesTags: (_result, _error, id) => [{ type: "Program", id }],
     }),
 
-    getProjectsById: builder.query({
+    getProjectsByProgramId: builder.query({
       query: (id) => ({
         url: `/program/${id}/projects`,
         method: "GET",
@@ -60,7 +63,7 @@ const programApi = baseApi.injectEndpoints({
     updateProgramName: builder.mutation({
       query: ({ id, ...body }) => ({
         url: `/program/${id}/name`,
-        method: "PUT",
+        method: "PATCH",
         body,
       }),
       invalidatesTags: (_result, _error, { id }) => [
@@ -75,7 +78,7 @@ export const {
   useCreateProgramMutation,
   useGetAllProgramQuery,
   useGetProgramByIdQuery,
-  useGetProjectsByIdQuery,
+  useGetProjectsByProgramIdQuery,
   useUpdateProgramNameMutation,
 } = programApi;
 

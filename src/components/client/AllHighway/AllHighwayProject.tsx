@@ -1,7 +1,7 @@
-import AllProgram from "@/pages/client/ClientAllProgram";
+import AllProgram from "@/pages/client/Program/ClientAllProgram";
 
 const AllPorject = () => {
-  const myPrograms = [
+  /* const myPrograms = [
     {
       id: 1,
       name: "Project Name",
@@ -112,14 +112,13 @@ const AllPorject = () => {
       deadline: "10-2-2025",
       progress: 50,
     },
-  ];
+  ]; */
 
   return (
     <div className="w-full">
       <AllProgram
         title="All Project"
         hideCreatedOn={true}
-        programs={myPrograms}
       />
     </div>
   );

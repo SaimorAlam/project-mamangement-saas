@@ -57,3 +57,16 @@ export interface IAddEmployeePayload {
   skills: string[];
   projects: string[];
 }
+
+export interface IEditEmployeePayload {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  joinedDate: string;
+  description: string;
+  skills: string[];
+  projects: string[];
+  profileImage: string | null;
+  userStatus: string;
+}
