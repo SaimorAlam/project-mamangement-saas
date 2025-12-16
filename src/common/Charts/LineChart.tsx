@@ -12,7 +12,7 @@ import { Copy, Trash2 } from "lucide-react"
 import { LegendValue } from "@/components/client/ProjectBuilder/ProjectConfiguration"
 import { generateLineChartData } from "@/utils"
 
-/* ================= TYPES ================= */
+/*     TYPES     */
 
 type ChartData = {
   name: string
@@ -27,7 +27,7 @@ type Props = {
   endingRange: number
 }
 
-/* ================= COMPONENT ================= */
+/*     COMPONENT     */
 
 export default function MultiAxisLineChart({
   widgetTitle = "My CSV",
@@ -39,7 +39,7 @@ export default function MultiAxisLineChart({
   const [showLineOnly, setShowLineOnly] = useState(false)
   const [hoveredLine, setHoveredLine] = useState<string | null>(null)
 
-  /* ===== DERIVED DATA (KEY FIX) ===== */
+  /*      DERIVED DATA (KEY FIX)      */
   const data: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return []
     return generateLineChartData(
@@ -50,7 +50,7 @@ export default function MultiAxisLineChart({
     )
   }, [xAxisValues, legendValues, startingRange, endingRange])
 
-  /* ===== ACTIONS ===== */
+  /*      ACTIONS      */
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2))
   }
@@ -70,7 +70,7 @@ export default function MultiAxisLineChart({
     )
   }
 
-  /* ===== RENDER ===== */
+  /*      RENDER      */
   return (
     <div className="bg-white rounded-lg p-6 border border-gray-200 grow">
       {/* Header */}

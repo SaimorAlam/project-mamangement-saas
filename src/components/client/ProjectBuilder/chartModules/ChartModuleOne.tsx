@@ -76,7 +76,6 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                             widgetTitle={widgetTitle}
                             xAxisValues={xAxisValues}
                             legendValues={legendValues}
-                            numOfLegendDataSet={numOfLegendDataSet}
                             startingRange={startingRange}
                             endingRange={endingRange}
                         />
@@ -87,7 +86,6 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                             widgetTitle={widgetTitle}
                             xAxisValues={xAxisValues}
                             legendValues={legendValues}
-                            numOfLegendDataSet={numOfLegendDataSet}
                             startingRange={startingRange}
                             endingRange={endingRange}
                         />
