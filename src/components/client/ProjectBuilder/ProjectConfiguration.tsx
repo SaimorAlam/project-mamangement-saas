@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import { handleDownloadCSV } from "@/utils";
 
 type LegendValue = {
   label: string;
@@ -9,7 +10,7 @@ type LegendValue = {
 
 const ProjectConfiguration: React.FC = () => {
   const [widgetTitle, setWidgetTitle] = useState(
-    "Campaign Performance"
+    "My-CSV"
   );
 
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1)
@@ -31,7 +32,7 @@ const ProjectConfiguration: React.FC = () => {
   const [showLegend, setShowLegend] = useState(true);
 
   // for showing user info below
-  const assignedBy={
+  const assignedBy = {
     name: "Alexis Burg",
     role: "Admin",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
@@ -138,6 +139,19 @@ const ProjectConfiguration: React.FC = () => {
   };
 
 
+  // making this csvTemplate = "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
+  const csvTemplate = (() => {
+    // Header row
+    const header =
+      ["Day", ...legendValues.map((l) => l.label)].join(",");
+
+    // Data rows
+    const rows = xAxisValues.map(
+      (day) => `${day}${",".repeat(legendValues.length)}`
+    );
+
+    return [header, ...rows].join("\n");
+  })();
 
 
 
@@ -459,7 +473,7 @@ const ProjectConfiguration: React.FC = () => {
         <button className="px-4 py-1.5 text-xs font-medium border border-gray-200 rounded-md cursor-pointer text-gray-700 hover:text-gray-900">
           Cancel
         </button>
-        <button className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer">
+        <button className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer" onClick={()=> handleDownloadCSV(csvTemplate, widgetTitle)}>
           Save Changes
         </button>
       </div>

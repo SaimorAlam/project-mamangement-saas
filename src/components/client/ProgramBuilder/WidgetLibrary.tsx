@@ -100,7 +100,7 @@ const WidgetLibrary: React.FC<ProjectWidgetProps> = ({
   ];
 
   return (
-    <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen flex flex-col">
+    <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-76 flex flex-col">
       {/* Header */}
       <div className="px-4 pt-4">
         <label className="block text-sm font-medium text-website-color-darkGray mb-2">

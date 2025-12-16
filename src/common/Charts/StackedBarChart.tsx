@@ -40,7 +40,7 @@ const widgetConfig: WidgetConfig = {
   chartSchema: {
     chartType: "stacked_bar",
     title: "Employee Attandence",
-    xAxis: ["Sunday", "Monday", "Tuesday","Friday", "Wednesday", "Sat"],
+    xAxis: ["Sunday", "Monday", "Tuesday", "Friday", "Wednesday", "Sat"],
     legend: [
       { label: "On Time", field: "onTime", color: "#6366f1" },
       { label: "Absent", field: "absent", color: "#06b6d4" },
@@ -107,34 +107,22 @@ export default function StackedBarChart() {
   };
 
 
-//   const widgetConfig: WidgetConfig = {
-//   chartSchema: {
-//     chartType: "stacked_bar",
-//     xAxis: ["Sunday", "Monday", "Tuesday","Friday", "Wednesday"],
-//     legend: [
-//       { label: "On Time", field: "onTime", color: "#6366f1" },
-//       { label: "Absent", field: "absent", color: "#06b6d4" },
-//       { label: "Late", field: "late", color: "#89c1a0" },
-//     ],
-//   },
-// };
+  /* CSV DOWNLOAD HANDLER */
+  // making this csvTemplate = "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
+  const csvTemplate = (() => {
+    const { legend, xAxis } = widgetConfig.chartSchema;
 
-  /* NEW: CSV DOWNLOAD HANDLER */
-  // const csvTemplate = "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
-const csvTemplate = (() => {
-  const { legend, xAxis } = widgetConfig.chartSchema;
+    // Header row
+    const header =
+      ["Day", ...legend.map((l) => l.label)].join(",");
 
-  // Header row
-  const header =
-    ["Day", ...legend.map((l) => l.label)].join(",");
+    // Data rows
+    const rows = xAxis.map(
+      (day) => `${day}${",".repeat(legend.length)}`
+    );
 
-  // Data rows
-  const rows = xAxis.map(
-    (day) => `${day}${",".repeat(legend.length)}`
-  );
-
-  return [header, ...rows].join("\n");
-})();
+    return [header, ...rows].join("\n");
+  })();
 
   const handleDownloadCSV = () => {
     const blob = new Blob([csvTemplate], {
@@ -182,7 +170,7 @@ const csvTemplate = (() => {
   /*    RENDER    */
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg p-6">
+    <div className="w-full h-fit bg-white border border-gray-200 rounded-lg p-6">
       <div className="flex justify-between mb-6">
         <div>
           <h2 className="text-xl font-semibold">Stacked Bar Chart</h2>

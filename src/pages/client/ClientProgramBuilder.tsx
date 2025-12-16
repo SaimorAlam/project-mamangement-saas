@@ -35,10 +35,10 @@ const ClientProgramBuilder = () => {
     <div className="flex gap-6">
       <WidgetLibrary onWidgetSelect={handleWidgetSelect} />
       <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10">
-        <ProjectStats activeWidget={activeWidget} />
 
         {!selectedWidget && (
           <>
+          <ProjectStats activeWidget={activeWidget} />
             <StackedBarChart />
             <div className="flex gap-4">
               <RadarChart />
@@ -71,7 +71,8 @@ const ClientProgramBuilder = () => {
           </>
         )}
 
-        {selectedWidget === "bar-chart" && <StackedBarChart />}
+        {selectedWidget === "bar-chart" && (<div className="flex gap-3"><StackedBarChart /><ProjectConfiguration /></div>)}
+        {/* {selectedWidget === "bar-chart" && <StackedBarChart />} */}
         {selectedWidget === "progress-ring" && (
           <ProgressRing
             title="Project Progress"
@@ -136,8 +137,8 @@ const ClientProgramBuilder = () => {
         {selectedWidget === "area-chart" && <AreaChart />}
       </div>
 
-      {selectedWidget === "KPI Widget" && <WidgetConfiguration />}
-      {selectedWidget === "bar-chart" && <ProjectConfiguration />}
+      {/* {selectedWidget === "bar-chart" && <ProjectConfiguration />} */}
+      {/* {selectedWidget === "KPI Widget" && <WidgetConfiguration />}
       {selectedWidget === "progress-ring" && <WidgetConfiguration />}
       {selectedWidget === "pie-chart" && <WidgetConfiguration />}
       {selectedWidget === "line-chart" && <WidgetConfiguration />}
@@ -146,7 +147,7 @@ const ClientProgramBuilder = () => {
       {selectedWidget === "picture-video" && <WidgetConfiguration />}
       {selectedWidget === "horizontal-bar-chart" && <WidgetConfiguration />}
       {selectedWidget === "heat-map-chart" && <WidgetConfiguration />}
-      {selectedWidget === "area-chart" && <WidgetConfiguration />}
+      {selectedWidget === "area-chart" && <WidgetConfiguration />} */}
     </div>
   );
 };
