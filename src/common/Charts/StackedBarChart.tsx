@@ -42,7 +42,7 @@ export default function StackedBarChart({
   const data: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateChartData(xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange);
-  }, [xAxisValues, legendValues,startingRange,endingRange]);
+  }, [xAxisValues, legendValues, startingRange, endingRange]);
 
   /*    TOTAL    */
   const totalEmployees = useMemo(() => {
@@ -138,15 +138,15 @@ export default function StackedBarChart({
           </p>
 
           <div className="flex gap-2 border-l pl-4">
-            <button onClick={handleCopy} className="p-2 border rounded">
+            <button onClick={handleCopy} className="p-2 border border-gray-200 rounded hover:bg-gray-50">
               <Copy size={18} />
             </button>
 
-            <button onClick={handleDownloadCSV} className="p-2 border rounded">
+            <button onClick={handleDownloadCSV} className="p-2 border border-gray-200 rounded hover:bg-gray-50">
               <Download size={18} />
             </button>
 
-            <button className="p-2 border rounded text-red-600">
+            <button className="p-2 border border-gray-200 rounded hover:bg-gray-50 text-red-600">
               <Trash2 size={18} />
             </button>
           </div>
