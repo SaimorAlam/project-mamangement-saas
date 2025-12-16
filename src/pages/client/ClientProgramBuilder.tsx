@@ -15,6 +15,7 @@ import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
 // import WidgetConfiguration from "@/components/client/ProgramBuilder/WidgetConfiguration";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
+import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 
 
 const ClientProgramBuilder = () => {
@@ -112,7 +113,8 @@ const ClientProgramBuilder = () => {
 
         {selectedWidget === "pie-chart" && <PieChart />}
 
-        {selectedWidget === "line-chart" && <MultiAxisLineChart />}
+        {selectedWidget === "line-chart" && <LineChartModule />}
+        {/* {selectedWidget === "line-chart" && <MultiAxisLineChart />} */}
 
         {selectedWidget === "data-table" && (
           <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">

@@ -19,6 +19,7 @@ export const handleDownloadCSV = (csvTemplate : string, widgetTitle: string) => 
 const getRandomValue = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
+// generating stacked bar chart random data
 export const generateChartData = (
   xAxis: string[],
   legend: LegendValue[],
@@ -40,3 +41,21 @@ export const generateChartData = (
     return item;
   });
 };
+
+export const generateLineChartData = (
+  xAxis: string[],
+  legend: LegendValue[],
+  min = 0,
+  max = 100
+) => {
+  return xAxis.map(label => {
+    const row: any = { name: label }
+
+    legend.forEach(l => {
+      row[l.field] =
+        Math.floor(Math.random() * (max - min + 1)) + min
+    })
+
+    return row
+  })
+}

@@ -9,6 +9,7 @@ export type LegendValue = {
 };
 
 const ProjectConfiguration = ({
+  widgedName, 
   widgetTitle, 
   setWidgetTitle,
   numOfXAxisDataSet,
@@ -24,6 +25,7 @@ const ProjectConfiguration = ({
   endingRange,
   setEndingRange
 }: {
+  widgedName: string,
   widgetTitle: string, 
   setWidgetTitle: React.Dispatch<React.SetStateAction<string>>,
   numOfXAxisDataSet: number,
@@ -127,10 +129,37 @@ const ProjectConfiguration = ({
     return [header, ...rows].join("\n");
   })();
 
+  const downloadCSV = ()=>{
+    // validating that if any of the legend labels or xAxisValues are empty, alert the user
+    for (let i = 0; i < legendValues.length; i++) {
+      if (!legendValues[i].label) {
+        alert(`Please fill in the label for legend ${i + 1}`);
+        return;
+      }
+    }
+
+    for (let i = 0; i < xAxisValues.length; i++) {
+      if (!xAxisValues[i]) {
+        alert(`Please fill in the value for X-Axis field ${i + 1}`);
+        return;
+      }
+    }
+
+    if(legendValues.length < 3){
+      alert(`Please add at least ${minLegend} legend values`);
+      return;
+    }
+    if(xAxisValues.length < 1){
+      alert(`Please add at least ${1} X-Axis value`);
+      return;
+    }
+    handleDownloadCSV(csvTemplate, widgetTitle)
+  }
+
 
 
   return (
-    <div className="w-[40%] h-full max-w-md mx-auto bg-white border border-gray-100 rounded-lg shadow-lg">
+    <div className="max-w-78 h-full   bg-white border border-gray-100 rounded-lg shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">
@@ -145,7 +174,7 @@ const ProjectConfiguration = ({
       <div className="px-4 py-4 space-y-4">
         {/* Stacked BarChart Widget Details Link */}
         <a href="#" className="text-xs text-blue-600 hover:underline">
-          Stacked BarChart Widget Details
+          {widgedName} Widget Details
         </a>
 
         {/* Widget Title */}
@@ -453,7 +482,7 @@ const ProjectConfiguration = ({
         <button className="px-4 py-1.5 text-xs font-medium border border-gray-200 rounded-md cursor-pointer text-gray-700 hover:text-gray-900">
           Cancel
         </button>
-        <button className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer" onClick={()=> handleDownloadCSV(csvTemplate, widgetTitle)}>
+        <button className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer" onClick={downloadCSV}>
           Save Changes
         </button>
       </div>

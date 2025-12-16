@@ -42,7 +42,7 @@ export default function StackedBarChart({
   const data: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateChartData(xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange);
-  }, [xAxisValues, legendValues, startingRange, endingRange]);
+  }, [xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange]);
 
   /*    TOTAL    */
   const totalEmployees = useMemo(() => {
@@ -62,26 +62,6 @@ export default function StackedBarChart({
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
   };
 
-  const handleDownloadCSV = () => {
-    if (!xAxisValues.length || !legendValues.length) return;
-
-    const header = ["Day", ...legendValues.map(l => l.label)].join(",");
-    const rows = xAxisValues.map(
-      day => `${day}${",".repeat(legendValues.length)}`
-    );
-
-    const csv = [header, ...rows].join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${widgetTitle}-template.csv`;
-    link.click();
-
-    URL.revokeObjectURL(url);
-  };
 
   /*    TOOLTIP    */
   const CustomTooltip = ({ active, payload }: any) => {
@@ -142,7 +122,7 @@ export default function StackedBarChart({
               <Copy size={18} />
             </button>
 
-            <button onClick={handleDownloadCSV} className="p-2 border border-gray-200 rounded hover:bg-gray-50">
+            <button className="p-2 border border-gray-200 rounded hover:bg-gray-50">
               <Download size={18} />
             </button>
 
