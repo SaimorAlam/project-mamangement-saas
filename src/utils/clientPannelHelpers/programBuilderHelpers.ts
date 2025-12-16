@@ -59,3 +59,21 @@ export const generateLineChartData = (
     return row
   })
 }
+
+export const generateAreaChartData = (
+  xAxis: string[],
+  legend: LegendValue[],
+  min = 0,
+  max = 100
+): ChartData[] => {
+  return xAxis.map(label => {
+    const row: ChartData = { name: label };
+
+    legend.forEach(l => {
+      row[l.field] =
+        Math.floor(Math.random() * (max - min + 1)) + min;
+    });
+
+    return row;
+  });
+};

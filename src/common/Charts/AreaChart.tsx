@@ -1,128 +1,146 @@
-import React, { useState } from 'react';
-import { Copy, Trash2 } from 'lucide-react';
+import React, { useMemo, useState } from "react";
+import { Copy, Trash2 } from "lucide-react";
+import { LegendValue } from "@/components/client/ProjectBuilder/ProjectConfiguration";
+import { generateAreaChartData } from "@/utils";
 
-interface DataPoint {
-  month: string;
-  goldex: number;
-  oceanic: number;
-}
+/*    TYPES    */
 
-const AreaChart: React.FC = () => {
-  const [data] = useState<DataPoint[]>([
-    { month: 'Jan', goldex: 750, oceanic: 1000 },
-    { month: 'Feb', goldex: 1000, oceanic: 1200 },
-    { month: 'Mar', goldex: 800, oceanic: 1150 },
-    { month: 'Apr', goldex: 900, oceanic: 1250 },
-    { month: 'May', goldex: 850, oceanic: 1300 },
-    { month: 'Jun', goldex: 950, oceanic: 1350 },
-    { month: 'Jul', goldex: 900, oceanic: 1400 },
-    { month: 'Aug', goldex: 1100, oceanic: 1450 },
-    { month: 'Sep', goldex: 1000, oceanic: 1500 },
-    { month: 'Oct', goldex: 950, oceanic: 1550 },
-    { month: 'Nov', goldex: 1050, oceanic: 1600 },
-    { month: 'Dec', goldex: 1100, oceanic: 1650 }
-  ]);
+type ChartData = {
+  name: string;
+  [key: string]: number | string;
+};
 
+type Props = {
+  widgetTitle?: string;
+  xAxisValues?: string[];
+  legendValues?: LegendValue[];
+  startingRange: number;
+  endingRange: number;
+};
+
+/*    COMPONENT    */
+
+const AreaChart: React.FC<Props> = ({
+  widgetTitle = "Area Chart",
+  xAxisValues = [],
+  legendValues = [],
+  startingRange,
+  endingRange,
+}) => {
   const [showLineOnly, setShowLineOnly] = useState(false);
 
+  /* ===== CHART DATA (KEY FIX) ===== */
+  const data: ChartData[] = useMemo(() => {
+    if (!xAxisValues.length || !legendValues.length) return [];
+    return generateAreaChartData(
+      xAxisValues,
+      legendValues,
+      startingRange,
+      endingRange
+    );
+  }, [xAxisValues, legendValues, startingRange, endingRange]);
+
+  /* ===== SVG DIMENSIONS ===== */
   const chartWidth = 700;
   const chartHeight = 250;
   const padding = { top: 20, right: 20, bottom: 40, left: 50 };
   const innerWidth = chartWidth - padding.left - padding.right;
   const innerHeight = chartHeight - padding.top - padding.bottom;
 
-  const maxValue = 1750;
-  const minValue = 0;
+  /* ===== SCALE HELPERS ===== */
+  const scaleX = (index: number) =>
+    (index / (data.length - 1 || 1)) * innerWidth;
 
-  // Create path for area chart
-  const createPath = (dataKey: 'goldex' | 'oceanic') => {
-    const points = data.map((d, i) => {
-      const x = (i / (data.length - 1)) * innerWidth;
-      const y = innerHeight - ((d[dataKey] - minValue) / (maxValue - minValue)) * innerHeight;
-      return { x, y };
-    });
+  const scaleY = (value: number) =>
+    innerHeight -
+    ((value - startingRange) / (endingRange - startingRange)) * innerHeight;
 
-    // Line path
-    const linePath = points.map((p, i) => 
-      `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`
-    ).join(' ');
+  /* ===== PATH GENERATOR ===== */
+  const createPath = (field: string) => {
+    const points = data.map((d, i) => ({
+      x: scaleX(i),
+      y: scaleY(Number(d[field])),
+    }));
 
-    // Area path (fill to bottom)
+    const linePath = points
+      .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
+      .join(" ");
+
     const areaPath = [
-      ...points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`),
-      `L ${points[points.length - 1].x} ${innerHeight}`,
+      ...points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`),
+      `L ${points[points.length - 1]?.x ?? 0} ${innerHeight}`,
       `L 0 ${innerHeight}`,
-      'Z'
-    ].join(' ');
+      "Z",
+    ].join(" ");
 
     return { linePath, areaPath };
   };
 
-  const goldexPaths = createPath('goldex');
-  const oceanicPaths = createPath('oceanic');
-
-  const yTicks = [0, 250, 500, 750, 1000, 1250, 1500, 1750];
-
+  /* ===== ACTIONS ===== */
   const handleCopy = () => {
-    console.log('Copy chart');
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
   };
 
   const handleDelete = () => {
-    console.log('Delete chart');
+    console.log("Delete chart");
   };
 
+  /* ===== Y TICKS ===== */
+  const yTicks = useMemo(() => {
+    const step = Math.ceil((endingRange - startingRange) / 7);
+    return Array.from({ length: 8 }, (_, i) => startingRange + i * step);
+  }, [startingRange, endingRange]);
+
+  /*    RENDER    */
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="w-full bg-white rounded-lg border border-gray-200 p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex flex-col  gap-6">
-          <h2 className="text-lg font-semibold text-gray-900">Area Chart</h2>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-0.5 bg-blue-400" />
-              <span className="text-xs text-gray-600">Goldex Inc</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-0.5 bg-emerald-400" />
-              <span className="text-xs text-gray-600">Oceanic Airlines</span>
-            </div>
+      <div className="flex justify-between mb-6">
+        <div>
+          <h2 className="text-lg font-semibold">{widgetTitle}</h2>
+
+          <div className="flex gap-6 mt-3">
+            {legendValues.map(l =>
+              l.label ? (
+                <div key={l.field} className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-sm">{l.label}</span>
+                </div>
+              ) : null
+            )}
           </div>
         </div>
-        <div className="">
-          
-            <div className='flex items-center gap-4 mb-2'>
-                <button
-                onClick={handleCopy}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer"
-                title="Copy"
-            >
-            <Copy size={18} />
+
+        <div>
+          <div className="flex gap-4 mb-2">
+            <button onClick={handleCopy}>
+              <Copy size={18} />
             </button>
-             <button
-                onClick={handleDelete}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer"
-                title="Delete"
-                >
-                <Trash2 size={18} />
+            <button onClick={handleDelete}>
+              <Trash2 size={18} />
             </button>
           </div>
+
           <button
             onClick={() => setShowLineOnly(!showLineOnly)}
-            className="text-xs text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+            className="text-xs text-blue-600"
           >
-            {showLineOnly ? 'Show Area' : 'Show Line Only'}
+            {showLineOnly ? "Show Area" : "Show Line Only"}
           </button>
         </div>
       </div>
 
       {/* Chart */}
-      <div className="overflow-x-auto">
+      {data.length ? (
         <svg width={chartWidth} height={chartHeight} className="mx-auto">
           <g transform={`translate(${padding.left}, ${padding.top})`}>
-            {/* Y-axis grid lines and labels */}
-            {yTicks.map((tick) => {
-              const y = innerHeight - ((tick - minValue) / (maxValue - minValue)) * innerHeight;
+            {/* Y Grid */}
+            {yTicks.map(tick => {
+              const y = scaleY(tick);
               return (
                 <g key={tick}>
                   <line
@@ -131,7 +149,6 @@ const AreaChart: React.FC = () => {
                     x2={innerWidth}
                     y2={y}
                     stroke="#f3f4f6"
-                    strokeWidth="1"
                   />
                   <text
                     x={-10}
@@ -146,58 +163,53 @@ const AreaChart: React.FC = () => {
               );
             })}
 
-            {/* Area fills */}
-            {!showLineOnly && (
-              <>
-                <path
-                  d={oceanicPaths.areaPath}
-                  fill="#6ee7b7"
-                  fillOpacity="0.3"
-                  className="transition-all duration-500"
-                />
-                <path
-                  d={goldexPaths.areaPath}
-                  fill="#93c5fd"
-                  fillOpacity="0.4"
-                  className="transition-all duration-500"
-                />
-              </>
-            )}
+            {/* Areas */}
+            {!showLineOnly &&
+              legendValues.map(l => {
+                const { areaPath } = createPath(l.field);
+                return (
+                  <path
+                    key={l.field}
+                    d={areaPath}
+                    fill={l.color}
+                    fillOpacity="0.3"
+                  />
+                );
+              })}
 
             {/* Lines */}
-            <path
-              d={oceanicPaths.linePath}
-              fill="none"
-              stroke="#34d399"
-              strokeWidth="2"
-              className="transition-all duration-500"
-            />
-            <path
-              d={goldexPaths.linePath}
-              fill="none"
-              stroke="#60a5fa"
-              strokeWidth="2"
-              className="transition-all duration-500"
-            />
-
-            {/* X-axis labels */}
-            {data.map((d, i) => {
-              const x = (i / (data.length - 1)) * innerWidth;
+            {legendValues.map(l => {
+              const { linePath } = createPath(l.field);
               return (
-                <text
-                  key={i}
-                  x={x}
-                  y={innerHeight + 25}
-                  textAnchor="middle"
-                  className="text-xs fill-gray-400"
-                >
-                  {d.month}
-                </text>
+                <path
+                  key={l.field}
+                  d={linePath}
+                  fill="none"
+                  stroke={l.color}
+                  strokeWidth="2"
+                />
               );
             })}
+
+            {/* X Labels */}
+            {data.map((d, i) => (
+              <text
+                key={i}
+                x={scaleX(i)}
+                y={innerHeight + 25}
+                textAnchor="middle"
+                className="text-xs fill-gray-400"
+              >
+                {d.name}
+              </text>
+            ))}
           </g>
         </svg>
-      </div>
+      ) : (
+        <div className="h-60 flex items-center justify-center text-gray-400">
+          No data available
+        </div>
+      )}
     </div>
   );
 };

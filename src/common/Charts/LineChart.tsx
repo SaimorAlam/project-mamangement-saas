@@ -139,7 +139,7 @@ export default function MultiAxisLineChart({
         </ResponsiveContainer>
       ) : (
         <div className="h-96 flex items-center justify-center text-gray-400">
-          No data available
+          No data available, Please fill the input field to generate the chart and then download the csv.
         </div>
       )}
     </div>

@@ -7,15 +7,16 @@ import StackedBarChart from "@/common/Charts/StackedBarChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import PieChart from "@/common/Charts/PieChart";
 import ProgressRing from "@/common/Charts/ProgressRing";
-import MultiAxisLineChart from "@/common/Charts/LineChart";
+// import MultiAxisLineChart from "@/common/Charts/LineChart";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
-import AreaChart from "@/common/Charts/AreaChart";
+// import AreaChart from "@/common/Charts/AreaChart";
 
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
 // import WidgetConfiguration from "@/components/client/ProgramBuilder/WidgetConfiguration";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
 import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
+import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 
 
 const ClientProgramBuilder = () => {
@@ -140,7 +141,8 @@ const ClientProgramBuilder = () => {
 
         {selectedWidget === "heat-map-chart" && <HeatmapChart />}
 
-        {selectedWidget === "area-chart" && <AreaChart />}
+        {selectedWidget === "area-chart" && <ChartModuleOne chartName="area-chart" />}
+        {/* {selectedWidget === "area-chart" && <AreaChart />} */}
       </div>
 
       {/* {selectedWidget === "bar-chart" && <ProjectConfiguration />} */}
