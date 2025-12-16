@@ -59,7 +59,7 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
     return (
         <div className="flex gap-3">
             {(() => {
-                if (chartName === "stacked-bar-chart") {
+                if (chartName === "bar-chart") {
                     return (
                         <StackedBarChart
                             widgetTitle={widgetTitle}
@@ -95,7 +95,10 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
             })()}
 
             <ProjectConfiguration
-                widgedName="Stack Bar Chart"
+                widgedName={chartName === "stacked-bar-chart" ? "Stacked Bar Chart" : 
+                    chartName === "area-chart" ? "Area Chart" : 
+                    chartName === "line-chart" ? "Line Chart" : 
+                    ""}
                 widgetTitle={widgetTitle}
                 setWidgetTitle={setWidgetTitle}
                 numOfXAxisDataSet={numOfXAxisDataSet}
