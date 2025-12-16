@@ -42,6 +42,7 @@ export default function UpdateProjectModal({
     id: manager.userId,
     name: manager.user.name,
   }));
+  console.log(allManagers);
   const { register, handleSubmit, reset, watch, setValue } = useForm({
     defaultValues: {
       name: "",

@@ -55,10 +55,12 @@ const AllProject = ({
 
   const { data, isLoading } = useGetProjectsByProgramIdQuery({
     programId,
-    page: currentPage,
-    limit,
-    search: debouncedSearch || undefined,
-    priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
+    args: {
+      page: currentPage,
+      limit,
+      search: debouncedSearch || undefined,
+      priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
+    },
   });
 
   const [updateProject] = useUpdateProjectMutation();

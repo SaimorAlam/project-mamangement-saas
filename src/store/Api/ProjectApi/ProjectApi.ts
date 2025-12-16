@@ -10,7 +10,10 @@ const projectApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: [{ type: "Project", id: "LIST" }],
+      invalidatesTags: (_res, _err, { programId }) => [
+        { type: "Program", id: programId },
+        { type: "Project", id: "LIST" },
+      ],
     }),
 
     getAllProjects: builder.query({
