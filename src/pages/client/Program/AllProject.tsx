@@ -14,12 +14,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import { Progress } from "@/components/ui/progress";
+import UpdateProjectModal from "./UpdateProjectModal";
+import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
+import { UpdateProjectPayload } from "@/types/Projects";
+import { toast } from "sonner";
 // import EditProjectModal from "./EditProjectModal";
 
 interface IProjectTableProps {
   title?: string;
   programId: string;
-  hideCreatedOn?: boolean;
 }
 
 const priorityOrder: Record<string, number> = {
@@ -31,7 +35,6 @@ const priorityOrder: Record<string, number> = {
 const AllProject = ({
   title = "All Projects",
   programId,
-  hideCreatedOn = false,
 }: IProjectTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(10);
@@ -45,8 +48,10 @@ const AllProject = ({
 
   const debouncedSearch = useDebounce(search, 500);
 
-  //   const [editProject, setEditProject] = useState<IProject | null>(null);
-  //   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editProject, setEditProject] = useState<UpdateProjectPayload | null>(
+    null
+  );
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const { data, isLoading } = useGetProjectsByProgramIdQuery({
     programId,
@@ -56,11 +61,28 @@ const AllProject = ({
     priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
   });
 
-  //   const [updateProject] = useUpdateProjectMutation();
+  const [updateProject] = useUpdateProjectMutation();
 
-  const projects = useMemo(() => data?.data ?? [], [data]);
+  const handleUpdateProject = async (project: UpdateProjectPayload) => {
+    console.log(project);
+    console.log(editProject);
+    try {
+      const res = await updateProject({
+        id: editProject?.id,
+        ...project,
+      }).unwrap();
+      console.log(res);
+      if (res.success) {
+        toast.success("Project updated successfully");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to update project");
+    }
+  };
 
-  const meta = data?.meta;
+  const projects = useMemo(() => data?.data?.data ?? [], [data]);
+  const meta = data?.data?.meta;
 
   const totalProjects = meta?.total ?? projects.length;
   const itemsPerPage = meta?.limit ?? limit;
@@ -171,10 +193,10 @@ const AllProject = ({
           <thead className="bg-gray-50">
             <tr>
               {[
-                "projectName",
+                "name",
+                "status",
                 "priority",
-                !hideCreatedOn && "createdAt",
-                "updatedAt",
+                "startDate",
                 "deadline",
                 "progress",
                 "actions",
@@ -188,7 +210,7 @@ const AllProject = ({
                           ? () => handleSort(col as any)
                           : undefined
                       }
-                      className="px-6 py-3 text-left text-xs font-semibold cursor-pointer"
+                      className="px-6 py-3 text-left text-xs font-semibold cursor-pointer capitalize"
                     >
                       {col.replace(/([A-Z])/g, " $1")}
                     </th>
@@ -200,27 +222,34 @@ const AllProject = ({
           <tbody>
             {sortedProjects.map((project) => (
               <tr key={project.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">{project.projectName}</td>
-
+                <td className="px-6 py-4">{project.name}</td>
+                <td className="px-6 py-4">
+                  <span className="px-2 py-1 text-xs rounded bg-gray-100">
+                    {project.status}
+                  </span>
+                </td>
                 <td className="px-6 py-4">
                   <PriorityDropdown defaultPriority={project.priority} />
                 </td>
 
-                {!hideCreatedOn && (
-                  <td className="px-6 py-4">{formatDate(project.createdAt)}</td>
-                )}
-
-                <td className="px-6 py-4">{formatDate(project.updatedAt)}</td>
+                <td className="px-6 py-4">{formatDate(project.startDate)}</td>
 
                 <td className="px-6 py-4">{formatDate(project.deadline)}</td>
 
-                <td className="px-6 py-4">{project.progress}%</td>
+                <td className="px-6 py-4 w-[180px]">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-gray-500">
+                      {project.progress}%
+                    </span>
+                    <Progress value={project.progress} />
+                  </div>
+                </td>
 
                 <td className="px-6 py-4">
                   <button
                     onClick={() => {
-                      //   setEditProject(project);
-                      //   setEditModalOpen(true);
+                      setEditProject(project);
+                      setEditModalOpen(true);
                     }}
                   >
                     <FaEdit className="text-blue-600" />
@@ -240,20 +269,14 @@ const AllProject = ({
         />
       </div>
 
-      {/* {editModalOpen && editProject && (
-        <EditProjectModal
+      {editModalOpen && editProject && (
+        <UpdateProjectModal
           project={editProject}
           open={editModalOpen}
           onClose={() => setEditModalOpen(false)}
-          onSave={async (payload) => {
-            await updateProject({
-              id: editProject.id,
-              ...payload,
-            });
-            setEditModalOpen(false);
-          }}
+          onSubmit={handleUpdateProject}
         />
-      )} */}
+      )}
     </div>
   );
 };

@@ -50,12 +50,14 @@ const programApi = baseApi.injectEndpoints({
     }),
 
     getProjectsByProgramId: builder.query({
-      query: (id) => ({
-        url: `/program/${id}/projects`,
-        method: "GET",
-      }),
-      providesTags: (_result, _error, id) => [
-        { type: "Program", id },
+      query: (data) => {
+        return {
+          url: `/program/${data?.programId}/projects`,
+          method: "GET",
+        };
+      },
+      providesTags: (_result, _error, data) => [
+        { type: "Program", id: data?.programId },
         { type: "Program", id: "LIST" },
       ],
     }),
