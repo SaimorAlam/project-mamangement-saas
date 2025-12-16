@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -9,144 +9,85 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Copy, Trash2, Download } from "lucide-react";
+import { LegendValue } from "@/components/client/ProjectBuilder/ProjectConfiguration";
+import { generateChartData } from "@/utils";
 
-/*    TYPES    */
+/*   TYPES   */
 
-type LegendItem = {
-  label: string;
-  field: string;
-  color: string;
-};
-
-type ChartSchema = {
-  chartType: "stacked_bar";
-  title: string;
-  xAxis: string[];
-  legend: LegendItem[];
-};
-
-type WidgetConfig = {
-  chartSchema: ChartSchema;
-};
-
-type ChartData = {
+export type ChartData = {
   name: string;
   [key: string]: number | string;
 };
 
-/*    WIDGET CONFIG    */
-
-const widgetConfig: WidgetConfig = {
-  chartSchema: {
-    chartType: "stacked_bar",
-    title: "Employee Attandence",
-    xAxis: ["Sunday", "Monday", "Tuesday", "Friday", "Wednesday", "Sat"],
-    legend: [
-      { label: "On Time", field: "onTime", color: "#6366f1" },
-      { label: "Absent", field: "absent", color: "#06b6d4" },
-      { label: "Late", field: "late", color: "#89c1a0" },
-      { label: "Present", field: "present", color: "#89FFa0" },
-    ],
-  },
+type Props = {
+  widgetTitle?: string;
+  xAxisValues?: string[];
+  legendValues?: LegendValue[];
+  startingRange: number,
+  endingRange: number,
 };
 
-/*    HELPERS    */
+/*   COMPONENT   */
 
-const getRandomValue = (min = 0, max = 100) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
-
-const generateChartData = (
-  xAxis: string[],
-  legend: LegendItem[]
-): ChartData[] => {
-  return xAxis.map((label) => {
-    const item: ChartData = { name: label };
-
-    legend.forEach((l) => {
-      item[l.field] = getRandomValue();
-    });
-
-    return item;
-  });
-};
-
-/*    COMPONENT    */
-
-export default function StackedBarChart() {
-  const { xAxis, legend } = widgetConfig.chartSchema;
-
-  const initialData = useMemo(
-    () => generateChartData(xAxis, legend),
-    [xAxis, legend]
-  );
-
-  const [data, setData] = useState<ChartData[]>(initialData);
+export default function StackedBarChart({
+  widgetTitle = "My CSV",
+  xAxisValues = [],
+  legendValues = [],
+  startingRange,
+  endingRange,
+}: Props) {
+  /*    DERIVED DATA (KEY FIX)    */
+  const data: ChartData[] = useMemo(() => {
+    if (!xAxisValues.length || !legendValues.length) return [];
+    return generateChartData(xAxisValues, legendValues, startingRange, endingRange);
+  }, [xAxisValues, legendValues,startingRange,endingRange]);
 
   /*    TOTAL    */
-
   const totalEmployees = useMemo(() => {
     return data.reduce((sum, row) => {
       return (
         sum +
-        legend.reduce(
-          (inner, l) => inner + Number(row[l.field]),
+        legendValues.reduce(
+          (inner, l) => inner + Number(row[l.field] || 0),
           0
         )
       );
     }, 0);
-  }, [data, legend]);
+  }, [data, legendValues]);
 
   /*    ACTIONS    */
-
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
   };
 
-  const handleReset = () => {
-    setData(generateChartData(xAxis, legend));
-  };
+  const handleDownloadCSV = () => {
+    if (!xAxisValues.length || !legendValues.length) return;
 
-
-  /* CSV DOWNLOAD HANDLER */
-  // making this csvTemplate = "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
-  const csvTemplate = (() => {
-    const { legend, xAxis } = widgetConfig.chartSchema;
-
-    // Header row
-    const header =
-      ["Day", ...legend.map((l) => l.label)].join(",");
-
-    // Data rows
-    const rows = xAxis.map(
-      (day) => `${day}${",".repeat(legend.length)}`
+    const header = ["Day", ...legendValues.map(l => l.label)].join(",");
+    const rows = xAxisValues.map(
+      day => `${day}${",".repeat(legendValues.length)}`
     );
 
-    return [header, ...rows].join("\n");
-  })();
+    const csv = [header, ...rows].join("\n");
 
-  const handleDownloadCSV = () => {
-    const blob = new Blob([csvTemplate], {
-      type: "text/csv;charset=utf-8;",
-    });
-
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
 
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `${widgetConfig.chartSchema.title}-template.csv`;
+    link.download = `${widgetTitle}-template.csv`;
     link.click();
 
     URL.revokeObjectURL(url);
   };
 
   /*    TOOLTIP    */
-
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
 
     const row = payload[0].payload;
-    const total = legend.reduce(
-      (sum, l) => sum + Number(row[l.field]),
+    const total = legendValues.reduce(
+      (sum, l) => sum + Number(row[l.field] || 0),
       0
     );
 
@@ -154,7 +95,7 @@ export default function StackedBarChart() {
       <div className="bg-white p-3 border rounded shadow-lg">
         <p className="font-semibold mb-2">{row.name}</p>
 
-        {legend.map((l) => (
+        {legendValues.map(l => (
           <p key={l.field} style={{ color: l.color }} className="text-sm">
             {l.label}: {row[l.field]}
           </p>
@@ -168,23 +109,24 @@ export default function StackedBarChart() {
   };
 
   /*    RENDER    */
-
   return (
-    <div className="w-full h-fit bg-white border border-gray-200 rounded-lg p-6">
+    <div className="w-full bg-white border border-gray-200 rounded-lg p-6">
       <div className="flex justify-between mb-6">
         <div>
-          <h2 className="text-xl font-semibold">Stacked Bar Chart</h2>
+          <h2 className="text-xl font-semibold">{widgetTitle}</h2>
 
           <div className="flex gap-6 mt-3">
-            {legend.map((l) => (
-              <div key={l.field} className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: l.color }}
-                />
-                <span className="text-sm">{l.label}</span>
-              </div>
-            ))}
+            {legendValues.map(l =>
+              l.label ? (
+                <div key={l.field} className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-sm">{l.label}</span>
+                </div>
+              ) : null
+            )}
           </div>
         </div>
 
@@ -194,28 +136,15 @@ export default function StackedBarChart() {
           </p>
 
           <div className="flex gap-2 border-l pl-4">
-            <button
-              onClick={handleCopy}
-              className="p-2 border rounded hover:bg-gray-50"
-              title="Copy data"
-            >
+            <button onClick={handleCopy} className="p-2 border rounded">
               <Copy size={18} />
             </button>
 
-            {/*NEW BUTTON */}
-            <button
-              onClick={handleDownloadCSV}
-              className="p-2 border rounded hover:bg-gray-50"
-              title="Download CSV template"
-            >
+            <button onClick={handleDownloadCSV} className="p-2 border rounded">
               <Download size={18} />
             </button>
 
-            <button
-              onClick={handleReset}
-              className="p-2 border rounded hover:bg-gray-50"
-              title="Reset data"
-            >
+            <button className="p-2 border rounded text-red-600">
               <Trash2 size={18} />
             </button>
           </div>
@@ -229,13 +158,13 @@ export default function StackedBarChart() {
           <YAxis />
           <Tooltip content={<CustomTooltip />} />
 
-          {legend.map((l, i) => (
+          {legendValues.map((l, i) => (
             <Bar
               key={l.field}
               dataKey={l.field}
               stackId="a"
               fill={l.color}
-              radius={i === legend.length - 1 ? [4, 4, 0, 0] : 0}
+              radius={i === legendValues.length - 1 ? [4, 4, 0, 0] : 0}
             />
           ))}
         </BarChart>

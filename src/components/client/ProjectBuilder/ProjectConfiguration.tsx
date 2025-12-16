@@ -2,30 +2,43 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import { handleDownloadCSV } from "@/utils";
 
-type LegendValue = {
+export type LegendValue = {
   label: string;
   field: string;
   color: string;
 };
 
-const ProjectConfiguration: React.FC = () => {
-  const [widgetTitle, setWidgetTitle] = useState(
-    "My-CSV"
-  );
-
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1)
-  const [xAxisValues, setXAxisValues] = useState<string[]>([]);
-
-  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
-
-  const [legendValues, setLegendValues] = useState<LegendValue[]>([
-    { label: "", field: "", color: "#13A490" },
-    { label: "", field: "", color: "#35B6EE" },
-    { label: "", field: "", color: "#6F78F9" },
-  ]);
-  const [startingRange, setStartingRange] = useState<number>(0);
-  const [endingRange, setEndingRange] = useState<number>(100);
-
+const ProjectConfiguration = ({
+  widgetTitle, 
+  setWidgetTitle,
+  numOfXAxisDataSet,
+  handleSetNumOfXAxisDataSet,
+  xAxisValues,
+  handleXAxisValueChange,
+  numOfLegendDataSet,
+  setNumOfLegendDataSet,
+  legendValues,
+  setLegendValues,
+  startingRange,
+  setStartingRange,
+  endingRange,
+  setEndingRange
+}: {
+  widgetTitle: string, 
+  setWidgetTitle: React.Dispatch<React.SetStateAction<string>>,
+  numOfXAxisDataSet: number,
+  handleSetNumOfXAxisDataSet: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  xAxisValues: string[],
+  handleXAxisValueChange: (index: number, value: string) => void,
+  numOfLegendDataSet: number,
+  setNumOfLegendDataSet: React.Dispatch<React.SetStateAction<number>>,
+  legendValues: LegendValue[],
+  setLegendValues: React.Dispatch<React.SetStateAction<LegendValue[]>>,
+  startingRange: number,
+  setStartingRange: React.Dispatch<React.SetStateAction<number>>,
+  endingRange: number,
+  setEndingRange: React.Dispatch<React.SetStateAction<number>>
+}) => {
 
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
@@ -38,45 +51,6 @@ const ProjectConfiguration: React.FC = () => {
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
   }
 
-
-  // all handler functions 
-
-  // handler for x-axis inputs
-  const minXaxisField = 1;
-  const maxXaxisField = 7;
-  const handleSetNumOfXAxisDataSet = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (isNaN(value)) {
-      setNumOfXAxisDataSet(1);
-    }
-    else if (value >= minXaxisField && value <= maxXaxisField) {
-      setNumOfXAxisDataSet(value);
-    } else {
-      setNumOfXAxisDataSet(1);
-      alert(`Please enter a number between ${minXaxisField} and ${maxXaxisField}`);
-    }
-
-    setXAxisValues((prev) => {
-      const updated = [...prev];
-      // Adding empty values if increased
-      while (updated.length < value) {
-        updated.push("");
-      }
-      // Removing extra values if decreased
-      return updated.slice(0, value);
-    });
-  }
-
-  const handleXAxisValueChange = (
-    index: number,
-    value: string
-  ) => {
-    setXAxisValues((prev) => {
-      const updated = [...prev];
-      updated[index] = value;
-      return updated;
-    });
-  };
 
   // handler for Legend inputs
   const minLegend = 3;
@@ -219,7 +193,13 @@ const ProjectConfiguration: React.FC = () => {
                   key={index}
                   type="text"
                   required
-                  placeholder="Enter this field value here..."
+                  placeholder={`Enter ${index+1}${index === 0
+                    ? "st"
+                    : index === 1
+                      ? "nd"
+                      : index === 2
+                        ? "rd"
+                        : "th"} field name here...`}
                   value={xAxisValues[index] || ""}
                   onChange={(e) =>
                     handleXAxisValueChange(index, e.target.value)
