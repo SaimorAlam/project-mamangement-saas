@@ -65,8 +65,9 @@ const programApi = baseApi.injectEndpoints({
         };
       },
       providesTags: (_result, _error, programId) => [
-        { type: "Program", id: programId },
+        { type: "Project", id: "LIST" },
         { type: "Program", id: "LIST" },
+        { type: "Program", id: programId },
       ],
     }),
 
