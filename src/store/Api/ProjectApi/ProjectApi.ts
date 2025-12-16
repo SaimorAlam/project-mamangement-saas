@@ -5,12 +5,15 @@ import baseApi from "../BaseApi/BaseApi";
 const projectApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createProject: builder.mutation({
-      query: (data) => ({
+      query: ({ employeeIds, ...data }) => ({
         url: "/project",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: [{ type: "Project", id: "LIST" }],
+      invalidatesTags: (_res, _err, { programId }) => [
+        { type: "Program", id: programId },
+        { type: "Project", id: "LIST" },
+      ],
     }),
 
     getAllProjects: builder.query({
@@ -29,16 +32,13 @@ const projectApi = baseApi.injectEndpoints({
           params,
         };
       },
-      providesTags: (result) =>
-        result?.data?.data
-          ? [
-              ...result.data.data.map((project: any) => ({
-                type: "Project",
-                id: project.id,
-              })),
-              { type: "Project", id: "LIST" },
-            ]
-          : [{ type: "Project", id: "LIST" }],
+      providesTags: (result) => [
+        { type: "Project", id: "LIST" },
+        ...(result?.data?.data ?? []).map((project: any) => ({
+          type: "Project",
+          id: project.id,
+        })),
+      ],
     }),
 
     searchProjects: builder.query({
@@ -59,10 +59,10 @@ const projectApi = baseApi.injectEndpoints({
     }),
 
     updateProject: builder.mutation({
-      query: ({ id, ...body }) => ({
+      query: ({ id, ...project }) => ({
         url: `/project/${id}`,
         method: "PATCH",
-        body,
+        body: project,
       }),
       invalidatesTags: (_res, _err, { id }) => [
         { type: "Project", id },

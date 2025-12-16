@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { X, Calendar, HelpCircle } from "lucide-react";
-import {
-  IEditEmployeePayload,
-} from "@/types";
+import { IEditEmployeePayload } from "@/types";
 import { useUpdateEmployeeMutation } from "@/store/Api/EmployeeApi/EmployeeApi";
 import { toast } from "sonner";
 
@@ -18,7 +16,6 @@ const EditEmployeeModal = ({
   onClose,
   employee,
 }: IEditEmployeeModalProps) => {
-
   const {
     register,
     handleSubmit,
@@ -80,9 +77,7 @@ const EditEmployeeModal = ({
     );
   };
 
-  const handleSkillKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       addSkillTag();
@@ -92,9 +87,7 @@ const EditEmployeeModal = ({
     }
   };
 
-  const handleProjectKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleProjectKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       addProjectTag();
@@ -117,11 +110,9 @@ const EditEmployeeModal = ({
       onClose();
     } catch (err: unknown) {
       if (err && typeof err === "object" && "data" in err) {
-        const errorData = (err as { data?: { message?: string } })
-          .data;
+        const errorData = (err as { data?: { message?: string } }).data;
         toast.error(
-          errorData?.message ||
-            "Failed to add employee. Please try again."
+          errorData?.message || "Failed to add employee. Please try again."
         );
       } else {
         toast.error("Something went wrong. Please try again.");
@@ -137,9 +128,7 @@ const EditEmployeeModal = ({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Edit Employee
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900">Edit Employee</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
@@ -226,8 +215,7 @@ const EditEmployeeModal = ({
                 return (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Joined Date{" "}
-                      <span className="text-red-500">*</span>
+                      Joined Date <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <input
@@ -325,8 +313,7 @@ const EditEmployeeModal = ({
           {/* Description */}
           <div>
             <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
-              Description{" "}
-              <HelpCircle size={14} className="text-gray-400" />
+              Description <HelpCircle size={14} className="text-gray-400" />
             </label>
             <textarea
               {...register("description", {
