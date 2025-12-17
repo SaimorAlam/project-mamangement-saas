@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Search,
   Calendar,
@@ -92,6 +92,14 @@ const AllProjectReview: React.FC = () => {
     startIndex + itemsPerPage
   );
 
+  const dateInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    if (dateInputRef.current) {
+      (dateInputRef.current as HTMLInputElement).showPicker();
+    }
+  };
+
   return (
     <div className="min-h-screen border border-gray-200 rounded-lg my-6 p-6">
       <div className="flex gap-6">
@@ -146,13 +154,48 @@ const AllProjectReview: React.FC = () => {
               </div>
 
               {/* Date Range */}
-              <button className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
-                <Calendar size={18} />
-                Date Range
-              </button>
+              <div className="relative">
+                <button
+                  onClick={handleButtonClick}
+                  className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                >
+                  <Calendar size={18} />
+                  Date Range
+                </button>
 
+                <input
+                  type="date"
+                  ref={dateInputRef}
+                  className="absolute opacity-0 pointer-events-none -bottom-2 left-0 w-0 h-0"
+                />
+              </div>
               {/* Export */}
-              <button className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+              <button 
+                onClick={() => {
+                  const headers = ["ID", "Project Name", "Assigned Staff", "Status", "Priority", "Submit Date"];
+                  const rows = projects.map(p => [
+                    p.id,
+                    p.name,
+                    p.assignedStaff.join(", "),
+                    p.status,
+                    p.priority,
+                    p.submitDate
+                  ]);
+                  
+                  const csvContent = [
+                    headers.join(","),
+                    ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
+                  ].join("\n");
+                  
+                  const blob = new Blob([csvContent], { type: "text/csv" });
+                  const url = window.URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.download = "projects.csv";
+                  link.click();
+                }}
+                className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+              >
                 <Download size={18} />
                 Export
               </button>
@@ -214,9 +257,8 @@ const AllProjectReview: React.FC = () => {
                             .map((_, idx) => (
                               <img
                                 key={idx}
-                                src={`https://i.pravatar.cc/150?img=${
-                                  project.id * 3 + idx
-                                }`}
+                                src={`https://i.pravatar.cc/150?img=${project.id * 3 + idx
+                                  }`}
                                 alt="Staff"
                                 className="w-8 h-8 rounded-full border-2 border-white"
                               />
@@ -290,11 +332,10 @@ const AllProjectReview: React.FC = () => {
                     onClick={() =>
                       typeof page === "number" && setCurrentPage(page)
                     }
-                    className={`px-3 py-1.5 text-sm rounded ${
-                      page === currentPage
+                    className={`px-3 py-1.5 text-sm rounded ${page === currentPage
                         ? "bg-blue-600 text-white"
                         : "border border-gray-300 hover:bg-gray-50"
-                    }`}
+                      }`}
                     disabled={page === "..."}
                   >
                     {page}
