@@ -26,8 +26,6 @@ const ClientProgramBuilder = () => {
   };
 
   // for stacked bar chart 
-  
-
 
   return (
     <div className="flex gap-6">
