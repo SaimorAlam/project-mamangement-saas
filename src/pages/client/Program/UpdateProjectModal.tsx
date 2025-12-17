@@ -163,7 +163,7 @@ export default function UpdateProjectModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {allManagers.map((m : any) => (
+                    {allManagers.map((m: any) => (
                       <SelectItem key={m.id} value={m.id}>
                         {m.name}
                       </SelectItem>
@@ -190,7 +190,12 @@ export default function UpdateProjectModal({
 
             <div>
               <Label>Progress</Label>
-              <Input type="number" min={0} max={100} {...register("progress")} />
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                {...register("progress")}
+              />
               <div className="mt-2">
                 <Progress value={progress} />
               </div>
