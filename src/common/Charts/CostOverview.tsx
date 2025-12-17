@@ -46,7 +46,7 @@ export default function CostOverview() {
 
   return (
     <div className="w-[60%] overflow-x-auto">
-      <div className="min-w-[300%] h-full bg-white rounded-lg border border-gray-200 p-6">
+      <div className="h-full bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-gray-800">
             Cost Overview

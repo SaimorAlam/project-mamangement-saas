@@ -42,12 +42,16 @@ const ClientAllProgram = ({
   >("ALL");
   // const navigate = useNavigate();
 
-  const [sortColumn, setSortColumn] = useState<keyof IProgram | null>(null);
+  const [sortColumn, setSortColumn] = useState<keyof IProgram | null>(
+    null
+  );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const debouncedSearch = useDebounce(search, 500);
 
   // Edit modal
-  const [editProgram, setEditProgram] = useState<IProgram | null>(null);
+  const [editProgram, setEditProgram] = useState<IProgram | null>(
+    null
+  );
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   // API calls
@@ -84,7 +88,8 @@ const ClientAllProgram = ({
     if (!sortColumn) {
       return list.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() -
+          new Date(a.createdAt).getTime()
       );
     }
 
@@ -156,7 +161,9 @@ const ClientAllProgram = ({
       <div className="bg-white rounded-lg border border-gray-200">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between px-6 py-4 border-b border-gray-200 gap-3">
-          <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
+          <h1 className="text-lg font-semibold text-gray-900">
+            {title}
+          </h1>
           <div className="flex items-center gap-3">
             <input
               type="text"
@@ -170,7 +177,9 @@ const ClientAllProgram = ({
             />
             <DropdownMenu>
               <DropdownMenuTrigger className="px-4 py-2 text-sm border border-gray-300 rounded-md min-w-32">
-                {priorityFilter === "ALL" ? "All Priorities" : priorityFilter}
+                {priorityFilter === "ALL"
+                  ? "All Priorities"
+                  : priorityFilter}
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
@@ -232,9 +241,13 @@ const ClientAllProgram = ({
                     onClick={() => handleRowClick(program.id)}
                     className="hover:bg-gray-50 h-[60px] cursor-pointer"
                   >
-                    <td className="px-6 py-4 text-sm">{program.programName}</td>
+                    <td className="px-6 py-4 text-sm">
+                      {program.programName}
+                    </td>
                     <td className="px-6 py-4">
-                      <PriorityDropdown defaultPriority={program.priority} />
+                      <PriorityDropdown
+                        defaultPriority={program.priority}
+                      />
                     </td>
                     {!hideCreatedOn && (
                       <td className="px-6 py-4 text-sm text-gray-600">
@@ -287,7 +300,10 @@ const ClientAllProgram = ({
                     ]
                       .filter(Boolean)
                       .map((_, i) => (
-                        <td key={i} className="px-6 py-4 text-sm text-gray-200">
+                        <td
+                          key={i}
+                          className="px-6 py-4 text-sm text-gray-200"
+                        >
                           &nbsp;
                         </td>
                       ))}
@@ -323,7 +339,10 @@ const ClientAllProgram = ({
           program={editProgram}
           onClose={() => setEditModalOpen(false)}
           onSave={async (updatedData: Partial<IProgram>) => {
-            await updateProgram({ id: editProgram.id, ...updatedData });
+            await updateProgram({
+              id: editProgram.id,
+              ...updatedData,
+            });
             setEditModalOpen(false);
           }}
         />

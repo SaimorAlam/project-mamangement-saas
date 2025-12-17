@@ -5,22 +5,15 @@ interface ITableProps {
   employees: IEmployeeProfile[];
   selectedEmployees: Set<string>;
   selectAll: boolean;
-
   visibleColumns?: string[];
-
   handleSelectAll: () => void;
   handleSelectEmployee: (id: string) => void;
-
   handleViewClick: (employeeId: string) => void;
-
   handleEditClick?: (employee: IEmployeeProfile) => void;
   handleDeleteEmployee?: (id: string) => void;
-  
-  /* 🔑 Sorting (API-driven) */
   handleSort?: (field: string) => void;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
-
   getRoleBadgeColor: (role: string) => string;
   getStatusBadgeColor?: (level: string) => string;
 }
@@ -51,11 +44,7 @@ const EmployeeTable = ({
 }: ITableProps) => {
   const renderSortIcon = (field: string) => {
     if (sortBy !== field) return null;
-    return sortOrder === "asc" ? (
-      <ArrowUp className="w-3 h-3 ml-1 inline" />
-    ) : (
-      <ArrowDown className="w-3 h-3 ml-1 inline" />
-    );
+    return sortOrder === "asc" ? " ▲" : " ▼";
   };
 
   const sortableHeader = (
@@ -67,9 +56,8 @@ const EmployeeTable = ({
       onClick={() => handleSort?.(field)}
       className={`px-6 py-3 text-left cursor-pointer select-none ${className}`}
     >
-      <span className="inline-flex items-center text-sm font-medium">
-        {label}
-        {renderSortIcon(field)}
+      <span className="inline-flex items-center text-sm text-xs font-medium text-gray-700">
+        {label} {renderSortIcon(field)}
       </span>
     </th>
   );
@@ -89,24 +77,17 @@ const EmployeeTable = ({
             </th>
 
             {visibleColumns.includes("employeeName") &&
-              sortableHeader("Employee Name", "name")}
-
+              sortableHeader("Employee Name", "userName")}
             {visibleColumns.includes("email") &&
               sortableHeader("Email", "email")}
-
             {visibleColumns.includes("role") &&
               sortableHeader("Role", "role")}
-
-            {visibleColumns.includes("projects") && (
-              <th className="px-6 py-3 text-left">Assign Project</th>
-            )}
-
+            {visibleColumns.includes("projects") &&
+              sortableHeader("Projects", "projects")}
             {visibleColumns.includes("lastActive") &&
-              sortableHeader("Last Active", "updatedAt", "w-36")}
-
+              sortableHeader("Last Active", "updatedAt")}
             {visibleColumns.includes("level") &&
-              sortableHeader("Level", "status")}
-
+              sortableHeader("Status", "status")}
             {visibleColumns.includes("action") && (
               <th className="px-6 py-3 text-left">Action</th>
             )}
@@ -122,12 +103,8 @@ const EmployeeTable = ({
               <td className="px-6 py-4">
                 <input
                   type="checkbox"
-                  checked={selectedEmployees.has(
-                    employee.id as string
-                  )}
-                  onChange={() =>
-                    handleSelectEmployee(employee.id as string)
-                  }
+                  checked={selectedEmployees.has(employee.id)}
+                  onChange={() => handleSelectEmployee(employee.id)}
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
                 />
               </td>
@@ -195,10 +172,14 @@ const EmployeeTable = ({
                   <td className="px-6 py-4">
                     <span
                       className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
-                        employee.user.status ? "Active" : "In Active"
+                        employee.user.userStatus === "ACTIVE"
+                          ? "Active"
+                          : "In Active"
                       )}`}
                     >
-                      {employee.user.status ? "Active" : "In Active"}
+                      {employee.user.userStatus === "ACTIVE"
+                        ? "Active"
+                        : "In Active"}
                     </span>
                   </td>
                 )}
@@ -214,7 +195,6 @@ const EmployeeTable = ({
                         <Eye className="w-4 h-4" />
                       </button>
                     )}
-
                     {handleEditClick && (
                       <button
                         className="p-1 text-green-600"
@@ -223,12 +203,11 @@ const EmployeeTable = ({
                         <Edit className="w-4 h-4" />
                       </button>
                     )}
-
                     {handleDeleteEmployee && (
                       <button
                         className="p-1 text-red-600"
                         onClick={() =>
-                          handleDeleteEmployee(employee.id as string)
+                          handleDeleteEmployee(employee.id)
                         }
                       >
                         <Trash2 className="w-4 h-4" />

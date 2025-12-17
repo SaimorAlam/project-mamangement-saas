@@ -42,15 +42,16 @@ interface AllProgramProjectGridViewProps {
   allProgramProjectData: ProgramCardProps[];
 }
 
-const AllProgramProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
-  allProgramProjectData: paginatedData,
-}) => {
+const AllProgramProjectTableView: React.FC<
+  AllProgramProjectGridViewProps
+> = ({ allProgramProjectData: paginatedData }) => {
   const statusColors: Record<StatusType, string> = {
     Live: "bg-[#EBFFF2] text-[#169E7B] border border-[#ABEFD5]",
     Returned: "bg-[#f8f0e8] text-[#FF974B] border border-[#f9dec9]",
     Overdue: "bg-[#FDF4F5] text-[#DA4352] border border-[#F8D3D5]",
     Draft: "bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]",
-    "In Review": "bg-[#FFF9ED] text-[#DB940C] border border-[#FCE38C]",
+    "In Review":
+      "bg-[#FFF9ED] text-[#DB940C] border border-[#FCE38C]",
     Submitted: "bg-[#F5F2FC] text-[#8B69E2] border border-[#DFDBF9]",
   };
 
@@ -64,7 +65,9 @@ const AllProgramProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
   const renderPriority = (priority: ProgramCardProps["priority"]) => (
     <div className="flex items-center gap-1">
       <Flag className={`w-4 h-4 ${priorityColors[priority]}`} />
-      <span className={`text-sm font-medium ${priorityColors[priority]}`}>
+      <span
+        className={`text-sm font-medium ${priorityColors[priority]}`}
+      >
         {priority}
       </span>
     </div>
@@ -83,9 +86,6 @@ const AllProgramProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
                 Project
               </TableHead>
               <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
-                Status
-              </TableHead>
-              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
                 Assign Staff
               </TableHead>
               <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
@@ -96,9 +96,6 @@ const AllProgramProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
               </TableHead>
               <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
                 Deadline
-              </TableHead>
-              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
-                Progress
               </TableHead>
               <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
                 Action
@@ -118,15 +115,6 @@ const AllProgramProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
                   {item.projectName}
                 </TableCell>
                 <TableCell className="px-6 py-3.5">
-                  <Badge
-                    className={`py-1.5 px-3 min-w-20  ${
-                      statusColors[item.status as StatusType]
-                    }`}
-                  >
-                    {item.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-6 py-3.5">
                   <RenderStaffAvatars staff={item.staffMembers} />
                 </TableCell>
                 <TableCell className="px-6 py-3.5">
@@ -137,17 +125,6 @@ const AllProgramProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
                 </TableCell>
                 <TableCell className="px-6 py-3.5 text-base text-muted-foreground">
                   {item.endDate}
-                </TableCell>
-                <TableCell className="px-6 py-3.5">
-                  <div className="flex items-center gap-3">
-                    <Progress
-                      value={item.progress}
-                      className="w-20 h-2 bg-[#E2E8F0]"
-                    />
-                    <span className="text-sm font-medium min-w-[3rem]">
-                      {item.progress}%
-                    </span>
-                  </div>
                 </TableCell>
                 <TableCell className="px-6 py-3.5">
                   <div className="flex items-center gap-2">

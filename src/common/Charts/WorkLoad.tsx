@@ -1,39 +1,82 @@
-import { useState, useMemo } from "react"
-import { Search, Filter } from "lucide-react"
+import { useState, useMemo } from "react";
+import { Search, Filter } from "lucide-react";
 
 interface WorkloadData {
-  name: string
-  completed: number
-  remaining: number
-  overdue: number
-  total: number
+  name: string;
+  completed: number;
+  remaining: number;
+  overdue: number;
+  total: number;
 }
 
 const initialData: WorkloadData[] = [
-  { name: "Mike Smith", completed: 15, remaining: 3, overdue: 1, total: 19 },
-  { name: "Jennifer Jones", completed: 16, remaining: 2, overdue: 1, total: 19 },
-  { name: "Sam Watson", completed: 14, remaining: 2, overdue: 1, total: 17 },
-  { name: "Theresa Webb", completed: 8, remaining: 4, overdue: 3, total: 15 },
-  { name: "Jane Cooper", completed: 7, remaining: 0, overdue: 4, total: 11 },
-  { name: "Ronald Richards", completed: 4, remaining: 2, overdue: 1, total: 7 },
-]
+  {
+    name: "Mike Smith",
+    completed: 15,
+    remaining: 3,
+    overdue: 1,
+    total: 19,
+  },
+  {
+    name: "Jennifer Jones",
+    completed: 16,
+    remaining: 2,
+    overdue: 1,
+    total: 19,
+  },
+  {
+    name: "Sam Watson",
+    completed: 14,
+    remaining: 2,
+    overdue: 1,
+    total: 17,
+  },
+  {
+    name: "Theresa Webb",
+    completed: 8,
+    remaining: 4,
+    overdue: 3,
+    total: 15,
+  },
+  {
+    name: "Jane Cooper",
+    completed: 7,
+    remaining: 0,
+    overdue: 4,
+    total: 11,
+  },
+  {
+    name: "Ronald Richards",
+    completed: 4,
+    remaining: 2,
+    overdue: 1,
+    total: 7,
+  },
+];
 
 export default function EmployeeWorkloadChart() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [data, _setData] = useState(initialData)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [data, _setData] = useState(initialData);
 
   const filteredData = useMemo(() => {
-    return data.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  }, [data, searchTerm])
+    return data.filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [data, searchTerm]);
 
-  const totalEmployees = data.reduce((sum, item) => sum + item.total, 0)
-  const maxValue = Math.max(...data.map((item) => item.total))
+  const totalEmployees = data.reduce(
+    (sum, item) => sum + item.total,
+    0
+  );
+  const maxValue = Math.max(...data.map((item) => item.total));
 
   return (
-    <div className="w-full bg-white rounded-lg border border-gray-200 p-6">
+    <div className="w-full bg-white rounded-lg border border-gray-200 p-6 h-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-gray-800">Employee workload</h2>
+        <h2 className="text-lg font-semibold text-gray-800">
+          Employee workload
+        </h2>
         <div className="flex items-center gap-4">
           {/* Search Bar */}
           <div className="relative">
@@ -51,33 +94,33 @@ export default function EmployeeWorkloadChart() {
           <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <Filter className="w-5 h-5 text-gray-600" />
           </button>
-
-          
         </div>
       </div>
-      
 
       {/* Legend */}
       <div className="flex justify-between">
         <div className="flex gap-4 mb-6">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-          <span className="text-sm text-gray-600">Completed</span>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+            <span className="text-sm text-gray-600">Completed</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+            <span className="text-sm text-gray-600">Remaining</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <span className="text-sm text-gray-600">Overdue</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-          <span className="text-sm text-gray-600">Remaining</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <span className="text-sm text-gray-600">Overdue</span>
-        </div>
-      </div>
 
-       <div>
-        {/* Total Employees */}
+        <div>
+          {/* Total Employees */}
           <span className="text-sm font-medium text-gray-600">
-            Total employees <span className="text-gray-800 font-semibold">{totalEmployees}</span>
+            Total employees{" "}
+            <span className="text-gray-800 font-semibold">
+              {totalEmployees}
+            </span>
           </span>
         </div>
       </div>
@@ -85,15 +128,19 @@ export default function EmployeeWorkloadChart() {
       {/* Chart */}
       <div className="space-y-4 mb-6">
         {filteredData.map((item) => {
-          const completedWidth = (item.completed / maxValue) * 100
-          const remainingWidth = (item.remaining / maxValue) * 100
-          const overdueWidth = (item.overdue / maxValue) * 100
+          const completedWidth = (item.completed / maxValue) * 100;
+          const remainingWidth = (item.remaining / maxValue) * 100;
+          const overdueWidth = (item.overdue / maxValue) * 100;
 
           return (
             <div key={item.name} className="group">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700 w-32">{item.name}</span>
-                <span className="text-sm font-medium text-gray-600">{item.total} Task</span>
+                <span className="text-sm font-medium text-gray-700 w-32">
+                  {item.name}
+                </span>
+                <span className="text-sm font-medium text-gray-600">
+                  {item.total} Task
+                </span>
               </div>
 
               {/* Stacked Bar */}
@@ -129,7 +176,7 @@ export default function EmployeeWorkloadChart() {
                 <div className="w-1 h-8 bg-gray-300 rounded-full"></div>
               </div>
             </div>
-          )
+          );
         })}
       </div>
 
@@ -152,5 +199,5 @@ export default function EmployeeWorkloadChart() {
         </div>
       </div>
     </div>
-  )
+  );
 }

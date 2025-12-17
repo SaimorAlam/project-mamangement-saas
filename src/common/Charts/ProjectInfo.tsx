@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface ProjectInfo {
   label: string;
@@ -7,17 +7,17 @@ interface ProjectInfo {
 
 const ProjectInformation: React.FC = () => {
   const projectData: ProjectInfo[] = [
-    { label: 'Start Date', value: '2 March 2025' },
-    { label: 'Contract Duration', value: '160 Days' },
-    { label: 'Completion Date', value: '9 August 2025' },
-    { label: 'Contract Value', value: '$200k' },
-    { label: 'Progress', value: '60% Completed' },
-    { label: 'Duration Difference', value: '5 days Delay/Early' },
-    { label: 'Workload', value: '3 Task Overdue' }
+    { label: "Start Date", value: "2 March 2025" },
+    { label: "Contract Duration", value: "160 Days" },
+    { label: "Completion Date", value: "9 August 2025" },
+    { label: "Contract Value", value: "$200k" },
+    { label: "Progress", value: "60% Completed" },
+    { label: "Duration Difference", value: "5 days Delay/Early" },
+    { label: "Workload", value: "3 Task Overdue" },
   ];
 
   return (
-    <div className='w-full'>
+    <div className="w-full">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full  p-6">
         {/* Title */}
         <h2 className="text-xl font-semibold text-gray-900 mb-6">

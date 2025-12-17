@@ -123,60 +123,57 @@ export default function EmployeeTableHeader({
                 id="filter-dropdown"
                 className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10"
               >
-                {/* By Role */}
-                <div className="py-2">
-                  <h3 className="text-sm font-semibold text-gray-900 px-4 pb-2">
-                    By Role:
-                  </h3>
-                  {["Editor", "Moderator", "Viewer"].map((role) => (
-                    <div
-                      key={role}
-                      className="flex items-center gap-2 pl-6 py-1 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        onChange={() =>
-                          setFilterBy(role.toLowerCase())
-                        }
-                        checked={filterBy === role.toLowerCase()}
-                      />
-                      <p className="text-sm text-gray-900">{role}</p>
-                    </div>
-                  ))}
-                </div>
-
                 {/* By Status */}
                 <div className="py-2">
                   <h3 className="text-sm font-semibold text-gray-900 px-4 pb-2">
                     By Status:
                   </h3>
+
+                  {["active", "banned", "deleted", "suspended"].map(
+                    (status) => (
+                      <div
+                        key={status}
+                        className="flex items-center gap-2 pl-6 py-1"
+                      >
+                        <input
+                          type="radio"
+                          name="status" // group radio buttons
+                          value={status}
+                          id={status}
+                          checked={
+                            filterBy.toUpperCase() ===
+                            status.toUpperCase()
+                          }
+                          onChange={() =>
+                            setFilterBy(status.toUpperCase())
+                          }
+                        />
+                        <label
+                          htmlFor={status}
+                          className="text-sm text-gray-900 capitalize"
+                        >
+                          {status}
+                        </label>
+                      </div>
+                    )
+                  )}
+
+                  {/* Option to clear filter */}
                   <div className="flex items-center gap-2 pl-6 py-1">
                     <input
-                      type="checkbox"
-                      checked={filterBy === "active"}
-                      onChange={(e) =>
-                        setFilterBy(
-                          e.target.checked ? "active" : "all"
-                        )
-                      }
+                      type="radio"
+                      name="status"
+                      value="all"
+                      id="all"
+                      checked={filterBy === "all"}
+                      onChange={() => setFilterBy("")}
                     />
-                    <p className="text-sm text-gray-900">
-                      Active Only
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 pl-6 py-1">
-                    <input
-                      type="checkbox"
-                      checked={filterBy === "in active"}
-                      onChange={(e) =>
-                        setFilterBy(
-                          e.target.checked ? "in active" : "all"
-                        )
-                      }
-                    />
-                    <p className="text-sm text-gray-900">
-                      Inactive Only
-                    </p>
+                    <label
+                      htmlFor="all"
+                      className="text-sm text-gray-900"
+                    >
+                      All
+                    </label>
                   </div>
                 </div>
 

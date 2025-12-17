@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import ProjectDueDate from "./ProjectDueDate";
 import ReviewerActivity from "./ReviewerActivity";
+import IndividualProjectDetails from "@/components/staffManager/Projects/IndividualProjectDetails";
 
 interface Project {
   id: number;
@@ -293,9 +294,7 @@ const AllProjectReview: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded cursor-pointer">
-                          <Eye size={16} />
-                        </button>
+                        <IndividualProjectDetails project={project}/>
                         <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded cursor-pointer">
                           <Edit2 size={16} />
                         </button>

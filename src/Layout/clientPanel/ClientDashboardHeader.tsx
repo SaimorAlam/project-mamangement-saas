@@ -5,7 +5,12 @@ import React, {
   ReactElement,
   isValidElement,
 } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
@@ -14,7 +19,13 @@ import SuccessModal from "@/components/client/SuccessModal";
 import NotificationModal from "@/components/client/NotificationModal";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import NewProjectModal from "@/components/client/NewProjectModal";
-import { Bell, CalendarDays, ChevronDown, Plus, UserPlus } from "lucide-react";
+import {
+  Bell,
+  CalendarDays,
+  ChevronDown,
+  Plus,
+  UserPlus,
+} from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -39,7 +50,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const location = useLocation();
   const currentPath = location.pathname;
   const ClientSidebarGroups = getClientSidebarItems();
-  const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
+  const allRoutes = ClientSidebarGroups.flatMap(
+    (group) => group.items
+  );
 
   // Determine current route
   let currentRoute = allRoutes.find((route) => {
@@ -71,16 +84,25 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [successOpen, setSuccessOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] =
+    useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const isEmployeePage = currentPath.includes("/employee");
   const isHighwayExpansionPage = currentPath.includes(
     "/highway-expansion/all-highway"
   );
-  const isAllProgramPage = currentPath.startsWith("/client-panel/all-program");
+  const isAllProgramPage = currentPath.startsWith(
+    "/client-panel/all-program"
+  );
   const isProgramOverviewPage = currentPath.startsWith(
     "/client-panel/program-overview/"
   );
+  const isProjectReviewPage = currentPath.includes(
+    "/client-panel/project-review"
+  );
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     setIsEmployeeModalOpen(false);
     setIsDropdownOpen(false);
@@ -129,6 +151,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           onClick={() => setActiveModal("Create Program")}
         />
       );
+
     if (isProgramOverviewPage)
       return (
         <>
@@ -138,18 +161,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             type="Primary"
             onClick={() => setIsProjectModalOpen(true)}
           />
-          {/* <NewProjectModal
-            open={isProjectModalOpen}
-            onClose={() => setIsProjectModalOpen(false)}
-            onSuccess={(projectName: string) => {
-              setIsProjectModalOpen(false);
-              setSuccessData({
-                programName: projectName || "New Project",
-                id: "",
-              });
-              setSuccessOpen(true);
-            }}
-          /> */}
           <CreateProjectModal
             open={isProjectModalOpen}
             programId={programId as string}
@@ -157,6 +168,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           />
         </>
       );
+
     if (isHighwayExpansionPage)
       return (
         <>
@@ -180,6 +192,19 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           />
         </>
       );
+
+    if (isProjectReviewPage) {
+      return (
+        <PrimaryButton
+          title="Create Support Ticket"
+          leftIcon={<Plus />}
+          type="Primary"
+          onClick={() =>
+            navigate("/client-panel/help/support/create-tickets")
+          }
+        />
+      );
+    }
 
     return (
       <>
@@ -219,14 +244,21 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
     <div>
       {/* Header */}
       <div className="flex items-center py-5 justify-between">
-        <div>
-          <h1 className="text-[32px] font-semibold">Good Morning 👋, {name}</h1>
-          <p className="text-base text-gray-500">
-            This is dashboard overview of Acme Corporation
-          </p>
-        </div>
+        {currentPath === "/client-panel" && (
+          <div>
+            <h1 className="text-[32px] font-semibold">
+              Good Morning 👋, {name}
+            </h1>
+            <p className="text-base text-gray-500">
+              This is dashboard overview of Acme Corporation
+            </p>
+          </div>
+        )}
 
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
 
         <div className="flex items-center justify-between gap-6 relative">
           <PrimaryButton
