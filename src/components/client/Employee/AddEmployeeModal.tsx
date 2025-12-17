@@ -47,7 +47,7 @@ const AddEmployeeModal = ({
   const projects = watch("projects");
 
   const [skillInput, setSkillInput] = useState("");
-  const [projectInput, setProjectInput] = useState("");
+  // const [projectInput, setProjectInput] = useState("");
 
   const [addEmployee, { isLoading }] = useAddEmployeeMutation();
   // Reset form when modal closes
@@ -62,7 +62,7 @@ const AddEmployeeModal = ({
         projects: ["Carlyle Hall", "Highway expedition"],
       });
       setSkillInput("");
-      setProjectInput("");
+      // setProjectInput("");
     }
   }, [open, reset]);
 
@@ -81,20 +81,20 @@ const AddEmployeeModal = ({
     );
   };
 
-  const addProjectTag = () => {
+  /* const addProjectTag = () => {
     const value = projectInput.trim();
     if (!value) return;
     if (projects.includes(value)) return;
     setValue("projects", [...projects, value]);
     setProjectInput("");
-  };
+  }; */
 
-  const removeProjectTag = (projectToRemove: string) => {
+  /* const removeProjectTag = (projectToRemove: string) => {
     setValue(
       "projects",
       projects.filter((project) => project !== projectToRemove)
     );
-  };
+  }; */
 
   const handleSkillKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>

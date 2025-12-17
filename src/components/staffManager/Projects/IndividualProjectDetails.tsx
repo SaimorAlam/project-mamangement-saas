@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AppDialog from "@/common/Modal/ModalTemplate";
 import { Upload, FileText, X, Eye } from "lucide-react";
 import { useState } from "react";
