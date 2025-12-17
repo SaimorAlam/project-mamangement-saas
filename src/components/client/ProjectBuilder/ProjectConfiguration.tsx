@@ -9,8 +9,8 @@ export type LegendValue = {
 };
 
 const ProjectConfiguration = ({
-  widgedName, 
-  widgetTitle, 
+  widgedName,
+  widgetTitle,
   setWidgetTitle,
   numOfXAxisDataSet,
   handleSetNumOfXAxisDataSet,
@@ -26,7 +26,7 @@ const ProjectConfiguration = ({
   setEndingRange
 }: {
   widgedName: string,
-  widgetTitle: string, 
+  widgetTitle: string,
   setWidgetTitle: React.Dispatch<React.SetStateAction<string>>,
   numOfXAxisDataSet: number,
   handleSetNumOfXAxisDataSet: (e: React.ChangeEvent<HTMLInputElement>) => void,
@@ -129,7 +129,30 @@ const ProjectConfiguration = ({
     return [header, ...rows].join("\n");
   })();
 
-  const downloadCSV = ()=>{
+  //-------------if i want to sent unique id inside for each generated csv file --------
+  // const csvTemplate = (() => {
+  //   const csvId = crypto.randomUUID();
+  //   const createdAt = new Date().toISOString();
+
+  //   // Metadata rows for sending id with that csv
+  //   const meta = [
+  //     `# csv_id=${csvId}`,
+  //     `# widget_title=${widgetTitle}`,
+  //     `# created_at=${createdAt}`,
+  //   ];
+
+  //   // Header row
+  //   const header = ["Day", ...legendValues.map(l => l.label)].join(",");
+
+  //   // Data rows
+  //   const rows = xAxisValues.map(
+  //     day => `${day}${",".repeat(legendValues.length)}`
+  //   );
+
+  //   return [...meta, header, ...rows].join("\n");
+  // })();
+
+  const downloadCSV = () => {
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
     for (let i = 0; i < legendValues.length; i++) {
       if (!legendValues[i].label) {
@@ -145,11 +168,11 @@ const ProjectConfiguration = ({
       }
     }
 
-    if(legendValues.length < 3){
+    if (legendValues.length < 3) {
       alert(`Please add at least ${minLegend} legend values`);
       return;
     }
-    if(xAxisValues.length < 1){
+    if (xAxisValues.length < 1) {
       alert(`Please add at least ${1} X-Axis value`);
       return;
     }
@@ -222,7 +245,7 @@ const ProjectConfiguration = ({
                   key={index}
                   type="text"
                   required
-                  placeholder={`Enter ${index+1}${index === 0
+                  placeholder={`Enter ${index + 1}${index === 0
                     ? "st"
                     : index === 1
                       ? "nd"
