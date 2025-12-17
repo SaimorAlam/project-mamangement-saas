@@ -62,7 +62,7 @@ const AddEmployeeModal = ({
         projects: ["Carlyle Hall", "Highway expedition"],
       });
       setSkillInput("");
-      setProjectInput("");
+      // setProjectInput("");
     }
   }, [open, reset]);
 
