@@ -22,6 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { toast } from "sonner";
+import { useGetAllManagersQuery } from "@/store/Api/UserApi/UserApi";
+import { Manager } from "@/types/User";
 
 type RepeatEvery = "WEEKLY" | "BI_WEEKLY" | "MONTHLY";
 type Priority = "LOW" | "MEDIUM" | "HIGH";
@@ -69,7 +72,8 @@ export default function CreateProjectModal({
   onClose,
 }: CreateProjectModalProps) {
   const [createProject, { isLoading, isSuccess }] = useCreateProjectMutation();
-
+  const { data: managers } = useGetAllManagersQuery({});
+  const allManagers = managers?.data?.data;
   const { register, handleSubmit, watch, setValue, reset, control } =
     useForm<CreateProjectForm>({
       defaultValues: {
@@ -107,16 +111,30 @@ export default function CreateProjectModal({
 
   const toISO = (date: string) => (date ? new Date(date).toISOString() : null);
 
-  const onSubmit = (data: CreateProjectForm) => {
-    createProject({
-      ...data,
-      isActive: true,
-      progress: 0,
-      chartList: ["string"],
-      startDate: toISO(data.startDate),
-      deadline: toISO(data.deadline),
-      estimatedCompletedDate: toISO(data.estimatedCompletedDate),
-    });
+  const onSubmit = async (data: CreateProjectForm) => {
+    try {
+      console.log(data);
+      const res = await createProject({
+        ...data,
+        ...(data.managerId?.trim() ? { managerId: data.managerId.trim() } : {}),
+        isActive: true,
+        progress: 0,
+        chartList: ["string"],
+        startDate: toISO(data.startDate),
+        deadline: toISO(data.deadline),
+        estimatedCompletedDate: toISO(data.estimatedCompletedDate),
+        remindBefore: Number(data.remindBefore),
+        latitude: Number(data.latitude),
+        longitude: Number(data.longitude),
+      });
+      console.log(res);
+      if (res.data) {
+        toast.success("Project created successfully");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to create project");
+    }
   };
 
   return (
@@ -218,18 +236,48 @@ export default function CreateProjectModal({
                 <Input type="number" {...register("remindBefore")} />
               </div>
 
-              <div>
-                <Label>Priority</Label>
-                <Select {...register("priority")}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="LOW">Low</SelectItem>
-                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                    <SelectItem value="HIGH">High</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex gap-2">
+                <div className="w-full">
+                  <Label>Priority</Label>
+                  <Select {...register("priority")}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="LOW">Low</SelectItem>
+                      <SelectItem value="MEDIUM">Medium</SelectItem>
+                      <SelectItem value="HIGH">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="w-full">
+                  <Label>Manager</Label>
+
+                  <Select
+                    value={watch("managerId") || ""}
+                    onValueChange={(value) =>
+                      setValue("managerId", value === "NONE" ? "" : value)
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select manager" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      {allManagers?.length > 0 ? (
+                        allManagers?.map((manager: Manager) => (
+                          <SelectItem key={manager?.userId} value={manager?.id}>
+                            {manager?.user?.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-red-500">
+                          No managers available
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div>

@@ -37,7 +37,7 @@ const Login = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "mdkazinaim0018@gmail.com",
-      password: "123456",
+      password: "123456789",
     },
   });
 
@@ -66,7 +66,7 @@ const Login = () => {
     }
   };
 
-  const [password, setPassword] = useState("123456");
+  const [password, setPassword] = useState("123456789");
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
