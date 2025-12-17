@@ -26,10 +26,17 @@ import { useGetAllManagersQuery } from "@/store/Api/UserApi/UserApi";
 
 interface UpdateProjectModalProps {
   open: boolean;
-  project: any; // API response object
+  project: any;
   onClose: () => void;
   onSubmit: (payload: UpdateProjectPayload) => Promise<void>;
 }
+
+/* ---------- helpers ---------- */
+const toInputDate = (iso?: string) =>
+  iso ? new Date(iso).toISOString().split("T")[0] : "";
+
+const toISODate = (date?: string) =>
+  date ? new Date(`${date}T00:00:00Z`).toISOString() : undefined;
 
 export default function UpdateProjectModal({
   open,
@@ -38,11 +45,13 @@ export default function UpdateProjectModal({
   onSubmit,
 }: UpdateProjectModalProps) {
   const { data: managers } = useGetAllManagersQuery({});
-  const allManagers = managers?.data?.data.map((manager: any) => ({
-    id: manager.userId,
-    name: manager.user.name,
-  }));
-  console.log(allManagers);
+
+  const allManagers =
+    managers?.data?.data.map((m: any) => ({
+      id: m.id,
+      name: m.user.name,
+    })) ?? [];
+
   const { register, handleSubmit, reset, watch, setValue } = useForm({
     defaultValues: {
       name: "",
@@ -61,40 +70,43 @@ export default function UpdateProjectModal({
   });
 
   const progress = watch("progress");
+
+  /* ---------- hydrate form ---------- */
   useEffect(() => {
-    if (project) {
-      reset({
-        name: project.name ?? "",
-        description: project.description ?? "",
-        priority: project.priority ?? "MEDIUM",
-        startDate: project.startDate?.split("T")[0],
-        deadline: project.deadline?.split("T")[0],
-        projectCompleteDate: project.projectCompleteDate?.split("T")[0] ?? "",
-        progress: project.progress ?? 0,
-        currentRate: project.currentRate ?? "",
-        budget: project.budget ?? "",
-        latitude: project.latitude ?? 0,
-        longitude: project.longitude ?? 0,
-        managerId: project.managerId ?? "",
-      });
-    }
+    if (!project) return;
+
+    reset({
+      name: project.name ?? "",
+      description: project.description ?? "",
+      priority: project.priority ?? "MEDIUM",
+      startDate: toInputDate(project.startDate),
+      deadline: toInputDate(project.deadline),
+      projectCompleteDate: toInputDate(project.projectCompleteDate),
+      progress: project.progress ?? 0,
+      currentRate: project.currentRate ?? "",
+      budget: project.budget ?? "",
+      latitude: project.latitude ?? 0,
+      longitude: project.longitude ?? 0,
+      managerId: project.managerId ?? "",
+    });
   }, [project, reset]);
 
+  /* ---------- submit ---------- */
   const submitHandler = async (data: UpdateProjectPayload) => {
     const payload: any = {
       ...data,
       progress: Number(data.progress),
       latitude: Number(data.latitude),
       longitude: Number(data.longitude),
+      startDate: toISODate(data.startDate),
+      deadline: toISODate(data.deadline),
+      projectCompleteDate: toISODate(data.projectCompleteDate),
     };
 
-    if (!data.managerId?.trim()) {
+    if (!payload.managerId?.trim()) {
       delete payload.managerId;
     }
-    // if(chartList.length === 0){
-    //   delete payload.chartList;
-    // }
-    console.log(payload);
+
     await onSubmit(payload);
     onClose();
   };
@@ -122,6 +134,7 @@ export default function UpdateProjectModal({
               <Label>Project Name</Label>
               <Input {...register("name", { required: true })} />
             </div>
+
             <div className="flex gap-4">
               <div className="w-full">
                 <Label>Priority</Label>
@@ -129,7 +142,7 @@ export default function UpdateProjectModal({
                   value={watch("priority")}
                   onValueChange={(v) => setValue("priority", v as any)}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -146,17 +159,15 @@ export default function UpdateProjectModal({
                   value={watch("managerId")}
                   onValueChange={(v) => setValue("managerId", v as any)}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {allManagers?.map(
-                      (manager: { id: string; name: string }) => (
-                        <SelectItem key={manager.id} value={manager.id}>
-                          {manager.name}
-                        </SelectItem>
-                      )
-                    )}
+                    {allManagers.map((m : any) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -179,12 +190,7 @@ export default function UpdateProjectModal({
 
             <div>
               <Label>Progress</Label>
-              <Input
-                type="number"
-                min={0}
-                max={100}
-                {...register("progress")}
-              />
+              <Input type="number" min={0} max={100} {...register("progress")} />
               <div className="mt-2">
                 <Progress value={progress} />
               </div>
