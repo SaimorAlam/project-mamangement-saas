@@ -2,7 +2,7 @@ import AppDialog from "@/common/Modal/ModalTemplate";
 import { Upload, FileText, X, Eye } from "lucide-react";
 import { useState } from "react";
 
-const IndividualProjectDetails = ({project}) => {
+const IndividualProjectDetails = ({project}:any) => {
     const [selectedFile, setSelectedFile] = useState<any>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +32,7 @@ const IndividualProjectDetails = ({project}) => {
             >
                 {/* Main Modal Content */}
                 <div className="mt-4">
+                    {project}
                     <label className="group relative flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all cursor-pointer">
 
                         {!selectedFile ? (

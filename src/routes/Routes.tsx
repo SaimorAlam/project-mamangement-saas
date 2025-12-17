@@ -108,11 +108,7 @@ const routes = createBrowserRouter([
         path: "/staff-manager-panel",
         element: (
           // <ProtectedRoute allowedRoles={["MANAGER"]}>
-<<<<<<< HEAD
-            <StaffManagerDashboardLayout />
-=======
           <StaffManagerDashboardLayout />
->>>>>>> b57af62baf4fbbf83c76b4f70530d5f1a18e9b05
           // </ProtectedRoute>
         ),
         children: getStaffManagerRoutes(),
