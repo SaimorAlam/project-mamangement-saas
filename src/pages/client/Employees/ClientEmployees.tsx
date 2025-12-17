@@ -1,4 +1,11 @@
-import React, { useEffect, useState, Suspense, lazy } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, {
+  useEffect,
+  useState,
+  Suspense,
+  lazy,
+  useMemo,
+} from "react";
 import Swal from "sweetalert2";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -12,22 +19,20 @@ import {
 
 import Pagination from "@/common/Pagination";
 import EmployeeTableHeader from "./EmployeeTableHeader";
-// import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
+import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
 import DianneRussellTask from "@/components/client/Employee/DianneRussellTask";
 import ViewEmployeeModal from "@/components/client/Employee/ViewEmployeeModal";
 import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
+
+// Lazy-load EmployeeTable
+const EmployeeTable = lazy(() => import("./EmployeeTable"));
 
 import {
   IEmployeeProfile,
   IEditEmployeePayload,
 } from "@/types/client-panel";
 
-// Lazy-load EmployeeTable
-const EmployeeTable = lazy(() => import("./EmployeeTable"));
-
-/* ------------------------------
-   Badge Utilities
---------------------------------*/
+/* ---------- Badge Utilities ---------- */
 const getRoleBadgeColor = (role: string) =>
   ({
     Manager: "bg-purple-100 text-purple-800 border-purple-200",
@@ -40,28 +45,33 @@ const getStatusBadgeColor = (status: string) =>
     ? "bg-green-100 text-green-800 border-green-200"
     : "bg-red-100 text-red-800 border-red-200";
 
-/* ------------------------------
-   Skeleton Loader
---------------------------------*/
+/* ---------- Skeleton Loader ---------- */
 const TableSkeleton = () => (
   <div className="p-6">
     <Skeleton count={5} height={40} className="mb-2" />
   </div>
 );
 
-/* ------------------------------
-   Component
---------------------------------*/
+/* ---------- Component ---------- */
 const ClientEmployees: React.FC = () => {
-  /* ---------- Query & Filter State ---------- */
+  /* ---------- Filters & Search ---------- */
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  const [status, setStatus] = useState<string | undefined>();
-  const [sortBy, setSortBy] = useState<string | undefined>();
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">();
+  const [status, setStatus] = useState<string | undefined>("");
   const [joinedDateFrom, setJoinedDateFrom] = useState<string>();
   const [joinedDateTo, setJoinedDateTo] = useState<string>();
+
+  /* ---------- Sorting ---------- */
+  const [sortColumn, setSortColumn] = useState<
+    | keyof IEmployeeProfile
+    | "userName"
+    | "email"
+    | "role"
+    | "status"
+    | "updatedAt"
+    | null
+  >(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   /* ---------- Pagination ---------- */
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,7 +87,7 @@ const ClientEmployees: React.FC = () => {
   >(new Set());
   const [selectAll, setSelectAll] = useState(false);
 
-  /* ---------- Modal State ---------- */
+  /* ---------- Modals ---------- */
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editEmployee, setEditEmployee] =
     useState<IEditEmployeePayload | null>(null);
@@ -93,14 +103,10 @@ const ClientEmployees: React.FC = () => {
       status,
       joinedDateFrom,
       joinedDateTo,
-      sortBy,
-      sortOrder,
     });
 
   const [deleteEmployee] = useDeleteEmployeeMutation();
   const [bulkDelete] = useBulkDeleteEmployeeMutation();
-
-  console.log(employeeResponse);
 
   const employeeList: IEmployeeProfile[] =
     employeeResponse?.data || [];
@@ -108,52 +114,97 @@ const ClientEmployees: React.FC = () => {
   const totalPages = meta?.totalPages || 1;
   const totalEmployees = meta?.total || 0;
 
-  /* ---------- Effects ---------- */
-
-  console.log(debouncedSearch);
-
+  /* ---------- Debounced Search ---------- */
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-    }, 1500);
-
-    return () => clearInterval(timer);
+    const timer = setTimeout(
+      () => setDebouncedSearch(searchTerm),
+      500
+    );
+    return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  /* ---------- Reset Page on Filter Change ---------- */
   useEffect(() => {
     setCurrentPage(1);
     setSelectedEmployees(new Set());
     setSelectAll(false);
-  }, [
-    searchTerm,
-    status,
-    sortBy,
-    sortOrder,
-    joinedDateFrom,
-    joinedDateTo,
-  ]);
+  }, [searchTerm, status, joinedDateFrom, joinedDateTo]);
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const dropdown = document.getElementById("filter-dropdown");
-      if (dropdown && !dropdown.contains(e.target as Node))
-        setShowFilterDropdown(false);
-    };
-
-    if (showFilterDropdown)
-      document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-  }, [showFilterDropdown]);
-
-  /* ---------- Handlers ---------- */
+  /* ---------- Sorting Handler ---------- */
   const handleSort = (field: string) => {
-    setSortBy(field);
-    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    if (sortColumn === field)
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    else {
+      setSortColumn(field as any);
+      setSortOrder("asc");
+    }
   };
 
-  const handleViewClick = (employeeId: string) => {
-    setViewModalId(employeeId);
+  /* ---------- Sorted Employees ---------- */
+  const sortedEmployees = useMemo(() => {
+    const list = [...employeeList];
+    if (!sortColumn) return list;
+
+    return list.sort((a, b) => {
+      let valA: any;
+      let valB: any;
+
+      switch (sortColumn) {
+        case "userName":
+          valA = a.user.name;
+          valB = b.user.name;
+          break;
+        case "email":
+          valA = a.user.email;
+          valB = b.user.email;
+          break;
+        case "role":
+          valA = a.user.role;
+          valB = b.user.role;
+          break;
+        case "status":
+          valA = a.user.status ? 1 : 0;
+          valB = b.user.status ? 1 : 0;
+          break;
+        case "updatedAt":
+          valA = new Date(a.user.updatedAt).getTime();
+          valB = new Date(b.user.updatedAt).getTime();
+          break;
+        default:
+          valA = a[sortColumn as keyof IEmployeeProfile];
+          valB = b[sortColumn as keyof IEmployeeProfile];
+      }
+
+      if (typeof valA === "string" && typeof valB === "string")
+        return sortOrder === "asc"
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+
+      if (typeof valA === "number" && typeof valB === "number")
+        return sortOrder === "asc" ? valA - valB : valB - valA;
+
+      return 0;
+    });
+  }, [employeeList, sortColumn, sortOrder]);
+
+  /* ---------- Selection Handlers ---------- */
+  const handleSelectAll = () => {
+    if (selectAll) setSelectedEmployees(new Set());
+    else
+      setSelectedEmployees(new Set(sortedEmployees.map((e) => e.id)));
+    setSelectAll(!selectAll);
+  };
+
+  const handleSelectEmployee = (id: string) => {
+    const updated = new Set(selectedEmployees);
+    updated.has(id) ? updated.delete(id) : updated.add(id);
+    setSelectedEmployees(updated);
+    setSelectAll(updated.size === sortedEmployees.length);
+  };
+
+  /* ---------- Action Handlers ---------- */
+  const handleViewClick = (id: string) => {
+    setViewModalId(id);
     setViewModalOpen(true);
   };
 
@@ -173,26 +224,6 @@ const ClientEmployees: React.FC = () => {
     setEditModalOpen(true);
   };
 
-  const handleCloseModals = () => {
-    setEditModalOpen(false);
-    setEditEmployee(null);
-    setViewModalOpen(false);
-    setViewModalId("");
-  };
-
-  const handleSelectAll = () => {
-    if (selectAll) setSelectedEmployees(new Set());
-    else setSelectedEmployees(new Set(employeeList.map((e) => e.id)));
-    setSelectAll(!selectAll);
-  };
-
-  const handleSelectEmployee = (id: string) => {
-    const updated = new Set(selectedEmployees);
-    updated.has(id) ? updated.delete(id) : updated.add(id);
-    setSelectedEmployees(updated);
-    setSelectAll(updated.size === employeeList.length);
-  };
-
   const handleDeleteEmployee = async (id: string) => {
     try {
       const result = await Swal.fire({
@@ -201,18 +232,11 @@ const ClientEmployees: React.FC = () => {
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "Cancel",
       });
 
       if (result.isConfirmed) {
         await deleteEmployee(id).unwrap();
-        Swal.fire(
-          "Deleted!",
-          "Employee has been deleted.",
-          "success"
-        );
+        Swal.fire("Deleted!", "Employee removed.", "success");
       }
     } catch (err: any) {
       Swal.fire(
@@ -225,30 +249,25 @@ const ClientEmployees: React.FC = () => {
 
   const handleDeleteSelected = async () => {
     if (!selectedEmployees.size) return;
-
-    // Show confirmation modal
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: `This will delete ${selectedEmployees.size} employee(s)! This action cannot be undone.`,
+      text: `Delete ${selectedEmployees.size} employee(s)?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete them!",
-      cancelButtonText: "Cancel",
     });
 
     if (!result.isConfirmed) return;
 
     try {
-      const ids = Array.from(selectedEmployees);
-      await bulkDelete({ employeeIds: ids }).unwrap();
-
+      await bulkDelete({
+        employeeIds: Array.from(selectedEmployees),
+      }).unwrap();
       setSelectedEmployees(new Set());
       setSelectAll(false);
-      toast.success("Selected employees deleted successfully");
+      toast.success("Employees deleted successfully");
     } catch (err: any) {
-      toast.error(err?.data?.message || "Bulk delete failed");
+      toast.error(err?.data?.message || "Delete failed");
     }
   };
 
@@ -265,8 +284,8 @@ const ClientEmployees: React.FC = () => {
             setShowFilterDropdown={setShowFilterDropdown}
             selectedEmployees={selectedEmployees}
             filterBy={status || "all"}
-            setFilterBy={(value) =>
-              setStatus(value === "all" ? undefined : value)
+            setFilterBy={(v) =>
+              setStatus(v === "all" ? undefined : v)
             }
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
@@ -277,12 +296,12 @@ const ClientEmployees: React.FC = () => {
 
         {isFetching ? (
           <TableSkeleton />
-        ) : employeeList.length > 0 ? (
+        ) : sortedEmployees.length > 0 ? (
           <div className="bg-white rounded-t-none rounded-lg shadow-sm border border-t-0 border-gray-200">
             {activeTab === "tables" ? (
               <Suspense fallback={<TableSkeleton />}>
                 <EmployeeTable
-                  employees={employeeList}
+                  employees={sortedEmployees}
                   selectedEmployees={selectedEmployees}
                   selectAll={selectAll}
                   handleSelectAll={handleSelectAll}
@@ -291,13 +310,14 @@ const ClientEmployees: React.FC = () => {
                   handleEditClick={handleEditClick}
                   handleDeleteEmployee={handleDeleteEmployee}
                   handleSort={handleSort}
+                  sortBy={sortColumn || undefined}
+                  sortOrder={sortOrder}
                   getRoleBadgeColor={getRoleBadgeColor}
                   getStatusBadgeColor={getStatusBadgeColor}
                 />
               </Suspense>
             ) : (
-              <></>
-              // <EmployeeListTask employees={employeeList} />
+              <EmployeeListTask employees={sortedEmployees} />
             )}
 
             <Pagination
@@ -320,14 +340,14 @@ const ClientEmployees: React.FC = () => {
         <EditEmployeeModal
           open={true}
           employee={editEmployee}
-          onClose={handleCloseModals}
+          onClose={() => setEditModalOpen(false)}
         />
       )}
       {viewModalOpen && viewModalId && (
         <ViewEmployeeModal
           open={true}
           employeeId={viewModalId}
-          onClose={handleCloseModals}
+          onClose={() => setViewModalOpen(false)}
         />
       )}
 

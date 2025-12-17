@@ -58,19 +58,6 @@ const ViewerPanelHeader = () => {
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
           />
-
-          {/* 🔹 Conditional Quick Action */}
-          <div className="relative">
-            <>
-              {showButton && (
-                <PrimaryButton
-                  title={"Upload Submission"}
-                  leftIcon={<Upload />}
-                  type={"Primary"}
-                />
-              )}
-            </>
-          </div>
         </div>
       </div>
 

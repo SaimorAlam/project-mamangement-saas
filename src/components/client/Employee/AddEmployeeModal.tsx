@@ -12,6 +12,14 @@ interface IAddEmployeeModalProps {
 
 const today = new Date().toISOString().split("T")[0];
 
+const PROJECT_OPTIONS = [
+  "Carlyle Hall",
+  "Highway Expedition",
+  "Metro Rail Extension",
+  "City Drainage Upgrade",
+  "Airport Terminal Renovation",
+];
+
 const AddEmployeeModal = ({
   open,
   onClose,
@@ -31,7 +39,7 @@ const AddEmployeeModal = ({
       sendWelcomeEmail: true,
       notifyProjectManager: false,
       skills: ["Civil Eng", "Architect"],
-      projects: ["Carlyle Hall", "Highway expedition"],
+      projects: [],
     },
   });
 
@@ -100,16 +108,16 @@ const AddEmployeeModal = ({
     }
   };
 
-  const handleProjectKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addProjectTag();
-    }
-    if (!projectInput && projects.length && e.key === "Backspace") {
-      removeProjectTag(projects[projects.length - 1]);
-    }
+  const addProject = (project: string) => {
+    if (projects.includes(project)) return;
+    setValue("projects", [...projects, project]);
+  };
+
+  const removeProject = (project: string) => {
+    setValue(
+      "projects",
+      projects.filter((p) => p !== project)
+    );
   };
 
   const onSubmit = async (data: IAddEmployeePayload) => {
@@ -353,6 +361,7 @@ const AddEmployeeModal = ({
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Project <span className="text-red-500">*</span>
               </label>
+
               <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
                 {projects.map((project) => (
                   <span
@@ -362,21 +371,34 @@ const AddEmployeeModal = ({
                     {project}
                     <button
                       type="button"
-                      onClick={() => removeProjectTag(project)}
+                      onClick={() => removeProject(project)}
                       className="text-gray-500 hover:text-gray-700"
                     >
                       <X size={12} />
                     </button>
                   </span>
                 ))}
-                <input
-                  value={projectInput}
-                  onChange={(e) => setProjectInput(e.target.value)}
-                  onKeyDown={handleProjectKeyDown}
-                  placeholder="Type project name and press Enter"
-                  className="flex-1 min-w-[120px] text-sm outline-none border-none bg-transparent"
-                />
+
+                <select
+                  value=""
+                  onChange={(e) => {
+                    if (e.target.value) addProject(e.target.value);
+                  }}
+                  className="flex-1 min-w-[140px] text-sm outline-none border-none bg-transparent text-gray-600 cursor-pointer"
+                >
+                  <option value="" disabled>
+                    Select project
+                  </option>
+                  {PROJECT_OPTIONS.filter(
+                    (p) => !projects.includes(p)
+                  ).map((project) => (
+                    <option key={project} value={project}>
+                      {project}
+                    </option>
+                  ))}
+                </select>
               </div>
+
               {!projects.length && (
                 <p className="text-red-500 text-xs mt-1">
                   At least one project is required
