@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { Command, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 export default function SearchBar({
   searchTerm,

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import ToggleSwitchComponent from "@/components/client/Settings/ToggleSwitchComponent";
-import ColorPickerComponent from "@/components/client/Settings/ColorPickerComponent";
-import FileUploadComponent from "@/components/client/Settings/FileUploadComponent";
+// import ColorPickerComponent from "@/components/client/Settings/ColorPickerComponent";
+// import FileUploadComponent from "@/components/client/Settings/FileUploadComponent";
 import CheckboxGroupComponent from "@/components/client/Settings/CheckboxGroupComponent";
 import BoxContainer from "@/common/BoxContainer";
 import DropdownSelect from "@/common/DropdownSelect";
-import PrimaryButton from "@/common/PrimaryButton";
+// import PrimaryButton from "@/common/PrimaryButton";
 import APIConnectionCard from "@/components/client/Settings/APIConnectionCard";
 
 const ViewerPanelSettings = () => {
@@ -21,15 +21,15 @@ const ViewerPanelSettings = () => {
   const [dateFormat, setDateFormat] = useState("DD/MM/YYYY");
   const [timeFormat, setTimeFormat] = useState("12 hour");
   const [firstDayOfWeek, setFirstDayOfWeek] = useState("Sun Day");
-  const [primaryColor, setPrimaryColor] = useState("#7F56D9");
-  const [secondaryColor, setSecondaryColor] = useState("#6366F1");
+  // const [primaryColor, setPrimaryColor] = useState("#7F56D9");
+  // const [secondaryColor, setSecondaryColor] = useState("#6366F1");
 
   // Additional states for other sections
-  const [currentPlan, setCurrentPlan] = useState("Business");
-  const [billingCycle, setBillingCycle] = useState("Yearly");
-  const [nextRenewal, setNextRenewal] = useState("25/6/2026");
-  const [paymentMethod, setPaymentMethod] = useState("Stripe");
-  const [enableAutoRenew, setEnableAutoRenew] = useState(true);
+  // const [currentPlan, setCurrentPlan] = useState("Business");
+  // const [billingCycle, setBillingCycle] = useState("Yearly");
+  // const [nextRenewal, setNextRenewal] = useState("25/6/2026");
+  // const [paymentMethod, setPaymentMethod] = useState("Stripe");
+  // const [enableAutoRenew, setEnableAutoRenew] = useState(true);
   const [enable2FA, setEnable2FA] = useState(true);
   const [sessionTimeout, setSessionTimeout] = useState("10 min");
 
@@ -106,7 +106,7 @@ const ViewerPanelSettings = () => {
     { value: "saturday", title: "Saturday" },
   ];
 
-  const plans = [
+  /* const plans = [
     { value: "business", title: "Business" },
     { value: "basic", title: "Basic" },
     { value: "premium", title: "Premium" },
@@ -119,7 +119,7 @@ const ViewerPanelSettings = () => {
     { value: "stripe", title: "Stripe" },
     { value: "paypal", title: "PayPal" },
     { value: "bank-transfer", title: "Bank Transfer" },
-  ];
+  ]; */
 
   const notificationItems = [
     {
@@ -153,7 +153,7 @@ const ViewerPanelSettings = () => {
     setNotifications({ ...notifications, [id]: checked });
   };
 
-  const handleUpgrade = () => {};
+  // const handleUpgrade = () => {};
 
   return (
     <div className="p-6">

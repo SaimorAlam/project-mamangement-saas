@@ -1,4 +1,4 @@
-import { Eye, Edit, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { Eye, Edit, Trash2 } from "lucide-react";
 import { IEmployeeProfile } from "@/types/client-panel";
 
 interface ITableProps {

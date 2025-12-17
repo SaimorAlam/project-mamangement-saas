@@ -1,7 +1,7 @@
 import React, { cloneElement, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
-import { Bell, Upload } from "lucide-react";
+import { Bell } from "lucide-react";
 import NotificationModal from "@/components/client/NotificationModal";
 import { useLocation, Link } from "react-router-dom";
 import {
@@ -19,7 +19,7 @@ const ViewerPanelHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const ClientSidebarGroups = getViewerPanelSidebarItems();
-  const { heading, breadcrumb, showButton } = useHeaderContext();
+  const { heading, breadcrumb } = useHeaderContext();
 
   const location = useLocation();
   const currentPath = location.pathname;
