@@ -19,9 +19,9 @@ export default function SearchBar({
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 w-100 border px-10 py-6 border-[#E2E8F0]"
         />
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white rounded-lg shadow-md p-1.5">
+        {/* <div className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white rounded-lg shadow-md p-1.5">
           <Command className=" text-gray-800 h-4 w-4" />
-        </div>
+        </div> */}
       </div>
       {/*<!-- End Rounded search input --> */}
     </>

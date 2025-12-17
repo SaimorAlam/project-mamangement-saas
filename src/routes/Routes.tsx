@@ -118,9 +118,9 @@ const routes = createBrowserRouter([
       {
         path: "/staff-employee-panel",
         element: (
-          <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
-            <StaffEmployeeDashboardLayout />
-          </ProtectedRoute>
+          // <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
+          <StaffEmployeeDashboardLayout />
+          // </ProtectedRoute>
         ),
         children: getStaffEmployeeRoutes(),
       },
@@ -130,7 +130,7 @@ const routes = createBrowserRouter([
         path: "/viewer-panel",
         element: (
           // <ProtectedRoute allowedRoles={["VIEWER"]}>
-            <ViewerPanelDashboardLayout />
+          <ViewerPanelDashboardLayout />
           // </ProtectedRoute>
         ),
         children: getViewerPanelRoutes(),
