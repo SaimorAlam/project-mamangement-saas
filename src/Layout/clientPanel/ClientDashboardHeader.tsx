@@ -5,7 +5,12 @@ import React, {
   ReactElement,
   isValidElement,
 } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
@@ -92,6 +97,12 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const isProgramOverviewPage = currentPath.startsWith(
     "/client-panel/program-overview/"
   );
+  const isProjectReviewPage = currentPath.includes(
+    "/client-panel/project-review"
+  );
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     setIsEmployeeModalOpen(false);
     setIsDropdownOpen(false);
@@ -140,6 +151,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           onClick={() => setActiveModal("Create Program")}
         />
       );
+
     if (isProgramOverviewPage)
       return (
         <>
@@ -156,6 +168,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           />
         </>
       );
+
     if (isHighwayExpansionPage)
       return (
         <>
@@ -179,6 +192,19 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           />
         </>
       );
+
+    if (isProjectReviewPage) {
+      return (
+        <PrimaryButton
+          title="Create Support Ticket"
+          leftIcon={<Plus />}
+          type="Primary"
+          onClick={() =>
+            navigate("/client-panel/help/support/create-tickets")
+          }
+        />
+      );
+    }
 
     return (
       <>

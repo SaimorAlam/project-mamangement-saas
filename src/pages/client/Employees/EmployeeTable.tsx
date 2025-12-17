@@ -62,8 +62,6 @@ const EmployeeTable = ({
     </th>
   );
 
-  console.log(employees[0]);
-
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -89,7 +87,7 @@ const EmployeeTable = ({
             {visibleColumns.includes("lastActive") &&
               sortableHeader("Last Active", "updatedAt")}
             {visibleColumns.includes("level") &&
-              sortableHeader("Level", "status")}
+              sortableHeader("Status", "status")}
             {visibleColumns.includes("action") && (
               <th className="px-6 py-3 text-left">Action</th>
             )}

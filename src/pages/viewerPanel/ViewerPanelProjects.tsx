@@ -9,7 +9,7 @@ import EmployeeWorkloadChart from "@/common/Charts/WorkLoad";
 const ViewerPanelProjects = () => {
   return (
     <div>
-      <div className="flex gap-6">
+      <div className="flex gap-6 items-stretch">
         <ProjectInformation />
         <ProgressRing />
         <EmployeeWorkloadChart />

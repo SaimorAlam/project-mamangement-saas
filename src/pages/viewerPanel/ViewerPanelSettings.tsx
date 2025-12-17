@@ -157,7 +157,7 @@ const ViewerPanelSettings = () => {
 
   return (
     <div className="p-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
         {/* Left Column */}
         <div className="space-y-8">
           {/* Language, Date & Time zone Settings */}
@@ -263,115 +263,6 @@ const ViewerPanelSettings = () => {
               />
             </div>
           </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-8">
-          {/* Setup Your Branding */}
-          <BoxContainer>
-            <h4 className=" mb-6">Setup Your Branding</h4>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <FileUploadComponent
-                label="Client logo *"
-                description="64X64 or 256×256px"
-                requirements="SVG, PNG, JPG or GIF (max size 2mb)"
-                buttonText="Upload Logo"
-              />
-
-              <FileUploadComponent
-                label="Favicon (Optional)"
-                description="32X32"
-                requirements="SVG, PNG (max size 512kb)"
-                buttonText="Upload Favicon"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ColorPickerComponent
-                label="Primary brand color *"
-                value={primaryColor}
-                onChange={setPrimaryColor}
-              />
-
-              <ColorPickerComponent
-                label="Secondary brand color *"
-                value={secondaryColor}
-                onChange={setSecondaryColor}
-              />
-            </div>
-          </BoxContainer>
-
-          {/* Billing and Plan */}
-          <div className="border border-gray-200 rounded-lg p-6">
-            <h4 className="mb-6">Billing and Plan</h4>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <DropdownSelect
-                label="Current Plan"
-                placeholderText={currentPlan}
-                dropdownItem={plans}
-                onChange={setCurrentPlan}
-              />
-
-              <DropdownSelect
-                label="Billing Cycle"
-                placeholderText={billingCycle}
-                dropdownItem={billingCycles}
-                onChange={setBillingCycle}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Next renewal
-                </label>
-                <input
-                  type="text"
-                  value={nextRenewal}
-                  onChange={(e) => setNextRenewal(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-              </div>
-
-              <DropdownSelect
-                label="Update Payment Method *"
-                placeholderText={paymentMethod}
-                dropdownItem={paymentMethods}
-                onChange={setPaymentMethod}
-              />
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Billing Address *{" "}
-                <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                className="w-full h-[100px] px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
-                defaultValue="123 Business Ave
-Suite 500
-San Francisco, CA 94105"
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <ToggleSwitchComponent
-                label="Enable Auto renew"
-                enabled={enableAutoRenew}
-                onChange={setEnableAutoRenew}
-              />
-
-              <PrimaryButton
-                type="Primary"
-                title="Request to Upgrade"
-                onClick={handleUpgrade}
-              />
-            </div>
-          </div>
-
-          {/* Security Settings */}
           <div className="border border-gray-200 rounded-lg p-6">
             <h4 className="mb-6">Security Settings</h4>
             <div className="grid grid-cols-2 gap-30 items-start">
