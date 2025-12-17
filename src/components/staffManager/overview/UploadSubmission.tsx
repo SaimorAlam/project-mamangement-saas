@@ -6,8 +6,8 @@ import { useState } from "react";
 const UploadSubmission = () => {
   const [selectedFile, setSelectedFile] = useState<any>(null);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file && file.type === "text/csv") {
       setSelectedFile(file);
     } else {

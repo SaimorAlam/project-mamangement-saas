@@ -1,5 +1,6 @@
 import {
   AlignStartHorizontal,
+  ArrowDownUp,
   ArrowRight,
   ChevronDown,
   Filter,
@@ -19,6 +20,7 @@ import Pagination from "../Pagination";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "../../../common/PrimaryButton";
 import DropdownSelect from "../../../common/DropdownSelect";
+import { da } from "date-fns/locale";
 
 const allProgramProjectData = [
   {
@@ -327,6 +329,7 @@ const AllProgramProject = () => {
   const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const filteredData = useMemo(() => {
@@ -335,9 +338,10 @@ const AllProgramProject = () => {
         statusFilter === "all" || item.status === statusFilter;
       const priorityMatch =
         priorityFilter === "all" || item.priority === priorityFilter;
-      return statusMatch && priorityMatch;
+      const sortMatch = sortBy === "all" || item.priority === sortBy;
+      return statusMatch && priorityMatch && sortMatch;
     });
-  }, [statusFilter, priorityFilter]);
+  }, [statusFilter, priorityFilter, sortBy]);
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -400,6 +404,33 @@ const AllProgramProject = () => {
             />
           </div>
 
+          {/* Sort By Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 bg-transparent border border-[#CAD2DB] h-12"
+              >
+                <ArrowDownUp  className="size-5"/>
+                Sort By
+                <ChevronDown className="size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-48 bg-white border border-[#CAD2DB]"
+            >
+              <div className="p-2">
+                <button className="mb-3 block w-full p-2 text-left rounded-lg hover:bg-gray-100" onClick={() => setSortBy("all")} title="This functionality will implement later">
+                  Ascending
+                </button>
+                <button className=" block w-full p-2 text-left rounded-lg hover:bg-gray-100" onClick={() => setSortBy("High")} title="This functionality will implement later">
+                  Descending
+                </button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
           {/* Filter Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
