@@ -133,9 +133,10 @@ export default function SubmissionTable({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleView(submission.id)}
-                        className="size-6 p-0 hover:bg-muted"
+                        className="size-6 p-0 hover:bg-muted hover:scale-105 hover:cursor-pointer"
+                        title="View submission"
                       >
-                        <Eye className="size-6 text-[#1C73E0]" />
+                        <Eye className="size-6 text-[#1C73E0] " />
                         <span className="sr-only">
                           View submission
                         </span>
@@ -144,7 +145,8 @@ export default function SubmissionTable({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(submission.id)}
-                        className="size-6 p-0 hover:bg-muted"
+                        className="size-6 p-0 hover:bg-muted hover:scale-105 hover:cursor-pointer"
+                        title="Edit submission"
                       >
                         <FileText className="size-6 text-[#169E7B]" />
                         <span className="sr-only">

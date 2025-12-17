@@ -404,6 +404,7 @@ const UpcomingDeadline = () => {
         </div>
 
         {/* View Calendar Button */}
+        <div className="" onMouseOver={() => setShowCalendar(true)} >
         <PrimaryButton
           title="View Calendar"
           type="Primary"
@@ -411,10 +412,11 @@ const UpcomingDeadline = () => {
           className="text-sm"
           onClick={() => setShowCalendar(true)}
         />
+        </div>
 
         {/* Calendar Popup */}
         {showCalendar && (
-          <div className="absolute top-14 right-0 z-50 bg-white rounded-xl shadow-lg border border-gray-200 p-4">
+          <div className="absolute top-14 right-0 z-50 bg-white rounded-xl shadow-lg border border-gray-200 p-4" onMouseLeave={() => setShowCalendar(false)}>
             <div className="flex justify-between items-center mb-2">
               <h4 className="font-semibold text-gray-800">
                 Calendar

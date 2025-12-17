@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { CardHeader } from "@/components/ui/card";
 import SubmissionTable from "../SubmissionTable";
-import DropdownSelect from "../../../common/DropdownSelect";
 import BoxContainer from "../../../common/BoxContainer";
 import { ISubmission } from "@/types";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -270,11 +269,6 @@ const LatestSubmission = () => {
     <BoxContainer>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 px-0">
         <h4 className="font-semibold text-md">Latest Submission</h4>
-        {/* <DropdownSelect
-          placeholderText="Sort By"
-          dropdownItem={dropdownItem}
-          onChange={handleChange}
-        /> */}
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -321,13 +315,13 @@ const LatestSubmission = () => {
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${sortOrder === 'asc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                
+                onClick={()=> setSortOrder("asc")}
               >
                 Ascending
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${sortOrder === 'desc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                
+                onClick={()=> setSortOrder("desc")}
               >
                 Descending
               </DropdownMenuItem>
