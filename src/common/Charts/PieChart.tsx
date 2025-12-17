@@ -18,8 +18,8 @@ interface ChartData {
 
 export default function PieChart() {
   const data: ChartData[] = [
-    { name: "Figma", value: 80, color: "#7F56D9" },
-    { name: "Sketch", value: 20, color: "#DFDBF9" },
+    { name: "Figma", value: 90, color: "#7F56D9" },
+    { name: "Sketch", value: 50, color: "#DFDBF9" },
   ]
 
   const title = "Pie Chart"

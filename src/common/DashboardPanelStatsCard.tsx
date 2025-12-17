@@ -10,6 +10,7 @@ import {
 import { JSX, useState } from "react";
 import { FaChartPie, FaUsers } from "react-icons/fa";
 import { IClientPanelStats } from "@/types";
+import { Link } from "react-router-dom";
 
 interface IProps {
   item: IClientPanelStats;
@@ -86,9 +87,9 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
         {/* Description & Link */}
         <div className="flex items-center justify-between text-sm text-gray-700 px-6 py-4">
           <span className="">{description}</span>
-          <a href="/work-in-progress" className="text-blue-500 hover:underline">
+          <Link to={`state-card/${title}`} className="text-blue-500 hover:underline">
             {link_text} &rarr;
-          </a>
+          </Link>
         </div>
       </div>
     </div>

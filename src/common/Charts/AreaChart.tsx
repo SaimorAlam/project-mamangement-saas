@@ -29,7 +29,7 @@ const AreaChart: React.FC<Props> = ({
 }) => {
   const [showLineOnly, setShowLineOnly] = useState(false);
 
-  /* ===== CHART DATA (KEY FIX) ===== */
+  /*    CHART DATA (KEY FIX)    */
   const data: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateAreaChartData(
@@ -40,14 +40,14 @@ const AreaChart: React.FC<Props> = ({
     );
   }, [xAxisValues, legendValues, startingRange, endingRange]);
 
-  /* ===== SVG DIMENSIONS ===== */
+  /*    SVG DIMENSIONS    */
   const chartWidth = 700;
   const chartHeight = 250;
   const padding = { top: 20, right: 20, bottom: 40, left: 50 };
   const innerWidth = chartWidth - padding.left - padding.right;
   const innerHeight = chartHeight - padding.top - padding.bottom;
 
-  /* ===== SCALE HELPERS ===== */
+  /*    SCALE HELPERS    */
   const scaleX = (index: number) =>
     (index / (data.length - 1 || 1)) * innerWidth;
 
@@ -55,7 +55,7 @@ const AreaChart: React.FC<Props> = ({
     innerHeight -
     ((value - startingRange) / (endingRange - startingRange)) * innerHeight;
 
-  /* ===== PATH GENERATOR ===== */
+  /*    PATH GENERATOR    */
   const createPath = (field: string) => {
     const points = data.map((d, i) => ({
       x: scaleX(i),
@@ -76,7 +76,7 @@ const AreaChart: React.FC<Props> = ({
     return { linePath, areaPath };
   };
 
-  /* ===== ACTIONS ===== */
+  /*    ACTIONS    */
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
   };
@@ -85,7 +85,7 @@ const AreaChart: React.FC<Props> = ({
     console.log("Delete chart");
   };
 
-  /* ===== Y TICKS ===== */
+  /*    Y TICKS    */
   const yTicks = useMemo(() => {
     const step = Math.ceil((endingRange - startingRange) / 7);
     return Array.from({ length: 8 }, (_, i) => startingRange + i * step);
@@ -207,7 +207,7 @@ const AreaChart: React.FC<Props> = ({
         </svg>
       ) : (
         <div className="h-60 flex items-center justify-center text-gray-400">
-          No data available
+          No data available. Please fill inputs in the widget to display chart and download csv.
         </div>
       )}
     </div>

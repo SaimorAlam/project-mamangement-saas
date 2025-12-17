@@ -1,6 +1,6 @@
 import React, { cloneElement, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
-import { Bell, Upload } from "lucide-react";
+import { Bell } from "lucide-react";
 import NotificationModal from "@/components/client/NotificationModal";
 import { useLocation, Link } from "react-router-dom";
 import {
@@ -14,6 +14,7 @@ import {
 import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffManagerHeaderContext";
+import UploadSubmission from "@/components/staffManager/overview/UploadSubmission";
 
 const StaffManagerDashboardHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -63,11 +64,7 @@ const StaffManagerDashboardHeader = () => {
           <div className="relative">
             <>
               {showButton && (
-                <PrimaryButton
-                  title={"Upload Submission"}
-                  leftIcon={<Upload />}
-                  type={"Primary"}
-                />
+                <UploadSubmission/>
               )}
             </>
           </div>

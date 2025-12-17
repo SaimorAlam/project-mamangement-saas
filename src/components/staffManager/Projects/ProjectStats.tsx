@@ -4,7 +4,7 @@ const ProjectStats = () => {
   const stats = [
     {
       title: "Total Project",
-      value: 0,
+      value: 45,
       growth: "",
       growth_type: "up",
       description: "",
@@ -14,7 +14,7 @@ const ProjectStats = () => {
     },
     {
       title: "Assigned Stuff",
-      value: 0,
+      value: 6,
       growth: "",
       growth_type: "",
       description: "",
@@ -24,7 +24,7 @@ const ProjectStats = () => {
     },
     {
       title: "Program Completion",
-      value: 0,
+      value: 14,
       growth: "",
       growth_type: "",
       description: "",
@@ -34,7 +34,7 @@ const ProjectStats = () => {
     },
     {
       title: "Overdue",
-      value: 0,
+      value: 20,
       growth: "",
       growth_type: "",
       description: "",

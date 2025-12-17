@@ -1,5 +1,6 @@
 import {
   AlignStartHorizontal,
+  ArrowDownUp,
   ArrowRight,
   ChevronDown,
   Filter,
@@ -11,6 +12,7 @@ import { useMemo, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AllProgramProjectGridView from "../AllProgramProjectGridView";
@@ -329,6 +331,8 @@ const AllProgramProject = () => {
   );
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [sortOrder, setSortOrder] = useState<string>("asc");
+  const [sortBy, setSortBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const filteredData = useMemo(() => {
@@ -337,9 +341,21 @@ const AllProgramProject = () => {
         statusFilter === "all" || item.status === statusFilter;
       const priorityMatch =
         priorityFilter === "all" || item.priority === priorityFilter;
-      return statusMatch && priorityMatch;
+      let sortMatch = true;
+      if (sortBy === "startDate") {
+        const itemDate = item.startDate.split("-").reverse().join("-");
+        sortMatch = sortOrder === "asc"
+          ? new Date(itemDate) >= new Date("1900-01-01")
+          : new Date(itemDate) <= new Date("9999-12-31");
+      } else if (sortBy === "endDate") {
+        const itemDate = item.endDate.split("-").reverse().join("-");
+        sortMatch = sortOrder === "asc"
+          ? new Date(itemDate) >= new Date("1900-01-01")
+          : new Date(itemDate) <= new Date("9999-12-31");
+      }
+      return statusMatch && priorityMatch && sortMatch;
     });
-  }, [statusFilter, priorityFilter]);
+  }, [statusFilter, priorityFilter, sortBy, sortOrder]);
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -379,11 +395,10 @@ const AllProgramProject = () => {
               type="Primary"
               title="Boards"
               leftIcon={<AlignStartHorizontal className="w-4 h-4" />}
-              className={`${
-                viewMode === "board"
+              className={`${viewMode === "board"
                   ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
                   : "bg-white border-black text-black! hover:text-black!"
-              }`}
+                }`}
               onClick={() => setViewMode("board")}
             />
 
@@ -391,14 +406,67 @@ const AllProgramProject = () => {
               type="Primary"
               title="Tables"
               leftIcon={<TableIcon className="w-4 h-4" />}
-              className={`${
-                viewMode === "table"
+              className={`${viewMode === "table"
                   ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
                   : "bg-white border-black text-black! hover:text-black!"
-              }`}
+                }`}
               onClick={() => setViewMode("table")}
             />
           </div>
+
+          {/* Sort By Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 bg-transparent border border-[#CAD2DB] h-12"
+              >
+                <ArrowDownUp className="size-5" />
+                Sort By
+                <ChevronDown className="size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-56 bg-white border border-[#CAD2DB] p-1"
+            >
+              {/* Field Selection */}
+              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Field
+              </div>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${sortBy === 'startDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                onClick={() => setSortBy("startDate")}
+              >
+                Starting Date
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                onClick={() => setSortBy("endDate")}
+              >
+                Ending Date
+              </DropdownMenuItem>
+
+              <div className="my-1 border-t border-gray-100" />
+
+              {/* Order Selection */}
+              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Order
+              </div>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${sortOrder === 'asc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                onClick={() => setSortOrder("asc")}
+              >
+                Ascending
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${sortOrder === 'desc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                onClick={() => setSortOrder("desc")}
+              >
+                Descending
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Filter Dropdown */}
           <DropdownMenu>
@@ -448,10 +516,10 @@ const AllProgramProject = () => {
                 item.priority === "High"
                   ? "High"
                   : item.priority === "Medium"
-                  ? "Medium"
-                  : item.priority === "Low"
-                  ? "Low"
-                  : "Low", // fallback to "Low" if not matching
+                    ? "Medium"
+                    : item.priority === "Low"
+                      ? "Low"
+                      : "Low", // fallback to "Low" if not matching
             }))}
           />
 
@@ -472,10 +540,10 @@ const AllProgramProject = () => {
                 item.priority === "High"
                   ? "High"
                   : item.priority === "Medium"
-                  ? "Medium"
-                  : item.priority === "Low"
-                  ? "Low"
-                  : "Low", // fallback to "Low" if not matching
+                    ? "Medium"
+                    : item.priority === "Low"
+                      ? "Low"
+                      : "Low", // fallback to "Low" if not matching
             }))}
           />
           {/* "View All" button if there are more than 4 programs/projects */}

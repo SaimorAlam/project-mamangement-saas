@@ -1,21 +1,13 @@
 import { useState } from "react";
 
-import DoughnutChart from "@/common/Charts/DoughnutChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
-import RadarChart from "@/common/Charts/RadarChart";
-// import StackedBarChart from "@/common/Charts/StackedBarChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import PieChart from "@/common/Charts/PieChart";
 import ProgressRing from "@/common/Charts/ProgressRing";
-// import MultiAxisLineChart from "@/common/Charts/LineChart";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
-// import AreaChart from "@/common/Charts/AreaChart";
 
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
-// import WidgetConfiguration from "@/components/client/ProgramBuilder/WidgetConfiguration";
-import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
-import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 
 
@@ -34,8 +26,6 @@ const ClientProgramBuilder = () => {
   };
 
   // for stacked bar chart 
-  
-
 
   return (
     <div className="flex gap-6">
@@ -46,7 +36,7 @@ const ClientProgramBuilder = () => {
           <>
           <ProjectStats activeWidget={activeWidget} />
             {/* <StackedBarChart /> */}
-            <div className="flex gap-4">
+            {/* <div className="flex gap-4">
               <RadarChart />
               <DoughnutChart
                 title="Doughnut Pie"
@@ -73,11 +63,11 @@ const ClientProgramBuilder = () => {
                 ]}
               />
             </div>
-            <HeatmapChart />
+            <HeatmapChart /> */}
           </>
         )}
 
-        {selectedWidget === "bar-chart" && (<StackedBarChartModule/>)}
+        {selectedWidget === "bar-chart" && <ChartModuleOne chartName="bar-chart" />}
         {/* {selectedWidget === "bar-chart" && <StackedBarChart />} */}
         {selectedWidget === "progress-ring" && (
           <ProgressRing
@@ -114,7 +104,7 @@ const ClientProgramBuilder = () => {
 
         {selectedWidget === "pie-chart" && <PieChart />}
 
-        {selectedWidget === "line-chart" && <LineChartModule />}
+        {selectedWidget === "line-chart" && <ChartModuleOne chartName="line-chart" />}
         {/* {selectedWidget === "line-chart" && <MultiAxisLineChart />} */}
 
         {selectedWidget === "data-table" && (

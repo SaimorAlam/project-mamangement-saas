@@ -22,6 +22,8 @@ import AllProjectReview from '@/components/client/ProjectReview/AllProjectReview
 import StaffManagerActivityLog from '@/pages/staffManager/StaffManagerActivityLog';
 import StaffManagerCreateTicket from '@/pages/staffManager/StaffManagerCreateTicket';
 import StaffManagerContactUs from '@/pages/staffManager/StaffManagerContactUs';
+// import CommingSoonPage from "@/common/CommingSoonPage";
+import StaffManagerStateCardDetails from "@/pages/staffManager/StaffManagerStateCardDetails";
 
 export function getStaffManagerRoutes() {
   return [
@@ -85,6 +87,10 @@ export function getStaffManagerRoutes() {
     {
       path: "user-activity-log",
       element: <StaffManagerUserActivityLog />,
+    },
+    {
+      path: "state-card/:cardTitle",
+      element: <StaffManagerStateCardDetails/>,
     },
   ];
 }
