@@ -404,7 +404,6 @@ const UpcomingDeadline = () => {
         </div>
 
         {/* View Calendar Button */}
-        <div className="" onMouseOver={() => setShowCalendar(true)} >
         <PrimaryButton
           title="View Calendar"
           type="Primary"
@@ -412,7 +411,6 @@ const UpcomingDeadline = () => {
           className="text-sm"
           onClick={() => setShowCalendar(true)}
         />
-        </div>
 
         {/* Calendar Popup */}
         {showCalendar && (
