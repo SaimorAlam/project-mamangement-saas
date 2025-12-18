@@ -5,7 +5,7 @@ import FileUploadComponent from "@/components/client/Settings/FileUploadComponen
 import CheckboxGroupComponent from "@/components/client/Settings/CheckboxGroupComponent";
 import BoxContainer from "@/common/BoxContainer";
 import DropdownSelect from "@/common/DropdownSelect";
-import PrimaryButton from "@/common/PrimaryButton";
+// import PrimaryButton from "@/common/PrimaryButton";
 import APIConnectionCard from "@/components/client/Settings/APIConnectionCard";
 
 const StaffManagerSettings = () => {
@@ -25,11 +25,11 @@ const StaffManagerSettings = () => {
   const [secondaryColor, setSecondaryColor] = useState("#6366F1");
 
   // Additional states for other sections
-  const [currentPlan, setCurrentPlan] = useState("Business");
-  const [billingCycle, setBillingCycle] = useState("Yearly");
-  const [nextRenewal, setNextRenewal] = useState("25/6/2026");
-  const [paymentMethod, setPaymentMethod] = useState("Stripe");
-  const [enableAutoRenew, setEnableAutoRenew] = useState(true);
+  // const [currentPlan, setCurrentPlan] = useState("Business");
+  // const [billingCycle, setBillingCycle] = useState("Yearly");
+  // const [nextRenewal, setNextRenewal] = useState("25/6/2026");
+  // const [paymentMethod, setPaymentMethod] = useState("Stripe");
+  // const [enableAutoRenew, setEnableAutoRenew] = useState(true);
   const [enable2FA, setEnable2FA] = useState(true);
   const [sessionTimeout, setSessionTimeout] = useState("10 min");
 
@@ -106,20 +106,20 @@ const StaffManagerSettings = () => {
     { value: "saturday", title: "Saturday" },
   ];
 
-  const plans = [
-    { value: "business", title: "Business" },
-    { value: "basic", title: "Basic" },
-    { value: "premium", title: "Premium" },
-  ];
-  const billingCycles = [
-    { value: "yearly", title: "Yearly" },
-    { value: "monthly", title: "Monthly" },
-  ];
-  const paymentMethods = [
-    { value: "stripe", title: "Stripe" },
-    { value: "paypal", title: "PayPal" },
-    { value: "bank-transfer", title: "Bank Transfer" },
-  ];
+  // const plans = [
+  //   { value: "business", title: "Business" },
+  //   { value: "basic", title: "Basic" },
+  //   { value: "premium", title: "Premium" },
+  // ];
+  // const billingCycles = [
+  //   { value: "yearly", title: "Yearly" },
+  //   { value: "monthly", title: "Monthly" },
+  // ];
+  // const paymentMethods = [
+  //   { value: "stripe", title: "Stripe" },
+  //   { value: "paypal", title: "PayPal" },
+  //   { value: "bank-transfer", title: "Bank Transfer" },
+  // ];
 
   const notificationItems = [
     {
@@ -153,7 +153,7 @@ const StaffManagerSettings = () => {
     setNotifications({ ...notifications, [id]: checked });
   };
 
-  const handleUpgrade = () => {};
+  // const handleUpgrade = () => {};
 
   return (
     <div className="p-6">
@@ -302,8 +302,9 @@ const StaffManagerSettings = () => {
             </div>
           </BoxContainer>
 
+          {/* removed this according to client requirements */}
           {/* Billing and Plan */}
-          <div className="border border-gray-200 rounded-lg p-6">
+          {/* <div className="border border-gray-200 rounded-lg p-6">
             <h4 className="mb-6">Billing and Plan</h4>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -369,7 +370,7 @@ San Francisco, CA 94105"
                 onClick={handleUpgrade}
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Security Settings */}
           <div className="border border-gray-200 rounded-lg p-6">

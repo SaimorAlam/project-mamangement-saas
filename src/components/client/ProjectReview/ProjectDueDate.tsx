@@ -1,6 +1,8 @@
-import { CalendarDays, ChevronRight, Clock4 } from "lucide-react";
+import ViewCalender from "@/common/ViewCalender";
+import { ChevronRight, Clock4 } from "lucide-react";
+import { useState } from "react";
 
-interface DueDateCard {
+export interface DueDateCard {
   programName: string;
   projectName: string;
   assignedTo: string[];
@@ -8,11 +10,17 @@ interface DueDateCard {
   daysLeft: number;
 }
 
+type ValuePiece = Date | null;
+type Value = ValuePiece | [ValuePiece, ValuePiece];
+
 const ProjectDueDate = () => {
+  const [value, onChange] = useState<Value>(new Date());
+    const [showCalendar, setShowCalendar] = useState(false);
+
   const dueDateCards: DueDateCard[] = [
     {
       programName: "Program name",
-      projectName: "Project name",
+      projectName: "Employee Management System",
       assignedTo: ["user1", "user2", "user3", "user4"],
       dueDate: "Jul 20, 2023",
       daysLeft: 8,
@@ -50,10 +58,12 @@ const ProjectDueDate = () => {
               Due Date
             </h3>
           </div>
-          <button className="flex items-center gap-1 text-xs rounded-lg bg-blue-600 p-3 text-white hover:bg-blue-800 duration-300 font-medium cursor-pointer">
-            View Calendar
-            <CalendarDays size={14} />
-          </button>
+          <ViewCalender
+          showCalendar={showCalendar}
+          setShowCalendar={setShowCalendar}
+          onChange={onChange}
+          value={value}
+        />
         </div>
 
         <div className="space-y-3">

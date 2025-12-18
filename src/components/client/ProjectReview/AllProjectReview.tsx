@@ -7,12 +7,16 @@ import {
   Edit2,
   Trash2,
   Flag,
+  ArrowDownUp,
+  ChevronDown,
 } from "lucide-react";
 import ProjectDueDate from "./ProjectDueDate";
 import ReviewerActivity from "./ReviewerActivity";
 import IndividualProjectDetails from "@/components/staffManager/Projects/IndividualProjectDetails";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
-interface Project {
+export interface Project {
   id: number;
   name: string;
   assignedStaff: string[];
@@ -24,6 +28,8 @@ interface Project {
 
 const AllProjectReview: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<string>("asc");
+  const [sortBy, setSortBy] = useState<string>("all");
   const [projects, setProjects] = useState<Project[]>(
     Array.from({ length: 50 }, (_, i) => ({
       id: i + 1,
@@ -120,7 +126,7 @@ const AllProjectReview: React.FC = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Search Permissions"
+                  placeholder="Search Projects"
                   className="pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none  w-64"
                 />
               </div>
@@ -153,6 +159,60 @@ const AllProjectReview: React.FC = () => {
                   </svg>
                 </div>
               </div>
+
+              {/* Sort By Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="px-4 py-2 pr-8 text-sm border border-gray-300 rounded-lg focus:outline-none appearance-none  bg-white cursor-pointer"
+              >
+                <ArrowDownUp className="size-5" />
+                Sort By
+                <ChevronDown className="size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-56 bg-white border border-[#CAD2DB] p-1"
+            >
+              {/* Field Selection */}
+              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Field
+              </div>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${sortBy === 'startDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                onClick={() => setSortBy("name")}
+              >
+                Name
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                onClick={() => setSortBy("submitDate")}
+              >
+                Submit Date
+              </DropdownMenuItem>
+
+              <div className="my-1 border-t border-gray-100" />
+
+              {/* Order Selection */}
+              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Order
+              </div>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${sortOrder === 'asc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                onClick={() => setSortOrder("asc")}
+              >
+                Ascending
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${sortOrder === 'desc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                onClick={() => setSortOrder("desc")}
+              >
+                Descending
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
               {/* Date Range */}
               <div className="relative">
