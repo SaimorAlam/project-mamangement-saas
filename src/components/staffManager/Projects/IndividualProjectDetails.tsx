@@ -67,9 +67,9 @@ const IndividualProjectDetails = ({ project }: { project: Project }) => {
       description="View complete project information"
       footer={
         <div className="w-full flex gap-3">
-          <button className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+          {/* <button className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
             Edit Project
-          </button>
+          </button> */}
           {/* <button className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">
             Close
           </button> */}

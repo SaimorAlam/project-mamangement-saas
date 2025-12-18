@@ -1,11 +1,10 @@
-import { ArrowRight, CalendarDays, Clock, X } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import UpcomingDeadlineCard from "./UpcomingDeadlineCard";
-import PrimaryButton from "../../../common/PrimaryButton";
 import BoxContainer from "../../../common/BoxContainer";
-import Calendar from "react-calendar";
 import { useState } from "react";
 import "react-calendar/dist/Calendar.css"; // important!
+import ViewCalender from "@/common/ViewCalender";
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -392,7 +391,7 @@ const deadlineData = [
 
 const UpcomingDeadline = () => {
   const [value, onChange] = useState<Value>(new Date());
-  const [showCalendar, setShowCalendar] = useState(false); // calendar toggle state
+  const [showCalendar, setShowCalendar] = useState(false);
 
   return (
     <BoxContainer>
@@ -404,31 +403,12 @@ const UpcomingDeadline = () => {
         </div>
 
         {/* View Calendar Button */}
-        <PrimaryButton
-          title="View Calendar"
-          type="Primary"
-          rightIcon={<CalendarDays />}
-          className="text-sm"
-          onClick={() => setShowCalendar(true)}
+        <ViewCalender
+          showCalendar={showCalendar}
+          setShowCalendar={setShowCalendar}
+          onChange={onChange}
+          value={value}
         />
-
-        {/* Calendar Popup */}
-        {showCalendar && (
-          <div className="absolute top-14 right-0 z-50 bg-white rounded-xl shadow-lg border border-gray-200 p-4" onMouseLeave={() => setShowCalendar(false)}>
-            <div className="flex justify-between items-center mb-2">
-              <h4 className="font-semibold text-gray-800">
-                Calendar
-              </h4>
-              <button
-                onClick={() => setShowCalendar(false)}
-                className="text-gray-500 hover:text-gray-700 cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <Calendar onChange={onChange} value={value} />
-          </div>
-        )}
       </div>
 
       {/* Deadline Cards */}

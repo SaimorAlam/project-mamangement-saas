@@ -33,7 +33,7 @@ const AppDialog = ({
         {/* </button> */}
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="max-h-[99vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold text-gray-900">
             {title}
@@ -47,7 +47,7 @@ const AppDialog = ({
         </DialogHeader>
 
         {/* Main Content */}
-        <div className="py-2">
+        <div className="py-2 ">
           {children}
         </div>
 
