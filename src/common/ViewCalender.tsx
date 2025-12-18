@@ -3,7 +3,7 @@ import { CalendarDays, X } from "lucide-react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
-/* ✅ Correct Types */
+/* Correct Types */
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
