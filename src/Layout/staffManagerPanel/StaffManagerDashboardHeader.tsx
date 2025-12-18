@@ -1,6 +1,6 @@
 import React, { cloneElement, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
-import { Bell } from "lucide-react";
+import { Bell, Eye, FileText, Home, Megaphone } from "lucide-react";
 import NotificationModal from "@/components/client/NotificationModal";
 import { useLocation, Link } from "react-router-dom";
 import {
@@ -20,7 +20,8 @@ const StaffManagerDashboardHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const StaffManagerSidebarItems = getStaffManagerSidebarItems();
-  const { heading, breadcrumb, showButton } = useHeaderContext();
+  // const { heading, breadcrumb, showButton } = useHeaderContext();
+  const { breadcrumb, showButton } = useHeaderContext();
 
   const location = useLocation();
   const currentPath = location.pathname;
@@ -36,9 +37,49 @@ const StaffManagerDashboardHeader = () => {
     <div>
       <div className="flex items-center py-5 justify-between">
         {/* Greeting */}
-        <div>
+        {/* <div>
           <h1 className="text-[32px] font-semibold">{heading}</h1>
           <p className="text-base text-gray-500">{breadcrumb}</p>
+        </div> */}
+        {/* Breadcrumb */}
+        <div className="flex flex-col gap-2">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <div className="text-xl flex items-center justify-center gap-1 ">
+                    <Home className="w-6 h-6" />
+                    <Link to="/">Home</Link>
+                  </div>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              {currentRoute ? (
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-[#356DF0] text-xl flex items-center justify-center gap-1 ">
+                    {currentRoute.icon &&
+                      React.isValidElement(currentRoute.icon)
+                      ? cloneElement(
+                        currentRoute.icon as React.ReactElement<{
+                          className?: string;
+                        }>,
+                        { className: "w-6 h-6" }
+                      )
+                      : null}
+                    {currentRoute.name}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              ) : (
+                <BreadcrumbItem>
+                  <BreadcrumbPage></BreadcrumbPage>
+                </BreadcrumbItem>
+              )}
+            </BreadcrumbList>
+          </Breadcrumb>
+          {currentPath==="/staff-manager-panel/projects" && (
+            <p className="text-base text-gray-500">{breadcrumb}</p>
+          )}
+
         </div>
 
         {/* Search */}
@@ -48,7 +89,7 @@ const StaffManagerDashboardHeader = () => {
         />
 
         {/* Right Controls */}
-        <div className="flex items-center justify-between gap-6 relative">
+        <div className="flex items-center justify-between gap-2 relative">
           {/* Notifications */}
           <PrimaryButton
             leftIcon={<Bell className="text-2xl" />}
@@ -60,49 +101,43 @@ const StaffManagerDashboardHeader = () => {
             onClose={() => setIsOpen(false)}
           />
 
-          {/* 🔹 Conditional Quick Action */}
+          {/* Preview */}
+          <PrimaryButton
+            leftIcon={<Eye className="text-2xl" />}
+            title="Preview"
+            type={"Outline"}
+            onClick={() => setIsOpen(true)}
+          />
+
+          {/* Save Draft */}
+          <PrimaryButton
+            leftIcon={<FileText className="text-2xl" />}
+            title="Save Draft"
+            type={"Outline"}
+            onClick={() => setIsOpen(true)}
+          />
+
+          {/* Publish */}
+          <PrimaryButton
+            leftIcon={<Megaphone className="text-2xl" />}
+            title="Publish"
+            type={currentPath==="/staff-manager-panel" ? "Outline":"Primary"}
+            onClick={() => setIsOpen(true)}
+          />
+
+          {/* Conditional Quick Action */}
+          {currentPath==="/staff-manager-panel" && (
           <div className="relative">
             <>
               {showButton && (
-                <UploadSubmission/>
+                <UploadSubmission />
               )}
             </>
           </div>
+          )}
         </div>
       </div>
-      {/* Breadcrumb */}
-      <div>
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            {currentRoute ? (
-              <BreadcrumbItem>
-                <BreadcrumbPage className="text-[#356DF0] flex items-center justify-center gap-1 ">
-                  {currentRoute.icon &&
-                  React.isValidElement(currentRoute.icon)
-                    ? cloneElement(
-                        currentRoute.icon as React.ReactElement<{
-                          className?: string;
-                        }>,
-                        { className: "w-4 h-4" }
-                      )
-                    : null}
-                  {currentRoute.name}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            ) : (
-              <BreadcrumbItem>
-                <BreadcrumbPage></BreadcrumbPage>
-              </BreadcrumbItem>
-            )}
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
+
     </div>
   );
 };

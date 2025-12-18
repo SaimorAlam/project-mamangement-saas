@@ -1,4 +1,3 @@
-import React from "react";
 import PrimaryButton from "./PrimaryButton";
 import { CalendarDays, X } from "lucide-react";
 import Calendar from "react-calendar";

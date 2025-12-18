@@ -68,7 +68,7 @@ const ProjectFileUpload = () => {
   };
 
   return (
-    <div className="min-h-screen w-full my-6 bg-white text-black border border-gray-200 rounded-lg flex items-center justify-center px-4">
+    <div className="min-h-screen w-full my-6 bg-white text-black border border-gray-200 rounded-lg flex items-start justify-center px-4 pt-10">
       <div className="w-full max-w-xl">
         <h2 className="text-center text-lg font-semibold mb-6">
           Select Project & Program Name First
@@ -108,7 +108,11 @@ const ProjectFileUpload = () => {
           </div>
         </div>
 
-        {!file && (
+
+        {
+        // Showing upload section only if project and program are selected
+         program && project &&
+        !file && (
           <>
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
@@ -180,7 +184,9 @@ const ProjectFileUpload = () => {
               </button>
             </div>
           </>
-        )}
+        )
+        
+        }
 
         {file && (
           <div className="bg-gray-900 border border-gray-700 rounded-md p-4 text-center mb-6">
