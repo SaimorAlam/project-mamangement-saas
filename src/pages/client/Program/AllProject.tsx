@@ -175,6 +175,8 @@ const AllProject = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
+                  <>
+                  
                   <DropdownMenuItem
                     key={p}
                     onClick={() => {
@@ -184,6 +186,7 @@ const AllProject = ({
                   >
                     {p}
                   </DropdownMenuItem>
+                  </>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
