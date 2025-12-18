@@ -161,58 +161,58 @@ const AllProjectReview: React.FC = () => {
               </div>
 
               {/* Sort By Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="px-4 py-2 pr-8 text-sm border border-gray-300 rounded-lg focus:outline-none appearance-none  bg-white cursor-pointer"
-              >
-                <ArrowDownUp className="size-5" />
-                Sort By
-                <ChevronDown className="size-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-56 bg-white border border-[#CAD2DB] p-1"
-            >
-              {/* Field Selection */}
-              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Field
-              </div>
-              <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${sortBy === 'startDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                onClick={() => setSortBy("name")}
-              >
-                Name
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                onClick={() => setSortBy("submitDate")}
-              >
-                Submit Date
-              </DropdownMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="px-4 py-2 pr-8 text-sm border border-gray-300 rounded-lg focus:outline-none appearance-none  bg-white cursor-pointer"
+                  >
+                    <ArrowDownUp className="size-5" />
+                    Sort By
+                    <ChevronDown className="size-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-white border border-[#CAD2DB] p-1"
+                >
+                  {/* Field Selection */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Field
+                  </div>
+                  <DropdownMenuItem
+                    className={`rounded-md cursor-pointer ${sortBy === 'startDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    onClick={() => setSortBy("name")}
+                  >
+                    Name
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    onClick={() => setSortBy("submitDate")}
+                  >
+                    Submit Date
+                  </DropdownMenuItem>
 
-              <div className="my-1 border-t border-gray-100" />
+                  <div className="my-1 border-t border-gray-100" />
 
-              {/* Order Selection */}
-              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Order
-              </div>
-              <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${sortOrder === 'asc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                onClick={() => setSortOrder("asc")}
-              >
-                Ascending
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${sortOrder === 'desc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                onClick={() => setSortOrder("desc")}
-              >
-                Descending
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  {/* Order Selection */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Order
+                  </div>
+                  <DropdownMenuItem
+                    className={`rounded-md cursor-pointer ${sortOrder === 'asc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    onClick={() => setSortOrder("asc")}
+                  >
+                    Ascending
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className={`rounded-md cursor-pointer ${sortOrder === 'desc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    onClick={() => setSortOrder("desc")}
+                  >
+                    Descending
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* Date Range */}
               <div className="relative">
@@ -231,7 +231,7 @@ const AllProjectReview: React.FC = () => {
                 />
               </div>
               {/* Export */}
-              <button 
+              <button
                 onClick={() => {
                   const headers = ["ID", "Project Name", "Assigned Staff", "Status", "Priority", "Submit Date"];
                   const rows = projects.map(p => [
@@ -242,12 +242,12 @@ const AllProjectReview: React.FC = () => {
                     p.priority,
                     p.submitDate
                   ]);
-                  
+
                   const csvContent = [
                     headers.join(","),
                     ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
                   ].join("\n");
-                  
+
                   const blob = new Blob([csvContent], { type: "text/csv" });
                   const url = window.URL.createObjectURL(blob);
                   const link = document.createElement("a");
@@ -354,7 +354,7 @@ const AllProjectReview: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <IndividualProjectDetails project={project}/>
+                        <IndividualProjectDetails project={project} />
                         <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded cursor-pointer">
                           <Edit2 size={16} />
                         </button>
@@ -392,8 +392,8 @@ const AllProjectReview: React.FC = () => {
                       typeof page === "number" && setCurrentPage(page)
                     }
                     className={`px-3 py-1.5 text-sm rounded ${page === currentPage
-                        ? "bg-blue-600 text-white"
-                        : "border border-gray-300 hover:bg-gray-50"
+                      ? "bg-blue-600 text-white"
+                      : "border border-gray-300 hover:bg-gray-50"
                       }`}
                     disabled={page === "..."}
                   >

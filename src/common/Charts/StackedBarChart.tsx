@@ -9,8 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Copy, Trash2, Download } from "lucide-react";
-import { LegendValue } from "@/components/client/ProjectBuilder/ProjectConfiguration";
 import { generateChartData } from "@/utils";
+import { LegendValue } from "@/components/client/ProjectBuilder/ProjectConfiguration";
 
 /*   TYPES   */
 
@@ -21,6 +21,7 @@ export type ChartData = {
 
 type Props = {
   widgetTitle?: string;
+  numberOfXaxisValue?: number;
   xAxisValues?: string[];
   legendValues?: LegendValue[];
   numOfLegendDataSet?: number;

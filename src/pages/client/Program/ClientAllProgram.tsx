@@ -18,6 +18,8 @@ import { useDebounce } from "@/hooks/useDebounce";
 // import { useNavigate } from "react-router-dom";
 import EditProgramModal from "./EditProgramModal";
 import { useNavigate } from "react-router-dom";
+import { ArrowDownUp, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface IProgramTableProps {
   title?: string;
@@ -37,6 +39,7 @@ const ClientAllProgram = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<
     "ALL" | "HIGH" | "MEDIUM" | "LOW"
   >("ALL");
@@ -175,11 +178,71 @@ const ClientAllProgram = ({
               }}
               className="px-4 py-2 text-sm border border-gray-300 rounded-md w-64"
             />
+            {/* Sort By Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="px-4 py-2 pr-8 text-sm border border-gray-300 rounded-lg focus:outline-none appearance-none  bg-white cursor-pointer"
+                  >
+                    <ArrowDownUp className="size-5" />
+                    Sort By
+                    <ChevronDown className="size-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-white border border-[#CAD2DB] p-1"
+                >
+                  {/* Field Selection */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Field
+                  </div>
+                  <DropdownMenuItem
+                    className={`rounded-md cursor-pointer ${sortBy === 'startDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    onClick={() => setSortBy("name")}
+                  >
+                    Program Name
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    onClick={() => setSortBy("submitDate")}
+                  >
+                    Updated At
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    onClick={() => setSortBy("submitDate")}
+                  >
+                    Deadline
+                  </DropdownMenuItem>
+
+                  <div className="my-1 border-t border-gray-100" />
+
+                  {/* Order Selection */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Order
+                  </div>
+                  <DropdownMenuItem
+                    className={`rounded-md cursor-pointer ${sortOrder === 'asc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    onClick={() => setSortOrder("asc")}
+                  >
+                    Ascending
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className={`rounded-md cursor-pointer ${sortOrder === 'desc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    onClick={() => setSortOrder("desc")}
+                  >
+                    Descending
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             <DropdownMenu>
-              <DropdownMenuTrigger className="px-4 py-2 text-sm border border-gray-300 rounded-md min-w-32">
+              <DropdownMenuTrigger className="px-4 py-2 font-semibold flex items-center gap-2 text-sm border border-gray-300 rounded-md min-w-32">
                 {priorityFilter === "ALL"
                   ? "All Priorities"
                   : priorityFilter}
+                  <ChevronDown className="h-5 w-5"/>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
