@@ -12,7 +12,7 @@ import ProjectDueDate from "./ProjectDueDate";
 import ReviewerActivity from "./ReviewerActivity";
 import IndividualProjectDetails from "@/components/staffManager/Projects/IndividualProjectDetails";
 
-interface Project {
+export interface Project {
   id: number;
   name: string;
   assignedStaff: string[];

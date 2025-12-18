@@ -1,6 +1,6 @@
 import { CalendarDays, ChevronRight, Clock4 } from "lucide-react";
 
-interface DueDateCard {
+export interface DueDateCard {
   programName: string;
   projectName: string;
   assignedTo: string[];
@@ -12,7 +12,7 @@ const ProjectDueDate = () => {
   const dueDateCards: DueDateCard[] = [
     {
       programName: "Program name",
-      projectName: "Project name",
+      projectName: "Employee Management System",
       assignedTo: ["user1", "user2", "user3", "user4"],
       dueDate: "Jul 20, 2023",
       daysLeft: 8,
