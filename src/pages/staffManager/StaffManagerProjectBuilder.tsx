@@ -6,12 +6,12 @@ import RadarCharts from "@/common/Charts/RadarChart";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
 import ProgressRing from "@/common/Charts/ProgressRing";
-import PieChart from "@/common/Charts/PieChart";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
 import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
+import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -101,7 +101,7 @@ const StaffManagerProjectBuilder = () => {
           />
         )}
 
-        {selectedWidget === "pie-chart" && <PieChart />}
+        {selectedWidget === "pie-chart" && <ChartModuleTwo chartName="pie-chart" />}
 
         {selectedWidget === "line-chart" && <LineChartModule />}
 

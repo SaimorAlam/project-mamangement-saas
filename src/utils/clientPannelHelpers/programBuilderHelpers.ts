@@ -1,5 +1,5 @@
 import { ChartData } from "@/common/Charts/StackedBarChart";
-import { LegendValue } from "@/components/client/ProjectBuilder/ProjectConfiguration";
+import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
 
 export const handleDownloadCSV = (csvTemplate : string, widgetTitle: string) => {
     const blob = new Blob([csvTemplate], {

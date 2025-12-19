@@ -8,7 +8,7 @@ export type LegendValue = {
   color: string;
 };
 
-const ProjectConfiguration = ({
+const WidgetForChartModuleOne = ({
   widgedName,
   widgetTitle,
   setWidgetTitle,
@@ -513,4 +513,4 @@ const ProjectConfiguration = ({
   );
 };
 
-export default ProjectConfiguration;
+export default WidgetForChartModuleOne;

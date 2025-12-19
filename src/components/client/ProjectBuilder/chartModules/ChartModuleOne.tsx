@@ -1,8 +1,11 @@
+// this module i created for Stacked Bar Chart, Line Chart and Area Chart
+// means this this a common widget which will work for these 3 charts
 import React, { useState } from 'react';
-import ProjectConfiguration, { LegendValue } from '../ProjectConfiguration';
+import { LegendValue } from '../WidgetForChartModuleOne';
 import StackedBarChart from '@/common/Charts/StackedBarChart';
 import AreaChart from '@/common/Charts/AreaChart';
 import MultiAxisLineChart from '@/common/Charts/LineChart';
+import WidgetForChartModuleOne from '../WidgetForChartModuleOne';
 
 const ChartModuleOne = ({ chartName }: { chartName: string }) => {
     const [widgetTitle, setWidgetTitle] = useState("My-CSV");
@@ -94,7 +97,7 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                 return null;
             })()}
 
-            <ProjectConfiguration
+            <WidgetForChartModuleOne
                 widgedName={chartName === "stacked-bar-chart" ? "Stacked Bar Chart" : 
                     chartName === "area-chart" ? "Area Chart" : 
                     chartName === "line-chart" ? "Line Chart" : 
