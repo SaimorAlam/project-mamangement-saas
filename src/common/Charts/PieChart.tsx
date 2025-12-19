@@ -31,6 +31,8 @@ export default function PieChartWidget({
   title,
   legendValues,
 }: PieChartWidgetProps) {
+const isAllLegendFieldEmpty = legendValues.filter((l)=> l.field!=="") 
+
   const data: ChartData[] = legendValues
     .filter((l) => l.label)
     .map((l) => ({
@@ -78,7 +80,7 @@ export default function PieChartWidget({
   };
 
   return (
-    <Card className="w-full  bg-white p-6 shadow-sm border border-gray-200">
+    <Card className="w-full  bg-white p-6 shadow-sm border border-gray-200 relative">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
@@ -144,6 +146,9 @@ export default function PieChartWidget({
           <Tooltip formatter={(value) => `${value}%`} />
         </RechartsPieChart>
       </ResponsiveContainer>
+      {isAllLegendFieldEmpty.length===0 && (
+        <div className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400">No data selected. Please input legend value for visual.</div>
+      )}
     </Card>
   );
 }

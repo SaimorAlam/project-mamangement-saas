@@ -2,9 +2,6 @@ import { useState } from "react";
 
 import HeatmapChart from "@/common/Charts/HeatmapChart";
 import GanttChart from "@/common/Charts/GanttChart";
-import ProgressRing from "@/common/Charts/ProgressRing";
-import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
-
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
@@ -69,40 +66,10 @@ const ClientProgramBuilder = () => {
 
         {selectedWidget === "bar-chart" && <ChartModuleOne chartName="bar-chart" />}
         {/* {selectedWidget === "bar-chart" && <StackedBarChart />} */}
-        {selectedWidget === "progress-ring" && (
-          <ProgressRing
-            title="Project Progress"
-            centerLabel="Total Progress"
-            data={[
-              {
-                name: "In Progress",
-                value: 65,
-                count: 12,
-                color: "#5D8AF3",
-              },
-              {
-                name: "Completed",
-                value: 14,
-                count: 30,
-                color: "#169E7B",
-              },
-              {
-                name: "Overdue",
-                value: 13,
-                count: 8,
-                color: "#DA4352",
-              },
-              {
-                name: "Not Started",
-                value: 8,
-                count: 8,
-                color: "#E2E8F0",
-              },
-            ]}
-          />
-        )}
+        {selectedWidget === "progress-ring" && <ChartModuleTwo chartName="progress-ring-chart" />}
 
         {selectedWidget === "pie-chart" && <ChartModuleTwo chartName="pie-chart" />}
+        {/* {selectedWidget === "dounught-chart" && <ChartModuleTwo chartName="pie-chart" />} */}
 
         {selectedWidget === "line-chart" && <ChartModuleOne chartName="line-chart" />}
         {/* {selectedWidget === "line-chart" && <MultiAxisLineChart />} */}
@@ -126,7 +93,7 @@ const ClientProgramBuilder = () => {
         )}
 
         {selectedWidget === "horizontal-bar-chart" && (
-          <HorizontalBarChart />
+          <ChartModuleTwo chartName="horizontal-bar-chart" />
         )}
 
         {selectedWidget === "heat-map-chart" && <HeatmapChart />}

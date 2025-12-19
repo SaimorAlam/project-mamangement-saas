@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { LegendValue } from '../WidgetForChartModuleOne';
 import WidgetForChartModuleTwo from '../WidgetForChartModuleTwo';
 import PieChart from '@/common/Charts/PieChart';
+import ProgressRingNew from '@/common/Charts/ProgressRingNew';
+import HorizontalBarChartNew from '@/common/Charts/HorizontalBarChartNew';
+import HorizontalBarChart from './../../../../common/Charts/HorizontalBarChart';
 
 const ChartModuleTwo = ({ chartName }: { chartName: string }) => {
     const [widgetTitle, setWidgetTitle] = useState("My-CSV");
@@ -31,7 +34,22 @@ const ChartModuleTwo = ({ chartName }: { chartName: string }) => {
                     );
                 } else if (chartName === "progress-ring-chart") {
                     return (
-                        <></>
+                        <ProgressRingNew
+                            widgetTitle={widgetTitle}
+                            legendValues={legendValues}
+                            startingRange={startingRange}
+                            endingRange={endingRange}
+                        />
+                    );
+                } else if (chartName === "horizontal-bar-chart") {
+                    return (
+                        <>
+                        <HorizontalBarChartNew
+                            widgetTitle={widgetTitle}
+                            legendValues={legendValues}
+                        />
+                        {/* <HorizontalBarChart/> */}
+                        </>
                     );
                 }
                 return null;
