@@ -2,109 +2,140 @@ import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartMo
 import { Copy, Trash2, Download } from "lucide-react";
 
 type Props = {
-  widgetTitle?: string;
-  legendValues?: LegendValue[];
+    widgetTitle?: string;
+    legendValues?: LegendValue[];
+    startingRange?: number;
+    endingRange?: number;
 };
 
 const generateId = () =>
-  crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
+    crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
 
 export default function HorizontalBarChartNew({
-  widgetTitle = "My CSV",
-  legendValues = [],
+    widgetTitle = "My CSV",
+    legendValues = [],
+    startingRange,
+    endingRange
 }: Props) {
-  // Placeholder value for visual width
-  const MAX_VALUE = 100;
 
-  const data = legendValues
-    .filter((l) => l.label)
-    .map((l) => ({
-      label: l.label,
-      value: Math.floor(Math.random() * MAX_VALUE),
-      color: "#6F78F9",
-    }));
+    const isAllLegendFieldEmpty = legendValues.filter((l) => l.field !== "")
 
-  const totalUsage = data.reduce((sum, d) => sum + d.value, 0);
+    // Placeholder value for visual width
+    const MAX_VALUE = 100;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-  };
+    const data = legendValues
+        .filter((l) => l.label)
+        .map((l) => ({
+            label: l.label,
+            value: Math.floor(Math.random() * MAX_VALUE),
+            color: l.color,
+        }));
 
-  const handleDelete = () => {
-    console.log("Reset handled by parent widget");
-  };
+    const totalUsage = data.reduce((sum, d) => sum + d.value, 0);
 
-  // CSV export (widget rule)
-  const handleExportCSV = () => {
-    const id = generateId();
+    const handleCopy = () => {
+        navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    };
 
-    const header = "Label,Value";
-    const rows = legendValues.map((l) => `${l.label},`);
-    const csv = [header, ...rows].join("\n");
+    const handleDelete = () => {
+        console.log("Reset handled by parent widget");
+    };
 
-    const blob = new Blob([csv], {
-      type: "text/csv;charset=utf-8;",
-    });
+    // CSV export (widget rule)
+    const handleExportCSV = () => {
+        const id = generateId();
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${widgetTitle}-${id}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+        const header = "Label,Value";
+        const rows = legendValues.map((l) => `${l.label},`);
+        const csv = [header, ...rows].join("\n");
 
-  return (
-    <div className="w-full bg-white rounded-lg border border-gray-200 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold">{widgetTitle}</h2>
-        <div className="flex gap-5">
-          <button onClick={handleExportCSV} title="Export CSV">
-            <Download size={18} />
-          </button>
-          <button onClick={handleCopy} title="Copy">
-            <Copy size={18} />
-          </button>
-          <button onClick={handleDelete} title="Reset">
-            <Trash2 size={18} />
-          </button>
-        </div>
-      </div>
+        const blob = new Blob([csv], {
+            type: "text/csv;charset=utf-8;",
+        });
 
-      {/* Legend + Total */}
-      <div className="flex justify-between mb-6 text-sm xl:text-lg">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-indigo-500" />
-          <span className=" text-gray-600">Usage Rate</span>
-        </div>
-        <div className=" text-gray-600">
-          Total usage <span className="font-semibold">{totalUsage}</span>k
-        </div>
-      </div>
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${widgetTitle}-${id}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
 
-      {/* Bars */}
-      <div className="space-y-4">
-        {data.map((item, i) => (
-          <div key={i} className="flex items-center gap-4">
-            <div className="w-20 text-right text-sm text-gray-600">
-              {item.label}
+    return (
+        <div className="w-full bg-white rounded-lg border border-gray-200 p-6 relative">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold">{widgetTitle}</h2>
+                <div className="flex gap-5">
+                    <button onClick={handleExportCSV} title="Export CSV">
+                        <Download size={18} />
+                    </button>
+                    <button onClick={handleCopy} title="Copy">
+                        <Copy size={18} />
+                    </button>
+                    <button onClick={handleDelete} title="Reset">
+                        <Trash2 size={18} />
+                    </button>
+                </div>
             </div>
 
-            <div className="flex-1 flex items-center gap-3 h-10 rounded-lg overflow-hidden">
-              <div
-                className="h-full rounded-lg transition-all duration-500"
-                style={{
-                  width: `${item.value}%`,
-                  backgroundColor: item.color,
-                }}
-              />
-            <div className="w-10 text-sm font-medium">{item.value}k</div>
+            {/* Legend + Total */}
+            <div className="flex justify-between mb-6 text-sm xl:text-lg">
+                <div className="flex items-center gap-3">
+                    {data.map((item, i) => (
+                        <div className="flex items-center gap-2" key={i}>
+                            <div className={`w-3 h-3 rounded-full `} style={{
+                                backgroundColor: item.color,
+                            }} />
+                            <span className=" text-gray-600">{item.label}</span>
+                        </div>
+                    ))}
+                </div>
+                {totalUsage !== 0 && (
+                    <div className=" text-gray-600">
+                        Total usage <span className="font-semibold">{totalUsage}</span>k
+                    </div>
+                )}
+
             </div>
 
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+            {/* Bars */}
+            <div className="space-y-4 mt-10">
+                {data.map((item, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                        <div className="w-20 text-right text-sm text-gray-600">
+                            {item.label}
+                        </div>
+
+                        <div className="flex-1 flex items-center gap-3 h-10 rounded-lg overflow-hidden">
+                            <div
+                                className="h-full rounded-lg transition-all duration-500"
+                                style={{
+                                    width: `${item.value}%`,
+                                    backgroundColor: item.color,
+                                }}
+                            />
+                            <div className="w-10 text-sm font-medium">{item.value}k</div>
+                        </div>
+                    </div>
+                ))}
+
+                {isAllLegendFieldEmpty.length !== 0 ? (
+                    <div className=" ml-24 flex justify-between">
+                        <div className="text-sm text-gray-500 flex flex-col items-center justify-center">
+                            <div className="">.</div>
+                            <div className="">{startingRange && startingRange}</div>
+                        </div>
+                        <div className="text-sm text-gray-500 flex flex-col items-center justify-center">
+                            <div className="">.</div>
+                            <div className="">{endingRange && endingRange}</div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400">No data selected. Please input legend value for visual.</div>
+                )}
+
+            </div>
+        </div>
+    );
 }

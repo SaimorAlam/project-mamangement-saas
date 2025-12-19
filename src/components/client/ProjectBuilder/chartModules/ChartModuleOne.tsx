@@ -6,12 +6,15 @@ import StackedBarChart from '@/common/Charts/StackedBarChart';
 import AreaChart from '@/common/Charts/AreaChart';
 import MultiAxisLineChart from '@/common/Charts/LineChart';
 import WidgetForChartModuleOne from '../WidgetForChartModuleOne';
+import HeatmapChartNew from '@/common/Charts/HeatmapChartNew';
 
 const ChartModuleOne = ({ chartName }: { chartName: string }) => {
     const [widgetTitle, setWidgetTitle] = useState("My-CSV");
 
     const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1)
     const [xAxisValues, setXAxisValues] = useState<string[]>([]);
+    console.log(xAxisValues);
+
 
     const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
 
@@ -60,7 +63,7 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
         console.log("parant x values: ", xAxisValues);
     };
     return (
-        <div className="flex gap-3">
+        <div className="flex justify-between gap-3">
             {(() => {
                 if (chartName === "bar-chart") {
                     return (
@@ -93,15 +96,26 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                             endingRange={endingRange}
                         />
                     )
+                } else if (chartName === "heat-map-chart") {
+                    return (
+                        <HeatmapChartNew
+                            widgetTitle={widgetTitle}
+                            xAxisValues={xAxisValues}
+                            legendValues={legendValues}
+                            startingRange={startingRange}
+                            endingRange={endingRange}
+                        />
+                    )
                 }
                 return null;
             })()}
 
             <WidgetForChartModuleOne
-                widgedName={chartName === "stacked-bar-chart" ? "Stacked Bar Chart" : 
-                    chartName === "area-chart" ? "Area Chart" : 
-                    chartName === "line-chart" ? "Line Chart" : 
-                    ""}
+                widgedName={chartName === "stacked-bar-chart" ? "Stacked Bar Chart" :
+                    chartName === "area-chart" ? "Area Chart" :
+                        chartName === "line-chart" ? "Line Chart" :
+                            chartName === "heat-map-chart" ? "Heatmap Chart" :
+                                ""}
                 widgetTitle={widgetTitle}
                 setWidgetTitle={setWidgetTitle}
                 numOfXAxisDataSet={numOfXAxisDataSet}
