@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Copy, Trash2 } from "lucide-react";
-import { LegendValue } from "@/components/client/ProjectBuilder/ProjectConfiguration";
+import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
 import { generateAreaChartData } from "@/utils";
 
 /*    TYPES    */

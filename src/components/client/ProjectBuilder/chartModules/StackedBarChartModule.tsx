@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ProjectConfiguration, { LegendValue } from '../ProjectConfiguration';
+import ProjectConfiguration, { LegendValue } from '../WidgetForChartModuleOne';
 import StackedBarChart from '@/common/Charts/StackedBarChart';
 
 const StackedBarChartModule = () => {

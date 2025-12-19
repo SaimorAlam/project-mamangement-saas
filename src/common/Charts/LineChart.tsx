@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts"
 import { Copy, Trash2 } from "lucide-react"
-import { LegendValue } from "@/components/client/ProjectBuilder/ProjectConfiguration"
+import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne"
 import { generateLineChartData } from "@/utils"
 
 /*     TYPES     */

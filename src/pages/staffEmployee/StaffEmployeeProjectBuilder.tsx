@@ -8,7 +8,6 @@ import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
 // import StackedBarChart from "@/common/Charts/StackedBarChart";
 import ProgressRing from "@/common/Charts/ProgressRing";
-import PieChart from "@/common/Charts/PieChart";
 // import MultiAxisLineChart from "@/common/Charts/LineChart";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 // import AreaChart from "@/common/Charts/AreaChart";
@@ -16,6 +15,7 @@ import GanttChart from "@/common/Charts/GanttChart";
 import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
+import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
 
 const StaffEmployeeProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -105,7 +105,7 @@ const StaffEmployeeProjectBuilder = () => {
           />
         )}
 
-        {selectedWidget === "pie-chart" && <PieChart />}
+        {selectedWidget === "pie-chart" && <ChartModuleTwo chartName="pie-chart" />}
 
         {selectedWidget === "line-chart" && <LineChartModule />}
 

@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import { Copy, Trash2, Download } from "lucide-react";
 import { generateChartData } from "@/utils";
-import { LegendValue } from "@/components/client/ProjectBuilder/ProjectConfiguration";
+import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
 
 /*   TYPES   */
 

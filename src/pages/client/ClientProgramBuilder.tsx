@@ -2,13 +2,13 @@ import { useState } from "react";
 
 import HeatmapChart from "@/common/Charts/HeatmapChart";
 import GanttChart from "@/common/Charts/GanttChart";
-import PieChart from "@/common/Charts/PieChart";
 import ProgressRing from "@/common/Charts/ProgressRing";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
+import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
 
 
 const ClientProgramBuilder = () => {
@@ -102,7 +102,7 @@ const ClientProgramBuilder = () => {
           />
         )}
 
-        {selectedWidget === "pie-chart" && <PieChart />}
+        {selectedWidget === "pie-chart" && <ChartModuleTwo chartName="pie-chart" />}
 
         {selectedWidget === "line-chart" && <ChartModuleOne chartName="line-chart" />}
         {/* {selectedWidget === "line-chart" && <MultiAxisLineChart />} */}
