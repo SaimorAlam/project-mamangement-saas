@@ -142,7 +142,7 @@ export default function ClientSingleProject() {
     setSheetData((prev) => {
       const updated = prev.map((row) => [...row, ""]);
       const newColIndex = updated[0].length - 1;
-      const payload = updated.map((row, rowIndex) => ({
+      const payload = updated.map((rowIndex) => ({
         row: rowIndex,
         col: newColIndex,
         value: "",

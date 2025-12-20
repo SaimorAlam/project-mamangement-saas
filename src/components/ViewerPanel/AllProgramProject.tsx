@@ -1,6 +1,5 @@
 import {
   AlignStartHorizontal,
-  ArrowDownUp,
   ArrowRight,
   ChevronDown,
   Filter,
@@ -8,11 +7,10 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ProjectGridView from "./ProjectGridView";
@@ -431,9 +429,10 @@ const AllProgramProject = () => {
   );
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
-  const [sortOrder, setSortOrder] = useState<string>("asc");
-  const [sortBy, setSortBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+
+  console.log(statusFilter);
+  console.log(priorityFilter);
 
   const itemsPerPage = 6;
 
