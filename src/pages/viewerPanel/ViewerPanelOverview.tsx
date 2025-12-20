@@ -1,11 +1,10 @@
-import AllProgramProject from "@/components/client/Overview/AllProgramProject";
+import AllProgramProject from "@/components/ViewerPanel/AllProgramProject";
 import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
 import ApexDonutChart from "@/common/Charts/ApexDonutChart";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/common/Charts/ApexBarChart";
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
-import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 
 const clientData = [
   {
@@ -72,32 +71,11 @@ const clientData = [
 
 const ViewerPanelOverview = () => {
   return (
-    <div className="">
+    <div>
       {/* Icon and Home */}
-
-      <div className="grid grid-cols-4 gap-6 my-6">
-        {clientData.map((item) => (
-          <DashboardPanelStatsCard key={item.title} item={item} />
-        ))}
-      </div>
 
       <div className="py-4">
         <AllProgramProject />
-      </div>
-
-      <div className="grid grid-cols-3 gap-8 ">
-        <div className="space-y-8 col-span-2">
-          <div className="flex items-center justify-center gap-8">
-            <ApexBarChart />
-            <ApexDonutChart />
-          </div>
-          <LatestSubmission />
-          <ApexColumnChart />
-        </div>
-        <div className="space-y-8">
-          <UpcomingDeadline />
-          <ActivityLog />
-        </div>
       </div>
     </div>
   );
