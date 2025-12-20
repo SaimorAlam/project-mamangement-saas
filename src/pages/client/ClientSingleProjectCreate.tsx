@@ -11,7 +11,6 @@ function ClientSingleProjectCreate() {
   const dispatch = useAppDispatch();
 
   const handleFileUpload = (file: File) => {
-    console.log("File received in ClientSingleProjectCreate:", file);
     dispatch(setFile(file));
     setCurrentView("sheet");
     navigate("/client-panel/single-project");
