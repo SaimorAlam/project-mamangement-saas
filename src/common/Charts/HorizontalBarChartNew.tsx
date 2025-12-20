@@ -128,8 +128,16 @@ export default function HorizontalBarChartNew({
                         </div>
                         <div className="text-sm text-gray-500 flex flex-col items-center justify-center">
                             <div className="">.</div>
+                            <div className="">{endingRange && startingRange && startingRange!==0 ? 
+                            (Math.floor((endingRange-startingRange)/2+startingRange)) :
+                            endingRange && (Math.floor(endingRange/2))
+                        }</div>
+                        </div>
+                        <div className="text-sm text-gray-500 flex flex-col items-center justify-center">
+                            <div className="">.</div>
                             <div className="">{endingRange && endingRange}</div>
                         </div>
+                       
                     </div>
                 ) : (
                     <div className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400">No data selected. Please input legend value for visual.</div>
