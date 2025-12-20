@@ -9,17 +9,17 @@ import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 
 const clientData = [
   {
-    title: "Total Program",
+    title: "Total Assigned Project",
     value: 56,
     growth: "+5%",
     growth_type: "up",
-    description: "24 program Running this month",
+    description: "since last month",
     link_text: "View all",
     icon: "FolderIcon",
     icon_bg_color: "#069576",
   },
   {
-    title: "Total Project",
+    title: "Submitted for Review",
     value: 156,
     growth: "+5%",
     growth_type: "up",
@@ -29,7 +29,7 @@ const clientData = [
     icon_bg_color: "#069576",
   },
   {
-    title: "Live Project",
+    title: "Returned for Edit",
     value: 36,
     growth: "+2%",
     growth_type: "up",
@@ -39,7 +39,7 @@ const clientData = [
     icon_bg_color: "#756CF5",
   },
   {
-    title: "Project in draft",
+    title: "In live",
     value: 15,
     growth: "+1.1%",
     growth_type: "up",
@@ -47,16 +47,6 @@ const clientData = [
     link_text: "View all",
     icon: "ProjectInDraft",
     icon_bg_color: "#4881FF",
-  },
-  {
-    title: "Pending Review",
-    value: 75,
-    growth: "+5%",
-    growth_type: "up",
-    description: "25 score growth",
-    link_text: "View all",
-    icon: "PendingReview",
-    icon_bg_color: "#069576",
   },
   {
     title: "Submission Overdue",

@@ -20,6 +20,7 @@ import StaffEmployeeUserActivityLog from "@/pages/staffEmployee/StaffEmployeeUse
 import StaffEmployeeActivityLog from "@/pages/staffEmployee/StaffEmployeeActivityLog";
 import StaffEmployeeContactUs from "@/pages/staffEmployee/StaffEmployeeContactUs";
 import StaffEmployeeCreateTicket from "@/pages/staffEmployee/StaffEmployeeCreateTicket";
+import StaffEmployeeStateCardDetails from "@/pages/staffEmployee/StaffEmployeeStateCardDetails";
 
 export default function getStaffEmployeeRoutes() {
   return [
@@ -82,5 +83,10 @@ export default function getStaffEmployeeRoutes() {
       path: "user-activity-log",
       element: <StaffEmployeeUserActivityLog />,
     },
+    {
+      path: "state-card/:cardTitle",
+      element: <StaffEmployeeStateCardDetails/>,
+    },
+    
   ];
 }

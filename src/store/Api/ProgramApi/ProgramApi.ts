@@ -29,12 +29,12 @@ const programApi = baseApi.injectEndpoints({
       providesTags: (result) =>
         result?.data?.data
           ? [
-              ...result.data.data.map((program: IProgram) => ({
-                type: "Program",
-                id: program.id,
-              })),
-              { type: "Program", id: "LIST" },
-            ]
+            ...result.data.data.map((program: IProgram) => ({
+              type: "Program",
+              id: program.id,
+            })),
+            { type: "Program", id: "LIST" },
+          ]
           : [{ type: "Program", id: "LIST" }],
     }),
 
@@ -82,15 +82,27 @@ const programApi = baseApi.injectEndpoints({
         { type: "Program", id: "LIST" },
       ],
     }),
-  }),
-});
 
-export const {
-  useCreateProgramMutation,
-  useGetAllProgramQuery,
-  useGetProgramByIdQuery,
-  useGetProjectsByProgramIdQuery,
-  useUpdateProgramNameMutation,
-} = programApi;
+    getStackBarChartCSVfilesTitleId: builder.query({
+      query: () => `/charts/stack-bar-chart`
+    }),
+    getHeatmapChartCSVfilesTitleId: builder.query({
+      query: () => `/charts/heat-map-chart`
+    }),
+    getMultiAxisLineChartCSVfilesTitleId: builder.query({
+      query: () => `/charts/multi-axis-line-chart`
+    }),
+  })
+})
+  export const {
+    useCreateProgramMutation,
+    useGetAllProgramQuery,
+    useGetProgramByIdQuery,
+    useGetProjectsByProgramIdQuery,
+    useUpdateProgramNameMutation,
+    useGetStackBarChartCSVfilesTitleIdQuery,
+    useGetHeatmapChartCSVfilesTitleIdQuery,
+    useGetMultiAxisLineChartCSVfilesTitleIdQuery
+  } = programApi;
 
-export default programApi;
+  export default programApi;
