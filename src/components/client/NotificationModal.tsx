@@ -202,7 +202,7 @@ export default function NotificationModal({
       ></div>
       <div
         className={cn(
-          "absolute right-104 top-15 h-[85vh] w-96 bg-white rounded-lg z-50 flex flex-col shadow-xl",
+          "absolute right-14 top-15 h-[85vh] w-96 bg-white rounded-lg z-50 flex flex-col shadow-xl",
           className
         )}
       >
