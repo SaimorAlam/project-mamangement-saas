@@ -12,7 +12,7 @@ import { jwtDecode } from "jwt-decode";
 
 const Role = {
   VIEWER: "viewer-panel",
-  EMPLOYEE: "client-panel", // todo: change to employee-panel when ready
+  EMPLOYEE: "staff-employee-panel", // todo: change to employee-panel when ready
   SUPPORTER: "supporter",
   MANAGER: "staff-manager-panel",
   ADMIN: "admin",
