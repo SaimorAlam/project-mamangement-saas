@@ -66,6 +66,7 @@ export default function StackedBarChart({
 
 
   /*    TOOLTIP    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
 
@@ -139,7 +140,7 @@ export default function StackedBarChart({
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="name" />
-          <YAxis />
+          <YAxis domain={[startingRange, endingRange]}/>
           <Tooltip content={<CustomTooltip />} />
 
           {legendValues.map((l, i) => (

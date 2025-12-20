@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import HeatmapChart from "@/common/Charts/HeatmapChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
@@ -96,7 +95,7 @@ const ClientProgramBuilder = () => {
           <ChartModuleTwo chartName="horizontal-bar-chart" />
         )}
 
-        {selectedWidget === "heat-map-chart" && <HeatmapChart />}
+        {selectedWidget === "heat-map-chart" && <ChartModuleOne chartName="heat-map-chart"/>}
 
         {selectedWidget === "area-chart" && <ChartModuleOne chartName="area-chart" />}
         {/* {selectedWidget === "area-chart" && <AreaChart />} */}

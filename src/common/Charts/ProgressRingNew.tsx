@@ -41,9 +41,7 @@ export default function ProgressRingNew({
   };
 
   const handleDelete = () => {
-    console.log(isAllLegendFieldEmpty);
-    
-    console.log("Reset handled by parent if needed");
+console.log("Reset handled by parent if needed");
   };
 
   //  CSV EXPORT (widget rules)
