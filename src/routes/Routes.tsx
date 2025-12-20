@@ -27,7 +27,7 @@ import { getClientRoutes } from "./ClientRoute";
 import { getStaffManagerRoutes } from "./StaffManagerRoute";
 import ViewerPanelDashboardLayout from "./../Layout/ViewerPanel/ViewerPanelDashboardLayout";
 import getViewerPanelRoutes from "./ViewerRoute";
-import ProtectedRoute from "./ProtectedRoute";
+// import ProtectedRoute from "./ProtectedRoute";
 import Unauthorized from "@/common/Unauthorized";
 import StaffEmployeeDashboardLayout from "@/Layout/staffEmployeePanel/StaffEmployeeDashboardLayout";
 import getStaffEmployeeRoutes from "./StaffEmployeeRoute";
