@@ -6,7 +6,6 @@ import WidgetForChartModuleTwo from '../WidgetForChartModuleTwo';
 import PieChart from '@/common/Charts/PieChart';
 import ProgressRingNew from '@/common/Charts/ProgressRingNew';
 import HorizontalBarChartNew from '@/common/Charts/HorizontalBarChartNew';
-import HorizontalBarChart from './../../../../common/Charts/HorizontalBarChart';
 
 const ChartModuleTwo = ({ chartName }: { chartName: string }) => {
     const [widgetTitle, setWidgetTitle] = useState("My-CSV");
@@ -47,6 +46,8 @@ const ChartModuleTwo = ({ chartName }: { chartName: string }) => {
                         <HorizontalBarChartNew
                             widgetTitle={widgetTitle}
                             legendValues={legendValues}
+                            startingRange={startingRange}
+                            endingRange={endingRange}
                         />
                         {/* <HorizontalBarChart/> */}
                         </>

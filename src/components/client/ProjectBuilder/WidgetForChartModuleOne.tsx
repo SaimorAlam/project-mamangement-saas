@@ -129,29 +129,6 @@ const WidgetForChartModuleOne = ({
     return [header, ...rows].join("\n");
   })();
 
-  //-------------if i want to sent unique id inside for each generated csv file --------
-  // const csvTemplate = (() => {
-  //   const csvId = crypto.randomUUID();
-  //   const createdAt = new Date().toISOString();
-
-  //   // Metadata rows for sending id with that csv
-  //   const meta = [
-  //     `# csv_id=${csvId}`,
-  //     `# widget_title=${widgetTitle}`,
-  //     `# created_at=${createdAt}`,
-  //   ];
-
-  //   // Header row
-  //   const header = ["Day", ...legendValues.map(l => l.label)].join(",");
-
-  //   // Data rows
-  //   const rows = xAxisValues.map(
-  //     day => `${day}${",".repeat(legendValues.length)}`
-  //   );
-
-  //   return [...meta, header, ...rows].join("\n");
-  // })();
-
   const downloadCSV = () => {
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
     for (let i = 0; i < legendValues.length; i++) {
@@ -182,7 +159,7 @@ const WidgetForChartModuleOne = ({
 
 
   return (
-    <div className="max-w-78 h-full   bg-white border border-gray-100 rounded-lg shadow-lg">
+    <div className="min-w-78 h-full   bg-white border border-gray-100 rounded-lg shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">
@@ -403,11 +380,10 @@ const WidgetForChartModuleOne = ({
                   />
                 </div>
               </div>
-              <span className="text-xs text-gray-700">Yes</span>
             </div>
           </div>
 
-          {Array.from({ length: numOfLegendDataSet }).map((_, index) => (
+          {showLegend && Array.from({ length: numOfLegendDataSet }).map((_, index) => (
             <div key={index}>
               {/* Legend Name */}
               <div className="flex items-center justify-between mb-2">
@@ -438,42 +414,47 @@ const WidgetForChartModuleOne = ({
               </div>
 
               {/* Legend Color */}
-              <div className="flex items-center mb-3">
-                <label
-                  className="text-xs text-gray-700"
-                  style={{ width: "110px" }}
-                >
-                  {index + 1}
-                  {index === 0
-                    ? "st"
-                    : index === 1
-                      ? "nd"
-                      : index === 2
-                        ? "rd"
-                        : "th"}{" "}
-                  Legend Color:
-                </label>
+              {
+                widgedName === "Heatmap Chart" ? null : (
+                  <div className="flex items-center mb-3">
+                    <label
+                      className="text-xs text-gray-700"
+                      style={{ width: "110px" }}
+                    >
+                      {index + 1}
+                      {index === 0
+                        ? "st"
+                        : index === 1
+                          ? "nd"
+                          : index === 2
+                            ? "rd"
+                            : "th"}{" "}
+                      Legend Color:
+                    </label>
 
-                <div className="flex items-center justify-end gap-2 flex-1">
-                  <input
-                    type="text"
-                    value={legendValues[index]?.color || "#000000"}
-                    onChange={(e) =>
-                      handleLegendColorChange(index, e.target.value)
-                    }
-                    className="text-xs px-2 py-1 border border-gray-200 rounded w-22"
-                  />
+                    <div className="flex items-center justify-end gap-2 flex-1">
+                      <input
+                        type="text"
+                        value={legendValues[index]?.color || "#000000"}
+                        onChange={(e) =>
+                          handleLegendColorChange(index, e.target.value)
+                        }
+                        className="text-xs px-2 py-1 border border-gray-200 rounded w-22"
+                      />
 
-                  <input
-                    type="color"
-                    value={legendValues[index]?.color || "#000000"}
-                    onChange={(e) =>
-                      handleLegendColorChange(index, e.target.value)
-                    }
-                    className="w-14 h-6 rounded border border-gray-200 cursor-pointer"
-                  />
-                </div>
-              </div>
+                      <input
+                        type="color"
+                        value={legendValues[index]?.color || "#000000"}
+                        onChange={(e) =>
+                          handleLegendColorChange(index, e.target.value)
+                        }
+                        className="w-14 h-6 rounded border border-gray-200 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                )
+              }
+
             </div>
           ))}
 
