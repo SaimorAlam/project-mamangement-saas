@@ -1,7 +1,5 @@
 import { Edit, Eye, Flag, Trash2 } from "lucide-react";
-// import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-// import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -26,7 +24,7 @@ export interface ProgramCardProps {
   staffMembers: StaffMember[];
   startDate: string;
   endDate: string;
-  priority: "High" | "Medium" | "Low";
+  priority: "High" | "Medium" | "Low" | string;
   progress: number;
 }
 
@@ -45,16 +43,6 @@ interface AllProgramProjectGridViewProps {
 const ProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
   allProgramProjectData: paginatedData,
 }) => {
-  /* const statusColors: Record<StatusType, string> = {
-    Live: "bg-[#EBFFF2] text-[#169E7B] border border-[#ABEFD5]",
-    Returned: "bg-[#f8f0e8] text-[#FF974B] border border-[#f9dec9]",
-    Overdue: "bg-[#FDF4F5] text-[#DA4352] border border-[#F8D3D5]",
-    Draft: "bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]",
-    "In Review":
-      "bg-[#FFF9ED] text-[#DB940C] border border-[#FCE38C]",
-    Submitted: "bg-[#F5F2FC] text-[#8B69E2] border border-[#DFDBF9]",
-  }; */
-
   const priorityColors = {
     High: "text-red-600",
     Medium: "text-orange-600",
@@ -64,9 +52,9 @@ const ProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
 
   const renderPriority = (priority: ProgramCardProps["priority"]) => (
     <div className="flex items-center gap-1">
-      <Flag className={`w-4 h-4 ${priorityColors[priority]}`} />
+      <Flag className={`w-4 h-4 ${priorityColors[priority as keyof typeof priorityColors] || priorityColors.Default}`} />
       <span
-        className={`text-sm font-medium ${priorityColors[priority]}`}
+        className={`text-sm font-medium ${priorityColors[priority as keyof typeof priorityColors] || priorityColors.Default}`}
       >
         {priority}
       </span>

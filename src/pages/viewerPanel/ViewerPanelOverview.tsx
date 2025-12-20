@@ -1,10 +1,4 @@
 import AllProgramProject from "@/components/ViewerPanel/AllProgramProject";
-import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
-import ActivityLog from "@/components/client/Overview/ActivityLog";
-import ApexDonutChart from "@/common/Charts/ApexDonutChart";
-import LatestSubmission from "@/components/client/Overview/LatestSubmission";
-import ApexBarChart from "@/common/Charts/ApexBarChart";
-import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 
 const clientData = [
   {
@@ -72,8 +66,6 @@ const clientData = [
 const ViewerPanelOverview = () => {
   return (
     <div>
-      {/* Icon and Home */}
-
       <div className="py-4">
         <AllProgramProject />
       </div>

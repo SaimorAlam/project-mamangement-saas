@@ -1,4 +1,3 @@
-import React from "react";
 import ProgramCard from "./ProgramCard";
 
 export interface StaffMember {
@@ -14,7 +13,7 @@ export interface ProgramCardProps {
   staffMembers: StaffMember[];
   startDate: string;
   endDate: string;
-  priority: "High" | "Medium" | "Low";
+  priority: "High" | "Medium" | "Low" | string;
   progress: number;
 }
 
@@ -22,29 +21,24 @@ interface AllProgramProjectGridViewProps {
   allProgramProjectData: ProgramCardProps[];
 }
 
-const AllProgramProjectGridView: React.FC<
-  AllProgramProjectGridViewProps
-> = ({ allProgramProjectData }) => {
+export default function ProjectGridView({
+  allProgramProjectData,
+}: AllProgramProjectGridViewProps) {
   return (
     <div className="grid grid-cols-4 gap-5">
       {allProgramProjectData?.map((projectData) => {
+        const processedProjectData = {
+          ...projectData,
+          priority: projectData.priority as "High" | "Medium" | "Low",
+        };
+
         return (
           <div className="" key={projectData.programName}>
             {/* Render a single program card */}
-            <ProgramCard
-              projectData={{
-                ...projectData,
-                priority: projectData.priority as
-                  | "High"
-                  | "Medium"
-                  | "Low",
-              }}
-            />
+            <ProgramCard projectData={processedProjectData} />
           </div>
         );
       })}
     </div>
   );
-};
-
-export default AllProgramProjectGridView;
+}

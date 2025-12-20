@@ -436,39 +436,14 @@ const AllProgramProject = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const itemsPerPage = 6;
-  const filteredData = useMemo(() => {
-    return allProgramProjectData.filter((item) => {
-      const statusMatch =
-        statusFilter === "all" || item.status === statusFilter;
-      const priorityMatch =
-        priorityFilter === "all" || item.priority === priorityFilter;
-      let sortMatch = true;
-      if (sortBy === "startDate") {
-        const itemDate = item.startDate
-          .split("-")
-          .reverse()
-          .join("-");
-        sortMatch =
-          sortOrder === "asc"
-            ? new Date(itemDate) >= new Date("1900-01-01")
-            : new Date(itemDate) <= new Date("9999-12-31");
-      } else if (sortBy === "endDate") {
-        const itemDate = item.endDate.split("-").reverse().join("-");
-        sortMatch =
-          sortOrder === "asc"
-            ? new Date(itemDate) >= new Date("1900-01-01")
-            : new Date(itemDate) <= new Date("9999-12-31");
-      }
-      return statusMatch && priorityMatch && sortMatch;
-    });
-  }, [statusFilter, priorityFilter, sortBy, sortOrder]);
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredData.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredData, currentPage]);
+  const totalPages = Math.ceil(
+    allProgramProjectData.length / itemsPerPage
+  );
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const statusOptions = [
     { value: "all", title: "All Status" },
@@ -524,76 +499,6 @@ const AllProgramProject = () => {
             />
           </div>
 
-          {/* Sort By Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2 bg-transparent border border-[#CAD2DB] h-12"
-              >
-                <ArrowDownUp className="size-5" />
-                Sort By
-                <ChevronDown className="size-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-56 bg-white border border-[#CAD2DB] p-1"
-            >
-              {/* Field Selection */}
-              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Field
-              </div>
-              <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${
-                  sortBy === "startDate"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
-                }`}
-                onClick={() => setSortBy("startDate")}
-              >
-                Starting Date
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${
-                  sortBy === "endDate"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
-                }`}
-                onClick={() => setSortBy("endDate")}
-              >
-                Ending Date
-              </DropdownMenuItem>
-
-              <div className="my-1 border-t border-gray-100" />
-
-              {/* Order Selection */}
-              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Order
-              </div>
-              <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${
-                  sortOrder === "asc"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
-                }`}
-                onClick={() => setSortOrder("asc")}
-              >
-                Ascending
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${
-                  sortOrder === "desc"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
-                }`}
-                onClick={() => setSortOrder("desc")}
-              >
-                Descending
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           {/* Filter Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -636,43 +541,22 @@ const AllProgramProject = () => {
       {viewMode === "table" ? (
         <>
           <ProjectTableView
-            allProgramProjectData={paginatedData.map((item) => ({
-              ...item,
-              priority:
-                item.priority === "High"
-                  ? "High"
-                  : item.priority === "Medium"
-                  ? "Medium"
-                  : item.priority === "Low"
-                  ? "Low"
-                  : "Low", // fallback to "Low" if not matching
-            }))}
+            allProgramProjectData={allProgramProjectData}
           />
 
-          {/* <Pagination
+          <Pagination
             currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            itemsPerPage={itemsPerPage}
             totalPages={totalPages}
-            filteredDataLength={filteredData.length}
-          /> */}
+            itemsPerPage={itemsPerPage}
+            totalPrograms={allProgramProjectData.length}
+            onPageChange={onPageChange}
+          />
         </>
       ) : (
         <>
           <ProjectGridView
-            allProgramProjectData={filteredData.map((item) => ({
-              ...item,
-              priority:
-                item.priority === "High"
-                  ? "High"
-                  : item.priority === "Medium"
-                  ? "Medium"
-                  : item.priority === "Low"
-                  ? "Low"
-                  : "Low", // fallback to "Low" if not matching
-            }))}
+            allProgramProjectData={allProgramProjectData}
           />
-          {/* "View All" button if there are more than 4 programs/projects */}
           {allProgramProjectData.length > 4 && (
             <div className="pt-6">
               <Link to="/work-in-progress">
@@ -680,7 +564,6 @@ const AllProgramProject = () => {
                   variant="ghost"
                   className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                 >
-                  {/* Display total count */}
                   View all {allProgramProjectData.length}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
