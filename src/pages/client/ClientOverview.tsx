@@ -5,8 +5,8 @@ import ApexDonutChart from "@/common/Charts/ApexDonutChart";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/common/Charts/ApexBarChart";
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
-import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 
 const clientData = [
   {
@@ -84,7 +84,7 @@ const ClientOverview = () => {
     <div className="">
       {/* Icon and Home */}
 
-      <div className="grid grid-cols-4 gap-6 my-6">
+      <div className="grid grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 my-6">
         {updatedClientData.map((item) => (
           <DashboardPanelStatsCard key={item.title} item={item} />
         ))}

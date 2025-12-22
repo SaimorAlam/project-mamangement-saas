@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChartData } from "@/common/Charts/StackedBarChart";
 import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
 
@@ -32,8 +33,6 @@ export const generateChartData = (
 
     legend.forEach((l) => {
       const r =Math.floor(getRandomValue(min, max)/numOfLegendDataSet);
-      console.log("numOfLegendDataSet: ", numOfLegendDataSet);
-      console.log("Random number generated: ", r);
       
       item[l.field] = r;
     });

@@ -82,7 +82,13 @@ const programApi = baseApi.injectEndpoints({
         { type: "Program", id: "LIST" },
       ],
     }),
-
+    getChartTitleId: builder.mutation({
+      query:(bodyData)=>({
+        url:`/chart`,
+        method:"POST",
+        body:bodyData
+      })
+    }),
     getStackBarChartCSVfilesTitleId: builder.query({
       query: () => `/charts/stack-bar-chart`
     }),
@@ -100,6 +106,7 @@ const programApi = baseApi.injectEndpoints({
     useGetProgramByIdQuery,
     useGetProjectsByProgramIdQuery,
     useUpdateProgramNameMutation,
+    useGetChartTitleIdMutation,
     useGetStackBarChartCSVfilesTitleIdQuery,
     useGetHeatmapChartCSVfilesTitleIdQuery,
     useGetMultiAxisLineChartCSVfilesTitleIdQuery

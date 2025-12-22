@@ -11,6 +11,7 @@ import {
 import { Copy, Trash2, Download } from "lucide-react";
 import { generateChartData } from "@/utils";
 import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
+import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 
 /*    == TYPES    == */
 
@@ -41,7 +42,7 @@ export default function StackedBarChart({
   const [isDownloading, setIsDownloading] = useState(false);
 
   /*   DATA   */
-  const data: ChartData[] = useMemo(() => {
+  const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateChartData(
       xAxisValues,
@@ -54,7 +55,7 @@ export default function StackedBarChart({
 
   /*   TOTAL   */
   const totalEmployees = useMemo(() => {
-    return data.reduce((sum, row) => {
+    return chartData.reduce((sum, row) => {
       return (
         sum +
         legendValues.reduce(
@@ -63,7 +64,7 @@ export default function StackedBarChart({
         )
       );
     }, 0);
-  }, [data, legendValues]);
+  }, [chartData, legendValues]);
 
   /*   CSV HELPERS   */
 
@@ -89,59 +90,58 @@ export default function StackedBarChart({
     URL.revokeObjectURL(url);
   };
 
-  /*   API + DOWNLOAD   */
+  /*   API calling + DOWNLOAD csv with id   */
+  const [getChartTitleId, { error, isLoading }] = useGetChartTitleIdMutation();
 
   const handleDownload = async () => {
-    try {
-      setIsDownloading(true);
+  try {
+    setIsDownloading(true);
 
-      const payload = {
-        numberOfDataset: numOfLegendDataSet,
-        firstFiledDataset: startingRange,
-        lastFiledDAtaset: endingRange,
-        showWidgets: legendValues.map(l => ({
-          legend_name: l.label,
-          color: l.color,
-        })),
-        title: widgetTitle,
-        status: "ACTIVE",
-        category: "AREA",
-        xAxis: JSON.stringify({
-          labels: xAxisValues,
-          values: [],
-        }),
-        yAxis: JSON.stringify({}),
-        zAxis: JSON.stringify({}),
-      };
+    const payload = {
+      numberOfDataset: numOfLegendDataSet,
+      firstFiledDataset: startingRange,
+      lastFiledDAtaset: endingRange,
+      showWidgets: legendValues.map(l => ({
+        legend_name: l.label,
+        color: l.color,
+      })),
+      title: widgetTitle,
+      status: "ACTIVE",
+      category: "BAR",
+      xAxis: JSON.stringify({
+        labels: xAxisValues,
+        values: [],
+      }),
+      yAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({}),
+    };
 
-      const response = await fetch("/api/v1/chart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    console.log("going for response...");
+    
+    // Calling the mutation and wait for the result
+    const result = await getChartTitleId(payload).unwrap();
+    console.log("response id is: ", result); 
 
-      console.log("payload is : ",payload);
-      console.log("error is : ",response);
-      
-      if (!response.ok) throw new Error("API failed");
+    const uniqueId = result.data.id; // backend generated id
 
-      const result = await response.json();
-      const uniqueId = result.id; // backend generated id
+    const csvTemplate = buildCsvTemplate();
+    downloadCsvFile(csvTemplate, `${widgetTitle}_${uniqueId}.csv`);
+  } catch (error) {
+    console.error("Download failed", error);
+    alert("Failed to download CSV");
+  } finally {
+    setIsDownloading(false);
+  }
+};
 
-      const csvTemplate = buildCsvTemplate();
-      downloadCsvFile(csvTemplate, `${widgetTitle}_${uniqueId}.csv`);
-    } catch (error) {
-      console.error("Download failed", error);
-      alert("Failed to download CSV");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
+
+  if (isLoading) return <p>Fetching id...</p>;
+  if (error) return <p>Error occurred while fetching data</p>;
 
   /*   ACTIONS   */
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
   /*   TOOLTIP   */
@@ -213,7 +213,7 @@ export default function StackedBarChart({
       </div>
 
       <ResponsiveContainer width="100%" height={350}>
-        <BarChart data={data}>
+        <BarChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="name" />
           <YAxis domain={[startingRange, endingRange]} />
