@@ -343,15 +343,20 @@ const AllProgramProject = () => {
         priorityFilter === "all" || item.priority === priorityFilter;
       let sortMatch = true;
       if (sortBy === "startDate") {
-        const itemDate = item.startDate.split("-").reverse().join("-");
-        sortMatch = sortOrder === "asc"
-          ? new Date(itemDate) >= new Date("1900-01-01")
-          : new Date(itemDate) <= new Date("9999-12-31");
+        const itemDate = item.startDate
+          .split("-")
+          .reverse()
+          .join("-");
+        sortMatch =
+          sortOrder === "asc"
+            ? new Date(itemDate) >= new Date("1900-01-01")
+            : new Date(itemDate) <= new Date("9999-12-31");
       } else if (sortBy === "endDate") {
         const itemDate = item.endDate.split("-").reverse().join("-");
-        sortMatch = sortOrder === "asc"
-          ? new Date(itemDate) >= new Date("1900-01-01")
-          : new Date(itemDate) <= new Date("9999-12-31");
+        sortMatch =
+          sortOrder === "asc"
+            ? new Date(itemDate) >= new Date("1900-01-01")
+            : new Date(itemDate) <= new Date("9999-12-31");
       }
       return statusMatch && priorityMatch && sortMatch;
     });
@@ -395,10 +400,11 @@ const AllProgramProject = () => {
               type="Primary"
               title="Boards"
               leftIcon={<AlignStartHorizontal className="w-4 h-4" />}
-              className={`${viewMode === "board"
+              className={`${
+                viewMode === "board"
                   ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
                   : "bg-white border-black text-black! hover:text-black!"
-                }`}
+              }`}
               onClick={() => setViewMode("board")}
             />
 
@@ -406,10 +412,11 @@ const AllProgramProject = () => {
               type="Primary"
               title="Tables"
               leftIcon={<TableIcon className="w-4 h-4" />}
-              className={`${viewMode === "table"
+              className={`${
+                viewMode === "table"
                   ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
                   : "bg-white border-black text-black! hover:text-black!"
-                }`}
+              }`}
               onClick={() => setViewMode("table")}
             />
           </div>
@@ -435,13 +442,21 @@ const AllProgramProject = () => {
                 Field
               </div>
               <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${sortBy === 'startDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                className={`rounded-md cursor-pointer ${
+                  sortBy === "startDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
+                }`}
                 onClick={() => setSortBy("startDate")}
               >
                 Starting Date
               </DropdownMenuItem>
               <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                className={`rounded-md cursor-pointer ${
+                  sortBy === "endDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
+                }`}
                 onClick={() => setSortBy("endDate")}
               >
                 Ending Date
@@ -454,13 +469,21 @@ const AllProgramProject = () => {
                 Order
               </div>
               <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${sortOrder === 'asc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                className={`rounded-md cursor-pointer ${
+                  sortOrder === "asc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
+                }`}
                 onClick={() => setSortOrder("asc")}
               >
                 Ascending
               </DropdownMenuItem>
               <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${sortOrder === 'desc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                className={`rounded-md cursor-pointer ${
+                  sortOrder === "desc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
+                }`}
                 onClick={() => setSortOrder("desc")}
               >
                 Descending
@@ -516,10 +539,10 @@ const AllProgramProject = () => {
                 item.priority === "High"
                   ? "High"
                   : item.priority === "Medium"
-                    ? "Medium"
-                    : item.priority === "Low"
-                      ? "Low"
-                      : "Low", // fallback to "Low" if not matching
+                  ? "Medium"
+                  : item.priority === "Low"
+                  ? "Low"
+                  : "Low", // fallback to "Low" if not matching
             }))}
           />
 
@@ -540,10 +563,10 @@ const AllProgramProject = () => {
                 item.priority === "High"
                   ? "High"
                   : item.priority === "Medium"
-                    ? "Medium"
-                    : item.priority === "Low"
-                      ? "Low"
-                      : "Low", // fallback to "Low" if not matching
+                  ? "Medium"
+                  : item.priority === "Low"
+                  ? "Low"
+                  : "Low", // fallback to "Low" if not matching
             }))}
           />
           {/* "View All" button if there are more than 4 programs/projects */}
