@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { handleDownloadCSV } from "@/utils";
+// import { handleDownloadCSV } from "@/utils";
+import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
+import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 
 export type LegendValue = {
   label: string;
@@ -11,6 +13,7 @@ export type LegendValue = {
 const WidgetForChartModuleOne = ({
   widgedName,
   widgetTitle,
+  widgetCategory,
   setWidgetTitle,
   numOfXAxisDataSet,
   handleSetNumOfXAxisDataSet,
@@ -27,6 +30,7 @@ const WidgetForChartModuleOne = ({
 }: {
   widgedName: string,
   widgetTitle: string,
+  widgetCategory: string,
   setWidgetTitle: React.Dispatch<React.SetStateAction<string>>,
   numOfXAxisDataSet: number,
   handleSetNumOfXAxisDataSet: (e: React.ChangeEvent<HTMLInputElement>) => void,
@@ -116,23 +120,22 @@ const WidgetForChartModuleOne = ({
 
 
   // making this csvTemplate = "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
-  const csvTemplate = (() => {
-    // Header row
-    const header =
-      ["Day", ...legendValues.map((l) => l.label)].join(",");
+  // const csvTemplate = (() => {
+  //   // Header row
+  //   const header =
+  //     ["Day", ...legendValues.map((l) => l.label)].join(",");
 
-    // Data rows
-    const rows = xAxisValues.map(
-      (day) => `${day}${",".repeat(legendValues.length)}`
-    );
+  //   // Data rows
+  //   const rows = xAxisValues.map(
+  //     (day) => `${day}${",".repeat(legendValues.length)}`
+  //   );
 
-    return [header, ...rows].join("\n");
-  })();
+  //   return [header, ...rows].join("\n");
+  // })();
+
+  const [getChartTitleId, {isLoading }] = useGetChartTitleIdMutation();
 
   const downloadCSV = () => {
-    // calling api to update csv file name with id 
-    
-
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
     for (let i = 0; i < legendValues.length; i++) {
       if (!legendValues[i].label) {
@@ -156,7 +159,32 @@ const WidgetForChartModuleOne = ({
       alert(`Please add at least ${1} X-Axis value`);
       return;
     }
-    handleDownloadCSV(csvTemplate, widgetTitle)
+    if(!widgetCategory){
+      alert(`Please input category : ${widgetCategory}`)
+      console.log("category: ",widgetCategory);
+      return;
+    }
+    const payload = {
+      numberOfDataset: numOfLegendDataSet,
+      firstFiledDataset: startingRange,
+      lastFiledDAtaset: endingRange,
+      showWidgets: legendValues.map(l => ({
+        legend_name: l.label,
+        color: l.color,
+      })),
+      title: widgetTitle,
+      status: "ACTIVE",
+      category: widgetCategory,
+      xAxis: JSON.stringify({
+        labels: xAxisValues,
+        values: [],
+      }),
+      yAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({}),
+    };
+    DownloadAndSaveCSVforModuleOneWidget(payload, getChartTitleId, widgetTitle, xAxisValues, legendValues)
+
+    // handleDownloadCSV(csvTemplate, widgetTitle)
   }
 
 
@@ -489,8 +517,8 @@ const WidgetForChartModuleOne = ({
         <button className="px-4 py-1.5 text-xs font-medium border border-gray-200 rounded-md cursor-pointer text-gray-700 hover:text-gray-900">
           Cancel
         </button>
-        <button className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer" onClick={downloadCSV}>
-          Save Changes
+        <button disabled={isLoading} className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer" onClick={downloadCSV}>
+          {isLoading ? "Saving..." : "Save Changes"}
         </button>
       </div>
     </div>

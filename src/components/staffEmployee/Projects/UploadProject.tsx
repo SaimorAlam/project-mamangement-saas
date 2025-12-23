@@ -1,212 +1,338 @@
-import React, { useState } from "react";
-import { Upload, ArrowRight, Download } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { UploadCloud, ChevronDown, Upload, Calendar } from "lucide-react";
+import { FaRoad } from "react-icons/fa";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import wrapper from "@/assets/wrapper.png";
 
-const UploadProject: React.FC = () => {
-  const [dragActive, setDragActive] = useState(false);
-  const [projectNote, setProjectNote] = useState("");
+const UploadProject = () => {
+  const [program, setProgram] = useState("");
+  const [project, setProject] = useState("");
+  const [dateOption, setDateOption] = useState("last1week");
+  const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
+  const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
   const [addNotes, setAddNotes] = useState(false);
+  const [projectNote, setProjectNote] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const datePickerRef = useRef<HTMLDivElement>(null);
 
-  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
+  const programs = ["Program A", "Program B", "Program C", "Program D", "Program E", "Program F", "Program G", "Program H", "Program I"];
+  const projects = ["Project X", "Project Y", "Project Z"];
+
+  const dateOptions = [
+    { value: "last1week", label: "Last 1 Week" },
+    { value: "last1month", label: "Last 1 Month" },
+    { value: "last3months", label: "Last 3 Months" },
+    { value: "custom", label: "Custom Range" },
+  ];
+
+  const handleDateOptionChange = (value: string) => {
+    setDateOption(value);
+
+    if (value !== "custom") {
+      // Auto-close the dropdown when preset is selected
+      setIsDatePickerOpen(false);
+
+      // Optionally auto-set dates based on selection
+      const end = new Date();
+      const start = new Date();
+
+      if (value === "last1week") start.setDate(end.getDate() - 7);
+      if (value === "last1month") start.setMonth(end.getMonth() - 1);
+      if (value === "last3months") start.setMonth(end.getMonth() - 3);
+
+      setCustomStartDate(start);
+      setCustomEndDate(end);
+    } else {
+      // Open calendar for custom range
+      setIsDatePickerOpen(true);
     }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer?.files && e.dataTransfer.files[0]) {
-      // Handle file upload here
-      console.log(e.dataTransfer.files[0]);
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile) {
+      setFile(droppedFile);
     }
   };
 
-  const handleFileInput = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (e.target.files && e.target.files[0]) {
-      // Handle file upload here
-      console.log(e.target.files[0]);
-    }
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const downloadCsvTemplate = () => {
+    const csvContent = "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "project_data_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleClearData = () => {
+    setFile(null);
+    setProjectNote("");
+    setAddNotes(false);
+  };
+
+  const handleSaveDraft = () => {
+    console.log({
+      program,
+      project,
+      dateOption,
+      startDate: customStartDate,
+      endDate: customEndDate,
+      file: file?.name,
+      notes: projectNote,
+      addNotes,
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br flex items-center justify-center p-6 grow">
-      <div className="w-full animate-fadeInUp">
-        {/* Main Card */}
-        <div className="bg-white/80 rounded-3xl border border-gray-200 overflow-hidden">
-          {/* Header Icon */}
-          <div className="pt-12 pb-6 text-center relative">
-            <div className="relative w-24 h-24 mx-auto mb-4">
-              <img
-                src={wrapper}
-                alt="Wrapper"
-                className="w-full h-full object-contain"
-              />
-            </div>
+    <div className="min-h-screen w-full my-6 bg-white text-black border border-gray-200 rounded-lg flex items-start justify-center px-4 pt-10">
+      <div className="w-full max-w-xl">
+        <h2 className="text-center text-lg font-semibold mb-6">
+          Select Project & Program Name First
+        </h2>
 
-            {/* Decorative elements */}
-            <div className="absolute top-8 left-12 w-16 h-16 bg-blue-400/20 rounded-full blur-2xl"></div>
-            <div className="absolute top-16 right-16 w-20 h-20 bg-indigo-400/20 rounded-full blur-3xl"></div>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-center text-2xl font-bold text-slate-800 mb-2 px-6">
-            No file Added to this Project Yet
-          </h1>
-
-          <p className="text-center text-sm text-slate-500 mb-8 px-6 max-w-md mx-auto leading-relaxed">
-            You haven't uploaded any data for this project. Start by
-            importing
-            <br />a CSV or spreadsheet file to populate tasks or
-            resources.
-          </p>
-
-          {/* Upload Area */}
-          <div className="px-8 pb-6">
-            <div
-              className={`relative border-2 border-dashed rounded-2xl p-12 transition-all duration-300 ${
-                dragActive
-                  ? "border-indigo-500 scale-[1.02]"
-                  : "border-slate-300 bg-slate-50/50 "
-              }`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
+        {/* Program Select */}
+        <div className="mb-4">
+          <label className="text-sm mb-1 block">Program Name *</label>
+          <div className="relative">
+            <select
+              value={program}
+              onChange={(e) => setProgram(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md appearance-none"
             >
-              {/* Upload Icon */}
-              <div className="flex justify-center mb-6">
-                <div className="w-16 h-16 rounded-xl bg-white shadow-lg shadow-slate-200/60 flex items-center justify-center border border-slate-200/80">
-                  <Upload
-                    className="w-8 h-8 text-slate-400"
-                    strokeWidth={1.5}
-                  />
-                </div>
-              </div>
-
-              {/* Upload Text */}
-              <p className="text-center text-slate-700 font-medium mb-3">
-                Drag and drop your CSV/XLSX file here
-              </p>
-              <p className="text-center text-slate-500 text-sm mb-6">
-                or
-              </p>
-
-              {/* Browse Button */}
-              <div className="flex justify-center mb-6">
-                <label className="cursor-pointer group">
-                  <span className="inline-flex items-center gap-2 px-6 py-2 text-indigo-600 hover:text-indigo-700 font-medium text-sm transition-all duration-200 group-hover:gap-3">
-                    Browse your device
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".csv,.xls,.xlsx,.mpp"
-                    onChange={handleFileInput}
-                  />
-                </label>
-              </div>
-
-              {/* Supported Formats */}
-              <p className="text-center text-xs text-slate-400">
-                Supported formats: csv, xls, xlsx, mpp | Max file size
-                : 10 MB
-              </p>
-
-              {dragActive && (
-                <div className="absolute inset-0 bg-indigo-500/5 rounded-2xl shimmer pointer-events-none"></div>
-              )}
-            </div>
-          </div>
-
-          {/* Import Button */}
-          <div className="px-8 pb-6">
-            <button className="w-1/4 bg-gradient-to-r bg-[#1C73E0] text-white font-semibold py-3.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 mx-auto">
-              <Upload className="w-5 h-5" strokeWidth={2} />
-              Import Project File
-            </button>
-          </div>
-
-          {/* Template Link */}
-          <div className="px-8 pb-8">
-            <a
-              href="#"
-              className="group flex items-center justify-center gap-2 text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-all duration-200"
-            >
-              <Download className="w-4 h-4" />
-              Download Simple CSV Template
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </a>
-          </div>
-
-          {/* Project Notes Section */}
-          <div className="border-t border-slate-200/60 bg-slate-50/40 px-8 py-6">
-            {/* Toggle */}
-            <label className="flex items-center gap-3 mb-4 cursor-pointer group">
-              <div className="relative">
-                <input
-                  type="checkbox"
-                  checked={addNotes}
-                  onChange={(e) => setAddNotes(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-slate-300 rounded-full peer-checked:bg-indigo-600 transition-all duration-300 shadow-inner"></div>
-                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-5 shadow-md"></div>
-              </div>
-              <span className="text-sm text-slate-700 font-medium group-hover:text-slate-900 transition-colors">
-                Add Notes for Project Admin/Manager
-              </span>
-            </label>
-
-            {/* Project Note Label */}
-            <div className="flex items-center gap-1.5 mb-3">
-              <label className="text-sm font-medium text-slate-700">
-                Project Note
-              </label>
-              <div className="w-4 h-4 rounded-full bg-slate-300 flex items-center justify-center">
-                <span className="text-[10px] text-white font-bold">
-                  ?
-                </span>
-              </div>
-            </div>
-
-            {/* Textarea */}
-            <div className="relative">
-              <textarea
-                value={projectNote}
-                onChange={(e) => setProjectNote(e.target.value)}
-                placeholder="Write a short description..."
-                className="w-full px-4 py-3 pr-12 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm text-slate-700 placeholder:text-slate-400 transition-all duration-200 shadow-sm min-h-[80px]"
-              />
-
-              {/* Send Button */}
-              <button className="absolute bottom-3 right-3 w-8 h-8 bg-indigo-600 hover:bg-indigo-700 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg shadow-indigo-500/30">
-                <ArrowRight
-                  className="w-4 h-4 text-white rotate-[-45deg]"
-                  strokeWidth={2.5}
-                />
-              </button>
-            </div>
+              <option value="">Select program name</option>
+              {programs.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
           </div>
         </div>
 
-        {/* Footer Text */}
-        <p
-          className="text-center text-xs text-slate-400 mt-6 animate-fadeInUp"
-          style={{ animationDelay: "0.2s" }}
-        >
-          Secure file upload with enterprise-grade encryption
-        </p>
+        {/* Project Select */}
+        <div className="mb-4">
+          <label className="text-sm mb-1 block">Project Name *</label>
+          <div className="relative">
+            <select
+              value={project}
+              onChange={(e) => setProject(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md appearance-none"
+            >
+              <option value="">Select Project Name</option>
+              {projects.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
+          </div>
+        </div>
+
+        {/* NEW: Date Range Selector */}
+        <div className="mb-8">
+          <label className="text-sm mb-1 block">Data Upload Date Range *</label>
+          <div className="relative" ref={datePickerRef}>
+            <div
+              onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+              className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md flex items-center justify-between cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Calendar size={16} className="text-gray-500" />
+                <span className="text-sm">
+                  {dateOptions.find((opt) => opt.value === dateOption)?.label || "Select date range"}
+                </span>
+              </div>
+              <ChevronDown className={`text-gray-500 transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`} size={16} />
+            </div>
+
+            {isDatePickerOpen && (
+              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg">
+                {/* Preset Options */}
+                {dateOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    onClick={() => handleDateOptionChange(option.value)}
+                    className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                  >
+                    {option.label}
+                    {dateOption === option.value && <span className="text-blue-500">✓</span>}
+                  </div>
+                ))}
+
+                {/* Custom Range Calendar */}
+                {dateOption === "custom" && (
+                  <div className="p-4 border-t border-gray-200">
+                    <DatePicker
+                      selected={customStartDate}
+                      onChange={(dates: [Date | null, Date | null]) => {
+                        const [start, end] = dates;
+                        setCustomStartDate(start);
+                        setCustomEndDate(end);
+                        if (end) {
+                          setIsDatePickerOpen(false); // Close when end date selected
+                        }
+                      }}
+                      startDate={customStartDate}
+                      endDate={customEndDate}
+                      selectsRange
+                      inline
+                      calendarClassName="custom-datepicker"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Display selected range below */}
+          {(customStartDate || customEndDate) && (
+            <p className="text-xs text-gray-500 mt-2">
+              Selected: {customStartDate?.toLocaleDateString()} - {customEndDate?.toLocaleDateString() || "Ongoing"}
+            </p>
+          )}
+        </div>
+
+        {/* Upload Section - Only show when program, project, and date range selected */}
+        {program && project && dateOption && !file && (
+          <>
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                <FaRoad size={32} className="text-gray-500" />
+              </div>
+            </div>
+
+            <h3 className="text-center text-lg font-semibold mb-2">
+              No file Added to this Project Yet
+            </h3>
+
+            <p className="text-center text-sm text-gray-400 mb-6">
+              You haven't uploaded any data for this project. Start by importing a CSV or spreadsheet file.
+            </p>
+
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              className="border border-dashed border-gray-500 rounded-lg p-10 text-center mb-4"
+            >
+              <Upload size={32} className="mx-auto text-gray-400 mb-4" />
+
+              <p className="text-sm text-gray-600 mb-2">
+                Drag and drop your CSV/XLSX file here
+              </p>
+              <p className="text-sm text-gray-400 mb-2">or</p>
+
+              <label className="text-blue-400 cursor-pointer">
+                Browse your device →
+                <input
+                  type="file"
+                  accept=".csv,.xls,.xlsx"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            <p className="text-xs text-gray-500 text-center mb-6">
+              Supported formats: .csv, .xls, .xlsx | Max file size: 10 MB
+            </p>
+
+            <div className="flex justify-center mb-4">
+              <button
+                onClick={handleImportClick}
+                className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-black px-6 py-2 rounded-md text-sm"
+              >
+                <UploadCloud size={16} />
+                Import Project File
+              </button>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.xls,.xlsx"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+
+            <div className="text-center">
+              <button
+                onClick={downloadCsvTemplate}
+                className="text-sm text-blue-400 hover:underline"
+              >
+                Download Simple CSV Template →
+              </button>
+            </div>
+          </>
+        )}
+
+        {file && (
+          <div className="bg-gray-900 border border-gray-700 rounded-md p-4 text-center mb-6">
+            <p className="text-sm text-green-400 mb-2">
+              File Selected Successfully
+            </p>
+            <p className="text-xs text-gray-300">{file.name}</p>
+          </div>
+        )}
+
+        {file && (
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <input
+                type="checkbox"
+                checked={addNotes}
+                onChange={(e) => setAddNotes(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span className="text-sm text-gray-700">
+                Add Notes for Project Admin/Manager
+              </span>
+            </div>
+
+            <textarea
+              value={projectNote}
+              onChange={(e) => setProjectNote(e.target.value)}
+              disabled={!addNotes}
+              placeholder="Write a short description..."
+              className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm resize-none h-32 disabled:bg-gray-50 disabled:text-gray-400"
+            />
+
+            <div className="flex justify-between mt-6">
+              <button
+                onClick={handleClearData}
+                className="px-5 py-2 border border-gray-200 rounded-md text-sm hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveDraft}
+                className="px-5 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600"
+              >
+                Save Draft
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

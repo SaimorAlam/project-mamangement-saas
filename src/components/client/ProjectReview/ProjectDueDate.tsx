@@ -14,8 +14,9 @@ type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const ProjectDueDate = () => {
-  const [value, onChange] = useState<Value>(new Date());
-    const [showCalendar, setShowCalendar] = useState(false);
+  // const [value, onChange] = useState<Value>(new Date());
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [dateRange, setDateRange] = useState<Value>(null);
 
   const dueDateCards: DueDateCard[] = [
     {
@@ -59,11 +60,14 @@ const ProjectDueDate = () => {
             </h3>
           </div>
           <ViewCalender
-          showCalendar={showCalendar}
-          setShowCalendar={setShowCalendar}
-          onChange={onChange}
-          value={value}
-        />
+            showCalendar={showCalendar}
+            setShowCalendar={setShowCalendar}
+            value={dateRange}
+            onChange={(range) => {
+              setDateRange(range);
+              setShowCalendar(false); // optional: auto-close
+            }}
+          />
         </div>
 
         <div className="space-y-3">
@@ -97,9 +101,8 @@ const ProjectDueDate = () => {
                   {card.assignedTo.map((_, idx) => (
                     <img
                       key={idx}
-                      src={`https://i.pravatar.cc/150?img=${
-                        20 + idx
-                      }`}
+                      src={`https://i.pravatar.cc/150?img=${20 + idx
+                        }`}
                       alt="User"
                       className="w-7 h-7 rounded-full border-2 border-white"
                     />

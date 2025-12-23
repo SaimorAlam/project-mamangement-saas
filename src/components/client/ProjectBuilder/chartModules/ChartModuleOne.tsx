@@ -113,6 +113,11 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                             chartName === "heat-map-chart" ? "Heatmap Chart" :
                                 ""}
                 widgetTitle={widgetTitle}
+                widgetCategory={chartName === "stacked-bar-chart" ? "BAR" :
+                    chartName === "area-chart" ? "AREA" :
+                        chartName === "line-chart" ? "LINE" :
+                            chartName === "heat-map-chart" ? "HEATMAP" :
+                                "BAR"}
                 setWidgetTitle={setWidgetTitle}
                 numOfXAxisDataSet={numOfXAxisDataSet}
                 handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}

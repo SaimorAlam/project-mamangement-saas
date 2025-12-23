@@ -61,6 +61,11 @@ const ChartModuleTwo = ({ chartName }: { chartName: string }) => {
                     chartName === "progress-ring-chart" ? "Progress Ring Chart" :
                         ""}
                 widgetTitle={widgetTitle}
+                widgetCategory={chartName === "stacked-bar-chart" ? "BAR" :
+                    chartName === "area-chart" ? "AREA" :
+                        chartName === "line-chart" ? "LINE" :
+                            chartName === "heat-map-chart" ? "HEATMAP" :
+                                "BAR"}
                 setWidgetTitle={setWidgetTitle}
                 numOfLegendDataSet={numOfLegendDataSet}
                 setNumOfLegendDataSet={setNumOfLegendDataSet}
