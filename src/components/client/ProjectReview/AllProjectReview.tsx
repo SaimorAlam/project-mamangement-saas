@@ -17,20 +17,65 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/common/PrimaryButton";
-import AllProgramProjectTableView from "../AllProgramProjectTableView";
 import Pagination from "../Pagination";
 import AllProgramProjectGridView from "../AllProgramProjectGridView";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProgramTable";
+import StaffEmployeeProgramCard from "@/components/staffEmployee/StaffEmployeeProgramCard";
+
+export type Priority = "HIGH" | "MEDIUM" | "LOW";
+export type ProjectStatus =
+  | "LIVE"
+  | "PENDING"
+  | "RETURNED"
+  | "OVERDUE"
+  | "DRAFT"
+  | "IN_REVIEW"
+  | "SUBMITTED";
+export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
 export interface Project {
-  id: number;
+  id: string;
+  programId: string;
+
   name: string;
-  assignedStaff: string[];
-  status: "Approved" | "Pending" | "Returned";
-  priority: "High" | "Medium" | "Low" | "Default";
-  submitDate: string;
-  selected: boolean;
+  description: string;
+
+  status: ProjectStatus;
+  priority: ProjectPriority;
+
+  startDate: string;
+  deadline: string;
+
+  progress: number;
+
+  managerId: string;
+
+  chartList: unknown[];
+
+  estimatedCompletedDate: string;
+  projectCompleteDate: string | null;
+
+  currentRate: string;
+  budget: string;
+
+  latitude: number | null;
+  longitude: number | null;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Program {
+  id: string;
+  programName: string;
+  programDescription: string;
+  priority: Priority;
+  deadline: string;
+  progress: number;
+  projects: Project[];
 }
 
 const allProgramProjectData = [
@@ -347,6 +392,10 @@ const AllProjectReview: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 11;
 
+  const { data } = useGetAllProgramQuery({});
+
+  const programs = data?.data?.data || [];
+
   const totalPages = Math.ceil(
     allProgramProjectData.length / itemsPerPage
   );
@@ -507,21 +556,7 @@ const AllProjectReview: React.FC = () => {
 
           {viewMode === "table" ? (
             <>
-              <AllProgramProjectTableView
-                allProgramProjectData={allProgramProjectData.map(
-                  (item) => ({
-                    ...item,
-                    priority:
-                      item.priority === "High"
-                        ? "High"
-                        : item.priority === "Medium"
-                        ? "Medium"
-                        : item.priority === "Low"
-                        ? "Low"
-                        : "Low", // fallback to "Low" if not matching
-                  })
-                )}
-              />
+              <StaffEmployeeProgramTable programs={programs} />
 
               <Pagination
                 currentPage={currentPage}
@@ -533,21 +568,18 @@ const AllProjectReview: React.FC = () => {
             </>
           ) : (
             <>
-              <AllProgramProjectGridView
-                allProgramProjectData={allProgramProjectData.map(
-                  (item) => ({
-                    ...item,
-                    priority:
-                      item.priority === "High"
-                        ? "High"
-                        : item.priority === "Medium"
-                        ? "Medium"
-                        : item.priority === "Low"
-                        ? "Low"
-                        : "Low", // fallback to "Low" if not matching
-                  })
-                )}
-              />
+              <div className="grid grid-cols-3 gap-5">
+                {programs?.map((programData: Program) => {
+                  return (
+                    <div key={programData.id}>
+                      <StaffEmployeeProgramCard
+                        program={programData}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+
               {/* "View All" button if there are more than 4 programs/projects */}
               {allProgramProjectData.length > 4 && (
                 <div className="pt-6">
