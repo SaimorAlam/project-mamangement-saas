@@ -7,7 +7,6 @@ import ApexBarChart from "@/common/Charts/ApexBarChart";
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import { useGetEmployeeDashboardStatsQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 import DashboardStatsCard from "@/components/staffEmployee/DashboardStatsCard";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 as Loader } from "lucide-react";
 
 const iconMap: { [key: string]: string } = {

@@ -20,7 +20,8 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
   const {
     title,
     value,
-    growth,
+    growth = "",
+    description,
     growth_type,
     link_text,
     icon,
@@ -91,7 +92,7 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
         </div>
         {/* Description & Link */}
         <div className="flex items-center justify-between text-sm text-gray-700 px-6 py-4">
-          {/* <span className="">{description && description}</span> */}
+          <span className="">{description && description}</span>
           <Link to={`state-card/${title}`} className="text-blue-500 hover:underline">
             {link_text} &rarr;
           </Link>

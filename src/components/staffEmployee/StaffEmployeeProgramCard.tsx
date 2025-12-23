@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ClipboardList, Flag, Layers } from "lucide-react";
+import { Flag, Layers } from "lucide-react";
 import { Link } from "react-router-dom";
 import PrimaryButton from "../../common/PrimaryButton";
 

@@ -19,7 +19,6 @@ import Pagination from "../Pagination";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "../../../common/PrimaryButton";
 import DropdownSelect from "../../../common/DropdownSelect";
-import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import StaffEmployeeProgramCard from "./../../staffEmployee/StaffEmployeeProgramCard";
 import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProgramTable";
 import { Loader2 as Loader } from "lucide-react";
@@ -92,7 +91,10 @@ const AllProgramProject = () => {
   const itemsPerPage = 6;
 
   // const { data, isLoading } = useGetAllProjectsQuery({});
-  const { data, isLoading } = useGetAllProgramQuery({});
+  const { data, isLoading } = useGetAllProgramQuery({
+    statusFilter,
+    priorityFilter,
+  });
 
   const program = data?.data?.data || [];
 
