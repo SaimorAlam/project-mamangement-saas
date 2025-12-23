@@ -13,9 +13,6 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
 
     const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1)
     const [xAxisValues, setXAxisValues] = useState<string[]>([]);
-    console.log(xAxisValues);
-
-
     const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
 
     const [legendValues, setLegendValues] = useState<LegendValue[]>([
@@ -60,7 +57,6 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
             updated[index] = value;
             return updated;
         });
-        console.log("parant x values: ", xAxisValues);
     };
     return (
         <div className="flex justify-between gap-3">

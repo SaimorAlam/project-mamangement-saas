@@ -1,6 +1,6 @@
 import React, { cloneElement, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
-import { Bell, Upload } from "lucide-react";
+import { Bell, Eye, FileText, Megaphone } from "lucide-react";
 import NotificationModal from "@/components/client/NotificationModal";
 import { useLocation, Link } from "react-router-dom";
 import {
@@ -14,6 +14,7 @@ import {
 import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffEmployeeHeaderContext";
 import { getStaffEmployeeSidebarItems } from "./staffEmployeeSidebarMenuItems";
+import UploadSubmission from "@/components/staffManager/overview/UploadSubmission";
 
 const StaffEmployeeDashboardHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -46,11 +47,10 @@ const StaffEmployeeDashboardHeader = () => {
           setSearchTerm={setSearchTerm}
         />
 
-        {/* Right Controls */}
-        <div className="flex items-center justify-between gap-6 relative">
+        <div className="flex items-center justify-between gap-2 relative">
           {/* Notifications */}
           <PrimaryButton
-            leftIcon={<Bell className="text-xl" />}
+            leftIcon={<Bell className="text-2xl" />}
             type={"Outline"}
             onClick={() => setIsOpen(true)}
           />
@@ -59,18 +59,40 @@ const StaffEmployeeDashboardHeader = () => {
             onClose={() => setIsOpen(false)}
           />
 
-          {/* 🔹 Conditional Quick Action */}
+          {/* Preview */}
+          <PrimaryButton
+            leftIcon={<Eye className="text-2xl" />}
+            title="Preview"
+            type={"Outline"}
+            onClick={() => setIsOpen(true)}
+          />
+
+          {/* Save Draft */}
+          <PrimaryButton
+            leftIcon={<FileText className="text-2xl" />}
+            title="Save Draft"
+            type={"Outline"}
+            onClick={() => setIsOpen(true)}
+          />
+
+          {/* Publish */}
+          <PrimaryButton
+            leftIcon={<Megaphone className="text-2xl" />}
+            title="Publish"
+            type={currentPath==="/staff-manager-panel" ? "Outline":"Primary"}
+            onClick={() => setIsOpen(true)}
+          />
+
+          {/* Conditional Quick Action */}
+          {currentPath==="/staff-employee-panel" && (
           <div className="relative">
             <>
               {showButton && (
-                <PrimaryButton
-                  title={"Upload Submission"}
-                  leftIcon={<Upload />}
-                  type={"Primary"}
-                />
+                <UploadSubmission />
               )}
             </>
           </div>
+          )}
         </div>
       </div>
 
