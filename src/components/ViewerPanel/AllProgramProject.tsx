@@ -467,7 +467,7 @@ const AllProgramProject = () => {
       {/* Header  */}
       <div className="flex items-center justify-between pb-6">
         <h4 className=" text-gray-900 text-2xl font-semibold">
-          Assigned Project
+          Assigned Projects
         </h4>
 
         <div className="flex items-center gap-3">

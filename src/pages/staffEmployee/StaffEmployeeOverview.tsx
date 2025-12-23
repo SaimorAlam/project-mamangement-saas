@@ -5,69 +5,56 @@ import ApexDonutChart from "@/common/Charts/ApexDonutChart";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/common/Charts/ApexBarChart";
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
-import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
+import { useGetEmployeeDashboardStatsQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
+import DashboardStatsCard from "@/components/staffEmployee/DashboardStatsCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 as Loader } from "lucide-react";
 
-const clientData = [
-  {
-    title: "Total Assigned Project",
-    value: 56,
-    growth: "+5%",
-    growth_type: "up",
-    description: "since last month",
-    link_text: "View all",
-    icon: "FolderIcon",
-    icon_bg_color: "#069576",
-  },
-  {
-    title: "Submitted for Review",
-    value: 156,
-    growth: "+5%",
-    growth_type: "up",
-    description: "24 project Running this month",
-    link_text: "View all",
-    icon: "FolderIcon",
-    icon_bg_color: "#069576",
-  },
-  {
-    title: "Returned for Edit",
-    value: 36,
-    growth: "+2%",
-    growth_type: "up",
-    description: "150 New user joined",
-    link_text: "View all",
-    icon: "LiveProject",
-    icon_bg_color: "#756CF5",
-  },
-  {
-    title: "In live",
-    value: 15,
-    growth: "+1.1%",
-    growth_type: "up",
-    description: "5 new clients joined",
-    link_text: "View all",
-    icon: "ProjectInDraft",
-    icon_bg_color: "#4881FF",
-  },
-  {
-    title: "Submission Overdue",
-    value: "7.8%",
-    growth: null,
-    growth_type: "down",
-    description: "50 Clients left",
-    link_text: "View all",
-    icon: "SubmissionOverdue",
-    icon_bg_color: "#DA4352",
-  },
-];
+const iconMap: { [key: string]: string } = {
+  totalAssignedProject: "FolderIcon",
+  submittedForReview: "FolderIcon",
+  returnedForEdit: "LiveProject",
+  liveProjects: "ProjectInDraft",
+  overdueProjects: "SubmissionOverdue",
+};
 
 const StaffEmployeeOverview = () => {
+  const { data, isLoading } = useGetEmployeeDashboardStatsQuery({});
+
+  const dashboardData = data?.data || {};
+
+  const processedDashboardData = Object.keys(dashboardData).map(
+    (key: string) => {
+      const dataObj = (
+        dashboardData as {
+          [key: string]: { count: number; growth: number };
+        }
+      )[key];
+
+      return {
+        title: key,
+        value: dataObj.count,
+        growth: dataObj.growth,
+        growth_type: dataObj.growth > 0 ? "up" : "down",
+        link_text: "View all",
+        icon: iconMap[key] || "FolderIcon",
+        icon_bg_color:
+          key === "overdueProjects" ? "#DA4352" : "#069576",
+      };
+    }
+  );
+
+  if (isLoading) {
+    return <Loader className="animate-spin" />;
+  }
+
   return (
     <div className="">
       {/* Icon and Home */}
 
       <div className="grid grid-cols-4 gap-6 my-6">
-        {clientData.map((item) => (
-          <DashboardPanelStatsCard key={item.title} item={item} />
+        {processedDashboardData.map((item) => (
+          <DashboardStatsCard key={item.title} item={item} />
         ))}
       </div>
 

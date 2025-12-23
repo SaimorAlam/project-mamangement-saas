@@ -16,12 +16,24 @@ interface IProps {
   item: IClientPanelStats;
 }
 
-const DashboardPanelStatsCard = ({ item }: IProps) => {
+function splitAndCapitalize(camelCaseString: string) {
+  // Insert a space before each capital letter that follows a lowercase letter
+  const spacedString = camelCaseString.replace(
+    /([a-z])([A-Z])/g,
+    "$1 $2"
+  );
+
+  // Capitalize the first letter of the entire string and return
+  return spacedString.charAt(0).toUpperCase() + spacedString.slice(1);
+}
+
+const DashboardStatsCard = ({ item }: IProps) => {
   const {
     title,
     value,
     growth,
     growth_type,
+    description,
     link_text,
     icon,
     icon_bg_color,
@@ -65,7 +77,7 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
             </div>
 
             <h3 className="text-gray-700 font-semibold text-lg">
-              {title}
+              {splitAndCapitalize(title)}
             </h3>
           </div>
 
@@ -91,6 +103,7 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
         </div>
         {/* Description & Link */}
         <div className="flex items-center justify-between text-sm text-gray-700 px-6 py-4">
+          <span className="">{description}</span>
           <Link
             to={`state-card/${title}`}
             className="text-blue-500 hover:underline"
@@ -102,4 +115,4 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
     </div>
   );
 };
-export default DashboardPanelStatsCard;
+export default DashboardStatsCard;
