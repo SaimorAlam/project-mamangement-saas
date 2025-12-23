@@ -1,41 +1,66 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { ClipboardList, Star, Flag } from "lucide-react";
+import { ClipboardList, Flag, Layers } from "lucide-react";
 import { Link } from "react-router-dom";
 import PrimaryButton from "../../common/PrimaryButton";
 
+export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
   | "LIVE"
   | "RETURNED"
   | "OVERDUE"
   | "DRAFT"
   | "IN_REVIEW"
-  | "SUBMITTED";
+  | "SUBMITTED"
+  | "PENDING";
 
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-export interface ProjectType {
+export interface Project {
   id: string;
   programId: string;
+
   name: string;
   description: string;
+
   status: ProjectStatus;
   priority: ProjectPriority;
+
   startDate: string;
   deadline: string;
+
   progress: number;
+
   managerId: string;
+
   chartList: unknown[];
-  latitude: number;
-  longitude: number;
+
+  estimatedCompletedDate: string;
+  projectCompleteDate: string | null;
+
+  currentRate: string;
+  budget: string;
+
+  latitude: number | null;
+  longitude: number | null;
+
   createdAt: string;
   updatedAt: string;
+}
+
+interface Program {
+  id: string;
+  programName: string;
+  programDescription: string;
+  priority: Priority;
+  deadline: string;
+  progress: number;
+  projects: Project[];
+}
+
+interface StaffEmployeeProgramCardProps {
+  program: Program;
 }
 
 const formatDate = (date: string) =>
@@ -45,31 +70,11 @@ const formatDate = (date: string) =>
     year: "numeric",
   });
 
-interface StaffEmployeeProgramCardProps {
-  project: ProjectType;
-}
-
 const StaffEmployeeProgramCard = ({
-  project,
+  program,
 }: StaffEmployeeProgramCardProps) => {
-  const {
-    id,
-    name,
-    status,
-    priority,
-    startDate,
-    deadline,
-    progress,
-  } = project;
-
-  const statusColors: Record<ProjectStatus, string> = {
-    LIVE: "bg-[#EBFFF2] text-[#169E7B] border border-[#ABEFD5]",
-    RETURNED: "bg-[#f8f0e8] text-[#FF974B] border border-[#f9dec9]",
-    OVERDUE: "bg-[#FDF4F5] text-[#DA4352] border border-[#F8D3D5]",
-    DRAFT: "bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]",
-    IN_REVIEW: "bg-[#FFF9ED] text-[#DB940C] border border-[#FCE38C]",
-    SUBMITTED: "bg-[#F5F2FC] text-[#8B69E2] border border-[#DFDBF9]",
-  };
+  const { id, programName, priority, deadline, progress, projects } =
+    program;
 
   const priorityColor =
     priority === "HIGH"
@@ -78,81 +83,87 @@ const StaffEmployeeProgramCard = ({
       ? "text-[#F59E0B]"
       : "text-[#16A34A]";
 
+  const statusCount = projects.reduce<Record<ProjectStatus, number>>(
+    (acc, project) => {
+      acc[project.status] = (acc[project.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<ProjectStatus, number>
+  );
+
   return (
-    <Card className="w-full max-w-md bg-white shadow-sm border border-[#E2E8F0]">
-      <CardContent className="px-0 py-0">
+    <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition h-[400px] flex flex-col">
+      <CardContent className="p-6 space-y-5 flex flex-col justify-between">
         {/* Header */}
-        <div className="flex items-start justify-between px-6 border-b border-gray-200 py-5">
-          <div className="flex items-start gap-3">
-            <div className="w-12 h-12 bg-[#069576] rounded-lg flex items-center justify-center">
-              <ClipboardList className="w-6 h-6 text-white" />
+        <div className="flex items-start justify-between">
+          <div className="flex gap-3">
+            <div className="w-12 h-12 rounded-xl bg-[#069576] flex items-center justify-center">
+              <Layers className="w-6 h-6 text-white" />
             </div>
 
             <div>
-              <h5 className="font-semibold text-gray-900">{name}</h5>
-              <p className="text-sm text-gray-600">
-                Project ID: {id.slice(0, 8)}…
+              <h4 className="font-semibold text-gray-900 leading-tight">
+                {programName}
+              </h4>
+              <p className="text-sm text-gray-600 line-clamp-2">
+                {projects[0]?.name}
               </p>
             </div>
           </div>
 
-          <Badge className={`${statusColors[status]} px-2 text-sm`}>
-            {status.replace("_", " ")}
+          <Badge variant="outline" className="text-xs px-2 py-1">
+            {projects.length} Projects
           </Badge>
         </div>
 
-        {/* Content */}
-        <div className="space-y-4 p-6">
-          {/* Dates */}
-          <div className="flex justify-between">
-            <div>
-              <p className="text-sm text-gray-800">Start Date</p>
-              <p className="text-base font-medium">
-                {formatDate(startDate)}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-800">Deadline</p>
-              <p className="text-base font-medium">
-                {formatDate(deadline)}
-              </p>
-            </div>
+        {/* Meta */}
+        <div className="flex justify-between text-sm">
+          <div>
+            <p className="text-gray-500">Deadline</p>
+            <p className="font-medium">{formatDate(deadline)}</p>
           </div>
 
-          {/* Priority */}
           <div>
-            <p className="text-sm text-gray-800 mb-1">Priority</p>
+            <p className="text-gray-500">Priority</p>
             <div className="flex items-center gap-1">
               <Flag className={`w-4 h-4 ${priorityColor}`} />
-              <span
-                className={`text-sm font-medium ${priorityColor}`}
-              >
+              <span className={`font-medium ${priorityColor}`}>
                 {priority}
               </span>
             </div>
           </div>
-
-          {/* Progress */}
-          <div>
-            <div className="flex justify-between mb-1">
-              <p className="text-sm text-gray-600">Progress</p>
-              <p className="text-sm font-medium">
-                {progress}% completed
-              </p>
-            </div>
-            <Progress value={progress} max={100} className="h-2" />
-          </div>
-
-          {/* CTA */}
-          <Link to={`/projects/${id}`}>
-            <PrimaryButton
-              title="View Project"
-              type="Primary"
-              className="w-full h-10"
-            />
-          </Link>
         </div>
+
+        {/* Project Status Summary */}
+        <div className="flex flex-wrap gap-2 overflow-auto max-h-[60px]">
+          {Object.entries(statusCount).map(([status, count]) => (
+            <Badge
+              key={status}
+              variant="secondary"
+              className="text-xs"
+            >
+              {status.replace("_", " ")} · {count}
+            </Badge>
+          ))}
+        </div>
+
+        {/* Progress */}
+        <div>
+          <div className="flex justify-between text-sm mb-1">
+            <span className="text-gray-600">Overall Progress</span>
+            <span className="font-medium">{progress}%</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+
+        {/* CTA */}
+        <Link to={`/programs/${id}`}>
+          <PrimaryButton
+            title="View Program"
+            type="Primary"
+            className="w-full h-10"
+          />
+        </Link>
       </CardContent>
     </Card>
   );

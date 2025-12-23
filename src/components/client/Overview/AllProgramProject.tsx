@@ -23,33 +23,59 @@ import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import StaffEmployeeProgramCard from "./../../staffEmployee/StaffEmployeeProgramCard";
 import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProgramTable";
 import { Loader2 as Loader } from "lucide-react";
+import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 
+export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
   | "LIVE"
+  | "PENDING"
   | "RETURNED"
   | "OVERDUE"
   | "DRAFT"
   | "IN_REVIEW"
   | "SUBMITTED";
-
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-export interface ProjectType {
+export interface Project {
   id: string;
   programId: string;
+
   name: string;
   description: string;
+
   status: ProjectStatus;
   priority: ProjectPriority;
+
   startDate: string;
   deadline: string;
+
   progress: number;
+
   managerId: string;
+
   chartList: unknown[];
-  latitude: number;
-  longitude: number;
+
+  estimatedCompletedDate: string;
+  projectCompleteDate: string | null;
+
+  currentRate: string;
+  budget: string;
+
+  latitude: number | null;
+  longitude: number | null;
+
   createdAt: string;
   updatedAt: string;
+}
+
+interface Program {
+  id: string;
+  programName: string;
+  programDescription: string;
+  priority: Priority;
+  deadline: string;
+  progress: number;
+  projects: Project[];
 }
 
 const AllProgramProject = () => {
@@ -65,16 +91,19 @@ const AllProgramProject = () => {
 
   const itemsPerPage = 6;
 
-  const { data, isLoading } = useGetAllProjectsQuery({});
+  // const { data, isLoading } = useGetAllProjectsQuery({});
+  const { data, isLoading } = useGetAllProgramQuery({});
 
-  const projects = data?.data?.projects?.data || [];
+  const program = data?.data?.data || [];
+
+  console.log("All Programs Data:", program);
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return projects.slice(startIndex, startIndex + itemsPerPage);
-  }, [projects, currentPage]);
+    return program.slice(startIndex, startIndex + itemsPerPage);
+  }, [program, currentPage]);
 
-  const totalPages = Math.ceil(projects.length / itemsPerPage);
+  const totalPages = Math.ceil(program.length / itemsPerPage);
 
   const statusOptions = [
     { value: "all", title: "All Status" },
@@ -244,7 +273,7 @@ const AllProgramProject = () => {
       {viewMode === "table" ? (
         <>
           <StaffEmployeeProgramTable
-            projects={paginatedData as ProjectType[]}
+            programs={paginatedData as Program[]}
           />
 
           <Pagination
@@ -252,22 +281,22 @@ const AllProgramProject = () => {
             setCurrentPage={setCurrentPage}
             itemsPerPage={itemsPerPage}
             totalPages={totalPages}
-            filteredDataLength={projects.length}
+            filteredDataLength={program.length}
           />
         </>
       ) : (
         <>
           <div className="grid grid-cols-4 gap-5">
-            {projects?.map((projectData: ProjectType) => {
+            {program?.map((programData: Program) => {
               return (
-                <div key={projectData.id}>
-                  <StaffEmployeeProgramCard project={projectData} />
+                <div key={programData.id}>
+                  <StaffEmployeeProgramCard program={programData} />
                 </div>
               );
             })}
           </div>
           {/* "View All" button if there are more than 4 programs/projects */}
-          {projects.length > 4 && (
+          {program.length > 4 && (
             <div className="pt-6">
               <Link to="/work-in-progress">
                 <Button
@@ -275,7 +304,7 @@ const AllProgramProject = () => {
                   className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                 >
                   {/* Display total count */}
-                  View all {projects.length}
+                  View all {program.length}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
