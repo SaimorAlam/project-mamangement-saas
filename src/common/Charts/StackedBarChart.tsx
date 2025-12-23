@@ -12,8 +12,9 @@ import { Copy, Trash2, Download } from "lucide-react";
 import { generateChartData } from "@/utils";
 import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
+import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 
-/*    == TYPES    == */
+/*       TYPES       */
 
 export type ChartData = {
   name: string;
@@ -29,7 +30,7 @@ type Props = {
   endingRange: number;
 };
 
-/*    == COMPONENT    == */
+/*       COMPONENT       */
 
 export default function StackedBarChart({
   widgetTitle = "My CSV",
@@ -66,37 +67,10 @@ export default function StackedBarChart({
     }, 0);
   }, [chartData, legendValues]);
 
-  /*   CSV HELPERS   */
-
-  const buildCsvTemplate = () => {
-    const header = ["X-Axis", ...legendValues.map(l => l.label)].join(",");
-
-    const rows = xAxisValues.map(
-      label => `${label}${",".repeat(legendValues.length)}`
-    );
-
-    return [header, ...rows].join("\n");
-  };
-
-  const downloadCsvFile = (csv: string, fileName: string) => {
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    link.click();
-
-    URL.revokeObjectURL(url);
-  };
-
   /*   API calling + DOWNLOAD csv with id   */
   const [getChartTitleId, { error, isLoading }] = useGetChartTitleIdMutation();
 
-  const handleDownload = async () => {
-  try {
-    setIsDownloading(true);
-
+  const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -115,23 +89,11 @@ export default function StackedBarChart({
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
     };
+    setIsDownloading(true)
 
-    console.log("going for response...");
-    
-    // Calling the mutation and wait for the result
-    const result = await getChartTitleId(payload).unwrap();
-    console.log("response id is: ", result); 
+    DownloadAndSaveCSVforModuleOneWidget(payload, getChartTitleId, widgetTitle, xAxisValues, legendValues)
 
-    const uniqueId = result.data.id; // backend generated id
-
-    const csvTemplate = buildCsvTemplate();
-    downloadCsvFile(csvTemplate, `${widgetTitle}_${uniqueId}.csv`);
-  } catch (error) {
-    console.error("Download failed", error);
-    alert("Failed to download CSV");
-  } finally {
-    setIsDownloading(false);
-  }
+    setIsDownloading(false)
 };
 
 

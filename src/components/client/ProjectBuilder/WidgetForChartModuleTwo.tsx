@@ -10,6 +10,7 @@ export type LegendValue = {
 const WidgetForChartModuleTwo = ({
     widgedName,
     widgetTitle,
+    widgetCategory,
     setWidgetTitle,
     numOfLegendDataSet,
     setNumOfLegendDataSet,
@@ -22,6 +23,7 @@ const WidgetForChartModuleTwo = ({
 }: {
     widgedName: string,
     widgetTitle: string,
+    widgetCategory: string,
     setWidgetTitle: React.Dispatch<React.SetStateAction<string>>,
     numOfLegendDataSet: number,
     setNumOfLegendDataSet: React.Dispatch<React.SetStateAction<number>>,
@@ -105,20 +107,23 @@ const WidgetForChartModuleTwo = ({
         });
     };
 
+    console.log(widgetCategory);
+    
 
-    // making this csvTemplate = "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
-    //   const csvTemplate = (() => {
-    //     // Header row
-    //     const header =
-    //       ["Day", ...legendValues.map((l) => l.label)].join(",");
-
-    //     // Data rows
-    //     const rows = xAxisValues.map(
-    //       (day) => `${day}${",".repeat(legendValues.length)}`
-    //     );
-
-    //     return [header, ...rows].join("\n");
-    //   })();
+        // const payload = {
+        //   numberOfDataset: numOfLegendDataSet,
+        //   firstFiledDataset: startingRange,
+        //   lastFiledDAtaset: endingRange,
+        //   showWidgets: legendValues.map(l => ({
+        //     legend_name: l.label,
+        //     color: l.color,
+        //   })),
+        //   title: widgetTitle,
+        //   status: "ACTIVE",
+        //   category: widgetCategory,
+        // };
+        // DownloadAndSaveCSVforModuleOneWidget(payload, getChartTitleId, widgetTitle, xAxisValues, legendValues)
+    
 
 
     return (
