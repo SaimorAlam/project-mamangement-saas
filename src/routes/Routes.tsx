@@ -86,7 +86,7 @@ const routes = createBrowserRouter([
         path: "/admin",
         element: (
           // <ProtectedRoute allowedRoles={["ADMIN"]}>
-            <AdminDashboardLayout />
+          <AdminDashboardLayout />
           // </ProtectedRoute>
         ),
         children: getAdminRoutes(),
@@ -97,7 +97,7 @@ const routes = createBrowserRouter([
         path: "/client-panel",
         element: (
           // <ProtectedRoute allowedRoles={["CLIENT"]}>
-            <ClientDashboardLayout />
+          <ClientDashboardLayout />
           // </ProtectedRoute>
         ),
         children: getClientRoutes(),
