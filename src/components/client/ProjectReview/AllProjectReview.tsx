@@ -1,20 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   Search,
-  Calendar,
-  Download,
-  Edit2,
-  Trash2,
-  Flag,
   ArrowDownUp,
   ChevronDown,
+  TableIcon,
+  AlignStartHorizontal,
 } from "lucide-react";
 import ProjectDueDate from "./ProjectDueDate";
 import ReviewerActivity from "./ReviewerActivity";
-import IndividualProjectDetails from "@/components/staffManager/Projects/IndividualProjectDetails";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import PrimaryButton from "@/common/PrimaryButton";
+import AllProgramProjectTableView from "../AllProgramProjectTableView";
+import Pagination from "../Pagination";
+import AllProgramProjectGridView from "../AllProgramProjectGridView";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 export interface Project {
   id: number;
@@ -26,86 +33,323 @@ export interface Project {
   selected: boolean;
 }
 
+const allProgramProjectData = [
+  {
+    id: "1",
+    programName: "Health Awareness",
+    projectName: "Wellness Project",
+    status: "Live",
+    staffMembers: [
+      {
+        name: "John Doe",
+        avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+      },
+      {
+        name: "Michael Smith",
+        avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+      },
+    ],
+    startDate: "15-06-2024",
+    endDate: "24-07-2024",
+    priority: "High",
+    progress: 35,
+  },
+  {
+    id: "2",
+    programName: "Education Drive",
+    projectName: "School Support",
+    status: "Returned",
+    staffMembers: [
+      {
+        name: "James Lee",
+        avatar: "https://randomuser.me/api/portraits/men/76.jpg",
+      },
+      {
+        name: "David Wilson",
+        avatar: "https://randomuser.me/api/portraits/men/12.jpg",
+      },
+    ],
+    startDate: "10-07-2024",
+    endDate: "20-08-2024",
+    priority: "Medium",
+    progress: 20,
+  },
+  {
+    id: "3",
+    programName: "Clean City",
+    projectName: "Community Cleaning",
+    status: "Draft",
+    staffMembers: [
+      {
+        name: "Chris Adams",
+        avatar: "https://randomuser.me/api/portraits/men/15.jpg",
+      },
+      {
+        name: "Oliver Brown",
+        avatar: "https://randomuser.me/api/portraits/men/36.jpg",
+      },
+    ],
+    startDate: "01-05-2024",
+    endDate: "30-06-2024",
+    priority: "Low",
+    progress: 100,
+  },
+  {
+    id: "4",
+    programName: "Sports Program",
+    projectName: "Youth Football",
+    status: "In Review",
+    staffMembers: [
+      {
+        name: "Adam Clark",
+        avatar: "https://randomuser.me/api/portraits/men/22.jpg",
+      },
+      {
+        name: "Ryan Scott",
+        avatar: "https://randomuser.me/api/portraits/men/18.jpg",
+      },
+    ],
+    startDate: "12-06-2024",
+    endDate: "12-09-2024",
+    priority: "High",
+    progress: 60,
+  },
+  {
+    id: "5",
+    programName: "Green Project",
+    projectName: "Tree Plantation",
+    status: "Overdue",
+    staffMembers: [
+      {
+        name: "Ethan Hall",
+        avatar: "https://randomuser.me/api/portraits/men/44.jpg",
+      },
+      {
+        name: "Lucas King",
+        avatar: "https://randomuser.me/api/portraits/men/29.jpg",
+      },
+    ],
+    startDate: "20-06-2024",
+    endDate: "25-07-2024",
+    priority: "Medium",
+    progress: 45,
+  },
+  {
+    id: "6",
+    programName: "Food Distribution",
+    projectName: "Hunger Relief",
+    status: "Live",
+    staffMembers: [
+      {
+        name: "Henry Evans",
+        avatar: "https://randomuser.me/api/portraits/men/53.jpg",
+      },
+      {
+        name: "Jack White",
+        avatar: "https://randomuser.me/api/portraits/men/62.jpg",
+      },
+    ],
+    startDate: "05-07-2024",
+    endDate: "15-08-2024",
+    priority: "High",
+    progress: 10,
+  },
+  {
+    id: "7",
+    programName: "Mental Health",
+    projectName: "Wellbeing Sessions",
+    status: "Live",
+    staffMembers: [
+      {
+        name: "William Harris",
+        avatar: "https://randomuser.me/api/portraits/men/66.jpg",
+      },
+      {
+        name: "Thomas Nelson",
+        avatar: "https://randomuser.me/api/portraits/men/72.jpg",
+      },
+    ],
+    startDate: "01-08-2024",
+    endDate: "30-09-2024",
+    priority: "Medium",
+    progress: 55,
+  },
+  {
+    id: "8",
+    programName: "Coding Bootcamp",
+    projectName: "Youth Tech Training",
+    status: "Live",
+    staffMembers: [
+      {
+        name: "Daniel Moore",
+        avatar: "https://randomuser.me/api/portraits/men/83.jpg",
+      },
+      {
+        name: "Matthew Taylor",
+        avatar: "https://randomuser.me/api/portraits/men/87.jpg",
+      },
+    ],
+    startDate: "10-06-2024",
+    endDate: "15-07-2024",
+    priority: "High",
+    progress: 70,
+  },
+  {
+    id: "9",
+    programName: "Disaster Relief",
+    projectName: "Flood Assistance",
+    status: "Overdue",
+    staffMembers: [
+      {
+        name: "Andrew Martinez",
+        avatar: "https://randomuser.me/api/portraits/men/92.jpg",
+      },
+      {
+        name: "Joseph Anderson",
+        avatar: "https://randomuser.me/api/portraits/men/99.jpg",
+      },
+    ],
+    startDate: "15-07-2024",
+    endDate: "25-08-2024",
+    priority: "High",
+    progress: 15,
+  },
+  {
+    id: "10",
+    programName: "Scholarship Fund",
+    projectName: "Student Aid",
+    status: "Completed",
+    staffMembers: [
+      {
+        name: "Samuel Perez",
+        avatar: "https://randomuser.me/api/portraits/men/3.jpg",
+      },
+      {
+        name: "Anthony Hill",
+        avatar: "https://randomuser.me/api/portraits/men/7.jpg",
+      },
+    ],
+    startDate: "01-04-2024",
+    endDate: "30-05-2024",
+    priority: "Low",
+    progress: 100,
+  },
+  {
+    id: "11",
+    programName: "Water Sanitation",
+    projectName: "Clean Water",
+    status: "Live",
+    staffMembers: [
+      {
+        name: "Jonathan Clark",
+        avatar: "https://randomuser.me/api/portraits/men/14.jpg",
+      },
+      {
+        name: "Patrick Allen",
+        avatar: "https://randomuser.me/api/portraits/men/21.jpg",
+      },
+    ],
+    startDate: "10-05-2024",
+    endDate: "20-07-2024",
+    priority: "Medium",
+    progress: 40,
+  },
+  {
+    id: "12",
+    programName: "Recycling Drive",
+    projectName: "Waste Management",
+    status: "Live",
+    staffMembers: [
+      {
+        name: "Peter Roberts",
+        avatar: "https://randomuser.me/api/portraits/men/25.jpg",
+      },
+      {
+        name: "George Lewis",
+        avatar: "https://randomuser.me/api/portraits/men/33.jpg",
+      },
+    ],
+    startDate: "12-06-2024",
+    endDate: "12-08-2024",
+    priority: "Low",
+    progress: 50,
+  },
+  {
+    id: "13",
+    programName: "Digital Literacy",
+    projectName: "Online Training",
+    status: "Pending",
+    staffMembers: [
+      {
+        name: "Paul Walker",
+        avatar: "https://randomuser.me/api/portraits/men/37.jpg",
+      },
+      {
+        name: "Kevin Hall",
+        avatar: "https://randomuser.me/api/portraits/men/39.jpg",
+      },
+    ],
+    startDate: "18-07-2024",
+    endDate: "30-08-2024",
+    priority: "Medium",
+    progress: 25,
+  },
+  {
+    id: "14",
+    programName: "Startup Mentorship",
+    projectName: "Business Training",
+    status: "Live",
+    staffMembers: [
+      {
+        name: "Brian Young",
+        avatar: "https://randomuser.me/api/portraits/men/49.jpg",
+      },
+      {
+        name: "Eric Green",
+        avatar: "https://randomuser.me/api/portraits/men/57.jpg",
+      },
+    ],
+    startDate: "05-06-2024",
+    endDate: "25-07-2024",
+    priority: "High",
+    progress: 65,
+  },
+  {
+    id: "15",
+    programName: "Art Therapy",
+    projectName: "Creative Workshops",
+    status: "Completed",
+    staffMembers: [
+      {
+        name: "Kyle Baker",
+        avatar: "https://randomuser.me/api/portraits/men/63.jpg",
+      },
+      {
+        name: "Dylan Reed",
+        avatar: "https://randomuser.me/api/portraits/men/68.jpg",
+      },
+    ],
+    startDate: "01-03-2024",
+    endDate: "01-05-2024",
+    priority: "Low",
+    progress: 100,
+  },
+];
+
 const AllProjectReview: React.FC = () => {
+  const [viewMode, setViewMode] = useState<"table" | "board">(
+    "board"
+  );
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
-  const [projects, setProjects] = useState<Project[]>(
-    Array.from({ length: 50 }, (_, i) => ({
-      id: i + 1,
-      name: "Project Name",
-      assignedStaff: ["user1", "user2", "user3"],
-      status: ["Approved", "Pending", "Returned"][
-        Math.floor(Math.random() * 3)
-      ] as any,
-      priority: ["High", "Medium", "Low", "Default"][
-        Math.floor(Math.random() * 4)
-      ] as any,
-      submitDate: "24-7-2024",
-      selected: false,
-    }))
-  );
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 11;
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Approved":
-        return "bg-green-50 text-green-700";
-      case "Pending":
-        return "bg-orange-50 text-orange-700";
-      case "Returned":
-        return "bg-red-50 text-red-700";
-      default:
-        return "bg-gray-50 text-gray-700";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "High":
-        return "text-red-600";
-      case "Medium":
-        return "text-orange-500";
-      case "Low":
-        return "text-blue-600";
-      default:
-        return "text-gray-600";
-    }
-  };
-
-  const toggleSelectAll = () => {
-    setProjects(
-      projects.map((p) => ({
-        ...p,
-        selected: !projects.every((p) => p.selected),
-      }))
-    );
-  };
-
-  const toggleSelect = (id: number) => {
-    setProjects(
-      projects.map((p) =>
-        p.id === id ? { ...p, selected: !p.selected } : p
-      )
-    );
-  };
-
-  const totalPages = Math.ceil(projects.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedProjects = projects.slice(
-    startIndex,
-    startIndex + itemsPerPage
+  const totalPages = Math.ceil(
+    allProgramProjectData.length / itemsPerPage
   );
-
-  const dateInputRef = useRef(null);
-
-  const handleButtonClick = () => {
-    if (dateInputRef.current) {
-      (dateInputRef.current as HTMLInputElement).showPicker();
-    }
-  };
 
   return (
     <div className="min-h-screen border border-gray-200 rounded-lg my-6 p-6">
@@ -181,13 +425,21 @@ const AllProjectReview: React.FC = () => {
                     Field
                   </div>
                   <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortBy === 'startDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    className={`rounded-md cursor-pointer ${
+                      sortBy === "startDate"
+                        ? "bg-indigo-50 text-indigo-600"
+                        : ""
+                    }`}
                     onClick={() => setSortBy("name")}
                   >
                     Name
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    className={`rounded-md cursor-pointer ${
+                      sortBy === "endDate"
+                        ? "bg-indigo-50 text-indigo-600"
+                        : ""
+                    }`}
                     onClick={() => setSortBy("submitDate")}
                   >
                     Submit Date
@@ -200,13 +452,21 @@ const AllProjectReview: React.FC = () => {
                     Order
                   </div>
                   <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortOrder === 'asc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    className={`rounded-md cursor-pointer ${
+                      sortOrder === "asc"
+                        ? "bg-indigo-50 text-indigo-600"
+                        : ""
+                    }`}
                     onClick={() => setSortOrder("asc")}
                   >
                     Ascending
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortOrder === 'desc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
+                    className={`rounded-md cursor-pointer ${
+                      sortOrder === "desc"
+                        ? "bg-indigo-50 text-indigo-600"
+                        : ""
+                    }`}
                     onClick={() => setSortOrder("desc")}
                   >
                     Descending
@@ -214,206 +474,97 @@ const AllProjectReview: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Date Range */}
-              <div className="relative">
-                <button
-                  onClick={handleButtonClick}
-                  className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
-                >
-                  <Calendar size={18} />
-                  Date Range
-                </button>
+              {/* View Toggle */}
+              <div className="flex items-center  bg-white gap-3">
+                <PrimaryButton
+                  type="Primary"
+                  title="Boards"
+                  leftIcon={
+                    <AlignStartHorizontal className="w-4 h-4" />
+                  }
+                  className={`${
+                    viewMode === "board"
+                      ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
+                      : "bg-white border-black text-black! hover:text-black!"
+                  }`}
+                  onClick={() => setViewMode("board")}
+                />
 
-                <input
-                  type="date"
-                  ref={dateInputRef}
-                  className="absolute opacity-0 pointer-events-none -bottom-2 left-0 w-0 h-0"
+                <PrimaryButton
+                  type="Primary"
+                  title="Tables"
+                  leftIcon={<TableIcon className="w-4 h-4" />}
+                  className={`${
+                    viewMode === "table"
+                      ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
+                      : "bg-white border-black text-black! hover:text-black!"
+                  }`}
+                  onClick={() => setViewMode("table")}
                 />
               </div>
-              {/* Export */}
-              <button
-                onClick={() => {
-                  const headers = ["ID", "Project Name", "Assigned Staff", "Status", "Priority", "Submit Date"];
-                  const rows = projects.map(p => [
-                    p.id,
-                    p.name,
-                    p.assignedStaff.join(", "),
-                    p.status,
-                    p.priority,
-                    p.submitDate
-                  ]);
-
-                  const csvContent = [
-                    headers.join(","),
-                    ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
-                  ].join("\n");
-
-                  const blob = new Blob([csvContent], { type: "text/csv" });
-                  const url = window.URL.createObjectURL(blob);
-                  const link = document.createElement("a");
-                  link.href = url;
-                  link.download = "projects.csv";
-                  link.click();
-                }}
-                className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
-              >
-                <Download size={18} />
-                Export
-              </button>
             </div>
           </div>
 
-          {/* Table */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3 text-left">
-                    <input
-                      type="checkbox"
-                      checked={projects.every((p) => p.selected)}
-                      onChange={toggleSelectAll}
-                      className="rounded border-gray-300 cursor-pointer"
-                    />
-                  </th>
-                  <th className="px-2 py-3 text-left text-sm font-semibold text-gray-700">
-                    Submitted Project Name
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                    Assign Staff
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                    Priority
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                    Submit Date
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {paginatedProjects.map((project) => (
-                  <tr key={project.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <input
-                        type="checkbox"
-                        checked={project.selected}
-                        onChange={() => toggleSelect(project.id)}
-                        className="rounded border-gray-300 cursor-pointer"
-                      />
-                    </td>
-                    <td className="px-2 py-3 text-sm text-gray-900">
-                      {project.name}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center">
-                        <div className="flex -space-x-2">
-                          {project.assignedStaff
-                            .slice(0, 3)
-                            .map((_, idx) => (
-                              <img
-                                key={idx}
-                                src={`https://i.pravatar.cc/150?img=${project.id * 3 + idx
-                                  }`}
-                                alt="Staff"
-                                className="w-8 h-8 rounded-full border-2 border-white"
-                              />
-                            ))}
-                          <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs font-medium text-gray-600">
-                            +3
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          project.status
-                        )}`}
-                      >
-                        {project.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div
-                        className={`flex items-center gap-1 text-sm font-medium ${getPriorityColor(
-                          project.priority
-                        )}`}
-                      >
-                        <Flag size={14} />
-                        {project.priority}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {project.submitDate}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <IndividualProjectDetails project={project} />
-                        <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded cursor-pointer">
-                          <Edit2 size={16} />
-                        </button>
-                        <button className="p-1.5 text-red-600 hover:bg-red-50 rounded cursor-pointer">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {viewMode === "table" ? (
+            <>
+              <AllProgramProjectTableView
+                allProgramProjectData={allProgramProjectData.map(
+                  (item) => ({
+                    ...item,
+                    priority:
+                      item.priority === "High"
+                        ? "High"
+                        : item.priority === "Medium"
+                        ? "Medium"
+                        : item.priority === "Low"
+                        ? "Low"
+                        : "Low", // fallback to "Low" if not matching
+                  })
+                )}
+              />
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
-              <div className="text-sm text-gray-600">
-                Showing {startIndex + 1} to{" "}
-                {Math.min(startIndex + itemsPerPage, projects.length)}{" "}
-                of {projects.length} Project
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.max(1, currentPage - 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Prev
-                </button>
-                {[1, 2, 3, "...", 30].map((page, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() =>
-                      typeof page === "number" && setCurrentPage(page)
-                    }
-                    className={`px-3 py-1.5 text-sm rounded ${page === currentPage
-                      ? "bg-blue-600 text-white"
-                      : "border border-gray-300 hover:bg-gray-50"
-                      }`}
-                    disabled={page === "..."}
-                  >
-                    {page}
-                  </button>
-                ))}
-                <button
-                  onClick={() =>
-                    setCurrentPage(
-                      Math.min(totalPages, currentPage + 1)
-                    )
-                  }
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          </div>
+              <Pagination
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                totalPages={totalPages}
+                filteredDataLength={allProgramProjectData.length}
+              />
+            </>
+          ) : (
+            <>
+              <AllProgramProjectGridView
+                allProgramProjectData={allProgramProjectData.map(
+                  (item) => ({
+                    ...item,
+                    priority:
+                      item.priority === "High"
+                        ? "High"
+                        : item.priority === "Medium"
+                        ? "Medium"
+                        : item.priority === "Low"
+                        ? "Low"
+                        : "Low", // fallback to "Low" if not matching
+                  })
+                )}
+              />
+              {/* "View All" button if there are more than 4 programs/projects */}
+              {allProgramProjectData.length > 4 && (
+                <div className="pt-6">
+                  <Link to="/work-in-progress">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    >
+                      {/* Display total count */}
+                      View all {allProgramProjectData.length}
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {/* Right Sidebar */}
