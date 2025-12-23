@@ -10,7 +10,7 @@ const ProjectStats = () => {
       description: "",
       link_text: "",
       icon: "FolderIcon",
-      icon_bg_color: "#059669",
+      icon_bg_color: "#5500f1",
     },
     {
       title: "Awaiting Review",
@@ -30,7 +30,7 @@ const ProjectStats = () => {
       description: "",
       link_text: "",
       icon: "PendingReview",
-      icon_bg_color: "#059669",
+      icon_bg_color: "#aeb100",
     },
     {
       title: "Live",
@@ -47,8 +47,8 @@ const ProjectStats = () => {
       growth: "",
       growth_type: "",
       description: "",
-      icon: "SubmissionOverdue",
-      icon_bg_color: "#DC2626",
+      icon: "Check",
+      icon_bg_color: "#059669",
     },
   ];
 
