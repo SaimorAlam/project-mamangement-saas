@@ -47,14 +47,27 @@ const employeeApi = baseApi.injectEndpoints({
     }),
 
     addEmployee: builder.mutation({
-      query: ({ projects, ...employeeData }) => ({
+      query: (data) => ({
         url: "/users/employees/create-employee",
         method: "POST",
-        body: employeeData,
+        body: data,
       }),
       invalidatesTags: [{ type: "Employees", id: "LIST" }],
     }),
-
+    addManager: builder.mutation({
+      query: (data) => ({
+        url: "/users/managers/create",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    addViewer: builder.mutation({
+      query: (data) => ({
+        url: "/users/viewers/create",
+        method: "POST",
+        body: data,
+      }),
+    }),
     updateEmployee: builder.mutation({
       query: ({ projects, id, ...employeeData }) => ({
         url: `/employees/${id}`,
@@ -98,6 +111,8 @@ export const {
   useBulkDeleteEmployeeMutation,
   useGetEmployeeTaskStatisticsQuery,
   useGetEmployeeTaskByIdQuery,
+  useAddManagerMutation,
+  useAddViewerMutation,
 } = employeeApi;
 
 export default employeeApi;

@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { X, Mail, Calendar, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { IAddEmployeePayload } from "@/types";
-import { useAddEmployeeMutation } from "@/store/Api/EmployeeApi/EmployeeApi";
+import {
+  useAddEmployeeMutation,
+  useAddManagerMutation,
+  useAddViewerMutation,
+} from "@/store/Api/EmployeeApi/EmployeeApi";
+import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 
 interface IAddEmployeeModalProps {
   open: boolean;
@@ -12,18 +18,7 @@ interface IAddEmployeeModalProps {
 
 const today = new Date().toISOString().split("T")[0];
 
-const PROJECT_OPTIONS = [
-  "Carlyle Hall",
-  "Highway Expedition",
-  "Metro Rail Extension",
-  "City Drainage Upgrade",
-  "Airport Terminal Renovation",
-];
-
-const AddEmployeeModal = ({
-  open,
-  onClose,
-}: IAddEmployeeModalProps) => {
+const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
   const {
     register,
     handleSubmit,
@@ -40,8 +35,11 @@ const AddEmployeeModal = ({
       notifyProjectManager: false,
       skills: ["Civil Eng", "Architect"],
       projects: [],
+      role: "Employee",
     },
   });
+
+  const selectedRole = watch("role");
 
   const skills = watch("skills");
   const projects = watch("projects");
@@ -49,7 +47,21 @@ const AddEmployeeModal = ({
   const [skillInput, setSkillInput] = useState("");
   // const [projectInput, setProjectInput] = useState("");
 
-  const [addEmployee, { isLoading }] = useAddEmployeeMutation();
+  const [addEmployee, { isLoading: employeeLoading }] =
+    useAddEmployeeMutation();
+  const [addManager, { isLoading: managerloading }] = useAddManagerMutation();
+  const [addViewer, { isLoading: viewerloading }] = useAddViewerMutation();
+  const { data: allProjects } = useGetAllProjectsQuery({});
+  const projectsData = allProjects?.data?.projects?.data?.map(
+    (project: { name: string; id: string }) => ({
+      name: project.name,
+      id: project.id,
+    })
+  );
+  const PROJECT_OPTIONS = projectsData?.map((project: any) => ({
+    label: project.name,
+    value: project.id,
+  }));
   // Reset form when modal closes
   useEffect(() => {
     if (!open) {
@@ -58,8 +70,9 @@ const AddEmployeeModal = ({
         description: "",
         sendWelcomeEmail: true,
         notifyProjectManager: false,
-        skills: ["Civil Eng", "Architect"],
-        projects: ["Carlyle Hall", "Highway expedition"],
+        skills: [],
+        projects: [],
+        role: "Employee",
       });
       setSkillInput("");
       // setProjectInput("");
@@ -96,9 +109,7 @@ const AddEmployeeModal = ({
     );
   }; */
 
-  const handleSkillKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       addSkillTag();
@@ -108,9 +119,9 @@ const AddEmployeeModal = ({
     }
   };
 
-  const addProject = (project: string) => {
-    if (projects.includes(project)) return;
-    setValue("projects", [...projects, project]);
+  const addProject = (projectId: string) => {
+    if (projects.includes(projectId)) return;
+    setValue("projects", [...projects, projectId]);
   };
 
   const removeProject = (project: string) => {
@@ -120,24 +131,83 @@ const AddEmployeeModal = ({
     );
   };
 
+  const cleanObject = (obj: Record<string, any>) => {
+    const newObj: Record<string, any> = {};
+    Object.keys(obj).forEach((key) => {
+      const value = obj[key];
+      if (
+        value !== "" &&
+        value !== null &&
+        value !== undefined &&
+        !(Array.isArray(value) && value.length === 0)
+      ) {
+        newObj[key] = value;
+      }
+    });
+    return newObj;
+  };
+
   const onSubmit = async (data: IAddEmployeePayload) => {
-    if (!skills.length || !projects.length) {
-      toast.error("Please add at least one skill and one project");
-      return;
+    if (selectedRole !== "Viewer") {
+      if (!skills.length || !projects.length) {
+        toast.error("Please add at least one skill and one project");
+        return;
+      }
     }
 
     try {
-      await addEmployee(data).unwrap();
+      let payload: any = {};
+      let mutation: any;
 
-      toast.success("Employee added successfully!");
+      if (selectedRole === "Employee") {
+        payload = {
+          name: data.name,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          password: data.password,
+          skills: data.skills,
+          description: data.description,
+          joinedDate: data.joinedDate,
+          projects: data.projects,
+          sendWelcomeEmail: data.sendWelcomeEmail,
+          notifyProjectManager: data.notifyProjectManager,
+        };
+        mutation = addEmployee;
+      } else if (selectedRole === "Manager") {
+        payload = {
+          name: data.name,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          password: data.password,
+          skills: data.skills,
+          description: data.description,
+          joinedDate: data.joinedDate,
+          projects: data.projects,
+          sendWelcomeEmail: data.sendWelcomeEmail,
+          notifyProjectManager: data.notifyProjectManager,
+        };
+        mutation = addManager;
+      } else if (selectedRole === "Viewer") {
+        payload = {
+          name: data.name,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          password: data.password,
+        };
+        mutation = addViewer;
+      }
+
+      const cleanedPayload = cleanObject(payload);
+
+      await mutation(cleanedPayload).unwrap();
+      toast.success(`${selectedRole} added successfully!`);
       onClose();
     } catch (err: unknown) {
       if (err && typeof err === "object" && "data" in err) {
-        const errorData = (err as { data?: { message?: string } })
-          .data;
+        const errorData = (err as { data?: { message?: string } }).data;
         toast.error(
           errorData?.message ||
-            "Failed to add employee. Please try again."
+            `Failed to add ${selectedRole}. Please try again.`
         );
       } else {
         toast.error("Something went wrong. Please try again.");
@@ -166,6 +236,21 @@ const AddEmployeeModal = ({
           onSubmit={handleSubmit(onSubmit)}
           className="px-6 py-5 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5"
         >
+          {/* Role Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Select Role <span className="text-red-500">*</span>
+            </label>
+            <select
+              {...register("role", { required: "Role is required" })}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none bg-white"
+            >
+              <option value="Employee">Employee</option>
+              <option value="Manager">Manager</option>
+              <option value="Viewer">Viewer</option>
+            </select>
+          </div>
+
           {/* Employee Name and Email */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -242,8 +327,7 @@ const AddEmployeeModal = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Employee Password{" "}
-                <span className="text-red-500">*</span>
+                Employee Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Mail
@@ -256,8 +340,7 @@ const AddEmployeeModal = ({
                     required: "Password is required",
                     minLength: {
                       value: 6,
-                      message:
-                        "Password must be at least 6 characters",
+                      message: "Password must be at least 6 characters",
                     },
                   })}
                   placeholder="Enter employee password"
@@ -273,163 +356,169 @@ const AddEmployeeModal = ({
           </div>
 
           {/* Joined Date */}
-          <div className="grid grid-cols-1 gap-4">
-            <Controller
-              name="joinedDate"
-              control={control}
-              rules={{ required: "Joined date is required" }}
-              render={({ field }) => {
-                const inputRef = useRef<HTMLInputElement>(null);
-                const openPicker = () => {
-                  inputRef.current?.showPicker?.();
-                  inputRef.current?.focus();
-                };
-                return (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Joined Date{" "}
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        {...field}
-                        ref={(e) => {
-                          field.ref(e);
-                          inputRef.current = e;
-                        }}
-                        onClick={openPicker}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none pr-16 cursor-pointer no-date-icon"
-                      />
-                      <button
-                        type="button"
-                        onClick={openPicker}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-                      >
-                        <Calendar size={16} />
-                      </button>
+          {selectedRole !== "Viewer" && (
+            <div className="grid grid-cols-1 gap-4">
+              <Controller
+                name="joinedDate"
+                control={control}
+                rules={{ required: "Joined date is required" }}
+                render={({ field }) => {
+                  const inputRef = useRef<HTMLInputElement>(null);
+                  const openPicker = () => {
+                    inputRef.current?.showPicker?.();
+                    inputRef.current?.focus();
+                  };
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Joined Date <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="date"
+                          {...field}
+                          ref={(e) => {
+                            field.ref(e);
+                            inputRef.current = e;
+                          }}
+                          onClick={openPicker}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none pr-16 cursor-pointer no-date-icon"
+                        />
+                        <button
+                          type="button"
+                          onClick={openPicker}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                        >
+                          <Calendar size={16} />
+                        </button>
+                      </div>
+                      {errors.joinedDate && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.joinedDate.message}
+                        </p>
+                      )}
                     </div>
-                    {errors.joinedDate && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.joinedDate.message}
-                      </p>
-                    )}
-                  </div>
-                );
-              }}
-            />
-          </div>
+                  );
+                }}
+              />
+            </div>
+          )}
 
           {/* Skills & Projects */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Skill <span className="text-red-500">*</span>
-              </label>
-              <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
-                {skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
-                  >
-                    {skill}
-                    <button
-                      type="button"
-                      onClick={() => removeSkillTag(skill)}
-                      className="text-gray-500 hover:text-gray-700"
+          {selectedRole !== "Viewer" && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Skill <span className="text-red-500">*</span>
+                </label>
+                <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
+                  {skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
                     >
-                      <X size={12} />
-                    </button>
-                  </span>
-                ))}
-                <input
-                  value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  onKeyDown={handleSkillKeyDown}
-                  placeholder="Type a skill and press Enter"
-                  className="flex-1 min-w-[120px] text-sm outline-none border-none bg-transparent"
-                />
-              </div>
-              {!skills.length && (
-                <p className="text-red-500 text-xs mt-1">
-                  At least one skill is required
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Project <span className="text-red-500">*</span>
-              </label>
-
-              <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
-                {projects.map((project) => (
-                  <span
-                    key={project}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
-                  >
-                    {project}
-                    <button
-                      type="button"
-                      onClick={() => removeProject(project)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <X size={12} />
-                    </button>
-                  </span>
-                ))}
-
-                <select
-                  value=""
-                  onChange={(e) => {
-                    if (e.target.value) addProject(e.target.value);
-                  }}
-                  className="flex-1 min-w-[140px] text-sm outline-none border-none bg-transparent text-gray-600 cursor-pointer"
-                >
-                  <option value="" disabled>
-                    Select project
-                  </option>
-                  {PROJECT_OPTIONS.filter(
-                    (p) => !projects.includes(p)
-                  ).map((project) => (
-                    <option key={project} value={project}>
-                      {project}
-                    </option>
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => removeSkillTag(skill)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
                   ))}
-                </select>
+                  <input
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    onKeyDown={handleSkillKeyDown}
+                    placeholder="Type a skill and press Enter"
+                    className="flex-1 min-w-[120px] text-sm outline-none border-none bg-transparent"
+                  />
+                </div>
+                {!skills.length && (
+                  <p className="text-red-500 text-xs mt-1">
+                    At least one skill is required
+                  </p>
+                )}
               </div>
 
-              {!projects.length && (
-                <p className="text-red-500 text-xs mt-1">
-                  At least one project is required
-                </p>
-              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Project <span className="text-red-500">*</span>
+                </label>
+
+                <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
+                  {projects.map((projectId: string) => (
+                    <span
+                      key={projectId}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
+                    >
+                      {PROJECT_OPTIONS?.find((p: any) => p.value === projectId)
+                        ?.label || projectId}
+                      <button
+                        type="button"
+                        onClick={() => removeProject(projectId)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  ))}
+
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value) addProject(e.target.value);
+                    }}
+                    className="flex-1 min-w-[140px] text-sm outline-none border-none bg-transparent text-gray-600 cursor-pointer"
+                  >
+                    <option value="" disabled>
+                      Select project
+                    </option>
+                    {PROJECT_OPTIONS.filter(
+                      (p: any) => !projects.includes(p.value)
+                    ).map((project: any) => (
+                      <option key={project.value} value={project.value}>
+                        {project.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {!projects.length && (
+                  <p className="text-red-500 text-xs mt-1">
+                    At least one project is required
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Description */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
-                Program Description{" "}
-                <HelpCircle size={14} className="text-gray-400" />{" "}
-                <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                {...register("description", {
-                  required: "Description is required",
-                })}
-                rows={4}
-                placeholder="Enter a description..."
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none resize-none"
-              />
-              {errors.description && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.description.message}
-                </p>
-              )}
+          {selectedRole !== "Viewer" && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                  Program Description{" "}
+                  <HelpCircle size={14} className="text-gray-400" />{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  {...register("description", {
+                    required: "Description is required",
+                  })}
+                  rows={4}
+                  placeholder="Enter a description..."
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none resize-none"
+                />
+                {errors.description && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.description.message}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Footer */}
           <div className="flex items-center justify-end gap-3 px-6 py-4">
@@ -442,14 +531,16 @@ const AddEmployeeModal = ({
             </button>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={employeeLoading || managerloading || viewerloading}
               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
-                isLoading
+                employeeLoading || managerloading || viewerloading
                   ? "bg-blue-400 text-white cursor-not-allowed"
                   : "bg-blue-600 text-white hover:bg-blue-700"
               }`}
             >
-              {isLoading ? "Adding Employee..." : "Add Employee"}
+              {employeeLoading || managerloading || viewerloading
+                ? `Adding ${selectedRole}...`
+                : `Add ${selectedRole}`}
             </button>
           </div>
         </form>
