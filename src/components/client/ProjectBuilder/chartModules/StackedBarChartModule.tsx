@@ -67,6 +67,7 @@ const StackedBarChartModule = () => {
             <ProjectConfiguration
                 widgedName="Stack Bar Chart"
                 widgetTitle={widgetTitle}
+                widgetCategory=''
                 setWidgetTitle={setWidgetTitle}
                 numOfXAxisDataSet={numOfXAxisDataSet}
                 handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}

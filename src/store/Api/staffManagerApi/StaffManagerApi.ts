@@ -5,7 +5,8 @@ const userApi = baseApi.injectEndpoints({
     getStaffEmpStateCarts: builder.query({
         query: ()=> `/manager/dashboard`,
         providesTags: ["Manager"],
-    })
+    }),
+    // add here the query 
   }),
 });
 
