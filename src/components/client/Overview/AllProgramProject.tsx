@@ -81,8 +81,8 @@ const AllProgramProject = () => {
   const [viewMode, setViewMode] = useState<"table" | "board">(
     "board"
   );
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [, setStatusFilter] = useState<string>("all");
+  const [, setPriorityFilter] = useState<string>("all");
 
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
@@ -91,10 +91,7 @@ const AllProgramProject = () => {
   const itemsPerPage = 6;
 
   // const { data, isLoading } = useGetAllProjectsQuery({});
-  const { data, isLoading } = useGetAllProgramQuery({
-    statusFilter,
-    priorityFilter,
-  });
+  const { data, isLoading } = useGetAllProgramQuery({});
 
   const program = data?.data?.data || [];
 
