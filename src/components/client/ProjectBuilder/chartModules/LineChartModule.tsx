@@ -67,6 +67,7 @@ const LineChartModule = () => {
                 widgedName="Multi Axis Line Chart"
                 widgetTitle={widgetTitle}
                 setWidgetTitle={setWidgetTitle}
+                widgetCategory=''
                 numOfXAxisDataSet={numOfXAxisDataSet}
                 handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
                 xAxisValues={xAxisValues}

@@ -1,5 +1,6 @@
 import {
   AlignStartHorizontal,
+  ArrowDownUp,
   ArrowRight,
   ChevronDown,
   Filter,
@@ -11,6 +12,7 @@ import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ProjectGridView from "./ProjectGridView";
@@ -430,6 +432,8 @@ const AllProgramProject = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState<string>("asc");
+  const [sortBy, setSortBy] = useState<string>("all");
 
   console.log(statusFilter);
   console.log(priorityFilter);
@@ -497,6 +501,76 @@ const AllProgramProject = () => {
               onClick={() => setViewMode("table")}
             />
           </div>
+
+          {/* Sort By Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 bg-transparent border border-[#CAD2DB] h-12"
+              >
+                <ArrowDownUp className="size-5" />
+                Sort By
+                <ChevronDown className="size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-56 bg-white border border-[#CAD2DB] p-1"
+            >
+              {/* Field Selection */}
+              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Field
+              </div>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${
+                  sortBy === "startDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
+                }`}
+                onClick={() => setSortBy("startDate")}
+              >
+                Starting Date
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${
+                  sortBy === "endDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
+                }`}
+                onClick={() => setSortBy("endDate")}
+              >
+                Ending Date
+              </DropdownMenuItem>
+
+              <div className="my-1 border-t border-gray-100" />
+
+              {/* Order Selection */}
+              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Order
+              </div>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${
+                  sortOrder === "asc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
+                }`}
+                onClick={() => setSortOrder("asc")}
+              >
+                Ascending
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={`rounded-md cursor-pointer ${
+                  sortOrder === "desc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
+                }`}
+                onClick={() => setSortOrder("desc")}
+              >
+                Descending
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Filter Dropdown */}
           <DropdownMenu>

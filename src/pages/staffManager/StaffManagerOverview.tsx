@@ -6,64 +6,55 @@ import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/common/Charts/ApexBarChart";
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
+import { useGetStaffEmpStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
 const clientData = [
   {
-    title: "Total Program",
-    value: 56,
-    growth: "+5%",
+    title: "Total Assigned Project",
+    value: 0,
+    growth: 0,
     growth_type: "up",
-    description: "24 program Running this month",
+    description: "",
     link_text: "View all",
     icon: "FolderIcon",
     icon_bg_color: "#069576",
   },
   {
-    title: "Total Project",
-    value: 156,
-    growth: "+5%",
+    title: "Submitted for Review",
+    value: 0,
+    growth: 0,
     growth_type: "up",
-    description: "24 project Running this month",
+    description: "",
     link_text: "View all",
     icon: "FolderIcon",
     icon_bg_color: "#069576",
   },
   {
-    title: "Live Project",
-    value: 36,
-    growth: "+2%",
+    title: "Returned for Edit",
+    value: 0,
+    growth: 0,
     growth_type: "up",
-    description: "150 New user joined",
+    description: "",
     link_text: "View all",
     icon: "LiveProject",
     icon_bg_color: "#756CF5",
   },
   {
-    title: "Project in draft",
-    value: 15,
-    growth: "+1.1%",
+    title: "In live",
+    value: 0,
+    growth: 0,
     growth_type: "up",
-    description: "5 new clients joined",
+    description: "",
     link_text: "View all",
     icon: "ProjectInDraft",
     icon_bg_color: "#4881FF",
   },
   {
-    title: "Pending Review",
-    value: 75,
-    growth: "+5%",
-    growth_type: "up",
-    description: "25 score growth",
-    link_text: "View all",
-    icon: "PendingReview",
-    icon_bg_color: "#069576",
-  },
-  {
     title: "Submission Overdue",
-    value: "7.8%",
+    value: 0,
     growth: null,
     growth_type: "down",
-    description: "50 Clients left",
+    description: "",
     link_text: "View all",
     icon: "SubmissionOverdue",
     icon_bg_color: "#DA4352",
@@ -71,13 +62,40 @@ const clientData = [
 ];
 
 const StaffManagerOverview = () => {
+  const { data, isLoading, error } = useGetStaffEmpStateCartsQuery("");
+  const dashboardData = data?.data;
+  if (isLoading) return <div>Fetching data</div>
+  if (error) return <div>Error during Fetching data</div>
+
+  const processedDashboardData = clientData.map((item, index) => {
+    const apiKeys = [
+      "totalAssignedProject",
+      "submittedForReview",
+      "returnedForEdit",
+      "liveProjects",
+      "overdueProjects",
+    ];
+
+    const apiData = dashboardData?.[apiKeys[index]];
+
+    return {
+      ...item,
+      value: apiData?.count ?? 0,
+      growth: apiData?.growth ?? 0,
+    };
+  });
+
+
   return (
     <div className="">
       {/* Icon and Home */}
 
       <div className="grid grid-cols-4 gap-6 my-6">
-        {clientData.map((item) => (
-          <DashboardPanelStatsCard key={item.title} item={item} />
+        {processedDashboardData.map((item) => (
+          <DashboardPanelStatsCard
+            key={item.title}
+            item={item}
+          />
         ))}
       </div>
 
