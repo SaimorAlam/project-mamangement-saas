@@ -18,7 +18,6 @@ import {
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/common/PrimaryButton";
 import Pagination from "../Pagination";
-import AllProgramProjectGridView from "../AllProgramProjectGridView";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
