@@ -56,10 +56,8 @@ const ViewEmployeeModal = ({
   open,
   onClose,
 }: IViewEmployeeModalProps) => {
-  if (!open) return null;
-
   const { data, isLoading } = useGetSingleEmployeeQuery(employeeId);
-
+  if (!open) return null;
   const employee = data?.data;
   const user = employee?.user;
 
@@ -68,9 +66,7 @@ const ViewEmployeeModal = ({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
-            View Employee
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900">View Employee</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
@@ -84,9 +80,7 @@ const ViewEmployeeModal = ({
           {isLoading ? (
             <EmployeeSkeletonLoader />
           ) : !employee ? (
-            <p className="text-sm text-red-500">
-              Employee data not found
-            </p>
+            <p className="text-sm text-red-500">Employee data not found</p>
           ) : (
             <>
               {/* Basic Info */}
@@ -97,15 +91,11 @@ const ViewEmployeeModal = ({
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-500">Name</p>
-                    <p className="text-gray-900 font-medium">
-                      {user?.name}
-                    </p>
+                    <p className="text-gray-900 font-medium">{user?.name}</p>
                   </div>
                   <div>
                     <p className="text-gray-500">Email</p>
-                    <p className="text-gray-900 font-medium">
-                      {user?.email}
-                    </p>
+                    <p className="text-gray-900 font-medium">{user?.email}</p>
                   </div>
                   <div>
                     <p className="text-gray-500">Phone</p>
@@ -115,9 +105,7 @@ const ViewEmployeeModal = ({
                   </div>
                   <div>
                     <p className="text-gray-500">Role</p>
-                    <p className="text-gray-900 font-medium">
-                      {user?.role}
-                    </p>
+                    <p className="text-gray-900 font-medium">{user?.role}</p>
                   </div>
                 </div>
               </div>
@@ -159,9 +147,7 @@ const ViewEmployeeModal = ({
                       </span>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500">
-                      No skills assigned
-                    </p>
+                    <p className="text-sm text-gray-500">No skills assigned</p>
                   )}
                 </div>
               </div>
@@ -171,9 +157,7 @@ const ViewEmployeeModal = ({
                 <h3 className="text-sm font-semibold text-gray-900 mb-2">
                   Description
                 </h3>
-                <p className="text-sm text-gray-700">
-                  {employee.description}
-                </p>
+                <p className="text-sm text-gray-700">{employee.description}</p>
               </div>
             </>
           )}

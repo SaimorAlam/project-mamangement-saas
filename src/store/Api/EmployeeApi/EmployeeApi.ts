@@ -87,6 +87,12 @@ const employeeApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Employees", id: "LIST" }],
     }),
+    getEmployeeTaskStatistics: builder.query({
+      query: (id) => `/employees/${id}/statistics`,
+    }),
+    getEmployeeTaskById: builder.query({
+      query: (id) => `/employees/${id}/tasks`,
+    }),
   }),
 });
 
@@ -98,6 +104,8 @@ export const {
   useUpdateEmployeeMutation,
   useDeleteEmployeeMutation,
   useBulkDeleteEmployeeMutation,
+  useGetEmployeeTaskStatisticsQuery,
+  useGetEmployeeTaskByIdQuery,
 } = employeeApi;
 
 export default employeeApi;

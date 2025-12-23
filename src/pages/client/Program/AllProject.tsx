@@ -19,6 +19,7 @@ import UpdateProjectModal from "./UpdateProjectModal";
 import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
 import { toast } from "sonner";
+
 // import EditProjectModal from "./EditProjectModal";
 
 interface IProjectTableProps {
@@ -155,7 +156,7 @@ const AllProject = ({
     <div className="min-h-screen py-6">
       <div className="bg-white rounded-lg border border-gray-200">
         {/* Header */}
-        <div className="flex justify-between px-6 py-4 border-b">
+        <div className="flex justify-between px-6 py-4 border-b border-gray-200">
           <h1 className="text-lg font-semibold">{title}</h1>
 
           <div className="flex gap-3">
@@ -166,26 +167,25 @@ const AllProject = ({
                 setSearch(e.target.value);
               }}
               placeholder="Search project..."
-              className="border rounded px-4 py-2 text-sm"
+              className="border border-gray-200 rounded px-4 py-2 text-sm"
             />
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="border px-4 py-2 rounded">
+              <DropdownMenuTrigger className="border border-gray-200 px-4 py-2 rounded">
                 {priorityFilter}
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
                   <>
-                  
-                  <DropdownMenuItem
-                    key={p}
-                    onClick={() => {
-                      setCurrentPage(1);
-                      setPriorityFilter(p as any);
-                    }}
-                  >
-                    {p}
-                  </DropdownMenuItem>
+                    <DropdownMenuItem
+                      key={p}
+                      onClick={() => {
+                        setCurrentPage(1);
+                        setPriorityFilter(p as any);
+                      }}
+                    >
+                      {p}
+                    </DropdownMenuItem>
                   </>
                 ))}
               </DropdownMenuContent>
