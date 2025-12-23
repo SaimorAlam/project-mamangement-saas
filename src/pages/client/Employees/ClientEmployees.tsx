@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, {
-  useEffect,
-  useState,
-  Suspense,
-  lazy,
-  useMemo,
-} from "react";
+import React, { useEffect, useState, Suspense, lazy, useMemo } from "react";
 import Swal from "sweetalert2";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -20,17 +14,14 @@ import {
 import Pagination from "@/common/Pagination";
 import EmployeeTableHeader from "./EmployeeTableHeader";
 import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
-import DianneRussellTask from "@/components/client/Employee/DianneRussellTask";
 import ViewEmployeeModal from "@/components/client/Employee/ViewEmployeeModal";
 import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
 
 // Lazy-load EmployeeTable
 const EmployeeTable = lazy(() => import("./EmployeeTable"));
 
-import {
-  IEmployeeProfile,
-  IEditEmployeePayload,
-} from "@/types/client-panel";
+import { IEmployeeProfile, IEditEmployeePayload } from "@/types/client-panel";
+import EmployeeTaskData from "@/components/client/Employee/EmployeeTaskData";
 
 /* ---------- Badge Utilities ---------- */
 const getRoleBadgeColor = (role: string) =>
@@ -60,7 +51,7 @@ const ClientEmployees: React.FC = () => {
   const [status, setStatus] = useState<string | undefined>("");
   const [joinedDateFrom, setJoinedDateFrom] = useState<string>();
   const [joinedDateTo, setJoinedDateTo] = useState<string>();
-
+  const [selectedEmployee, setSelectedEmployee] = useState<IEmployeeProfile>();
   /* ---------- Sorting ---------- */
   const [sortColumn, setSortColumn] = useState<
     | keyof IEmployeeProfile
@@ -78,48 +69,42 @@ const ClientEmployees: React.FC = () => {
   const itemsPerPage = 10;
 
   /* ---------- UI State ---------- */
-  const [activeTab, setActiveTab] = useState<"tables" | "task">(
-    "tables"
-  );
+  const [activeTab, setActiveTab] = useState<"tables" | "task">("tables");
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const [selectedEmployees, setSelectedEmployees] = useState<
-    Set<string>
-  >(new Set());
+  const [selectedEmployees, setSelectedEmployees] = useState<Set<string>>(
+    new Set()
+  );
   const [selectAll, setSelectAll] = useState(false);
 
   /* ---------- Modals ---------- */
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editEmployee, setEditEmployee] =
-    useState<IEditEmployeePayload | null>(null);
+  const [editEmployee, setEditEmployee] = useState<IEditEmployeePayload | null>(
+    null
+  );
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [viewModalId, setViewModalId] = useState("");
 
   /* ---------- API ---------- */
-  const { data: employeeResponse, isFetching } =
-    useGetAllEmployeesQuery({
-      page: currentPage,
-      limit: itemsPerPage,
-      search: debouncedSearch || undefined,
-      status,
-      joinedDateFrom,
-      joinedDateTo,
-    });
+  const { data: employeeResponse, isFetching } = useGetAllEmployeesQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: debouncedSearch || undefined,
+    status,
+    joinedDateFrom,
+    joinedDateTo,
+  });
 
   const [deleteEmployee] = useDeleteEmployeeMutation();
   const [bulkDelete] = useBulkDeleteEmployeeMutation();
 
-  const employeeList: IEmployeeProfile[] =
-    employeeResponse?.data || [];
+  const employeeList: IEmployeeProfile[] = employeeResponse?.data || [];
   const meta = employeeResponse?.meta || {};
   const totalPages = meta?.totalPages || 1;
   const totalEmployees = meta?.total || 0;
 
   /* ---------- Debounced Search ---------- */
   useEffect(() => {
-    const timer = setTimeout(
-      () => setDebouncedSearch(searchTerm),
-      500
-    );
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
@@ -190,14 +175,17 @@ const ClientEmployees: React.FC = () => {
   /* ---------- Selection Handlers ---------- */
   const handleSelectAll = () => {
     if (selectAll) setSelectedEmployees(new Set());
-    else
-      setSelectedEmployees(new Set(sortedEmployees.map((e) => e.id)));
+    else setSelectedEmployees(new Set(sortedEmployees.map((e) => e.id)));
     setSelectAll(!selectAll);
   };
 
   const handleSelectEmployee = (id: string) => {
     const updated = new Set(selectedEmployees);
-    updated.has(id) ? updated.delete(id) : updated.add(id);
+    if (updated.has(id)) {
+      updated.delete(id);
+    } else {
+      updated.add(id);
+    }
     setSelectedEmployees(updated);
     setSelectAll(updated.size === sortedEmployees.length);
   };
@@ -239,11 +227,7 @@ const ClientEmployees: React.FC = () => {
         Swal.fire("Deleted!", "Employee removed.", "success");
       }
     } catch (err: any) {
-      Swal.fire(
-        "Error",
-        err?.data?.message || "Something went wrong",
-        "error"
-      );
+      Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
     }
   };
 
@@ -284,9 +268,7 @@ const ClientEmployees: React.FC = () => {
             setShowFilterDropdown={setShowFilterDropdown}
             selectedEmployees={selectedEmployees}
             filterBy={status || "all"}
-            setFilterBy={(v) =>
-              setStatus(v === "all" ? undefined : v)
-            }
+            setFilterBy={(v) => setStatus(v === "all" ? undefined : v)}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             setJoinedDateFrom={setJoinedDateFrom}
@@ -317,7 +299,10 @@ const ClientEmployees: React.FC = () => {
                 />
               </Suspense>
             ) : (
-              <EmployeeListTask employees={sortedEmployees} />
+              <EmployeeListTask
+                employees={sortedEmployees}
+                setSelectedEmployee={setSelectedEmployee}
+              />
             )}
 
             <Pagination
@@ -353,7 +338,9 @@ const ClientEmployees: React.FC = () => {
 
       {activeTab === "task" && (
         <div className="w-full">
-          <DianneRussellTask />
+          <EmployeeTaskData
+            selectedEmployee={selectedEmployee as IEmployeeProfile}
+          />
         </div>
       )}
     </div>

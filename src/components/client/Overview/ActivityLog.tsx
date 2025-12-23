@@ -16,8 +16,7 @@ const activityLogData = [
     id: "2",
     type: "error",
     title: "Failed login attempt",
-    description:
-      "Multiple failed login attempts for Global Industries",
+    description: "Multiple failed login attempts for Global Industries",
     timestamp: "43 minutes ago",
     metadata: "IP: 185.32.44.12",
   },
@@ -25,8 +24,7 @@ const activityLogData = [
     id: "3",
     type: "success",
     title: "Dashboard published",
-    description:
-      'Acme Corporation published "Sales Overview" dashboard',
+    description: 'Acme Corporation published "Sales Overview" dashboard',
     timestamp: "10 minutes ago",
     metadata: "By Admin",
   },
@@ -62,17 +60,12 @@ const ActivityLog = () => {
           {/* Activity Items */}
           <div className="space-y-6 py-4">
             {activityLogData.map((activity) => (
-              <div
-                key={activity.id}
-                className=" flex items-start gap-3"
-              >
+              <div key={activity.id} className=" flex items-start gap-3">
                 <div className=" relative min-h-20 flex">
                   {/* Status Indicator */}
                   <div
                     className={`size-3 rounded-full flex-shrink-0 z-1 ${
-                      activity.type === "success"
-                        ? ""
-                        : "bg-[#DA4352]"
+                      activity.type === "success" ? "" : "bg-[#DA4352]"
                     }`}
                   />
 
@@ -84,9 +77,7 @@ const ActivityLog = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <h5 className="text-[#1D2028]">
-                          {activity.title}
-                        </h5>
+                        <h5 className="text-[#1D2028]">{activity.title}</h5>
                       </div>
                       <p className="text-sm text-[#475569] mt-1">
                         {activity.description}

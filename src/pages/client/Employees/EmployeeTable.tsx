@@ -47,16 +47,12 @@ const EmployeeTable = ({
     return sortOrder === "asc" ? " ▲" : " ▼";
   };
 
-  const sortableHeader = (
-    label: string,
-    field: string,
-    className = ""
-  ) => (
+  const sortableHeader = (label: string, field: string, className = "") => (
     <th
       onClick={() => handleSort?.(field)}
       className={`px-6 py-3 text-left cursor-pointer select-none ${className}`}
     >
-      <span className="inline-flex items-center text-sm text-xs font-medium text-gray-700">
+      <span className="inline-flex items-center text-sm font-medium text-gray-700">
         {label} {renderSortIcon(field)}
       </span>
     </th>
@@ -80,8 +76,7 @@ const EmployeeTable = ({
               sortableHeader("Employee Name", "userName")}
             {visibleColumns.includes("email") &&
               sortableHeader("Email", "email")}
-            {visibleColumns.includes("role") &&
-              sortableHeader("Role", "role")}
+            {visibleColumns.includes("role") && sortableHeader("Role", "role")}
             {visibleColumns.includes("projects") &&
               sortableHeader("Projects", "projects")}
             {visibleColumns.includes("lastActive") &&
@@ -160,29 +155,26 @@ const EmployeeTable = ({
               {visibleColumns.includes("lastActive") && (
                 <td className="px-6 py-4 text-sm text-gray-600">
                   {employee.user.updatedAt
-                    ? new Date(
-                        employee.user.updatedAt
-                      ).toLocaleDateString()
+                    ? new Date(employee.user.updatedAt).toLocaleDateString()
                     : "N/A"}
                 </td>
               )}
 
-              {visibleColumns.includes("level") &&
-                getStatusBadgeColor && (
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
-                        employee.user.userStatus === "ACTIVE"
-                          ? "Active"
-                          : "In Active"
-                      )}`}
-                    >
-                      {employee.user.userStatus === "ACTIVE"
+              {visibleColumns.includes("level") && getStatusBadgeColor && (
+                <td className="px-6 py-4">
+                  <span
+                    className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
+                      employee.user.userStatus === "ACTIVE"
                         ? "Active"
-                        : "In Active"}
-                    </span>
-                  </td>
-                )}
+                        : "In Active"
+                    )}`}
+                  >
+                    {employee.user.userStatus === "ACTIVE"
+                      ? "Active"
+                      : "In Active"}
+                  </span>
+                </td>
+              )}
 
               {visibleColumns.includes("action") && (
                 <td className="px-6 py-4">
@@ -206,9 +198,7 @@ const EmployeeTable = ({
                     {handleDeleteEmployee && (
                       <button
                         className="p-1 text-red-600"
-                        onClick={() =>
-                          handleDeleteEmployee(employee.id)
-                        }
+                        onClick={() => handleDeleteEmployee(employee.id)}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

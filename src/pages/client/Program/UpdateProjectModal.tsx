@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { X } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -114,15 +113,15 @@ export default function UpdateProjectModal({
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-3xl rounded-2xl p-6">
-        <DialogHeader className="flex justify-between items-center border-b pb-4">
+        <DialogHeader className="flex justify-between items-center border-b border-gray-200 pb-4">
           <DialogTitle className="text-xl font-semibold">
             Update Project
           </DialogTitle>
-          <DialogClose asChild>
+          {/* <DialogClose asChild>
             <Button variant="ghost" className="p-2">
               <X size={20} />
             </Button>
-          </DialogClose>
+          </DialogClose> */}
         </DialogHeader>
 
         <form
@@ -227,10 +226,10 @@ export default function UpdateProjectModal({
             <Textarea
               className="resize-none h-24"
               {...register("description")}
-            />
+            /> 
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
