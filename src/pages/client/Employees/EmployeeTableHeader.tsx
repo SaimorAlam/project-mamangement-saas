@@ -108,9 +108,7 @@ export default function EmployeeTableHeader({
           {/* Filter Dropdown */}
           <div className="relative">
             <button
-              onClick={() =>
-                setShowFilterDropdown(!showFilterDropdown)
-              }
+              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
               className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
             >
               <Filter className="w-4 h-4" />
@@ -141,12 +139,9 @@ export default function EmployeeTableHeader({
                           value={status}
                           id={status}
                           checked={
-                            filterBy.toUpperCase() ===
-                            status.toUpperCase()
+                            filterBy.toUpperCase() === status.toUpperCase()
                           }
-                          onChange={() =>
-                            setFilterBy(status.toUpperCase())
-                          }
+                          onChange={() => setFilterBy(status.toUpperCase())}
                         />
                         <label
                           htmlFor={status}
@@ -168,10 +163,7 @@ export default function EmployeeTableHeader({
                       checked={filterBy === "all"}
                       onChange={() => setFilterBy("")}
                     />
-                    <label
-                      htmlFor="all"
-                      className="text-sm text-gray-900"
-                    >
+                    <label htmlFor="all" className="text-sm text-gray-900">
                       All
                     </label>
                   </div>
@@ -185,9 +177,7 @@ export default function EmployeeTableHeader({
                   <input
                     type="date"
                     className="border border-gray-300 rounded px-2 py-1 mb-2 w-full"
-                    onChange={(e) =>
-                      setJoinedDateFrom(e.target.value)
-                    }
+                    onChange={(e) => setJoinedDateFrom(e.target.value)}
                   />
                   <input
                     type="date"

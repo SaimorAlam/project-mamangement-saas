@@ -5,12 +5,7 @@ import React, {
   ReactElement,
   isValidElement,
 } from "react";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
@@ -19,13 +14,7 @@ import SuccessModal from "@/components/client/SuccessModal";
 import NotificationModal from "@/components/client/NotificationModal";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import NewProjectModal from "@/components/client/NewProjectModal";
-import {
-  Bell,
-  CalendarDays,
-  ChevronDown,
-  Plus,
-  UserPlus,
-} from "lucide-react";
+import { Bell, CalendarDays, ChevronDown, Plus, UserPlus } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -35,7 +24,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { getClientSidebarItems } from "./clientSidebarItems";
-import CreateProjectModal from "./CreateProjectModal";
+// import CreateProjectModal from "./CreateProjectModal";
+import CreateProject from "./CreateProject";
 
 interface ClientDashboardHeaderProps {
   name: string;
@@ -50,9 +40,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const location = useLocation();
   const currentPath = location.pathname;
   const ClientSidebarGroups = getClientSidebarItems();
-  const allRoutes = ClientSidebarGroups.flatMap(
-    (group) => group.items
-  );
+  const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
 
   // Determine current route
   let currentRoute = allRoutes.find((route) => {
@@ -84,16 +72,13 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [successOpen, setSuccessOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isEmployeeModalOpen, setIsEmployeeModalOpen] =
-    useState(false);
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const isEmployeePage = currentPath.includes("/employee");
   const isHighwayExpansionPage = currentPath.includes(
     "/highway-expansion/all-highway"
   );
-  const isAllProgramPage = currentPath.startsWith(
-    "/client-panel/all-program"
-  );
+  const isAllProgramPage = currentPath.startsWith("/client-panel/all-program");
   const isProgramOverviewPage = currentPath.startsWith(
     "/client-panel/program-overview/"
   );
@@ -161,11 +146,15 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             type="Primary"
             onClick={() => setIsProjectModalOpen(true)}
           />
-          <CreateProjectModal
+          {/* <CreateProjectModal
             open={isProjectModalOpen}
             programId={programId as string}
             onClose={() => setIsProjectModalOpen(false)}
-          />
+          /> */}
+          {isProjectModalOpen && <CreateProject
+            programId={programId as string}
+            onClose={() => setIsProjectModalOpen(false)}
+          />}
         </>
       );
 
@@ -199,9 +188,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           title="Create Support Ticket"
           leftIcon={<Plus />}
           type="Primary"
-          onClick={() =>
-            navigate("/client-panel/help/support/create-tickets")
-          }
+          onClick={() => navigate("/client-panel/help/support/create-tickets")}
         />
       );
     }
@@ -255,10 +242,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           </div>
         )}
 
-        <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         <div className="flex items-center justify-between gap-6 relative">
           <PrimaryButton

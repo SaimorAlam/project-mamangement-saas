@@ -3,15 +3,11 @@ import { IEmployeeProfile } from "@/types";
 
 interface IEmployeeProps {
   employees?: IEmployeeProfile[];
-  setSelectedEmployee: (employee: IEmployeeProfile) => void;
 }
 
-const EmployeeListTask = ({
-  employees,
-  setSelectedEmployee,
-}: IEmployeeProps) => {
-  const data = employees || [];
-  console.log(data);
+const EmployeeTask = ({ employees: propEmployees }: IEmployeeProps) => {
+  const data = propEmployees || [];
+
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const allSelected =
     data.length > 0 && selectedEmployees.length === data.length;
@@ -53,9 +49,6 @@ const EmployeeListTask = ({
                 <th className="px-6 py-3 text-lg font-semibold text-gray-700">
                   Last Action
                 </th>
-                <th className="px-6 py-3 text-lg font-semibold text-gray-700">
-                  Action
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -90,14 +83,6 @@ const EmployeeListTask = ({
                   <td className="px-6 py-3 text-gray-500">
                     {emp.user.lastActive ? "Active" : "Inactive"}
                   </td>
-                  <td className="px-6 py-3 text-gray-500">
-                    <button
-                      onClick={() => setSelectedEmployee(emp)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      View Task
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -108,4 +93,4 @@ const EmployeeListTask = ({
   );
 };
 
-export default EmployeeListTask;
+export default EmployeeTask;
