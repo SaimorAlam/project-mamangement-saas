@@ -27,6 +27,7 @@ import {
 } from "@/common/Skeleton/Skeleton";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import { useGetUser } from "@/hooks/useGetUser";
 
 // const allProgramProjectData = [
 //   {
@@ -432,6 +433,7 @@ import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 // ];
 
 const AllProgramProject = () => {
+  const { id } = useGetUser();
   const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
@@ -439,8 +441,12 @@ const AllProgramProject = () => {
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
   const { data: programs } = useGetAllProgramQuery({});
-  const { data, isLoading } = useGetAllProjectsQuery({});
+  const { data, isLoading } = useGetAllProjectsQuery(
+    { employeeId: id },
+    { skip: !id }
+  );
   const allPrograms = programs?.data && programs?.data?.data;
+
   const mapProjectToView = (project: any) => {
     const programName = allPrograms?.find(
       (program: any) => program.id === project.programId
@@ -523,23 +529,22 @@ const AllProgramProject = () => {
     { value: "Default", title: "Default" },
   ];
 
-  console.log("normalizedProjects:", normalizedProjects.length);
-  console.log("filteredProjects:", filteredProjects.length);
-  console.log("sortedProjects:", sortedProjects.length);
-  console.log("paginatedProjects:", paginatedProjects.length);
   return (
     <div className="pb-6 min-h-[500px]">
       {/* Header  */}
       {isLoading ? (
         <>
           <HeaderSkeleton />
-
           {viewMode === "table" ? (
             <ProjectTableSkeleton />
           ) : (
             <ProjectGridSkeleton />
           )}
         </>
+      ) : projects.length === 0 ? (
+        <div className="text-center text-6xl font-semibold text-gray-200 grid place-content-center h-[calc(80vh-100px)]">
+          No Project Found
+        </div>
       ) : (
         <>
           <div className="flex items-center justify-between pb-6">

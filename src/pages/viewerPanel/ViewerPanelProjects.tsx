@@ -10,7 +10,6 @@ import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useLocation } from "react-router-dom";
 const ViewerPanelProjects = () => {
   const location = useLocation();
-  console.log(location);
   const { id } = location.state || {};
 
   const { data, isLoading } = useGetProjectByIdQuery(id, { skip: !id });
@@ -19,7 +18,7 @@ const ViewerPanelProjects = () => {
   return (
     <div className="">
       {!id ? (
-        <div className="text-center text-4xl font-semibold text-gray-200 grid place-content-center h-[calc(80vh-100px)]">
+        <div className="text-center text-6xl font-semibold text-gray-200 grid place-content-center h-[60vh]">
           No Project Found
         </div>
       ) : isLoading ? (

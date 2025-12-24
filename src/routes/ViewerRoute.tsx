@@ -4,17 +4,17 @@ import ViewerPanelMarketingStrategy from "@/pages/viewerPanel/ViewerPanelMarketi
 import ViewerPanelTimosSuperShop from "@/pages/viewerPanel/ViewerPanelTimosSuperShop";
 import ViewerPanelProgramName from "@/pages/viewerPanel/ViewerPanelProgramName";
 import ViewerPanelHighwayExpansion from "@/pages/viewerPanel/ViewerPanelHighwayExpansion";
-import ViewerPanelHelp from "@/pages/viewerPanel/ViewerPanelHelp";
-import ViewerPanelSupport from "@/pages/viewerPanel/ViewerPanelSupport";
-import ViewerPanelSupportTickets from "@/pages/viewerPanel/ViewerPanelSupportTickets";
-import ViewerPanelFeedback from "@/pages/viewerPanel/ViewerPanelFeedBack";
-import ViewerPanelProductTour from "@/pages/viewerPanel/ViewerPanelProductTour";
 import ViewerPanelSettings from "@/pages/viewerPanel/ViewerPanelSettings";
-import ViewerPanelUserActivityLog from "@/pages/viewerPanel/ViewerPanelUsersActivityLog";
-import ViewerPanelWorkInProgress from "@/pages/viewerPanel/ViewerPanelWorkInProgress";
 import ViewerPanelActivityLog from "@/pages/viewerPanel/ViewerPanelActivityLog";
-import ViewerPanelCreateTicket from "@/pages/viewerPanel/ViewerPanelCreateTicket";
-import ViewerPanelContactUs from "@/pages/viewerPanel/ViewerPanelContactUs";
+// import ViewerPanelHelp from "@/pages/viewerPanel/ViewerPanelHelp";
+// import ViewerPanelSupport from "@/pages/viewerPanel/ViewerPanelSupport";
+// import ViewerPanelSupportTickets from "@/pages/viewerPanel/ViewerPanelSupportTickets";
+// import ViewerPanelFeedback from "@/pages/viewerPanel/ViewerPanelFeedBack";
+// import ViewerPanelProductTour from "@/pages/viewerPanel/ViewerPanelProductTour";
+// import ViewerPanelUserActivityLog from "@/pages/viewerPanel/ViewerPanelUsersActivityLog";
+// import ViewerPanelWorkInProgress from "@/pages/viewerPanel/ViewerPanelWorkInProgress";
+// import ViewerPanelCreateTicket from "@/pages/viewerPanel/ViewerPanelCreateTicket";
+// import ViewerPanelContactUs from "@/pages/viewerPanel/ViewerPanelContactUs";
 import ViewerPanelCarlyleHall from "@/pages/viewerPanel/ViewerPanelCarlyleHall";
 import ViewerPanelEmployees from "@/pages/viewerPanel/ViewerPanelEmployees";
 import ViewerPanelAlfalaBuilders from "@/pages/viewerPanel/ViewerPanelAlfalaBuilders";
@@ -45,34 +45,34 @@ export default function getViewerPanelRoutes() {
       element: <ViewerPanelHighwayExpansion />,
     },
     { path: "activity-log", element: <ViewerPanelActivityLog /> },
-    {
-      path: "help",
-      element: <ViewerPanelHelp />,
-      children: [
-        {
-          path: "support",
-          element: <ViewerPanelSupport />,
-          children: [
-            { index: true, element: <ViewerPanelSupportTickets /> },
-            {
-              path: "create-tickets",
-              element: <ViewerPanelCreateTicket />,
-            },
-          ],
-        },
-        { path: "feedback", element: <ViewerPanelFeedback /> },
-        { path: "product-tour", element: <ViewerPanelProductTour /> },
-        { path: "contact-us", element: <ViewerPanelContactUs /> },
-      ],
-    },
+    // {
+    //   path: "help",
+    //   element: <ViewerPanelHelp />,
+    //   children: [
+    //     {
+    //       path: "support",
+    //       element: <ViewerPanelSupport />,
+    //       children: [
+    //         { index: true, element: <ViewerPanelSupportTickets /> },
+    //         {
+    //           path: "create-tickets",
+    //           element: <ViewerPanelCreateTicket />,
+    //         },
+    //       ],
+    //     },
+    //     { path: "feedback", element: <ViewerPanelFeedback /> },
+    //     { path: "product-tour", element: <ViewerPanelProductTour /> },
+    //     { path: "contact-us", element: <ViewerPanelContactUs /> },
+    //   ],
+    // },
     { path: "settings", element: <ViewerPanelSettings /> },
-    {
-      path: "work-in-progress",
-      element: <ViewerPanelWorkInProgress />,
-    },
-    {
-      path: "user-activity-log",
-      element: <ViewerPanelUserActivityLog />,
-    },
+    // {
+    //   path: "work-in-progress",
+    //   element: <ViewerPanelWorkInProgress />,
+    // },
+    // {
+    //   path: "user-activity-log",
+    //   element: <ViewerPanelUserActivityLog />,
+    // },
   ];
 }
