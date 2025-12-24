@@ -58,7 +58,6 @@ const ViewerPanelSidebar = () => {
 
     // Dropdown (parent with children)
     if (item.children && item.children.length > 0) {
-
       return (
         <SidebarMenuItem key={fullPath}>
           <DropdownMenu onOpenChange={(v) => setOpen(v)}>

@@ -89,7 +89,6 @@ const StaffEmployeeProgramCard = ({
     },
     {} as Record<ProjectStatus, number>
   );
-  console.log(statusCount);
 
   return (
     <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition h-[400px] flex flex-col">
