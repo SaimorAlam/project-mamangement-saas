@@ -95,7 +95,7 @@ const AllProgramProject = () => {
 
   const program = data?.data?.data || [];
 
-  console.log("All Programs Data:", program);
+  console.log("All Programs Data:", program);   
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
