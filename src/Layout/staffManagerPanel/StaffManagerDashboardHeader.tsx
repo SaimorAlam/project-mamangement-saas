@@ -2,7 +2,7 @@ import React, { cloneElement, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
 import { Bell, Eye, FileText, Home, Megaphone, Upload } from "lucide-react";
 import NotificationModal from "@/components/client/NotificationModal";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,6 +19,7 @@ import UploadSubmission from "@/components/staffManager/overview/UploadSubmissio
 const StaffManagerDashboardHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const StaffManagerSidebarItems = getStaffManagerSidebarItems();
   // const { heading, breadcrumb, showButton } = useHeaderContext();
   const { breadcrumb, showButton } = useHeaderContext();
@@ -139,7 +140,7 @@ const StaffManagerDashboardHeader = () => {
                     leftIcon={<Upload className="text-2xl" />}
                     title="Upload Submission"
                     type="Primary"
-                    onClick={() => setIsOpen(true)}
+                    onClick={() => navigate("/staff-manager-panel/projects/upload-submission")}
                   />
                 )}
               </>
@@ -149,7 +150,12 @@ const StaffManagerDashboardHeader = () => {
             <div className="relative">
               <>
                 {showButton && (
-                  <UploadSubmission />
+                  <PrimaryButton
+                    leftIcon={<Upload className="text-2xl" />}
+                    title="Upload Submission"
+                    type="Primary"
+                    onClick={() => navigate("/staff-manager-panel/projects/upload-submission")}
+                  />
                 )}
               </>
             </div>

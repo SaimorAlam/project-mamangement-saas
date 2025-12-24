@@ -233,7 +233,7 @@ export default function UpdateProjectModal({
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Update Project</Button>
+            <Button type="submit" className="border">Update Project</Button>
           </div>
         </form>
       </DialogContent>

@@ -30,13 +30,7 @@ export function getStaffManagerRoutes() {
   return [
     { index: true, element: <StaffManagerOverview /> },
     { path: "projects", element: <StaffManagerProjects /> },
-    {
-      path: "projects",
-      element: <StaffManagerProjects />,
-      children: [
-        { path: "upload-submission", element: <StaffManagerUploadSubmission /> },
-      ],
-    },
+    { path: "projects/upload-submission", element: <StaffManagerUploadSubmission />  },
     { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
     { path: "employees", element: <StaffManagerEmployees /> },
     {

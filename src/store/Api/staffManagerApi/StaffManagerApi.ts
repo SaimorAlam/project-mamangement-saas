@@ -30,10 +30,12 @@ const userApi = baseApi.injectEndpoints({
     //   providesTags: ["Manager"],
     // }),
     getTopOverdueProjects: builder.query({
-      query: () => `/manager/charts/top-overdue-projects`
+      query: () => `/manager/charts/top-overdue-projects`,
+      providesTags: ["Manager"],
     }),
     getSubmissionStatus: builder.query({
-      query: () => `/manager/submission-status`
+      query: () => `/manager/submission-status`,
+      providesTags: ["Manager"],
     }),
   }),
 });

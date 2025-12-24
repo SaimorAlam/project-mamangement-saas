@@ -36,7 +36,7 @@ const priorityOrder: Record<string, number> = {
 
 const StaffManagerProjects = ({
   title = "All Projects",
-  programId = "sdoifiewr",
+  programId = "2a4b2086-0147-40ca-be12-1bfd855046fd",
 }: IProjectTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(10);
