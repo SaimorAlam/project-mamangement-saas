@@ -5,6 +5,7 @@ import BoxContainer from "../../../common/BoxContainer";
 import { useState } from "react";
 import "react-calendar/dist/Calendar.css"; // important!
 import ViewCalender from "@/common/ViewCalender";
+import { Loader2 } from "lucide-react";
 
 import { useGetUpcomingDeadlinesQuery } from "@/store/Api/DeadlineApi/DeadlineApi";
 
@@ -31,8 +32,6 @@ const UpcomingDeadline = () => {
 
   const deadlineData = data?.data?.projects || [];
 
-  console.log("Deadline Data:", deadlineData);
-
   return (
     <BoxContainer>
       <div className="flex items-center justify-between gap-2 pb-8 relative">
@@ -53,11 +52,17 @@ const UpcomingDeadline = () => {
 
       {/* Deadline Cards */}
       <div className="w-full">
-        {deadlineData?.map(
-          (project: IUpcomingDeadlineFromBackend, i: number) => (
-            <div key={i} className="pb-6">
-              <UpcomingDeadlineCard deadlineData={project} />
-            </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-32">
+            <Loader2 className="animate-spin h-6 w-6 text-gray-600" />
+          </div>
+        ) : (
+          deadlineData?.map(
+            (project: IUpcomingDeadlineFromBackend, i: number) => (
+              <div key={i} className="pb-6">
+                <UpcomingDeadlineCard deadlineData={project} />
+              </div>
+            )
           )
         )}
       </div>
