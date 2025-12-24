@@ -1,6 +1,6 @@
 import React, { cloneElement, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
-import { Bell, Eye, FileText, Home, Megaphone } from "lucide-react";
+import { Bell, Eye, FileText, Home, Megaphone, Upload } from "lucide-react";
 import NotificationModal from "@/components/client/NotificationModal";
 import { useLocation, Link } from "react-router-dom";
 import {
@@ -76,7 +76,7 @@ const StaffManagerDashboardHeader = () => {
               )}
             </BreadcrumbList>
           </Breadcrumb>
-          {currentPath==="/staff-manager-panel/projects" && (
+          {currentPath === "/staff-manager-panel/projects" && (
             <p className="text-base text-gray-500">{breadcrumb}</p>
           )}
 
@@ -101,39 +101,58 @@ const StaffManagerDashboardHeader = () => {
             onClose={() => setIsOpen(false)}
           />
 
-          {/* Preview */}
-          <PrimaryButton
-            leftIcon={<Eye className="text-2xl" />}
-            title="Preview"
-            type={"Outline"}
-            onClick={() => setIsOpen(true)}
-          />
+          {currentPath === "/staff-manager-panel/projects/upload-submission" && (
+            <>
+              {/* Preview */}
+              <PrimaryButton
+                leftIcon={<Eye className="text-2xl" />}
+                title="Preview"
+                type={"Outline"}
+                onClick={() => setIsOpen(true)}
+              />
 
-          {/* Save Draft */}
-          <PrimaryButton
-            leftIcon={<FileText className="text-2xl" />}
-            title="Save Draft"
-            type={"Outline"}
-            onClick={() => setIsOpen(true)}
-          />
+              {/* Save Draft */}
+              <PrimaryButton
+                leftIcon={<FileText className="text-2xl" />}
+                title="Save Draft"
+                type={"Outline"}
+                onClick={() => setIsOpen(true)}
+              />
 
-          {/* Publish */}
-          <PrimaryButton
-            leftIcon={<Megaphone className="text-2xl" />}
-            title="Publish"
-            type={currentPath==="/staff-manager-panel" ? "Outline":"Primary"}
-            onClick={() => setIsOpen(true)}
-          />
+              {/* Publish */}
+              <PrimaryButton
+                leftIcon={<Megaphone className="text-2xl" />}
+                title="Publish"
+                type={currentPath === "/staff-manager-panel" ? "Outline" : "Primary"}
+                onClick={() => setIsOpen(true)}
+              />
+            </>
+          )
+          }
 
           {/* Conditional Quick Action */}
-          {currentPath==="/staff-manager-panel" && (
-          <div className="relative">
-            <>
-              {showButton && (
-                <UploadSubmission />
-              )}
-            </>
-          </div>
+          {currentPath === "/staff-manager-panel" && (
+            <div className="relative">
+              <>
+                {showButton && (
+                  <PrimaryButton
+                    leftIcon={<Upload className="text-2xl" />}
+                    title="Upload Submission"
+                    type="Primary"
+                    onClick={() => setIsOpen(true)}
+                  />
+                )}
+              </>
+            </div>
+          )}
+          {currentPath === "/staff-manager-panel/projects" && (
+            <div className="relative">
+              <>
+                {showButton && (
+                  <UploadSubmission />
+                )}
+              </>
+            </div>
           )}
         </div>
       </div>

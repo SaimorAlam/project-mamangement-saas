@@ -24,11 +24,19 @@ import StaffManagerCreateTicket from '@/pages/staffManager/StaffManagerCreateTic
 import StaffManagerContactUs from '@/pages/staffManager/StaffManagerContactUs';
 // import CommingSoonPage from "@/common/CommingSoonPage";
 import StaffManagerStateCardDetails from "@/pages/staffManager/StaffManagerStateCardDetails";
+import StaffManagerUploadSubmission from "@/pages/staffManager/StaffManagerUploadSubmission";
 
 export function getStaffManagerRoutes() {
   return [
     { index: true, element: <StaffManagerOverview /> },
     { path: "projects", element: <StaffManagerProjects /> },
+    {
+      path: "projects",
+      element: <StaffManagerProjects />,
+      children: [
+        { path: "upload-submission", element: <StaffManagerUploadSubmission /> },
+      ],
+    },
     { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
     { path: "employees", element: <StaffManagerEmployees /> },
     {
