@@ -73,8 +73,7 @@ const formatDate = (date: string) =>
 const StaffEmployeeProgramCard = ({
   program,
 }: StaffEmployeeProgramCardProps) => {
-  const { id, programName, priority, deadline, progress, projects } =
-    program;
+  const { id, programName, priority, deadline, progress, projects } = program;
 
   const priorityColor =
     priority === "HIGH"
@@ -83,13 +82,14 @@ const StaffEmployeeProgramCard = ({
       ? "text-[#F59E0B]"
       : "text-[#16A34A]";
 
-  const statusCount = projects.reduce<Record<ProjectStatus, number>>(
+  const statusCount = projects?.reduce<Record<ProjectStatus, number>>(
     (acc, project) => {
-      acc[project.status] = (acc[project.status] || 0) + 1;
+      acc[project?.status] = (acc[project?.status] || 0) + 1;
       return acc;
     },
     {} as Record<ProjectStatus, number>
   );
+  console.log(statusCount);
 
   return (
     <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition h-[400px] flex flex-col">
@@ -106,13 +106,13 @@ const StaffEmployeeProgramCard = ({
                 {programName}
               </h4>
               <p className="text-sm text-gray-600 line-clamp-2">
-                {projects[0]?.name}
+                {projects?.length > 0 ? projects[0]?.name : "No projects"}
               </p>
             </div>
           </div>
 
           <Badge variant="outline" className="text-xs px-2 py-1">
-            {projects.length} Projects
+            {projects?.length} Projects
           </Badge>
         </div>
 
@@ -127,24 +127,19 @@ const StaffEmployeeProgramCard = ({
             <p className="text-gray-500">Priority</p>
             <div className="flex items-center gap-1">
               <Flag className={`w-4 h-4 ${priorityColor}`} />
-              <span className={`font-medium ${priorityColor}`}>
-                {priority}
-              </span>
+              <span className={`font-medium ${priorityColor}`}>{priority}</span>
             </div>
           </div>
         </div>
 
         {/* Project Status Summary */}
         <div className="flex flex-wrap gap-2 overflow-auto max-h-[60px]">
-          {Object.entries(statusCount).map(([status, count]) => (
-            <Badge
-              key={status}
-              variant="secondary"
-              className="text-xs"
-            >
-              {status.replace("_", " ")} · {count}
-            </Badge>
-          ))}
+          {statusCount &&
+            Object?.entries(statusCount)?.map(([status, count]) => (
+              <Badge key={status} variant="secondary" className="text-xs">
+                {status.replace("_", " ")} · {count}
+              </Badge>
+            ))}
         </div>
 
         {/* Progress */}
