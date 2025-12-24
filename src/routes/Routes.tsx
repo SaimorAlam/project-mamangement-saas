@@ -1,5 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-
 // Application route imports
 import App from "../App";
 import About from "../pages/About";
@@ -41,6 +40,7 @@ const routes = createBrowserRouter([
         path: "/",
         element: <Home />,
       },
+
       {
         path: "/about",
         element: <About />,
@@ -89,6 +89,7 @@ const routes = createBrowserRouter([
           <AdminDashboardLayout />
           // </ProtectedRoute>
         ),
+
         children: getAdminRoutes(),
       },
 

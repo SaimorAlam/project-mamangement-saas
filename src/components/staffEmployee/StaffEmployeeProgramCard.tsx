@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Flag, Layers } from "lucide-react";
 import { Link } from "react-router-dom";
 import PrimaryButton from "../../common/PrimaryButton";
+import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -83,19 +84,20 @@ const StaffEmployeeProgramCard = ({
       ? "text-[#F59E0B]"
       : "text-[#16A34A]";
 
-  const statusCount = projects.reduce<Record<ProjectStatus, number>>(
+  const statusCount = projects?.reduce<Record<ProjectStatus, number>>(
     (acc, project) => {
-      acc[project.status] = (acc[project.status] || 0) + 1;
+      acc[project?.status] = (acc[project?.status] || 0) + 1;
       return acc;
     },
     {} as Record<ProjectStatus, number>
   );
+  console.log(statusCount);
 
   return (
-    <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition h-[400px] flex flex-col">
-      <CardContent className="p-6 space-y-5 flex flex-col justify-between">
+    <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">
+      <CardContent className="flex flex-col justify-between p-0">
         {/* Header */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between border-b border-gray-200 py-2 px-4">
           <div className="flex gap-3">
             <div className="w-12 h-12 rounded-xl bg-[#069576] flex items-center justify-center">
               <Layers className="w-6 h-6 text-white" />
@@ -105,50 +107,62 @@ const StaffEmployeeProgramCard = ({
               <h4 className="font-semibold text-gray-900 leading-tight">
                 {programName}
               </h4>
-              <p className="text-sm text-gray-600 line-clamp-2">
-                {projects[0]?.name}
+              <p className="text-sm text-gray-600 line-clamp-2 mt-1">
+                {projects?.length > 0
+                  ? projects[0]?.name
+                  : "No projects"}
               </p>
             </div>
           </div>
 
-          <Badge variant="outline" className="text-xs px-2 py-1">
-            {projects.length} Projects
+          <Badge
+            variant="outline"
+            className="text-xs px-2 py-1 border-gray-200 text-gray-500"
+          >
+            {projects?.length} Projects
           </Badge>
         </div>
 
-        {/* Meta */}
-        <div className="flex justify-between text-sm">
-          <div>
-            <p className="text-gray-500">Deadline</p>
-            <p className="font-medium">{formatDate(deadline)}</p>
-          </div>
+        <div className="py-2 px-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="mb-1">Assigned People</h3>
+              <RenderStaffAvatars
+                staff={Array.from({ length: 3 }, (_, i) => ({
+                  id: i.toString(),
+                  name: `Staff ${i + 1}`,
+                  avatar:
+                    "https://randomuser.me/api/portraits/men/19.jpg",
+                }))}
+              />
+            </div>
 
-          <div>
-            <p className="text-gray-500">Priority</p>
-            <div className="flex items-center gap-1">
-              <Flag className={`w-4 h-4 ${priorityColor}`} />
-              <span className={`font-medium ${priorityColor}`}>
-                {priority}
-              </span>
+            <div className="flex flex-col gap-y-4 text-sm py-2 px-4">
+              <div>
+                <p className="text-gray-500">Project start</p>
+                <p className="font-medium">{formatDate(deadline)}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-500">Project finish</p>
+                <p className="font-medium">{formatDate(deadline)}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Project Status Summary */}
-        <div className="flex flex-wrap gap-2 overflow-auto max-h-[60px]">
-          {Object.entries(statusCount).map(([status, count]) => (
-            <Badge
-              key={status}
-              variant="secondary"
-              className="text-xs"
-            >
-              {status.replace("_", " ")} · {count}
-            </Badge>
-          ))}
+        <div className="px-4 py-2">
+          <p className="text-gray-500">Priority</p>
+          <div className="flex items-center gap-1">
+            <Flag className={`w-4 h-4 ${priorityColor}`} />
+            <span className={`text-sm font-medium ${priorityColor}`}>
+              {priority}
+            </span>
+          </div>
         </div>
 
         {/* Progress */}
-        <div>
+        <div className="py-2 px-4">
           <div className="flex justify-between text-sm mb-1">
             <span className="text-gray-600">Overall Progress</span>
             <span className="font-medium">{progress}%</span>
@@ -157,13 +171,15 @@ const StaffEmployeeProgramCard = ({
         </div>
 
         {/* CTA */}
-        <Link to={`/programs/${id}`}>
-          <PrimaryButton
-            title="View Program"
-            type="Primary"
-            className="w-full h-10"
-          />
-        </Link>
+        <div className="py-2 px-4">
+          <Link to={`/programs/${id}`}>
+            <PrimaryButton
+              title="View Program"
+              type="Primary"
+              className="w-full h-10"
+            />
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );
