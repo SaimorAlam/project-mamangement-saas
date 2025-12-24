@@ -62,7 +62,7 @@ const clientData = [
   {
     title: "Submission Overdue",
     value: "7.8%",
-    growth: null,
+    growth: undefined,
     growth_type: "down",
     description: "50 Clients left",
     link_text: "View all",

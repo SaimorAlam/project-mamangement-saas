@@ -2,6 +2,12 @@ import baseApi from "../BaseApi/BaseApi";
 
 const employeeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getEmployeeDashboardStats: builder.query({
+      query: () => ({
+        url: "/employeeDashboard/dashboard",
+        method: "GET",
+      }),
+    }),
     getAllEmployees: builder.query({
       query: ({
         page,
@@ -20,7 +26,8 @@ const employeeApi = baseApi.injectEndpoints({
 
         if (search) params.append("search", search);
         if (status) params.append("status", status);
-        if (joinedDateFrom) params.append("joinedDateFrom", joinedDateFrom);
+        if (joinedDateFrom)
+          params.append("joinedDateFrom", joinedDateFrom);
         if (joinedDateTo) params.append("joinedDateTo", joinedDateTo);
         if (sortBy) params.append("sortBy", sortBy);
         if (sortOrder) params.append("sortOrder", sortOrder);
@@ -103,6 +110,7 @@ const employeeApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetEmployeeDashboardStatsQuery,
   useGetAllEmployeesQuery,
   useGetSingleEmployeeQuery,
   useAddEmployeeMutation,

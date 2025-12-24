@@ -1,6 +1,6 @@
 export interface IClientPanelStats {
   title: string;
-  growth: string | null;
+  growth?: number | string;
   value: number | string;
   growth_type: "up" | "down" | undefined | string;
   description?: string;

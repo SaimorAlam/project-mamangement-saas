@@ -45,16 +45,6 @@ interface AllProgramProjectGridViewProps {
 const AllProgramProjectTableView: React.FC<
   AllProgramProjectGridViewProps
 > = ({ allProgramProjectData: paginatedData }) => {
-  /* const statusColors: Record<StatusType, string> = {
-    Live: "bg-[#EBFFF2] text-[#169E7B] border border-[#ABEFD5]",
-    Returned: "bg-[#f8f0e8] text-[#FF974B] border border-[#f9dec9]",
-    Overdue: "bg-[#FDF4F5] text-[#DA4352] border border-[#F8D3D5]",
-    Draft: "bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]",
-    "In Review":
-      "bg-[#FFF9ED] text-[#DB940C] border border-[#FCE38C]",
-    Submitted: "bg-[#F5F2FC] text-[#8B69E2] border border-[#DFDBF9]",
-  }; */
-
   const priorityColors = {
     High: "text-red-600",
     Medium: "text-orange-600",
