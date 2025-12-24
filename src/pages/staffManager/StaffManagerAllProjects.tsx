@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import ProjectStats from "@/components/staffManager/Projects/ProjectStats";
 import { useState, useMemo } from "react";
 import { FaSpinner, FaEdit } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
+import //   useUpdateProjectMutation,
+"@/store/Api/ProjectApi/ProjectApi";
 import Pagination from "@/common/Pagination";
 // import { IProject } from "@/types/project";
 import {
@@ -18,14 +19,12 @@ import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
 import { toast } from "sonner";
 import UpdateProjectModal from "../client/Program/UpdateProjectModal";
-import SideManagerMain from "@/components/staffManager/Projects/SideManagerMain";
-import { ChevronDown } from "lucide-react";
 
 // import EditProjectModal from "./EditProjectModal";
 
 interface IProjectTableProps {
   title?: string;
-  programId?: string;
+  programId: string;
 }
 
 const priorityOrder: Record<string, number> = {
@@ -34,9 +33,9 @@ const priorityOrder: Record<string, number> = {
   LOW: 1,
 };
 
-const StaffManagerProjects = ({
+const AllProject = ({
   title = "All Projects",
-  programId = "sdoifiewr",
+  programId,
 }: IProjectTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(10);
@@ -139,10 +138,10 @@ const StaffManagerProjects = ({
   const formatDate = (date?: string) =>
     date
       ? new Date(date).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
       : "-";
 
   if (isLoading) {
@@ -152,19 +151,10 @@ const StaffManagerProjects = ({
       </div>
     );
   }
-  // if (projects) {
-  //   return (
-  //     <div className="flex items-center justify-center h-[60vh]">
-  //       <h1 className="text-gray-400 text-center">No Projects Found.</h1>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="min-h-screen py-6">
-      <ProjectStats />
-      <div className="flex gap-3 justify-between">
-      <div className="bg-white rounded-lg border border-gray-200 mt-10 grow">
+      <div className="bg-white rounded-lg border border-gray-200">
         {/* Header */}
         <div className="flex justify-between px-6 py-4 border-b border-gray-200">
           <h1 className="text-lg font-semibold">{title}</h1>
@@ -181,8 +171,8 @@ const StaffManagerProjects = ({
             />
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex gap-3 items-center border border-gray-200 px-4 py-2 rounded">
-                {priorityFilter} <ChevronDown className="text-gray-600"/>
+              <DropdownMenuTrigger className="border border-gray-200 px-4 py-2 rounded">
+                {priorityFilter}
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
@@ -283,8 +273,6 @@ const StaffManagerProjects = ({
           onPageChange={setCurrentPage}
         />
       </div>
-      <SideManagerMain/>
-      </div>
 
       {editModalOpen && editProject && (
         <UpdateProjectModal
@@ -298,4 +286,4 @@ const StaffManagerProjects = ({
   );
 };
 
-export default StaffManagerProjects;
+export default AllProject;

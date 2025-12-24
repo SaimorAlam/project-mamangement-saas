@@ -27,7 +27,7 @@ const UpcomingDeadline = () => {
   const [value, onChange] = useState<Value>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const { data, isLoading } = useGetUpcomingDeadlinesQuery({});
+  const { data } = useGetUpcomingDeadlinesQuery({});
 
   const deadlineData = data?.data?.projects || [];
 
