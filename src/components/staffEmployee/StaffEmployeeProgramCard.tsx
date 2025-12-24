@@ -74,8 +74,7 @@ const formatDate = (date: string) =>
 const StaffEmployeeProgramCard = ({
   program,
 }: StaffEmployeeProgramCardProps) => {
-  const { id, programName, priority, deadline, progress, projects } =
-    program;
+  const { id, programName, priority, deadline, progress, projects } = program;
 
   const priorityColor =
     priority === "HIGH"
