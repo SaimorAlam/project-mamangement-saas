@@ -1,4 +1,4 @@
-import { Edit, Eye, Flag, Trash2 } from "lucide-react";
+import { Eye, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import RenderStaffAvatars from "./RenderStaffAvater";
+import { useNavigate } from "react-router-dom";
 
 export interface StaffMember {
   name: string;
@@ -52,15 +53,29 @@ const ProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
 
   const renderPriority = (priority: ProgramCardProps["priority"]) => (
     <div className="flex items-center gap-1">
-      <Flag className={`w-4 h-4 ${priorityColors[priority as keyof typeof priorityColors] || priorityColors.Default}`} />
+      <Flag
+        className={`w-4 h-4 ${
+          priorityColors[priority as keyof typeof priorityColors] ||
+          priorityColors.Default
+        }`}
+      />
       <span
-        className={`text-sm font-medium ${priorityColors[priority as keyof typeof priorityColors] || priorityColors.Default}`}
+        className={`text-sm font-medium ${
+          priorityColors[priority as keyof typeof priorityColors] ||
+          priorityColors.Default
+        }`}
       >
         {priority}
       </span>
     </div>
   );
-
+  const navigate = useNavigate();
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   return (
     <Card className="w-full shadow-none border-none">
       <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full min-h-[420px]">
@@ -91,7 +106,7 @@ const ProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.map((item) => (
+            {paginatedData?.map((item) => (
               <TableRow
                 key={item.id}
                 className="border-b border-[#E2E8F0] hover:bg-muted/30 transition-colors odd:bg-white even:bg-[#F7F9FA]"
@@ -109,21 +124,25 @@ const ProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
                   {renderPriority(item.priority)}
                 </TableCell>
                 <TableCell className="px-6 py-3.5 text-base text-muted-foreground">
-                  {item.startDate}
+                  {formatDate(item.startDate)}
                 </TableCell>
                 <TableCell className="px-6 py-3.5 text-base text-muted-foreground">
-                  {item.endDate}
+                  {formatDate(item.endDate)}
                 </TableCell>
                 <TableCell className="px-6 py-3.5">
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
-                      <Eye className="w-4 h-4 text-[#1C73E0]" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Edit className="w-4 h-4 text-[#169E7B]" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Trash2 className="w-4 h-4 text-[#B00020]" />
+                    <Button
+                      variant="default"
+                      className=" p-4 bg-blue-500 text-white"
+                      size="sm"
+                      onClick={() => {
+                        navigate("/viewer-panel/projects", {
+                          state: { id: item?.id },
+                        });
+                      }}
+                    >
+                      <Eye className="w-4 h-4" />
+                      View Project
                     </Button>
                   </div>
                 </TableCell>

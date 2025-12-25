@@ -24,6 +24,8 @@ interface AllProgramProjectGridViewProps {
 export default function ProjectGridView({
   allProgramProjectData,
 }: AllProgramProjectGridViewProps) {
+  console.log(allProgramProjectData);
+  console.log(allProgramProjectData.length);
   return (
     <div className="grid grid-cols-4 gap-5">
       {allProgramProjectData?.map((projectData) => {
@@ -33,7 +35,7 @@ export default function ProjectGridView({
         };
 
         return (
-          <div className="" key={projectData.programName}>
+          <div className="" key={projectData.id}>
             {/* Render a single program card */}
             <ProgramCard projectData={processedProjectData} />
           </div>

@@ -112,9 +112,7 @@ const ApexBarChart = () => {
 
   return (
     <BoxContainer>
-      <h2 className="text-2xl font-semibold mb-4">
-        Top Overdue: 25 Project
-      </h2>
+      <h2 className="text-2xl font-semibold mb-4">Top Overdue: 25 Project</h2>
       {chartData.series.length > 0 && (
         <Chart
           className=""

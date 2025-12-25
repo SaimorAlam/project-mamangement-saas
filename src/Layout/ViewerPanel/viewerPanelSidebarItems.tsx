@@ -2,15 +2,15 @@ import {
   Building2,
   ChartPie,
   Folder,
-  Headphones,
-  Info,
+  // Headphones,
+  // Info,
   Megaphone,
-  Milestone,
-  Phone,
+  // Milestone,
+  // Phone,
   Store,
-  UserStar,
-  Ticket,
-  TicketPlus,
+  // UserStar,
+  // Ticket,
+  // TicketPlus,
 } from "lucide-react";
 import { IoSettingsOutline } from "react-icons/io5";
 
@@ -68,45 +68,45 @@ export const getViewerPanelSidebarItems = (): SidebarGroup[] => {
     {
       label: "Support",
       items: [
-        {
-          icon: <Info />,
-          name: "Help",
-          path: "/viewer-panel/help",
-          children: [
-            {
-              icon: <Headphones />,
-              path: "support",
-              name: "Support",
-              children: [
-                {
-                  index: true,
-                  icon: <Ticket />,
-                  name: "Support Ticket",
-                },
-                {
-                  icon: <TicketPlus />,
-                  path: "create-tickets",
-                  name: "Create Ticket",
-                },
-              ],
-            },
-            {
-              icon: <UserStar />,
-              path: "feedback",
-              name: "Feedback",
-            },
-            {
-              icon: <Milestone />,
-              path: "product-tour",
-              name: "Product Tour",
-            },
-            {
-              icon: <Phone />,
-              path: "contact-us",
-              name: "Contact US",
-            },
-          ],
-        },
+        // {
+        //   icon: <Info />,
+        //   name: "Help",
+        //   path: "/viewer-panel/help",
+        //   children: [
+        //     {
+        //       icon: <Headphones />,
+        //       path: "support",
+        //       name: "Support",
+        //       children: [
+        //         {
+        //           index: true,
+        //           icon: <Ticket />,
+        //           name: "Support Ticket",
+        //         },
+        //         {
+        //           icon: <TicketPlus />,
+        //           path: "create-tickets",
+        //           name: "Create Ticket",
+        //         },
+        //       ],
+        //     },
+        //     {
+        //       icon: <UserStar />,
+        //       path: "feedback",
+        //       name: "Feedback",
+        //     },
+        //     {
+        //       icon: <Milestone />,
+        //       path: "product-tour",
+        //       name: "Product Tour",
+        //     },
+        //     {
+        //       icon: <Phone />,
+        //       path: "contact-us",
+        //       name: "Contact US",
+        //     },
+        //   ],
+        // },
         {
           icon: <IoSettingsOutline className="size-6" />,
           name: "Settings",

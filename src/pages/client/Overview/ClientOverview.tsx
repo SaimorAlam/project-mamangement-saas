@@ -1,12 +1,12 @@
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
-import ApexDonutChart from "@/common/Charts/ApexDonutChart";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/common/Charts/ApexBarChart";
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
+import ProjectStatusDonutChart from "./Components/ProjectStatusDonutChart";
 
 const clientData = [
   {
@@ -93,20 +93,23 @@ const ClientOverview = () => {
       <div className="py-4">
         <AllProgramProject />
       </div>
-
-      <div className="grid grid-cols-3 gap-8 ">
-        <div className="space-y-8 col-span-2">
-          <div className="flex items-center justify-center gap-8">
+      <div className="grid xl:grid-cols-3 w-full gap-8 ">
+        <div className="space-y-8 xl:col-span-2">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-center justify-center ">
             <ApexBarChart />
-            <ApexDonutChart />
+            <div className="h-full!">
+              <ProjectStatusDonutChart />
+            </div>
           </div>
-          <LatestSubmission />
           <ApexColumnChart />
         </div>
         <div className="space-y-8">
           <UpcomingDeadline />
           <ActivityLog />
         </div>
+      </div>
+      <div className="my-6">
+        <LatestSubmission />
       </div>
     </div>
   );

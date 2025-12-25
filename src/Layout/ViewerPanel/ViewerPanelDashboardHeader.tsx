@@ -19,17 +19,13 @@ const ViewerPanelHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const ClientSidebarGroups = getViewerPanelSidebarItems();
-  const { heading, breadcrumb } = useHeaderContext();
+  const { heading } = useHeaderContext();
 
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const allRoutes = ClientSidebarGroups.flatMap(
-    (group) => group.items
-  );
-  const currentRoute = allRoutes.find(
-    (route) => route.path === currentPath
-  );
+  const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
+  const currentRoute = allRoutes.find((route) => route.path === currentPath);
 
   return (
     <div>
@@ -37,14 +33,11 @@ const ViewerPanelHeader = () => {
         {/* Greeting */}
         <div>
           <h1 className="text-[32px] font-semibold">{heading}</h1>
-          <p className="text-base text-gray-500">{breadcrumb}</p>
+          {/* <p className="text-base text-gray-500">{breadcrumb}</p> */}
         </div>
 
         {/* Search */}
-        <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         {/* Right Controls */}
         <div className="flex items-center justify-between gap-6 relative">
@@ -54,10 +47,7 @@ const ViewerPanelHeader = () => {
             type={"Outline"}
             onClick={() => setIsOpen(true)}
           />
-          <NotificationModal
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-          />
+          <NotificationModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
         </div>
       </div>
 
@@ -74,8 +64,7 @@ const ViewerPanelHeader = () => {
             {currentRoute ? (
               <BreadcrumbItem>
                 <BreadcrumbPage className="text-[#356DF0] flex items-center justify-center gap-1 ">
-                  {currentRoute.icon &&
-                  React.isValidElement(currentRoute.icon)
+                  {currentRoute.icon && React.isValidElement(currentRoute.icon)
                     ? cloneElement(
                         currentRoute.icon as React.ReactElement<{
                           className?: string;

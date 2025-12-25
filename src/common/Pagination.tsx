@@ -42,6 +42,7 @@ const Pagination = ({
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalPrograms);
 
+
   return (
     <div className="flex flex-col md:flex-row items-center justify-between gap-2 px-6 py-4 border-t border-gray-200">
       {/* Showing X to Y of Z */}
