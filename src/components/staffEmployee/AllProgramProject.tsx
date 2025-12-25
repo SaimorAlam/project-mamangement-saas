@@ -15,11 +15,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Pagination from "../Pagination";
+import Pagination from "../client/Pagination";
 import { Button } from "@/components/ui/button";
-import PrimaryButton from "../../../common/PrimaryButton";
-import DropdownSelect from "../../../common/DropdownSelect";
-import StaffEmployeeProgramCard from "./../../staffEmployee/StaffEmployeeProgramCard";
+import PrimaryButton from "@/common/PrimaryButton";
+import DropdownSelect from "@/common/DropdownSelect";
+import StaffEmployeeProgramCard from "./StaffEmployeeProgramCard";
 import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProgramTable";
 import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
@@ -30,7 +30,10 @@ export type ProjectStatus =
   | "PENDING"
   | "RETURNED"
   | "OVERDUE"
-  | "DRAFT" | "IN_REVIEW" | "SUBMITTED"; export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
+  | "DRAFT"
+  | "IN_REVIEW"
+  | "SUBMITTED";
+export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
 export interface Project {
   id: string;

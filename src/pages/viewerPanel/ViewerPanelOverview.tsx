@@ -1,4 +1,4 @@
-import AllProgramProject from "@/components/ViewerPanel/AllProgramProject";
+import AllProgramProject from "@/components/staffEmployee/AllProgramProject";
 
 const ViewerPanelOverview = () => {
   return (

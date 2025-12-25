@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
-import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
-import ActivityLog from "@/components/client/Overview/ActivityLog";
-import ApexDonutChart from "@/common/Charts/ApexDonutChart";
-import LatestSubmission from "@/components/client/Overview/LatestSubmission";
-import ApexBarChart from "@/common/Charts/ApexBarChart";
-import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
-import { useGetStaffEmpStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import {
+  useGetStaffEmpStateCartsQuery,
+} from "@/store/Api/staffManagerApi/StaffManagerApi";
+import BoxContainer from "@/common/BoxContainer";
+import OverDueChart from "./../../components/staffManager/overview/OverDueChart";
+import ProjectStatusChart from './../../components/staffManager/overview/ProjectStatusChart';
+import { FaSpinner } from "react-icons/fa";
+import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
+import LatestSubmission from "@/components/staffManager/overview/LatestSubmission";
+// import ActivityLog from "@/components/staffManager/overview/ActivityLog";
 
 const clientData = [
   {
@@ -61,11 +65,25 @@ const clientData = [
   },
 ];
 
+
+
 const StaffManagerOverview = () => {
-  const { data, isLoading, error } = useGetStaffEmpStateCartsQuery("");
-  const dashboardData = data?.data;
-  if (isLoading) return <div>Fetching data</div>
-  if (error) return <div>Error during Fetching data</div>
+  const {
+    data: staffData,
+    isLoading: staffLoading,
+    error: staffError,
+  } = useGetStaffEmpStateCartsQuery("");
+
+  
+
+  const dashboardData = staffData?.data;
+
+  if (staffLoading) return (
+    <div className="flex items-center justify-center h-[60vh]">
+            <FaSpinner className="animate-spin" size={24} />
+          </div>
+  );
+  if (staffError) return <div>Error during Fetching data</div>;
 
   const processedDashboardData = clientData.map((item, index) => {
     const apiKeys = [
@@ -85,17 +103,11 @@ const StaffManagerOverview = () => {
     };
   });
 
-
   return (
-    <div className="">
-      {/* Icon and Home */}
-
+    <div>
       <div className="grid grid-cols-4 gap-6 my-6">
         {processedDashboardData.map((item) => (
-          <DashboardPanelStatsCard
-            key={item.title}
-            item={item}
-          />
+          <DashboardPanelStatsCard key={item.title} item={item} />
         ))}
       </div>
 
@@ -103,18 +115,25 @@ const StaffManagerOverview = () => {
         <AllProgramProject />
       </div>
 
-      <div className="grid grid-cols-3 gap-8 ">
+      <div className="grid grid-cols-3 gap-8 mb-4">
         <div className="space-y-8 col-span-2">
-          <div className="flex items-center justify-center gap-8">
-            <ApexBarChart />
-            <ApexDonutChart />
+          <div className="flex justify-center gap-3">
+            <BoxContainer>
+              <h2 className="text-2xl font-semibold mb-4">
+                Top Overdue Projects
+              </h2>
+              <OverDueChart />
+            </BoxContainer>
+
+            <ProjectStatusChart />
           </div>
-          <LatestSubmission />
-          <ApexColumnChart />
+          {/* need to integrate api ----------------------- */}
+          <LatestSubmission /> 
+          {/* <ApexColumnChart /> */}
         </div>
-        <div className="space-y-8">
-          <UpcomingDeadline />
-          <ActivityLog />
+        <div className="space-y-8 mb-8">
+          <SmUpcomingDeadline />
+          {/* <ActivityLog /> */}
         </div>
       </div>
     </div>
