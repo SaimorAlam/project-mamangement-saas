@@ -11,8 +11,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
+// import { useDebounce } from "@/hooks/useDebounce";
+// import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { Progress } from "@/components/ui/progress";
 import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import UpdateProjectModal from "../client/Program/UpdateProjectModal";
 import SideManagerMain from "@/components/staffManager/Projects/SideManagerMain";
 import { ChevronDown } from "lucide-react";
+import { useGetProgramAllProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -36,7 +37,7 @@ const priorityOrder: Record<string, number> = {
 
 const StaffManagerProjects = ({
   title = "All Projects",
-  programId = "2a4b2086-0147-40ca-be12-1bfd855046fd",
+  // programId = "2a4b2086-0147-40ca-be12-1bfd855046fd",
 }: IProjectTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(10);
@@ -48,44 +49,22 @@ const StaffManagerProjects = ({
   const [sortColumn, setSortColumn] = useState<any | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const debouncedSearch = useDebounce(search, 500);
+  // const debouncedSearch = useDebounce(search, 500);
 
   const [editProject, setEditProject] = useState<UpdateProjectPayload | null>(
     null
   );
   const [editModalOpen, setEditModalOpen] = useState(false);
 
-  const { data, isLoading } = useGetProjectsByProgramIdQuery({
-    programId,
-    args: {
-      page: currentPage,
-      limit,
-      search: debouncedSearch || undefined,
-      priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
-    },
-  });
+  // const { data, isLoading } = useGetAllProjectsQuery({});
+  const { data, isLoading } = useGetProgramAllProjectsQuery({});
 
   const [updateProject] = useUpdateProjectMutation();
 
-  const handleUpdateProject = async (project: UpdateProjectPayload) => {
-    console.log(project);
-    console.log(editProject);
-    try {
-      const res = await updateProject({
-        id: editProject?.id,
-        ...project,
-      }).unwrap();
-      console.log(res);
-      if (res.success) {
-        toast.success("Project updated successfully");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to update project");
-    }
-  };
-
-  const projects = useMemo(() => data?.data?.data ?? [], [data]);
+  const projects = useMemo(() => data?.data?.projects ?? [], [data]);
+  const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]);
+  console.log("p details: ", programDetails);
+  
   const meta = data?.data?.meta;
 
   const totalProjects = meta?.total ?? projects.length;
@@ -145,6 +124,24 @@ const StaffManagerProjects = ({
       })
       : "-";
 
+  const handleUpdateProject = async (project: UpdateProjectPayload) => {
+    console.log(project);
+    console.log(editProject);
+    try {
+      const res = await updateProject({
+        id: editProject?.id,
+        ...project,
+      }).unwrap();
+      console.log(res);
+      if (res.success) {
+        toast.success("Project updated successfully");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to update project");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -164,126 +161,138 @@ const StaffManagerProjects = ({
     <div className="min-h-screen py-6">
       <ProjectStats />
       <div className="flex gap-3 justify-between">
-      <div className="bg-white rounded-lg border border-gray-200 mt-10 grow">
-        {/* Header */}
-        <div className="flex justify-between px-6 py-4 border-b border-gray-200">
-          <h1 className="text-lg font-semibold">{title}</h1>
+        <div className="bg-white rounded-lg border border-gray-200 mt-10 grow">
+          {/* Header */}
+          <div className="flex justify-between px-6 py-4 border-b border-gray-200">
+            <h1 className="text-lg font-semibold">{title}</h1>
 
-          <div className="flex gap-3">
-            <input
-              value={search}
-              onChange={(e) => {
-                setCurrentPage(1);
-                setSearch(e.target.value);
-              }}
-              placeholder="Search project..."
-              className="border border-gray-200 rounded px-4 py-2 text-sm"
-            />
+            <div className="flex gap-3">
+              <input
+                value={search}
+                onChange={(e) => {
+                  setCurrentPage(1);
+                  setSearch(e.target.value);
+                }}
+                placeholder="Search project..."
+                className="border border-gray-200 rounded px-4 py-2 text-sm"
+              />
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex gap-3 items-center border border-gray-200 px-4 py-2 rounded">
-                {priorityFilter} <ChevronDown className="text-gray-600"/>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
-                  <>
-                    <DropdownMenuItem
-                      key={p}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex gap-3 items-center border border-gray-200 px-4 py-2 rounded">
+                  {priorityFilter} <ChevronDown className="text-gray-600" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
+                    <>
+                      <DropdownMenuItem
+                        key={p}
+                        onClick={() => {
+                          setCurrentPage(1);
+                          setPriorityFilter(p as any);
+                        }}
+                      >
+                        {p}
+                      </DropdownMenuItem>
+                    </>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          {/* Table */}
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                {[
+                  "name",
+                  "assignStaff",
+                  "priority",
+                  // "startDate",
+                  "deadline",
+                  "progress",
+                  "actions",
+                ].map(
+                  (col) =>
+                    col && (
+                      <th
+                        key={col}
+                        onClick={
+                          col !== "actions"
+                            ? () => handleSort(col as any)
+                            : undefined
+                        }
+                        className="px-6 py-3 text-left text-xs font-semibold cursor-pointer capitalize"
+                      >
+                        {col.replace(/([A-Z])/g, " $1")}
+                      </th>
+                    )
+                )}
+              </tr>
+            </thead>
+
+            <tbody>
+              {sortedProjects.map((project) => (
+                <tr key={project.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">{project.name}</td>
+                  <td className="px-6 py-4">
+                    {/* here i will show the assigned staffs images */}
+                    {project.assignStuff.avatars && project.assignStuff.avatars.length > 0 ? (
+                      <div className="flex -space-x-2">
+                        {project.assignStuff.avatars.map((staff: any) => (
+                          <img
+                            key={staff.name}
+                            src={staff?.image || "https://images.pexels.com/photos/4126749/pexels-photo-4126749.jpeg"}
+                            alt={staff.name}
+                            className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-gray-500 text-sm">No Staff</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    <PriorityDropdown defaultPriority={project.priority} />
+                  </td>
+
+                  {/* <td className="px-6 py-4">{formatDate(project.startDate)}</td> */}
+
+                  <td className="px-6 py-4">{formatDate(project.deadline)}</td>
+
+                  <td className="px-6 py-4 w-[180px]">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-gray-500">
+                        {project.progress}%
+                      </span>
+                      <Progress value={project.progress} />
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <button
                       onClick={() => {
-                        setCurrentPage(1);
-                        setPriorityFilter(p as any);
+                        setEditProject(project);
+                        setEditModalOpen(true);
                       }}
                     >
-                      {p}
-                    </DropdownMenuItem>
-                  </>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                      <FaEdit className="text-blue-600" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            itemsPerPage={itemsPerPage}
+            totalPrograms={totalProjects}
+            onPageChange={setCurrentPage}
+          />
         </div>
-
-        {/* Table */}
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              {[
-                "name",
-                "status",
-                "priority",
-                "startDate",
-                "deadline",
-                "progress",
-                "actions",
-              ].map(
-                (col) =>
-                  col && (
-                    <th
-                      key={col}
-                      onClick={
-                        col !== "actions"
-                          ? () => handleSort(col as any)
-                          : undefined
-                      }
-                      className="px-6 py-3 text-left text-xs font-semibold cursor-pointer capitalize"
-                    >
-                      {col.replace(/([A-Z])/g, " $1")}
-                    </th>
-                  )
-              )}
-            </tr>
-          </thead>
-
-          <tbody>
-            {sortedProjects.map((project) => (
-              <tr key={project.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">{project.name}</td>
-                <td className="px-6 py-4">
-                  <span className="px-2 py-1 text-xs rounded bg-gray-100">
-                    {project.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <PriorityDropdown defaultPriority={project.priority} />
-                </td>
-
-                <td className="px-6 py-4">{formatDate(project.startDate)}</td>
-
-                <td className="px-6 py-4">{formatDate(project.deadline)}</td>
-
-                <td className="px-6 py-4 w-[180px]">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">
-                      {project.progress}%
-                    </span>
-                    <Progress value={project.progress} />
-                  </div>
-                </td>
-
-                <td className="px-6 py-4">
-                  <button
-                    onClick={() => {
-                      setEditProject(project);
-                      setEditModalOpen(true);
-                    }}
-                  >
-                    <FaEdit className="text-blue-600" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          totalPrograms={totalProjects}
-          onPageChange={setCurrentPage}
-        />
-      </div>
-      <SideManagerMain/>
+        <SideManagerMain sidebar={programDetails}/>
       </div>
 
       {editModalOpen && editProject && (

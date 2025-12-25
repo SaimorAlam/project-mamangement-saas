@@ -1,20 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import baseApi from "../BaseApi/BaseApi";
 
-// interface GetProjectsParams {
-// page?: number;
-// limit?: number;
-// status?: string;
-// priority?: string;
-// name?: string;
-// programId?: string;
-// managerId?: string;
-// startDate?: string;
-// endDate?: string;
-// sortBy?: string;
-// sortOrder?: string;
-// }
-
 const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getStaffEmpStateCarts: builder.query({
@@ -66,6 +52,14 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/project-dashboard`,
       providesTags: ["Manager"],
     }),
+    getAllProjects: builder.query({ // it is for temporary
+      query: () => `/project`,
+      providesTags: ["Manager"],
+    }),
+    getProgramAllProjects: builder.query({ // it is main for this page
+      query: () => `/manager/program-dashboard`,
+      providesTags: ["Manager"],
+    }),
   }),
 });
 
@@ -76,7 +70,9 @@ export const {
   useGetUpcomingDeadlinesQuery,
   useGetAllActivityLogsQuery,
   useGetAllLatestSubmissionsQuery,
-  useGetProjectPageStateCartsQuery
+  useGetProjectPageStateCartsQuery,
+  useGetAllProjectsQuery,
+  useGetProgramAllProjectsQuery
 } = userApi;
 
 export default userApi;

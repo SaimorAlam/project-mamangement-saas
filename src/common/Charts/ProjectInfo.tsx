@@ -16,7 +16,7 @@ interface ProjectInfo {
   value: string | number;
 }
 
-const ProjectInformation = ({ projectData }: { projectData: any }) => {
+const ProjectInformation = ({ projectData }: { projectData?: any }) => {
   const projectDataInfo: ProjectInfo[] = [
     { label: "Project Name", value: projectData?.name },
     { label: "Status", value: projectData?.status },

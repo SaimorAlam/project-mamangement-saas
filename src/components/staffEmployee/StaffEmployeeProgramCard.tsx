@@ -83,13 +83,13 @@ const StaffEmployeeProgramCard = ({
       ? "text-[#F59E0B]"
       : "text-[#16A34A]";
 
-  const statusCount = projects?.reduce<Record<ProjectStatus, number>>(
-    (acc, project) => {
-      acc[project?.status] = (acc[project?.status] || 0) + 1;
-      return acc;
-    },
-    {} as Record<ProjectStatus, number>
-  );
+  // const statusCount = projects?.reduce<Record<ProjectStatus, number>>(
+  //   (acc, project) => {
+  //     acc[project?.status] = (acc[project?.status] || 0) + 1;
+  //     return acc;
+  //   },
+  //   {} as Record<ProjectStatus, number>
+  // );
 
   return (
     <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">

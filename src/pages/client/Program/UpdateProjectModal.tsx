@@ -5,6 +5,7 @@ interface UpdateProjectModalProps {
   open: boolean;
   project: any;
   onClose: () => void;
+  onSubmit?: (data: any) => void;
 }
 
 export default function UpdateProjectModal({
@@ -12,6 +13,7 @@ export default function UpdateProjectModal({
   project,
   onClose,
 }: UpdateProjectModalProps) {
+  
   if (!open) return null;
 
   return <UpdateProject project={project} onClose={onClose} />;

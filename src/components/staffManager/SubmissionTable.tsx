@@ -20,12 +20,14 @@ import { Eye, FileText } from "lucide-react";
 export interface Submission {
   id: number;
   submission: string;
-  submittedBy: {
-    name: string;
-    avatar: string;
+  employee: {
+    user: {
+      name: string;
+      profileImage: string;
+    }
   };
-  date: string;
-  status: "approved" | "in_review" | "returned" | "draft";
+  createdAt: string;
+  status: "APPROVED" | "PENDING" | "RETURNED" | "DRAFT";
 }
 
 type SubmissionTableProps = {
@@ -51,17 +53,17 @@ export default function SubmissionTable({
   };
 
   const statusClasses: Record<string, string> = {
-    approved: "text-[#0B5A4A] bg-[#EBFFF2] border border-[#ABEFD5]",
-    in_review: "text-[#665CFF] bg-[#F2F2FF] border border-[#C7C2FF]",
-    returned: "text-[#B00020] bg-[#FFEAEA] border border-[#FFB3B3]",
-    draft: "text-[#6B7280] bg-[#F3F4F6] border border-[#D1D5DB]",
+    APPROVED: "text-[#0B5A4A] bg-[#EBFFF2] border border-[#ABEFD5]",
+    PENDING: "text-[#665CFF] bg-[#F2F2FF] border border-[#C7C2FF]",
+    RETURNED: "text-[#B00020] bg-[#FFEAEA] border border-[#FFB3B3]",
+    DRAFT: "text-[#6B7280] bg-[#F3F4F6] border border-[#D1D5DB]",
   };
 
   const statusLabels = {
-    approved: "Approved",
-    in_review: "In Review",
-    returned: "Returned",
-    draft: "Draft",
+    APPROVED: "APPROVED",
+    PENDING: "PENDING",
+    RETURNED: "RETURNED",
+    DRAFT: "DRAFT",
   };
 
   return (
@@ -69,7 +71,7 @@ export default function SubmissionTable({
       <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full">
         {/* Scroll wrapper around full table */}
         <ScrollArea className="h-[400px] w-full">
-          <Table className="">
+          <Table className="overflow-x">
             <TableHeader>
               <TableRow className="border-b border-[#E2E8F0] bg-[#F7F9FA]">
                 <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
@@ -100,29 +102,31 @@ export default function SubmissionTable({
                   </TableCell>
                   <TableCell className="px-6 py-3.5">
                     <div className="flex items-center space-x-3">
-                      <Avatar className="size-10">
-                        <AvatarImage
-                          src={submission.submittedBy.avatar}
-                          alt={submission.submittedBy.name}
-                        />
-                        <AvatarFallback className="text-base font-normal">
-                          {getInitials(submission.submittedBy.name)}
-                        </AvatarFallback>
-                      </Avatar>
+                      {submission.employee.user.profileImage && (
+                        <Avatar className="size-10">
+                          <AvatarImage
+                            src={submission.employee.user.profileImage}
+                            alt={submission.employee.user.name}
+                          />
+                          <AvatarFallback className="text-base font-normal">
+                            {getInitials(submission.employee.user.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
                       <span className="text-base font-normal">
-                        {submission.submittedBy.name}
+                        {submission.employee.user.name}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-3.5 text-base text-muted-foreground">
-                    {submission.date}
+                    {submission.createdAt?.split("T")[0]}
                   </TableCell>
+
                   <TableCell className="px-6 py-3.5">
                     <Badge
                       variant="outline"
-                      className={`py-1.5 px-3 min-w-20 ${
-                        statusClasses[submission.status]
-                      }`}
+                      className={`py-1.5 px-3 min-w-20 ${statusClasses[submission.status]
+                        }`}
                     >
                       {statusLabels[submission.status]}
                     </Badge>
