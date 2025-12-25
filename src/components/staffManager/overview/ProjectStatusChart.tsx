@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DropdownSelect from "@/common/DropdownSelect";
 import { useGetSubmissionStatusQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import ApexDonutChart from "@/common/Charts/ApexDonutChart";
 import Chart from "react-apexcharts";
 
 import { useMemo, useState } from "react";

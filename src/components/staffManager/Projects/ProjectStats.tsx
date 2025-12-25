@@ -1,9 +1,11 @@
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
+import { useGetProjectPageStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import { FaSpinner } from "react-icons/fa";
 
 const ProjectStats = () => {
   const stats = [
     {
-      title: "Total Assigned",
+      title: "Total Projects",
       value: 85,
       growth: "",
       growth_type: "up",
@@ -13,7 +15,7 @@ const ProjectStats = () => {
       icon_bg_color: "#5500f1",
     },
     {
-      title: "Awaiting Review",
+      title: "Assigned Stuff",
       value: 3,
       growth: "",
       growth_type: "",
@@ -23,38 +25,58 @@ const ProjectStats = () => {
       icon_bg_color: "#4881FF",
     },
     {
-      title: "Under Review",
+      title: "Program Completion",
       value: 14,
       growth: "",
       growth_type: "",
       description: "",
       link_text: "",
-      icon: "PendingReview",
-      icon_bg_color: "#aeb100",
+      icon: "Check",
+      icon_bg_color: "#00FF00",
     },
     {
-      title: "Live",
+      title: "Pending Review",
       value: 13,
       growth: "",
       growth_type: "",
       description: "",
-      icon: "LiveProject",
-      icon_bg_color: "#DC2626",
-    },
-    {
-      title: "Completed Projects",
-      value: 243,
-      growth: "",
-      growth_type: "",
-      description: "",
-      icon: "Check",
-      icon_bg_color: "#059669",
+      icon: "PendingReview",
+      icon_bg_color: "#aeb100",
     },
   ];
 
+  const {
+    data: staffData,
+    isLoading,
+    error,
+  } = useGetProjectPageStateCartsQuery("");
+
+  const dashboardData = staffData?.data;
+
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <FaSpinner className="animate-spin" size={24} />
+      </div>
+    );
+
+  if (error) return <div>Error during Fetching data</div>;
+
+  const apiKeys = [
+    "totalProjects",
+    "assignedStaff",
+    "programCompletion",
+    "pendingReviews",
+  ] as const;
+
+  const processedDashboardData = stats.map((item, index) => ({
+    ...item,
+    value: dashboardData?.[apiKeys[index]] ?? item.value,
+  }));
+
   return (
-    <div className="grid grid-cols- sm:grid-cols-2 lg:grid-cols-4 gap-6 cursor-pointer">
-      {stats.map((item, index) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 cursor-pointer">
+      {processedDashboardData.map((item, index) => (
         <DashboardPanelStatsCard key={index} item={item} />
       ))}
     </div>

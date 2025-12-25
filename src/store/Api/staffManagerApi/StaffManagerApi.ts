@@ -30,10 +30,41 @@ const userApi = baseApi.injectEndpoints({
     //   providesTags: ["Manager"],
     // }),
     getTopOverdueProjects: builder.query({
-      query: () => `/manager/charts/top-overdue-projects`
+      query: () => `/manager/charts/top-overdue-projects`,
+      providesTags: ["Manager"],
     }),
     getSubmissionStatus: builder.query({
-      query: () => `/manager/submission-status`
+      query: () => `/manager/submission-status`,
+      providesTags: ["Manager"],
+    }),
+    getUpcomingDeadlines: builder.query({
+      query: (params) => ({
+        url: "/manager/projects/upcoming-deadlines",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
+    getAllActivityLogs: builder.query({
+      query: (params) => ({
+        url: "/activities",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
+    getAllLatestSubmissions: builder.query({
+      query: (params) => ({
+        url: "/manager/all-manager-submission",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
+    // for project page
+    getProjectPageStateCarts: builder.query({
+      query: () => `/manager/project-dashboard`,
+      providesTags: ["Manager"],
     }),
   }),
 });
@@ -41,7 +72,11 @@ const userApi = baseApi.injectEndpoints({
 export const {
   useGetStaffEmpStateCartsQuery,
   useGetTopOverdueProjectsQuery,
-  useGetSubmissionStatusQuery
+  useGetSubmissionStatusQuery,
+  useGetUpcomingDeadlinesQuery,
+  useGetAllActivityLogsQuery,
+  useGetAllLatestSubmissionsQuery,
+  useGetProjectPageStateCartsQuery
 } = userApi;
 
 export default userApi;
