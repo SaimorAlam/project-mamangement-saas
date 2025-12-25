@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
-import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 // import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import {
@@ -12,6 +11,7 @@ import OverDueChart from "./../../components/staffManager/overview/OverDueChart"
 import ProjectStatusChart from './../../components/staffManager/overview/ProjectStatusChart';
 import { FaSpinner } from "react-icons/fa";
 import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
+import LatestSubmission from "@/components/staffManager/overview/LatestSubmission";
 
 const clientData = [
   {
@@ -118,7 +118,7 @@ const StaffManagerOverview = () => {
 
       <div className="grid grid-cols-3 gap-8 mb-4">
         <div className="space-y-8 col-span-2">
-          <div className="flex items-center justify-center">
+          <div className="flex justify-center gap-3">
             <BoxContainer>
               <h2 className="text-2xl font-semibold mb-4">
                 Top Overdue Projects
