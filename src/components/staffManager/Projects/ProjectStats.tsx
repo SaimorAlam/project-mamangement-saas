@@ -1,4 +1,6 @@
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
+import { useGetProjectPageStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import { FaSpinner } from "react-icons/fa";
 
 const ProjectStats = () => {
   const stats = [
@@ -43,9 +45,38 @@ const ProjectStats = () => {
     },
   ];
 
+  const {
+    data: staffData,
+    isLoading,
+    error,
+  } = useGetProjectPageStateCartsQuery("");
+
+  const dashboardData = staffData?.data;
+
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <FaSpinner className="animate-spin" size={24} />
+      </div>
+    );
+
+  if (error) return <div>Error during Fetching data</div>;
+
+  const apiKeys = [
+    "totalProjects",
+    "assignedStaff",
+    "programCompletion",
+    "pendingReviews",
+  ] as const;
+
+  const processedDashboardData = stats.map((item, index) => ({
+    ...item,
+    value: dashboardData?.[apiKeys[index]] ?? item.value,
+  }));
+
   return (
-    <div className="grid grid-cols- sm:grid-cols-2 lg:grid-cols-4 gap-6 cursor-pointer">
-      {stats.map((item, index) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 cursor-pointer">
+      {processedDashboardData.map((item, index) => (
         <DashboardPanelStatsCard key={index} item={item} />
       ))}
     </div>

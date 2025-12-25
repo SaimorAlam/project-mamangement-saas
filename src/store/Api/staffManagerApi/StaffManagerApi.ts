@@ -37,13 +37,19 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/submission-status`,
       providesTags: ["Manager"],
     }),
+    // for project page
+    getProjectPageStateCarts: builder.query({
+      query: () => `/manager/project-dashboard`,
+      providesTags: ["Manager"],
+    }),
   }),
 });
 
 export const {
   useGetStaffEmpStateCartsQuery,
   useGetTopOverdueProjectsQuery,
-  useGetSubmissionStatusQuery
+  useGetSubmissionStatusQuery,
+  useGetProjectPageStateCartsQuery
 } = userApi;
 
 export default userApi;
