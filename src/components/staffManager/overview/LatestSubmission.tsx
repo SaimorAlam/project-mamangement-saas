@@ -42,8 +42,10 @@ const LatestSubmission = () => {
         toDate: "2026-12-12"
     });
 
-    console.log("data c: ", data);
+    console.log("working");
+
     const submissionsData = data?.data || [];
+    console.log("working", submissionsData);
 
 
 
@@ -77,6 +79,8 @@ const LatestSubmission = () => {
     // });
 
     const sortedSubmissions = submissions;
+    console.log("working sorted",sortedSubmissions);
+    
 
 
     if (isLoading) return <div className="text-gray-400 text-center">Fetching data...</div>;
@@ -147,7 +151,7 @@ const LatestSubmission = () => {
                 </DropdownMenu>
             </CardHeader>
             {/* Pass the whole array instead of mapping */}
-            <SubmissionTable submissions={sortedSubmissions} />
+            <SubmissionTable submissions={submissionsData} />
         </BoxContainer>
     );
 };

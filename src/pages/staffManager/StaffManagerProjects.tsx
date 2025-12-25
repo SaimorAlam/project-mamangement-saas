@@ -11,8 +11,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
+// import { useDebounce } from "@/hooks/useDebounce";
+// import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { Progress } from "@/components/ui/progress";
 import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import UpdateProjectModal from "../client/Program/UpdateProjectModal";
 import SideManagerMain from "@/components/staffManager/Projects/SideManagerMain";
 import { ChevronDown } from "lucide-react";
+import { useGetAllProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -36,7 +37,7 @@ const priorityOrder: Record<string, number> = {
 
 const StaffManagerProjects = ({
   title = "All Projects",
-  programId = "2a4b2086-0147-40ca-be12-1bfd855046fd",
+  // programId = "2a4b2086-0147-40ca-be12-1bfd855046fd",
 }: IProjectTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(10);
@@ -48,22 +49,23 @@ const StaffManagerProjects = ({
   const [sortColumn, setSortColumn] = useState<any | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const debouncedSearch = useDebounce(search, 500);
+  // const debouncedSearch = useDebounce(search, 500);
 
   const [editProject, setEditProject] = useState<UpdateProjectPayload | null>(
     null
   );
   const [editModalOpen, setEditModalOpen] = useState(false);
 
-  const { data, isLoading } = useGetProjectsByProgramIdQuery({
-    programId,
-    args: {
-      page: currentPage,
-      limit,
-      search: debouncedSearch || undefined,
-      priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
-    },
-  });
+  const { data, isLoading } = useGetAllProjectsQuery({});
+  // const { data, isLoading } = useGetProjectsByProgramIdQuery({
+  //   programId,
+  //   args: {
+  //     page: currentPage,
+  //     limit,
+  //     search: debouncedSearch || undefined,
+  //     priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
+  //   },
+  // });
 
   const [updateProject] = useUpdateProjectMutation();
 
@@ -85,7 +87,7 @@ const StaffManagerProjects = ({
     }
   };
 
-  const projects = useMemo(() => data?.data?.data ?? [], [data]);
+  const projects = useMemo(() => data?.data?.projects?.data ?? [], [data]);
   const meta = data?.data?.meta;
 
   const totalProjects = meta?.total ?? projects.length;
