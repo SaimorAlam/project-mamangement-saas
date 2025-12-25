@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
-import { useCreateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
+import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { useGetAllManagersQuery } from "@/store/Api/UserApi/UserApi";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -12,7 +12,6 @@ import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import useGetAllEmployees from "@/utils/useGetAllEmployees";
-import { FaSpinner } from "react-icons/fa";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -33,7 +32,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 type RepeatEvery = "WEEKLY" | "BI_WEEKLY" | "MONTHLY";
 type Priority = "LOW" | "MEDIUM" | "HIGH";
 
-interface CreateProjectForm {
+interface UpdateProjectForm {
   name: string;
   message: string;
   programId: string;
@@ -54,7 +53,7 @@ interface CreateProjectForm {
   longitude: number;
   status: string;
   dataUploadDateDays: string;
-  workingDays: string[]; // Added workingDays
+  workingDays: string[];
 }
 
 // Location Picker Component
@@ -74,82 +73,99 @@ const LocationMarker = ({
   return pos.lat !== 0 ? <Marker position={[pos.lat, pos.lng]} /> : null;
 };
 
-const CreateProject = ({
-  programId,
+const UpdateProject = ({
+  project,
   onClose,
 }: {
-  programId: string;
+  project: any;
   onClose: () => void;
 }) => {
   const { allEmployees: allEmployeesData, isLoading: employeeLoading } =
     useGetAllEmployees();
   console.log(allEmployeesData);
-  const [createProject, { isLoading, isSuccess }] = useCreateProjectMutation();
+  const [updateProject, { isLoading, isSuccess }] = useUpdateProjectMutation();
 
   // Queries
   const { data: managersData } = useGetAllManagersQuery({});
   const allManagers = managersData?.data?.data || [];
 
-  // const { data: employeesData } = useGetAllEmployeesQuery({
-  //   page: 1,
-  //   limit: 100,
-  // });
-  const allEmployees: any = allEmployeesData || [];
+  const allEmployees: any = allEmployeesData;
 
   const [shareWith, setShareWith] = useState<
     "onlyMe" | "inviteStaff" | "followTemplate"
-  >("onlyMe");
+  >("inviteStaff");
 
-  const [enableDetails, setEnableDetails] = useState(false);
+  const [enableDetails, setEnableDetails] = useState(true);
   const [selectedStaffs, setSelectedStaffs] = useState<string[]>([]);
-  const [mapPosition, setMapPosition] = useState({ lat: 51.505, lng: -0.09 }); // Default London
+  const [mapPosition, setMapPosition] = useState({ lat: 51.505, lng: -0.09 });
 
-  const { register, handleSubmit, watch, setValue, control } =
-    useForm<CreateProjectForm>({
-      defaultValues: {
-        programId,
-        priority: "MEDIUM",
-        repeatEvery: "WEEKLY",
-        repeatOnDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], // Start empty
-        workingDays: [], // Initialize workingDays
-        latitude: 0,
-        longitude: 0,
-        remindBefore: 30,
-        startDate: new Date().toISOString().split("T")[0],
-        dataUploadDateDays: "3",
-      },
-    });
+  const { register, handleSubmit, watch, setValue, control, reset } =
+    useForm<UpdateProjectForm>();
 
   const repeatEvery = watch("repeatEvery");
   const repeatOnDays = watch("repeatOnDays");
-  const workingDays = watch("workingDays"); // Watch workingDays state
+  const workingDays = watch("workingDays");
+
+  const toInputDate = (iso?: string) =>
+    iso ? new Date(iso).toISOString().split("T")[0] : "";
 
   useEffect(() => {
-    // Get user's current location on mount
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setMapPosition({ lat: latitude, lng: longitude });
-          setValue("latitude", latitude);
-          setValue("longitude", longitude);
-        },
-        () => {
-          // If denied, stick to default or previous
-        }
-      );
+    if (project) {
+      const initialEmployeeIds = project.employeeIds || [];
+      setSelectedStaffs(initialEmployeeIds);
+
+      const lat = Number(project.latitude) || 0;
+      const lng = Number(project.longitude) || 0;
+      if (lat !== 0 && lng !== 0) {
+        setMapPosition({ lat, lng });
+      }
+
+      reset({
+        name: project.name || "",
+        message: project.message || "",
+        programId: project.programId,
+        description: project.description || "",
+        repeatEvery: project.repeatEvery || "WEEKLY",
+        repeatOnDays: project.repeatOnDays || [],
+        repeatOnDates: project.repeatOnDates || [],
+        remindBefore: project.remindBefore || 30,
+        priority: project.priority || "MEDIUM",
+        startDate: toInputDate(project.startDate),
+        deadline: toInputDate(project.deadline),
+        estimatedCompletedDate: toInputDate(project.estimatedCompletedDate),
+        managerId: project.managerId || "",
+        employeeIds: initialEmployeeIds,
+        currentRate: project.currentRate || "",
+        budget: project.budget || "",
+        latitude: lat,
+        longitude: lng,
+        status: project.status || "Active",
+        workingDays: project.workingDays || [],
+        dataUploadDateDays:
+          String(Math.floor((project.remindBefore || 4320) / (24 * 60))) || "3",
+      });
+
+      if (project.description || project.managerId || project.budget) {
+        setEnableDetails(true);
+      }
+
+      if (initialEmployeeIds.length > 0) {
+        setShareWith("inviteStaff");
+      }
     }
-  }, [setValue]);
+  }, [project, reset]);
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success("Project created successfully");
+      toast.success("Project updated successfully");
       onClose();
     }
   }, [isSuccess, onClose]);
+
   if (employeeLoading) {
-    return <FaSpinner />;
+    return <div>Loading...</div>;
   }
+
   const toggleDay = (day: string) => {
     const map: Record<string, string> = {
       Mon: "MONDAY",
@@ -182,7 +198,6 @@ const CreateProject = ({
     return (repeatOnDays || []).includes(map[shortDay]);
   };
 
-  // Logic for Working Days
   const toggleWorkingDay = (day: string) => {
     const map: Record<string, string> = {
       Mon: "MONDAY",
@@ -248,41 +263,43 @@ const CreateProject = ({
     return newObj;
   };
 
-  const onSubmit = async (data: CreateProjectForm) => {
+  const onSubmit = async (data: UpdateProjectForm) => {
     try {
-      const { dataUploadDateDays } = data;
-      console.log(selectedStaffs);
+      const initialEmployeeIds = project.employeeIds || [];
+      const addEmployeeIds = selectedStaffs.filter(
+        (id) => !initialEmployeeIds.includes(id)
+      );
+      const removeEmployeeIds = initialEmployeeIds.filter(
+        (id: string) => !selectedStaffs.includes(id)
+      );
+
       const payload = {
-        message: data.message || "New Project Created",
-        repeatEvery: data.repeatEvery,
-        repeatOnDays: data.repeatOnDays || [],
-        repeatOnDates: data.repeatOnDates || [],
-        remindBefore: parseInt(dataUploadDateDays) * 24 * 60,
-        isActive: true,
         name: data.name,
-        programId: programId,
-        description: data.description || "",
         priority: data.priority,
-        deadline: toISO(data.deadline || data.estimatedCompletedDate),
-        managerId: data.managerId || null,
-        employeeIds: selectedStaffs,
+        description: data.description,
+        deadline: toISO(data.deadline),
         startDate: toISO(data.startDate),
-        progress: 0,
-        chartList: [],
-        estimatedCompletedDate: toISO(data.estimatedCompletedDate),
+        projectCompleteDate: toISO(data.estimatedCompletedDate),
+        progress: project.progress || 0,
         currentRate: data.currentRate || "0",
         budget: data.budget || "0",
         latitude: Number(data.latitude) || 0,
         longitude: Number(data.longitude) || 0,
+        chartList: project.chartList || [],
+        managerId: data.managerId || null,
+        addEmployeeIds: addEmployeeIds,
+        removeEmployeeIds: removeEmployeeIds,
       };
 
-      console.log("Create Project Payload:", payload);
       const cleanedPayload = cleanPayload(payload);
 
-      await createProject(cleanedPayload).unwrap();
+      await updateProject({
+        id: project.id,
+        ...cleanedPayload,
+      }).unwrap();
     } catch (error: any) {
       console.error(error);
-      toast.error(error?.data?.message || "Failed to create project");
+      toast.error(error?.data?.message || "Failed to update project");
     }
   };
 
@@ -291,10 +308,10 @@ const CreateProject = ({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold">Create New Project</h2>
+          <h2 className="text-lg font-semibold">Update Project</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 font-bold text-2xl"
           >
             ×
           </button>
@@ -361,9 +378,9 @@ const CreateProject = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                   >
                     <option value="">Select staff</option>
-                    {allEmployees?.map((emp: any) => (
+                    {allEmployees.map((emp: any) => (
                       <option key={emp.id} value={emp.id}>
-                        {emp?.name} ({emp?.role})
+                        {emp.name} ({emp.role})
                       </option>
                     ))}
                   </select>
@@ -618,13 +635,7 @@ const CreateProject = ({
                   </label>
                   <input
                     type="date"
-                    {...register("startDate")} // Re-using startDate here as per design showing it again? Or strictly "Starting Date".
-                    // Actually design shows "Data Date" at top and "Starting Date" here.
-                    // They might be distinct. If `createProject` API only has one `startDate`, I'll bind both to same or pick one.
-                    // I'll bind this to `startDate` and the top one also to `startDate`?
-                    // Or use `projectStartDate` if I add field.
-                    // For now keeping both bound to `startDate` effectively syncs them or I should ignore one.
-                    // I'll assume they map to the same field for MVP.
+                    {...register("startDate")}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50"
                   />
                 </div>
@@ -696,7 +707,7 @@ const CreateProject = ({
           {/* Map Section */}
           <div className="mt-8">
             <h3 className="text-sm font-medium text-gray-700 mb-2">
-              Project Location of Highway Expansion Program
+              Project Location
             </h3>
             <div className="h-64 w-full rounded-lg overflow-hidden border border-gray-200">
               <MapContainer
@@ -714,7 +725,6 @@ const CreateProject = ({
                 />
               </MapContainer>
             </div>
-            {/* Hidden inputs to ensure form validation/submission catches these if needed, though state is managed */}
             <input type="hidden" {...register("latitude")} />
             <input type="hidden" {...register("longitude")} />
           </div>
@@ -733,7 +743,7 @@ const CreateProject = ({
               disabled={isLoading}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
             >
-              {isLoading ? "Creating..." : "Create Project"}
+              {isLoading ? "Updating..." : "Update Project"}
             </button>
           </div>
         </form>
@@ -742,4 +752,4 @@ const CreateProject = ({
   );
 };
 
-export default CreateProject;
+export default UpdateProject;

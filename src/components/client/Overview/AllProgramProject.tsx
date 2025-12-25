@@ -30,10 +30,7 @@ export type ProjectStatus =
   | "PENDING"
   | "RETURNED"
   | "OVERDUE"
-  | "DRAFT"
-  | "IN_REVIEW"
-  | "SUBMITTED";
-export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
+  | "DRAFT" | "IN_REVIEW" | "SUBMITTED"; export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
 export interface Project {
   id: string;

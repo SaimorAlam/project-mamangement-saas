@@ -16,9 +16,9 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { Progress } from "@/components/ui/progress";
 import UpdateProjectModal from "./UpdateProjectModal";
-import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
+// import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -64,25 +64,25 @@ const AllProject = ({
     },
   });
 
-  const [updateProject] = useUpdateProjectMutation();
+  // const [updateProject] = useUpdateProjectMutation();
 
-  const handleUpdateProject = async (project: UpdateProjectPayload) => {
-    console.log(project);
-    console.log(editProject);
-    try {
-      const res = await updateProject({
-        id: editProject?.id,
-        ...project,
-      }).unwrap();
-      console.log(res);
-      if (res.success) {
-        toast.success("Project updated successfully");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to update project");
-    }
-  };
+  // const handleUpdateProject = async (project: UpdateProjectPayload) => {
+  //   console.log(project);
+  //   console.log(editProject);
+  //   try {
+  //     const res = await updateProject({
+  //       id: editProject?.id,
+  //       ...project,
+  //     }).unwrap();
+  //     console.log(res);
+  //     if (res.success) {
+  //       toast.success("Project updated successfully");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Failed to update project");
+  //   }
+  // };
 
   const projects = useMemo(() => data?.data?.data ?? [], [data]);
   const meta = data?.data?.meta;
@@ -279,7 +279,7 @@ const AllProject = ({
           project={editProject}
           open={editModalOpen}
           onClose={() => setEditModalOpen(false)}
-          onSubmit={handleUpdateProject}
+          // onSubmit={handleUpdateProject}
         />
       )}
     </div>
