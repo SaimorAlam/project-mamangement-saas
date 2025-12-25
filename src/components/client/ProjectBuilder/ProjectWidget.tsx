@@ -132,7 +132,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="px-4 pt-4">
         <label className="block text-sm font-medium text-website-color-darkGray mb-2">
           Project Name*
         </label>
@@ -143,6 +143,36 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Add program or select</option>
+          </select>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg
+              className="w-4 h-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-4 pt-4">
+        <label className="block text-sm font-medium text-website-color-darkGray mb-2">
+          Use Template
+        </label>
+        <div className="relative">
+          <select
+            value={selectedProgram}
+            onChange={(e) => setSelectedProgram(e.target.value)}
+            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Template name</option>
           </select>
           <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
             <svg
