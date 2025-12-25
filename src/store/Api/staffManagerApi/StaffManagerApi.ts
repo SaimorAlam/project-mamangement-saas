@@ -60,6 +60,15 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/program-dashboard`,
       providesTags: ["Manager"],
     }),
+    // for program review
+    getAllReviewProjects: builder.query({ // it is main for this page
+      query: () => `/manager/submissions`,
+      providesTags: ["Manager"],
+    }),
+    getAllReviewProjectsReviewerActivity: builder.query({ // it is main for this page
+      query: () => `/manager/activity`,
+      providesTags: ["Manager"],
+    }),
   }),
 });
 
@@ -72,7 +81,9 @@ export const {
   useGetAllLatestSubmissionsQuery,
   useGetProjectPageStateCartsQuery,
   useGetAllProjectsQuery,
-  useGetProgramAllProjectsQuery
+  useGetProgramAllProjectsQuery,
+  useGetAllReviewProjectsQuery,
+  useGetAllReviewProjectsReviewerActivityQuery
 } = userApi;
 
 export default userApi;
