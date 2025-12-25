@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 // Helper function to format dates
-const formatDate = (dateString?: string | null) => {
+export const formatDate = (dateString?: string | null) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
   return new Intl.DateTimeFormat("en-GB", {

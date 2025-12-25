@@ -65,9 +65,7 @@ const priorityColors: Record<Priority, string> = {
 const renderPriority = (priority: Priority) => (
   <div className="flex items-center gap-1">
     <Flag className={`w-4 h-4 ${priorityColors[priority]}`} />
-    <span
-      className={`text-sm font-medium ${priorityColors[priority]}`}
-    >
+    <span className={`text-sm font-medium ${priorityColors[priority]}`}>
       {priority}
     </span>
   </div>
@@ -122,9 +120,7 @@ const ProgramModal = ({
               style={{ width: `${program.progress}%` }}
             />
           </div>
-          <p className="mt-1 text-sm font-medium">
-            {program.progress}%
-          </p>
+          <p className="mt-1 text-sm font-medium">{program.progress}%</p>
         </div>
 
         <div className="text-sm">
@@ -156,11 +152,8 @@ const ProgramModal = ({
 );
 
 // Table Component
-const StaffEmployeeProgramTable = ({
-  programs,
-}: ProgramTableProps) => {
-  const [selectedProgram, setSelectedProgram] =
-    useState<Program | null>(null);
+const StaffEmployeeProgramTable = ({ programs }: ProgramTableProps) => {
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [open, setOpen] = useState(false);
 
   const handleViewProgram = (program: Program) => {
@@ -183,7 +176,7 @@ const StaffEmployeeProgramTable = ({
           </TableHeader>
 
           <TableBody>
-            {programs.map((program) => (
+            {programs?.map((program) => (
               <TableRow
                 key={program.id}
                 className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
@@ -228,11 +221,7 @@ const StaffEmployeeProgramTable = ({
       </CardContent>
 
       {selectedProgram && (
-        <ProgramModal
-          program={selectedProgram}
-          open={open}
-          setOpen={setOpen}
-        />
+        <ProgramModal program={selectedProgram} open={open} setOpen={setOpen} />
       )}
     </Card>
   );

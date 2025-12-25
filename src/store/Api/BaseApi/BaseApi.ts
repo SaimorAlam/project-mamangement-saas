@@ -26,14 +26,14 @@ const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
-  console.log(result)
+  console.log(result);
   if (result.error && result.error.status === 401) {
     const state = api.getState() as any;
     const refreshToken = state.auth.user?.refreshToken;
-    console.log(refreshToken)
+    console.log(refreshToken);
     if (!refreshToken) {
       api.dispatch(logOut());
-      console.log("Inside Dispatch")
+      console.log("Inside Dispatch");
       return result;
     }
     const refreshResult = await baseQuery(
@@ -67,6 +67,7 @@ const baseApi = createApi({
     "Viewer",
     "Employees",
     "Project",
+    "Dashboard",
   ],
 });
 export default baseApi;

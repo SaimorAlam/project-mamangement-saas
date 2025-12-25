@@ -1,7 +1,9 @@
 // src/routes/clientRoutes.tsx
 import { lazy } from "react";
 
-const ClientOverview = lazy(() => import("@/pages/client/ClientOverview"));
+const ClientOverview = lazy(
+  () => import("@/pages/client/Overview/ClientOverview")
+);
 const ClientAllProgram = lazy(
   () => import("@/pages/client/Program/ClientAllProgram")
 );
