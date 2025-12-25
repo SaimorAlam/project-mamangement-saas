@@ -1,16 +1,34 @@
 import { Eye, Edit, Trash2 } from "lucide-react";
-// import { IEmployeeProfile } from "@/types/client-panel";
 import { UserType } from "@/types/Auth/Auth";
 import { useLazyGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+
+// Project interface
+export interface Project {
+  id: string;
+  programId: string;
+  name: string;
+  description: string;
+  status: string;
+  priority: string;
+  startDate: string;
+  deadline: string;
+  progress: number;
+  managerId: string;
+  chartList: unknown[];
+  estimatedCompletedDate: string;
+  projectCompleteDate: string | null;
+  currentRate: string;
+  budget: string;
+  latitude: number | null;
+  longitude: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface ITableProps {
   employees: UserType[];
-  selectedEmployees?: Set<string>;
-  selectAll?: boolean;
   visibleColumns?: string[];
-  handleSelectAll: () => void;
-  handleSelectEmployee?: (id: string) => void;
   handleViewClick: (employeeId: string) => void;
   handleEditClick?: (employee: UserType) => void;
   handleDeleteEmployee?: (id: string) => void;
@@ -23,8 +41,6 @@ interface ITableProps {
 
 const EmployeeTable = ({
   employees,
-  // selectedEmployees,
-  // selectAll,
   visibleColumns = [
     "employeeName",
     "email",
@@ -34,8 +50,6 @@ const EmployeeTable = ({
     "level",
     "action",
   ],
-  // handleSelectAll,
-  // handleSelectEmployee,
   handleViewClick,
   handleEditClick,
   handleDeleteEmployee,
@@ -45,9 +59,54 @@ const EmployeeTable = ({
   getRoleBadgeColor,
   getStatusBadgeColor,
 }: ITableProps) => {
-  const [userId, setUserId] = useState<string>("");
-  const [getProjects, { data }] = useLazyGetAllProjectsQuery();
+  const [employeeProjects, setEmployeeProjects] = useState<
+    Record<string, Project[]>
+  >({});
+  const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+  const [getProjects] = useLazyGetAllProjectsQuery();
 
+  // Fetch projects for all employees in parallel
+  useEffect(() => {
+    const fetchProjectsForEmployees = async () => {
+      setIsLoadingProjects(true);
+
+      const entries = await Promise.all(
+        employees.map(async (employee) => {
+          const queryParams =
+            employee.role === "MANAGER"
+              ? { managerId: employee.id }
+              : employee.role === "VIEWER"
+              ? { viewerId: employee.id }
+              : { employeeId: employee.id };
+
+          try {
+            const result = await getProjects(queryParams).unwrap();
+            return [employee.id, result?.data || []] as const;
+          } catch {
+            return [employee.id, []] as const;
+          }
+        })
+      );
+
+      setEmployeeProjects(Object.fromEntries(entries));
+      setIsLoadingProjects(false);
+    };
+
+    if (employees.length) {
+      fetchProjectsForEmployees();
+    }
+  }, [employees, getProjects]);
+
+  // Memoize derived project stats
+  const employeeProjectStats = useMemo(() => {
+    const stats: Record<string, { count: number }> = {};
+    for (const employeeId in employeeProjects) {
+      const projects = employeeProjects[employeeId] ?? [];
+      stats[employeeId] = { count: projects.length };
+    }
+    return stats;
+  }, [employeeProjects]);
+  console.log(employeeProjectStats);
   const renderSortIcon = (field: string) => {
     if (sortBy !== field) return null;
     return sortOrder === "asc" ? " ▲" : " ▼";
@@ -64,21 +123,11 @@ const EmployeeTable = ({
     </th>
   );
 
-  console.log(employees);
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead className="bg-gray-50">
           <tr>
-            {/* <th className="px-6 py-3 text-left">
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={handleSelectAll}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
-              />
-            </th> */}
-
             {visibleColumns.includes("employeeName") &&
               sortableHeader("Employee Name", "userName")}
             {visibleColumns.includes("email") &&
@@ -98,27 +147,13 @@ const EmployeeTable = ({
 
         <tbody className="bg-white divide-y divide-gray-200">
           {employees?.map((employee) => {
-            getProjects(
-              employee.role === "MANAGER"
-                ? { managerId: employee.id }
-                : employee.role === "VIEWER"
-                ? { viewerId: employee.id }
-                : { employeeId: employee.id }
-            );
+            const projectStats = employeeProjectStats[employee.id];
+
             return (
               <tr
                 key={employee.id}
                 className="hover:bg-gray-50 transition-colors"
               >
-                {/* <td className="px-6 py-4">
-                <input
-                  type="checkbox"
-                  checked={selectedEmployees.has(employee.id)}
-                  onChange={() => handleSelectEmployee(employee.id)}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
-                />
-              </td> */}
-
                 {visibleColumns.includes("employeeName") && (
                   <td className="px-6 py-4">
                     <div className="flex items-center">
@@ -152,20 +187,22 @@ const EmployeeTable = ({
                   </td>
                 )}
 
-                {/* {visibleColumns.includes("projects") && (
-                <td className="px-6 py-4">
-                  <div className="grid grid-cols-3 gap-2">
-                    {employee.projects?.map((project, index) => (
-                      <span
-                        key={index}
-                        className="text-xs border bg-gray-50 px-2 py-1 rounded-lg"
-                      >
-                        {project}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-              )} */}
+                {visibleColumns.includes("projects") && (
+                  <td className="px-6 py-4">
+                    {isLoadingProjects ? (
+                      <span className="text-xs text-gray-400">Loading...</span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900">
+                          {projectStats?.count ?? 0}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {projectStats?.count === 1 ? "project" : "projects"}
+                        </span>
+                      </div>
+                    )}
+                  </td>
+                )}
 
                 {visibleColumns.includes("lastActive") && (
                   <td className="px-6 py-4 text-sm text-gray-600">

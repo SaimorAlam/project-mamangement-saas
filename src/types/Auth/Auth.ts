@@ -29,7 +29,7 @@ export type UserType = {
   email: string;
   phoneNumber: string;
   name: string;
-  role: "ADMIN" | "EDITOR" | "VIEWER";
+  role: "CLIENT" | "EMPLOYEE" | "VIEWER" | "MANAGER";
   profileImage: string | null;
   language?: "ENGLISH" | "FRENCH" | "SPANISH";
   timezone?: string | null;
