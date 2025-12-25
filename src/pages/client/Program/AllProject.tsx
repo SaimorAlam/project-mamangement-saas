@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaSpinner, FaEdit } from "react-icons/fa";
+import { FaSpinner, FaEdit, FaTrash } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import //   useUpdateProjectMutation,
 "@/store/Api/ProjectApi/ProjectApi";
@@ -18,6 +18,8 @@ import { Progress } from "@/components/ui/progress";
 import UpdateProjectModal from "./UpdateProjectModal";
 // import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
+import Swal from "sweetalert2";
+import { useDeleteProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 // import { toast } from "sonner";
 
 // import EditProjectModal from "./EditProjectModal";
@@ -63,6 +65,8 @@ const AllProject = ({
       priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
     },
   });
+
+  const [deleteProject] = useDeleteProjectMutation();
 
   // const [updateProject] = useUpdateProjectMutation();
 
@@ -143,6 +147,27 @@ const AllProject = ({
           day: "numeric",
         })
       : "-";
+
+
+      const handleDelete = async (project: UpdateProjectPayload) => {
+         try {
+              const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "This action cannot be undone!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+              });
+        
+              if (result.isConfirmed) {
+                await deleteProject(project.id).unwrap();
+                Swal.fire("Deleted!", "Project removed.", "success");
+              }
+            } catch (err: any) {
+              Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
+            }
+
+      };
 
   if (isLoading) {
     return (
@@ -250,7 +275,7 @@ const AllProject = ({
                   </div>
                 </td>
 
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 space-x-2">
                   <button
                     onClick={() => {
                       setEditProject(project);
@@ -258,6 +283,13 @@ const AllProject = ({
                     }}
                   >
                     <FaEdit className="text-blue-600" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleDelete(project);
+                    }}
+                  >
+                    <FaTrash className="text-red-600" />
                   </button>
                 </td>
               </tr>

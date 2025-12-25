@@ -51,7 +51,6 @@ const ClientSidebar = () => {
       : `${parentPath}/${item.path}`;
 
     const active = isRouteActive(item, parentPath);
-
     // Dropdown (parent with children)
     if (item.children && item.children.length > 0) {
       return (
