@@ -37,6 +37,14 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/submission-status`,
       providesTags: ["Manager"],
     }),
+    getUpcomingDeadlines: builder.query({
+      query: (params) => ({
+        url: "/manager/projects/upcoming-deadlines",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
     // for project page
     getProjectPageStateCarts: builder.query({
       query: () => `/manager/project-dashboard`,
@@ -49,6 +57,7 @@ export const {
   useGetStaffEmpStateCartsQuery,
   useGetTopOverdueProjectsQuery,
   useGetSubmissionStatusQuery,
+  useGetUpcomingDeadlinesQuery,
   useGetProjectPageStateCartsQuery
 } = userApi;
 

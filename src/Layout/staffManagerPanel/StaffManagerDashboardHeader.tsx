@@ -14,7 +14,6 @@ import {
 import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffManagerHeaderContext";
-import UploadSubmission from "@/components/staffManager/overview/UploadSubmission";
 
 const StaffManagerDashboardHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -124,7 +123,7 @@ const StaffManagerDashboardHeader = () => {
               <PrimaryButton
                 leftIcon={<Megaphone className="text-2xl" />}
                 title="Publish"
-                type={currentPath === "/staff-manager-panel" ? "Outline" : "Primary"}
+                type={"Primary"}
                 onClick={() => setIsOpen(true)}
               />
             </>

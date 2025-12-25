@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Chart from "react-apexcharts";
 import { useState, useEffect } from "react";
@@ -122,7 +123,7 @@ const OverDueChart = () => {
           overDueChartData.series.length === 0 ||
           overDueChartData.series[0].data.length === 0) && (
           <div className="text-center text-sm text-gray-500 py-6">
-            No overdue data to display
+            Yet no overdue projects.
           </div>
         )}
 

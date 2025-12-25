@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
-import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 // import ApexColumnChart from "@/common/Charts/ApexColumnChart";
@@ -12,6 +11,7 @@ import BoxContainer from "@/common/BoxContainer";
 import OverDueChart from "./../../components/staffManager/overview/OverDueChart";
 import ProjectStatusChart from './../../components/staffManager/overview/ProjectStatusChart';
 import { FaSpinner } from "react-icons/fa";
+import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
 
 const clientData = [
   {
@@ -132,7 +132,7 @@ const StaffManagerOverview = () => {
           {/* <ApexColumnChart /> */}
         </div>
         <div className="space-y-8 mb-8">
-          <UpcomingDeadline />
+          <SmUpcomingDeadline />
           <ActivityLog />
         </div>
       </div>
