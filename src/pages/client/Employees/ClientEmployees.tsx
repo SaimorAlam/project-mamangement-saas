@@ -13,15 +13,14 @@ import {
 
 import Pagination from "@/common/Pagination";
 import EmployeeTableHeader from "./EmployeeTableHeader";
-import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
+// import EmployeeListTask from "@/components/client/Employee/EmployeeListTask";
 import ViewEmployeeModal from "@/components/client/Employee/ViewEmployeeModal";
-import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
-
+// import EditEmployeeModal from "@/components/client/Employee/EditEmployeeModal";
 // Lazy-load EmployeeTable
 const EmployeeTable = lazy(() => import("./EmployeeTable"));
-
-import { IEmployeeProfile, IEditEmployeePayload } from "@/types/client-panel";
-import EmployeeTaskData from "@/components/client/Employee/EmployeeTaskData";
+// import EmployeeTaskData from "@/components/client/Employee/EmployeeTaskData";
+import { useGetAllUsersQuery } from "@/store/Api/UserApi/UserApi";
+import { UserType } from "@/types/Auth/Auth";
 
 /* ---------- Badge Utilities ---------- */
 const getRoleBadgeColor = (role: string) =>
@@ -51,10 +50,10 @@ const ClientEmployees: React.FC = () => {
   const [status, setStatus] = useState<string | undefined>("");
   const [joinedDateFrom, setJoinedDateFrom] = useState<string>();
   const [joinedDateTo, setJoinedDateTo] = useState<string>();
-  const [selectedEmployee, setSelectedEmployee] = useState<IEmployeeProfile>();
+  // const [selectedEmployee, setSelectedEmployee] = useState<UserType>();
   /* ---------- Sorting ---------- */
   const [sortColumn, setSortColumn] = useState<
-    | keyof IEmployeeProfile
+    | keyof UserType
     | "userName"
     | "email"
     | "role"
@@ -78,9 +77,7 @@ const ClientEmployees: React.FC = () => {
 
   /* ---------- Modals ---------- */
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editEmployee, setEditEmployee] = useState<IEditEmployeePayload | null>(
-    null
-  );
+  const [editEmployee, setEditEmployee] = useState<UserType | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [viewModalId, setViewModalId] = useState("");
 
@@ -94,10 +91,19 @@ const ClientEmployees: React.FC = () => {
     joinedDateTo,
   });
 
+  const { data: allUser, isLoading: userLoading } = useGetAllUsersQuery({});
+  console.log(allUser?.data?.data);
+  const employeeList: UserType[] = allUser?.data?.data?.filter(
+    (item: any) => item.role !== "CLIENT"
+  );
+
   const [deleteEmployee] = useDeleteEmployeeMutation();
   const [bulkDelete] = useBulkDeleteEmployeeMutation();
 
-  const employeeList: IEmployeeProfile[] = employeeResponse?.data || [];
+  // const employeeList: IEmployeeProfile[] = employeeResponse?.data || [];
+  // console.log(employeeList);
+  console.log(employeeList);
+
   const meta = employeeResponse?.meta || {};
   const totalPages = meta?.totalPages || 1;
   const totalEmployees = meta?.total || 0;
@@ -127,7 +133,7 @@ const ClientEmployees: React.FC = () => {
 
   /* ---------- Sorted Employees ---------- */
   const sortedEmployees = useMemo(() => {
-    const list = [...employeeList];
+    const list = employeeList && [...employeeList];
     if (!sortColumn) return list;
 
     return list.sort((a, b) => {
@@ -136,28 +142,28 @@ const ClientEmployees: React.FC = () => {
 
       switch (sortColumn) {
         case "userName":
-          valA = a.user.name;
-          valB = b.user.name;
+          valA = a.name;
+          valB = b.name;
           break;
         case "email":
-          valA = a.user.email;
-          valB = b.user.email;
+          valA = a.email;
+          valB = b.email;
           break;
         case "role":
-          valA = a.user.role;
-          valB = b.user.role;
+          valA = a.role;
+          valB = b.role;
           break;
         case "status":
-          valA = a.user.status ? 1 : 0;
-          valB = b.user.status ? 1 : 0;
+          valA = a.status ? 1 : 0;
+          valB = b.status ? 1 : 0;
           break;
         case "updatedAt":
-          valA = new Date(a.user.updatedAt).getTime();
-          valB = new Date(b.user.updatedAt).getTime();
+          valA = new Date(a.updatedAt as string).getTime();
+          valB = new Date(b.updatedAt as string).getTime();
           break;
         default:
-          valA = a[sortColumn as keyof IEmployeeProfile];
-          valB = b[sortColumn as keyof IEmployeeProfile];
+          valA = a[sortColumn as keyof UserType];
+          valB = b[sortColumn as keyof UserType];
       }
 
       if (typeof valA === "string" && typeof valB === "string")
@@ -179,16 +185,16 @@ const ClientEmployees: React.FC = () => {
     setSelectAll(!selectAll);
   };
 
-  const handleSelectEmployee = (id: string) => {
-    const updated = new Set(selectedEmployees);
-    if (updated.has(id)) {
-      updated.delete(id);
-    } else {
-      updated.add(id);
-    }
-    setSelectedEmployees(updated);
-    setSelectAll(updated.size === sortedEmployees.length);
-  };
+  // const handleSelectEmployee = (id: string) => {
+  //   const updated = new Set(selectedEmployees);
+  //   if (updated.has(id)) {
+  //     updated.delete(id);
+  //   } else {
+  //     updated.add(id);
+  //   }
+  //   setSelectedEmployees(updated);
+  //   setSelectAll(updated.size === sortedEmployees.length);
+  // };
 
   /* ---------- Action Handlers ---------- */
   const handleViewClick = (id: string) => {
@@ -196,18 +202,19 @@ const ClientEmployees: React.FC = () => {
     setViewModalOpen(true);
   };
 
-  const handleEditClick = (employee: IEmployeeProfile) => {
+  const handleEditClick = (employee: UserType) => {
     setEditEmployee({
       id: employee.id,
-      name: employee.user.name,
-      email: employee.user.email,
-      phoneNumber: employee.user.phoneNumber,
-      joinedDate: employee.joinedDate,
-      skills: employee.skills,
-      projects: [],
-      description: employee.description,
-      profileImage: employee.user.profileImage,
-      userStatus: "ACTIVE",
+      name: employee.name,
+      email: employee.email,
+      phoneNumber: employee.phoneNumber,
+      createdAt: employee.createdAt,
+      role: employee.role,
+      // skills: employee.skills,
+      // projects: [],
+      // description: employee.description,
+      profileImage: employee.profileImage,
+      status: employee.status,
     });
     setEditModalOpen(true);
   };
@@ -276,35 +283,37 @@ const ClientEmployees: React.FC = () => {
           />
         </div>
 
-        {isFetching ? (
+        {isFetching || userLoading ? (
           <TableSkeleton />
         ) : sortedEmployees.length > 0 ? (
           <div className="bg-white rounded-t-none rounded-lg shadow-sm border border-t-0 border-gray-200">
-            {activeTab === "tables" ? (
-              <Suspense fallback={<TableSkeleton />}>
-                <EmployeeTable
-                  employees={sortedEmployees}
-                  selectedEmployees={selectedEmployees}
-                  selectAll={selectAll}
-                  handleSelectAll={handleSelectAll}
-                  handleSelectEmployee={handleSelectEmployee}
-                  handleViewClick={handleViewClick}
-                  handleEditClick={handleEditClick}
-                  handleDeleteEmployee={handleDeleteEmployee}
-                  handleSort={handleSort}
-                  sortBy={sortColumn || undefined}
-                  sortOrder={sortOrder}
-                  getRoleBadgeColor={getRoleBadgeColor}
-                  getStatusBadgeColor={getStatusBadgeColor}
-                />
-              </Suspense>
-            ) : (
-              <EmployeeListTask
-                employees={sortedEmployees}
-                setSelectedEmployee={setSelectedEmployee}
-              />
-            )}
-
+            {
+              activeTab === "tables" && (
+                <Suspense fallback={<TableSkeleton />}>
+                  <EmployeeTable
+                    employees={sortedEmployees}
+                    selectedEmployees={selectedEmployees}
+                    selectAll={selectAll}
+                    handleSelectAll={handleSelectAll}
+                    // handleSelectEmployee={handleSelectEmployee}
+                    handleViewClick={handleViewClick}
+                    handleEditClick={handleEditClick}
+                    handleDeleteEmployee={handleDeleteEmployee}
+                    handleSort={handleSort}
+                    sortBy={sortColumn || undefined}
+                    sortOrder={sortOrder}
+                    getRoleBadgeColor={getRoleBadgeColor}
+                    getStatusBadgeColor={getStatusBadgeColor}
+                  />
+                </Suspense>
+              )
+              // : (
+              //   <EmployeeListTask
+              //     employees={sortedEmployees}
+              //     setSelectedEmployee={setSelectedEmployee}
+              //   />
+              // )}
+            }
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -321,13 +330,13 @@ const ClientEmployees: React.FC = () => {
       </div>
 
       {/* Modals */}
-      {editModalOpen && editEmployee && (
+      {/* {editModalOpen && editEmployee && (
         <EditEmployeeModal
           open={true}
           employee={editEmployee}
           onClose={() => setEditModalOpen(false)}
         />
-      )}
+      )} */}
       {viewModalOpen && viewModalId && (
         <ViewEmployeeModal
           open={true}
@@ -336,13 +345,11 @@ const ClientEmployees: React.FC = () => {
         />
       )}
 
-      {activeTab === "task" && (
+      {/* {activeTab === "task" && (
         <div className="w-full">
-          <EmployeeTaskData
-            selectedEmployee={selectedEmployee as IEmployeeProfile}
-          />
+          <EmployeeTaskData selectedEmployee={selectedEmployee as UserType} />
         </div>
-      )}
+      )} */}
     </div>
   );
 };

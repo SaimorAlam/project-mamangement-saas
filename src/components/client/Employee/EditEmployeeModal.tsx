@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { X, Calendar, HelpCircle } from "lucide-react";
-import { IEditEmployeePayload } from "@/types";
 import { useUpdateEmployeeMutation } from "@/store/Api/EmployeeApi/EmployeeApi";
 import { toast } from "sonner";
+import { UserType } from "@/types/Auth/Auth";
 
 interface IEditEmployeeModalProps {
   open: boolean;
   onClose: () => void;
-  employee: IEditEmployeePayload;
+  employee: UserType;
 }
 
 const EditEmployeeModal = ({
@@ -19,17 +19,17 @@ const EditEmployeeModal = ({
   const {
     register,
     handleSubmit,
-    watch,
+    // watch,
     setValue,
     control,
     reset,
     formState: { errors },
-  } = useForm<IEditEmployeePayload>({
+  } = useForm<UserType>({
     defaultValues: employee,
   });
 
-  const skills = watch("skills") || [];
-  const projects = watch("projects") || [];
+  // const skills = watch("skills") || [];
+  // const projects = watch("projects") || [];
 
   const [skillInput, setSkillInput] = useState("");
   const [projectInput, setProjectInput] = useState("");
@@ -41,8 +41,8 @@ const EditEmployeeModal = ({
     if (open && employee) {
       reset({
         ...employee,
-        skills: employee.skills || [],
-        projects: employee?.projects || [],
+        // skills: employee.skills || [],
+        // projects: employee?.projects || [],
       });
       setSkillInput("");
       setProjectInput("");
