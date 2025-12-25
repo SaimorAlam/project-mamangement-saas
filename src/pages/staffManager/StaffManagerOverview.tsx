@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
-import ActivityLog from "@/components/client/Overview/ActivityLog";
-// import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import {
   useGetStaffEmpStateCartsQuery,
@@ -12,6 +10,7 @@ import ProjectStatusChart from './../../components/staffManager/overview/Project
 import { FaSpinner } from "react-icons/fa";
 import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
 import LatestSubmission from "@/components/staffManager/overview/LatestSubmission";
+// import ActivityLog from "@/components/staffManager/overview/ActivityLog";
 
 const clientData = [
   {
@@ -128,12 +127,13 @@ const StaffManagerOverview = () => {
 
             <ProjectStatusChart />
           </div>
-          <LatestSubmission />
+          {/* need to integrate api ----------------------- */}
+          <LatestSubmission /> 
           {/* <ApexColumnChart /> */}
         </div>
         <div className="space-y-8 mb-8">
           <SmUpcomingDeadline />
-          <ActivityLog />
+          {/* <ActivityLog /> */}
         </div>
       </div>
     </div>

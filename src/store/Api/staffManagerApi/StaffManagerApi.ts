@@ -45,6 +45,22 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Manager"],
     }),
+    getAllActivityLogs: builder.query({
+      query: (params) => ({
+        url: "/activities",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
+    getAllLatestSubmissions: builder.query({
+      query: (params) => ({
+        url: "/manager/all-manager-submission",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
     // for project page
     getProjectPageStateCarts: builder.query({
       query: () => `/manager/project-dashboard`,
@@ -58,6 +74,8 @@ export const {
   useGetTopOverdueProjectsQuery,
   useGetSubmissionStatusQuery,
   useGetUpcomingDeadlinesQuery,
+  useGetAllActivityLogsQuery,
+  useGetAllLatestSubmissionsQuery,
   useGetProjectPageStateCartsQuery
 } = userApi;
 
