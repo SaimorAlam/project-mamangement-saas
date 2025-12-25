@@ -18,7 +18,7 @@ import { UpdateProjectPayload } from "@/types/Projects";
 import { toast } from "sonner";
 import UpdateProjectModal from "../client/Program/UpdateProjectModal";
 import { ChevronDown } from "lucide-react";
-import { useGetProgramAllProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import { useGetAllReviewProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
 import ReviewerActivity from "@/components/staffManager/projectReview/ReviewerActivity";
 import { Badge } from "@/components/ui/badge";
@@ -58,11 +58,11 @@ const AllProjectsReview = ({
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   // const { data, isLoading } = useGetAllProjectsQuery({});
-  const { data, isLoading } = useGetProgramAllProjectsQuery({});
+  const { data, isLoading } = useGetAllReviewProjectsQuery({});
 
   const [updateProject] = useUpdateProjectMutation();
 
-  const projects = useMemo(() => data?.data?.projects ?? [], [data]);
+  const projects = useMemo(() => data?.data ?? [], [data]);
 //   const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]); // Sidebar data
 
   const meta = data?.data?.meta;
@@ -247,7 +247,7 @@ const AllProjectsReview = ({
             <tbody>
               {sortedProjects.map((project) => (
                 <tr key={project.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">{project.name}</td>
+                  <td className="px-6 py-4">{project.project.name}</td>
                   <td className="px-6 py-4">
                     {project.assignStuff?.avatars?.length > 0 ? (
                       <div className="flex items-center">
@@ -290,17 +290,17 @@ const AllProjectsReview = ({
                       className={`py-1.5 px-3 min-w-20 ${statusClasses[project.status]
                         }`}
                     >
-                      {statusLabels[project.status]}
+                      {statusLabels[project.project.status]}
                     </Badge>
                   </td>
 
                   <td className="px-6 py-4">
-                    <PriorityDropdown defaultPriority={project.priority} />
+                    <PriorityDropdown defaultPriority={project.project.priority} />
                   </td>
 
                   {/* <td className="px-6 py-4">{formatDate(project.startDate)}</td> */}
 
-                  <td className="px-6 py-4">{formatDate(project.deadline)}</td>
+                  <td className="px-6 py-4">{formatDate(project.createdAt)}</td>
 
                   {/* <td className="px-6 py-4 w-[180px]">
                     <div className="flex flex-col gap-1">
