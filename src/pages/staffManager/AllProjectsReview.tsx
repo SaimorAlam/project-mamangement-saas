@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import ProjectStats from "@/components/staffManager/Projects/ProjectStats";
 import { useState, useMemo } from "react";
 import { FaSpinner } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
@@ -13,14 +12,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 // import { useDebounce } from "@/hooks/useDebounce";
 // import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
-import { Progress } from "@/components/ui/progress";
+// import { Progress } from "@/components/ui/progress";
 import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
 import { toast } from "sonner";
 import UpdateProjectModal from "../client/Program/UpdateProjectModal";
-import SideManagerMain from "@/components/staffManager/Projects/SideManagerMain";
 import { ChevronDown } from "lucide-react";
 import { useGetProgramAllProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
+import ReviewerActivity from "@/components/staffManager/projectReview/ReviewerActivity";
+import { Badge } from "@/components/ui/badge";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -35,7 +36,7 @@ const priorityOrder: Record<string, number> = {
   LOW: 1,
 };
 
-const StaffManagerProjects = ({
+const AllProjectsReview = ({
   title = "All Projects",
   // programId = "2a4b2086-0147-40ca-be12-1bfd855046fd",
 }: IProjectTableProps) => {
@@ -62,7 +63,7 @@ const StaffManagerProjects = ({
   const [updateProject] = useUpdateProjectMutation();
 
   const projects = useMemo(() => data?.data?.projects ?? [], [data]);
-  const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]); // Sidebar data
+//   const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]); // Sidebar data
 
   const meta = data?.data?.meta;
 
@@ -155,12 +156,24 @@ const StaffManagerProjects = ({
   //     </div>
   //   );
   // }
+  const statusClasses: Record<string, string> = {
+    APPROVED: "text-[#0B5A4A] bg-[#EBFFF2] border border-[#ABEFD5]",
+    PENDING: "text-[#665CFF] bg-[#F2F2FF] border border-[#C7C2FF]",
+    RETURNED: "text-[#B00020] bg-[#FFEAEA] border border-[#FFB3B3]",
+    DRAFT: "text-[#6B7280] bg-[#F3F4F6] border border-[#D1D5DB]",
+  };
+
+  const statusLabels : any = {
+    APPROVED: "APPROVED",
+    PENDING: "PENDING",
+    RETURNED: "RETURNED",
+    DRAFT: "DRAFT",
+  };
 
   return (
     <div className="min-h-screen py-6">
-      <ProjectStats />
       <div className="flex gap-3 justify-between">
-        <div className="bg-white rounded-lg border border-gray-200 mt-10 grow">
+        <div className="bg-white rounded-lg border border-gray-200  grow">
           {/* Header */}
           <div className="flex justify-between px-6 py-4 border-b border-gray-200">
             <h1 className="text-lg font-semibold">{title}</h1>
@@ -206,10 +219,11 @@ const StaffManagerProjects = ({
                 {[
                   "name",
                   "assignStaff",
+                  "status",
                   "priority",
                   // "startDate",
-                  "deadline",
-                  "progress",
+                  "submitDate",
+                //   "progress",
                   // "actions",
                 ].map(
                   (col) =>
@@ -270,6 +284,16 @@ const StaffManagerProjects = ({
                     )}
                   </td>
 
+                <td className="px-6 py-4">
+                    <Badge
+                      variant="outline"
+                      className={`py-1.5 px-3 min-w-20 ${statusClasses[project.status]
+                        }`}
+                    >
+                      {statusLabels[project.status]}
+                    </Badge>
+                  </td>
+
                   <td className="px-6 py-4">
                     <PriorityDropdown defaultPriority={project.priority} />
                   </td>
@@ -278,14 +302,14 @@ const StaffManagerProjects = ({
 
                   <td className="px-6 py-4">{formatDate(project.deadline)}</td>
 
-                  <td className="px-6 py-4 w-[180px]">
+                  {/* <td className="px-6 py-4 w-[180px]">
                     <div className="flex flex-col gap-1">
                       <span className="text-xs text-gray-500">
                         {project.progress}%
                       </span>
                       <Progress value={project.progress} />
                     </div>
-                  </td>
+                  </td> */}
 
                   {/* <td className="px-6 py-4">
                     <button
@@ -310,7 +334,10 @@ const StaffManagerProjects = ({
             onPageChange={setCurrentPage}
           />
         </div>
-        <SideManagerMain sidebar={programDetails} />
+        <div className="w-110 space-y-6">
+          <SmUpcomingDeadline />
+          <ReviewerActivity />
+        </div>
       </div>
 
       {editModalOpen && editProject && (
@@ -325,4 +352,4 @@ const StaffManagerProjects = ({
   );
 };
 
-export default StaffManagerProjects;
+export default AllProjectsReview;
