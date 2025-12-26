@@ -35,9 +35,11 @@ const ReviewerActivity = () => {
             Reviewer Activity
           </h3>
         </div>
+        {activities.length > 0 && (
         <button className="text-gray-500 hover:bg-gray-50 p-1 rounded-md transition-colors">
           <Filter size={22} />
         </button>
+        )}
       </div>
 
       {/* Activity List */}
