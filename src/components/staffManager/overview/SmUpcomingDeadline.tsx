@@ -35,7 +35,7 @@
 //   const deadlineData = data?.data?.projects || [];
 //   console.log("Upcommitn dddddddddd:");
 //   console.log("Upcommitn dddddddddd:",deadlineData,deadlineData.length);
-  
+
 
 //   return (
 //     <BoxContainer>
@@ -159,12 +159,14 @@ const SmUpcomingDeadline = () => {
         </div>
 
         {/* View Calendar Button */}
-        <ViewCalender
-          showCalendar={showCalendar}
-          setShowCalendar={setShowCalendar}
-          onChange={handleDateChange} // Pass the handleDateChange to get the selected range
-          value={value}
-        />
+        {deadlineData.length !== 0 && (
+          <ViewCalender
+            showCalendar={showCalendar}
+            setShowCalendar={setShowCalendar}
+            onChange={handleDateChange} // Pass the handleDateChange to get the selected range
+            value={value}
+          />
+        )}
       </div>
 
       {/* Display Selected Range Days */}
@@ -192,7 +194,7 @@ const SmUpcomingDeadline = () => {
       {/* View All Button */}
       <div>
         {deadlineData.length === 0 ? (
-          <div className="py-6 text-center text-gray-400">Nothing is upcoming.</div>
+          <div className="py-6 text-center text-gray-400">Nothing is in upcoming.</div>
         ) : (
           <Button
             variant="ghost"

@@ -124,14 +124,11 @@ const StaffManagerProjects = ({
       : "-";
 
   const handleUpdateProject = async (project: UpdateProjectPayload) => {
-    console.log(project);
-    console.log(editProject);
     try {
       const res = await updateProject({
         id: editProject?.id,
         ...project,
       }).unwrap();
-      console.log(res);
       if (res.success) {
         toast.success("Project updated successfully");
       }
@@ -148,13 +145,13 @@ const StaffManagerProjects = ({
       </div>
     );
   }
-  // if (projects) {
-  //   return (
-  //     <div className="flex items-center justify-center h-[60vh]">
-  //       <h1 className="text-gray-400 text-center">No Projects Found.</h1>
-  //     </div>
-  //   );
-  // }
+  if (!projects) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <h1 className="text-gray-400 text-center">Not yet any Projects Found.</h1>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-6">

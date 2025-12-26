@@ -52,10 +52,6 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/project-dashboard`,
       providesTags: ["Manager"],
     }),
-    getAllProjects: builder.query({ // it is for temporary
-      query: () => `/project`,
-      providesTags: ["Manager"],
-    }),
     getProgramAllProjects: builder.query({ // it is main for this page
       query: () => `/manager/program-dashboard`,
       providesTags: ["Manager"],
@@ -80,7 +76,6 @@ export const {
   useGetAllActivityLogsQuery,
   useGetAllLatestSubmissionsQuery,
   useGetProjectPageStateCartsQuery,
-  useGetAllProjectsQuery,
   useGetProgramAllProjectsQuery,
   useGetAllReviewProjectsQuery,
   useGetAllReviewProjectsReviewerActivityQuery
