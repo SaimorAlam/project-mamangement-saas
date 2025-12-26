@@ -22,7 +22,7 @@ import DropdownSelect from "../../../common/DropdownSelect";
 import StaffEmployeeProgramCard from "./../../staffEmployee/StaffEmployeeProgramCard";
 import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProgramTable";
 import { Loader2 as Loader } from "lucide-react";
-import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -35,7 +35,7 @@ export type ProjectStatus =
   | "SUBMITTED";
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-export interface Project {
+export interface StaffEmployeeProject {
   id: string;
   programId: string;
 
@@ -51,6 +51,7 @@ export interface Project {
   progress: number;
 
   managerId: string;
+  viewerId: string;
 
   chartList: unknown[];
 
@@ -67,18 +68,10 @@ export interface Project {
   updatedAt: string;
 }
 
-interface Program {
-  id: string;
-  programName: string;
-  programDescription: string;
-  priority: Priority;
-  deadline: string;
-  progress: number;
-  projects: Project[];
-}
-
 const AllProgramProject = () => {
-  const [viewMode, setViewMode] = useState<"table" | "board">("board");
+  const [viewMode, setViewMode] = useState<"table" | "board">(
+    "board"
+  );
   const [, setStatusFilter] = useState<string>("all");
   const [, setPriorityFilter] = useState<string>("all");
 
@@ -88,19 +81,13 @@ const AllProgramProject = () => {
 
   const itemsPerPage = 6;
 
-  // const { data, isLoading } = useGetAllProjectsQuery({});
-  const { data, isLoading } = useGetAllProgramQuery({});
+  const { data, isLoading } = useGetAllProjectsQuery({});
 
-  const program = data?.data?.data || [];
+  console.log("All Projects Data:", data?.data?.projects?.data);
 
-  console.log("All Programs Data:", program);
+  const projects = data?.data?.projects?.data || [];
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return program.slice(startIndex, startIndex + itemsPerPage);
-  }, [program, currentPage]);
-
-  const totalPages = Math.ceil(program.length / itemsPerPage);
+  const totalPages = Math.ceil(projects.length / itemsPerPage);
 
   const statusOptions = [
     { value: "all", title: "All Status" },
@@ -179,7 +166,9 @@ const AllProgramProject = () => {
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "startDate" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortBy === "startDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortBy("startDate")}
               >
@@ -187,7 +176,9 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortBy === "endDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortBy("endDate")}
               >
@@ -202,7 +193,9 @@ const AllProgramProject = () => {
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortOrder === "asc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortOrder("asc")}
               >
@@ -210,7 +203,9 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortOrder === "desc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortOrder("desc")}
               >
@@ -260,28 +255,30 @@ const AllProgramProject = () => {
       {/* Content */}
       {viewMode === "table" ? (
         <>
-          <StaffEmployeeProgramTable programs={paginatedData as Program[]} />
+          <StaffEmployeeProgramTable
+            projects={projects as StaffEmployeeProject[]}
+          />
 
           <Pagination
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             itemsPerPage={itemsPerPage}
             totalPages={totalPages}
-            filteredDataLength={program.length}
+            filteredDataLength={projects.length}
           />
         </>
       ) : (
         <>
           <div className="grid grid-cols-4 gap-5">
-            {program?.map((programData: Program) => {
+            {projects?.map((projectData: StaffEmployeeProject) => {
               return (
-                <div key={programData.id}>
-                  <StaffEmployeeProgramCard program={programData} />
+                <div key={projectData.id}>
+                  <StaffEmployeeProgramCard project={projectData} />
                 </div>
               );
             })}
           </div>
-          {program.length > 4 && (
+          {projects.length > 4 && (
             <div className="pt-6">
               <Link to="/work-in-progress">
                 <Button
@@ -289,7 +286,7 @@ const AllProgramProject = () => {
                   className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                 >
                   {/* Display total count */}
-                  View all {program.length}
+                  View all {projects.length}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>

@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import PrimaryButton from "../../common/PrimaryButton";
 import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 
-export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
   | "LIVE"
   | "RETURNED"
@@ -18,7 +17,7 @@ export type ProjectStatus =
 
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-export interface Project {
+export interface StaffEmployeeProject {
   id: string;
   programId: string;
 
@@ -34,6 +33,7 @@ export interface Project {
   progress: number;
 
   managerId: string;
+  viewerId: string;
 
   chartList: unknown[];
 
@@ -50,18 +50,8 @@ export interface Project {
   updatedAt: string;
 }
 
-interface Program {
-  id: string;
-  programName: string;
-  programDescription: string;
-  priority: Priority;
-  deadline: string;
-  progress: number;
-  projects: Project[];
-}
-
 interface StaffEmployeeProgramCardProps {
-  program: Program;
+  project: StaffEmployeeProject;
 }
 
 const formatDate = (date: string) =>
@@ -72,9 +62,17 @@ const formatDate = (date: string) =>
   });
 
 const StaffEmployeeProgramCard = ({
-  program,
+  project,
 }: StaffEmployeeProgramCardProps) => {
-  const { id, programName, priority, deadline, progress, projects } = program;
+  const {
+    id,
+    name,
+    description,
+    priority,
+    deadline,
+    startDate,
+    progress,
+  } = project;
 
   const priorityColor =
     priority === "HIGH"
@@ -82,14 +80,6 @@ const StaffEmployeeProgramCard = ({
       : priority === "MEDIUM"
       ? "text-[#F59E0B]"
       : "text-[#16A34A]";
-
-  // const statusCount = projects?.reduce<Record<ProjectStatus, number>>(
-  //   (acc, project) => {
-  //     acc[project?.status] = (acc[project?.status] || 0) + 1;
-  //     return acc;
-  //   },
-  //   {} as Record<ProjectStatus, number>
-  // );
 
   return (
     <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">
@@ -103,12 +93,10 @@ const StaffEmployeeProgramCard = ({
 
             <div>
               <h4 className="font-semibold text-gray-900 leading-tight">
-                {programName}
+                {name}
               </h4>
               <p className="text-sm text-gray-600 line-clamp-2 mt-1">
-                {projects?.length > 0
-                  ? projects[0]?.name
-                  : "No projects"}
+                {description || "No description"}
               </p>
             </div>
           </div>
@@ -117,14 +105,16 @@ const StaffEmployeeProgramCard = ({
             variant="outline"
             className="text-xs px-2 py-1 border-gray-200 text-gray-500"
           >
-            {projects?.length} Projects
+            Project
           </Badge>
         </div>
 
+        {/* Assigned People */}
         <div className="py-2 px-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="mb-1">Assigned People</h3>
+              {/* Kept intentionally even if data is not available */}
               <RenderStaffAvatars
                 staff={Array.from({ length: 3 }, (_, i) => ({
                   id: i.toString(),
@@ -138,7 +128,7 @@ const StaffEmployeeProgramCard = ({
             <div className="flex flex-col gap-y-4 text-sm py-2 px-4">
               <div>
                 <p className="text-gray-500">Project start</p>
-                <p className="font-medium">{formatDate(deadline)}</p>
+                <p className="font-medium">{formatDate(startDate)}</p>
               </div>
 
               <div>
@@ -149,6 +139,7 @@ const StaffEmployeeProgramCard = ({
           </div>
         </div>
 
+        {/* Priority */}
         <div className="px-4 py-2">
           <p className="text-gray-500">Priority</p>
           <div className="flex items-center gap-1">
@@ -170,9 +161,9 @@ const StaffEmployeeProgramCard = ({
 
         {/* CTA */}
         <div className="py-2 px-4">
-          <Link to={`/programs/${id}`}>
+          <Link to={`/projects/${id}`}>
             <PrimaryButton
-              title="View Program"
+              title="View Project"
               type="Primary"
               className="w-full h-10"
             />

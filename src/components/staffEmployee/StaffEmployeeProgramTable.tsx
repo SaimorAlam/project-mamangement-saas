@@ -1,5 +1,6 @@
 import { Edit, Eye, Flag, Trash2 } from "lucide-react";
 import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -18,37 +19,62 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-// Types
-export type Priority = "HIGH" | "MEDIUM" | "LOW";
+/* -------------------------------------------------------------------------- */
+/*                                   TYPES                                    */
+/* -------------------------------------------------------------------------- */
 
-export interface Project {
+export type ProjectStatus =
+  | "LIVE"
+  | "RETURNED"
+  | "OVERDUE"
+  | "DRAFT"
+  | "IN_REVIEW"
+  | "SUBMITTED"
+  | "PENDING";
+
+export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
+
+export interface StaffEmployeeProject {
   id: string;
   programId: string;
+
   name: string;
   description: string;
-  status: string;
-  priority: Priority;
+
+  status: ProjectStatus;
+  priority: ProjectPriority;
+
   startDate: string;
   deadline: string;
+
   progress: number;
+
   managerId: string;
+  viewerId: string;
+
+  chartList: unknown[];
+
+  estimatedCompletedDate: string;
+  projectCompleteDate: string | null;
+
+  currentRate: string;
+  budget: string;
+
+  latitude: number | null;
+  longitude: number | null;
+
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface Program {
-  id: string;
-  programName: string;
-  programDescription: string;
-  priority: Priority;
-  deadline: string;
-  progress: number;
-  projects: Project[];
+interface StaffEmployeeProjectTableProps {
+  projects: StaffEmployeeProject[];
 }
 
-interface ProgramTableProps {
-  programs: Program[];
-}
+/* -------------------------------------------------------------------------- */
+/*                                   UTILS                                    */
+/* -------------------------------------------------------------------------- */
 
-// Utils
 const formatDate = (date: string) =>
   new Date(date).toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -56,28 +82,33 @@ const formatDate = (date: string) =>
     year: "numeric",
   });
 
-const priorityColors: Record<Priority, string> = {
+const priorityColors: Record<ProjectPriority, string> = {
   HIGH: "text-red-600",
   MEDIUM: "text-orange-600",
   LOW: "text-blue-600",
 };
 
-const renderPriority = (priority: Priority) => (
+const renderPriority = (priority: ProjectPriority) => (
   <div className="flex items-center gap-1">
     <Flag className={`w-4 h-4 ${priorityColors[priority]}`} />
-    <span className={`text-sm font-medium ${priorityColors[priority]}`}>
+    <span
+      className={`text-sm font-medium ${priorityColors[priority]}`}
+    >
       {priority}
     </span>
   </div>
 );
 
-// Modal for viewing program details
-const ProgramModal = ({
-  program,
+/* -------------------------------------------------------------------------- */
+/*                                 MODAL                                      */
+/* -------------------------------------------------------------------------- */
+
+const ProjectModal = ({
+  project,
   open,
   setOpen,
 }: {
-  program: Program;
+  project: StaffEmployeeProject;
   open: boolean;
   setOpen: (open: boolean) => void;
 }) => (
@@ -86,30 +117,37 @@ const ProgramModal = ({
       <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-white">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900">
-            {program.programName}
+            {project.name}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Program details overview
+            Project details overview
           </DialogDescription>
         </DialogHeader>
       </div>
 
       <div className="px-6 py-6 space-y-6">
         <div className="text-sm">
-          <p className="text-muted-foreground mb-1">Program ID</p>
-          <p className="font-medium text-gray-900">{program.id}</p>
+          <p className="text-muted-foreground mb-1">Project ID</p>
+          <p className="font-medium text-gray-900">{project.id}</p>
+        </div>
+
+        <div className="text-sm">
+          <p className="text-muted-foreground mb-1">Status</p>
+          <p className="font-medium text-gray-900">
+            {project.status}
+          </p>
         </div>
 
         <div className="text-sm">
           <p className="text-muted-foreground mb-1">Deadline</p>
           <p className="font-medium text-gray-900">
-            {formatDate(program.deadline)}
+            {formatDate(project.deadline)}
           </p>
         </div>
 
         <div className="text-sm">
           <p className="text-muted-foreground mb-1">Priority</p>
-          {renderPriority(program.priority)}
+          {renderPriority(project.priority)}
         </div>
 
         <div className="text-sm">
@@ -117,28 +155,19 @@ const ProgramModal = ({
           <div className="h-2.5 w-full bg-slate-200 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400"
-              style={{ width: `${program.progress}%` }}
+              style={{ width: `${project.progress}%` }}
             />
           </div>
-          <p className="mt-1 text-sm font-medium">{program.progress}%</p>
+          <p className="mt-1 text-sm font-medium">
+            {project.progress}%
+          </p>
         </div>
 
         <div className="text-sm">
           <p className="text-muted-foreground mb-1">Description</p>
           <p className="leading-relaxed">
-            {program.programDescription || "No description provided."}
+            {project.description || "No description provided."}
           </p>
-        </div>
-
-        <div className="text-sm">
-          <p className="text-muted-foreground mb-1">Projects</p>
-          <ul className="list-disc pl-5 space-y-1">
-            {program.projects.map((proj) => (
-              <li key={proj.id}>
-                {proj.name} ({proj.status}, {proj.priority})
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
 
@@ -151,13 +180,19 @@ const ProgramModal = ({
   </Dialog>
 );
 
-// Table Component
-const StaffEmployeeProgramTable = ({ programs }: ProgramTableProps) => {
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
+/* -------------------------------------------------------------------------- */
+/*                               TABLE                                        */
+/* -------------------------------------------------------------------------- */
+
+const StaffEmployeeProjectTable = ({
+  projects,
+}: StaffEmployeeProjectTableProps) => {
+  const [selectedProject, setSelectedProject] =
+    useState<StaffEmployeeProject | null>(null);
   const [open, setOpen] = useState(false);
 
-  const handleViewProgram = (program: Program) => {
-    setSelectedProgram(program);
+  const handleViewProject = (project: StaffEmployeeProject) => {
+    setSelectedProject(project);
     setOpen(true);
   };
 
@@ -167,34 +202,34 @@ const StaffEmployeeProgramTable = ({ programs }: ProgramTableProps) => {
         <Table>
           <TableHeader>
             <TableRow className="border-b border-gray-200 bg-[#F7F9FA]">
-              <TableHead className="px-6 py-3.5">Program</TableHead>
+              <TableHead className="px-6 py-3.5">Project</TableHead>
               <TableHead className="px-6 py-3.5">Priority</TableHead>
               <TableHead className="px-6 py-3.5">Deadline</TableHead>
-              <TableHead className="px-6 py-3.5">Projects</TableHead>
+              <TableHead className="px-6 py-3.5">Status</TableHead>
               <TableHead className="px-6 py-3.5">Action</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {programs?.map((program) => (
+            {projects?.map((project) => (
               <TableRow
-                key={program.id}
+                key={project.id}
                 className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
               >
                 <TableCell className="px-6 py-3.5 font-medium">
-                  {program.programName}
+                  {project.name}
                 </TableCell>
 
                 <TableCell className="px-6 py-3.5">
-                  {renderPriority(program.priority)}
+                  {renderPriority(project.priority)}
                 </TableCell>
 
                 <TableCell className="px-6 py-3.5 text-muted-foreground">
-                  {formatDate(program.deadline)}
+                  {formatDate(project.deadline)}
                 </TableCell>
 
                 <TableCell className="px-6 py-3.5">
-                  {program.projects.length}
+                  {project.status}
                 </TableCell>
 
                 <TableCell className="px-6 py-3.5">
@@ -202,13 +237,15 @@ const StaffEmployeeProgramTable = ({ programs }: ProgramTableProps) => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleViewProgram(program)}
+                      onClick={() => handleViewProject(project)}
                     >
                       <Eye className="w-4 h-4 text-[#1C73E0]" />
                     </Button>
+
                     <Button variant="ghost" size="sm">
                       <Edit className="w-4 h-4 text-[#169E7B]" />
                     </Button>
+
                     <Button variant="ghost" size="sm">
                       <Trash2 className="w-4 h-4 text-[#B00020]" />
                     </Button>
@@ -220,11 +257,15 @@ const StaffEmployeeProgramTable = ({ programs }: ProgramTableProps) => {
         </Table>
       </CardContent>
 
-      {selectedProgram && (
-        <ProgramModal program={selectedProgram} open={open} setOpen={setOpen} />
+      {selectedProject && (
+        <ProjectModal
+          project={selectedProject}
+          open={open}
+          setOpen={setOpen}
+        />
       )}
     </Card>
   );
 };
 
-export default StaffEmployeeProgramTable;
+export default StaffEmployeeProjectTable;
