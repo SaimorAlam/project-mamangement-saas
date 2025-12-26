@@ -1,12 +1,12 @@
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import UpcomingDeadline from "@/components/staffEmployee/Overview/UpcomingDeadline";
-import ApexDonutChart from "@/common/Charts/ApexDonutChart";
 import LatestSubmission from "@/components/staffEmployee/Overview/LatestSubmissions";
 import { useGetEmployeeDashboardStatsQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 import DashboardStatsCard from "@/components/staffEmployee/DashboardStatsCard";
 import { Loader2 as Loader } from "lucide-react";
 import BoxContainer from "./../../common/BoxContainer";
 import OverDueChart from "@/components/staffEmployee/Overview/OverdueChart";
+import ProjectStatusChart from '@/components/staffEmployee/ProjectStatusChart';
 
 const iconMap: { [key: string]: string } = {
   totalAssignedProject: "FolderIcon",
@@ -62,7 +62,7 @@ const StaffEmployeeOverview = () => {
 
       <div className="grid grid-cols-3 gap-8 ">
         <div className="space-y-8 col-span-2">
-          <div className="flex items-center justify-center gap-8">
+          <div className="flex items-start justify-center gap-8">
             <div className="flex items-start justify-center gap-8">
               <BoxContainer>
                 <h2 className="text-2xl font-semibold mb-4">
@@ -71,9 +71,8 @@ const StaffEmployeeOverview = () => {
                 <OverDueChart />
               </BoxContainer>
 
-              {/* <ProjectStatusChart /> */}
             </div>
-            <ApexDonutChart />
+              <ProjectStatusChart />
           </div>
           <LatestSubmission />
         </div>

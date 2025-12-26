@@ -113,7 +113,7 @@ const AllProgramProject = () => {
     <div className="pb-6 min-h-[500px]">
       {/* Header  */}
       <div className="flex items-center justify-between pb-6">
-        <h4 className=" text-gray-900">All Program & Project</h4>
+        <h4 className=" text-gray-900 text-xl font-semibold">All Program & Project</h4>
         <div className="flex items-center gap-3">
           {/* View Toggle */}
           <div className="flex items-center  bg-white gap-3">

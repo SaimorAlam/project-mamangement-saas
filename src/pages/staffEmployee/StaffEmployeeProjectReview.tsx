@@ -1,11 +1,13 @@
-import AllProjectReview from "@/components/client/ProjectReview/AllProjectReview";
+import AllProjectReview from "@/components/staffEmployee/AllProgramProject";
 import ProjectReviewStats from "@/components/client/ProjectReview/ProjectReviewStats";
 
 const StaffEmployeeProjectReview = () => {
   return (
     <>
       <ProjectReviewStats />
-      <AllProjectReview />
+      <div className="mt-8">
+        <AllProjectReview />
+      </div>
     </>
   );
 };
