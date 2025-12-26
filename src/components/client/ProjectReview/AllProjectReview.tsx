@@ -21,8 +21,9 @@ import Pagination from "../Pagination";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
-import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
-import StaffEmployeeProgramCard from "@/components/staffEmployee/StaffEmployeeProjectCard";
+
+import AllProgramProjectTableView from "../AllProgramProjectTableView";
+import AllProgramProjectGridView from "../AllProgramProjectGridView";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -65,16 +66,6 @@ export interface Project {
 
   createdAt: string;
   updatedAt: string;
-}
-
-interface Program {
-  id: string;
-  programName: string;
-  programDescription: string;
-  priority: Priority;
-  deadline: string;
-  progress: number;
-  projects: Project[];
 }
 
 const AllProjectReview: React.FC = () => {
@@ -250,7 +241,9 @@ const AllProjectReview: React.FC = () => {
 
           {viewMode === "table" ? (
             <>
-              <StaffEmployeeProgramTable programs={programs} />
+              <AllProgramProjectTableView
+                allProgramProjectData={programs}
+              />
 
               <Pagination
                 currentPage={currentPage}
@@ -262,17 +255,9 @@ const AllProjectReview: React.FC = () => {
             </>
           ) : (
             <>
-              <div className="grid grid-cols-3 gap-5">
-                {programs?.map((programData: Program) => {
-                  return (
-                    <div key={programData.id}>
-                      <StaffEmployeeProgramCard
-                        program={programData}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
+              <AllProgramProjectGridView
+                allProgramProjectData={programs}
+              />
 
               {/* "View All" button if there are more than 4 programs/projects */}
               {programs.length > 4 && (

@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Pagination from "@/common/Pagination";
+// import Pagination from "@/common/Pagination";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
@@ -77,15 +77,15 @@ const AllProgramProject = () => {
 
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 6;
+  // const itemsPerPage = 6;
 
   const { data, isLoading } = useGetAllProjectsQuery({});
 
   const projects = data?.data?.projects?.data || [];
 
-  const totalPages = Math.ceil(projects.length / itemsPerPage);
+  // const totalPages = Math.ceil(projects.length / itemsPerPage);
 
   const statusOptions = [
     { value: "all", title: "All Status" },
