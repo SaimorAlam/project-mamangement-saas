@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaSpinner } from "react-icons/fa";
+import { FaEdit, FaSpinner } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import Pagination from "@/common/Pagination";
 // import { IProject } from "@/types/project";
@@ -149,13 +149,13 @@ const AllProjectsReview = ({
       </div>
     );
   }
-  // if (projects) {
-  //   return (
-  //     <div className="flex items-center justify-center h-[60vh]">
-  //       <h1 className="text-gray-400 text-center">No Projects Found.</h1>
-  //     </div>
-  //   );
-  // }
+  if (sortedProjects.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <h1 className="text-gray-400 text-center">Still Now, No Projects For Review.</h1>
+      </div>
+    );
+  }
   const statusClasses: Record<string, string> = {
     APPROVED: "text-[#0B5A4A] bg-[#EBFFF2] border border-[#ABEFD5]",
     PENDING: "text-[#665CFF] bg-[#F2F2FF] border border-[#C7C2FF]",
@@ -224,7 +224,7 @@ const AllProjectsReview = ({
                   // "startDate",
                   "submitDate",
                 //   "progress",
-                  // "actions",
+                  "actions",
                 ].map(
                   (col) =>
                     col && (
@@ -302,25 +302,30 @@ const AllProjectsReview = ({
 
                   <td className="px-6 py-4">{formatDate(project.createdAt)}</td>
 
-                  {/* <td className="px-6 py-4 w-[180px]">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs text-gray-500">
-                        {project.progress}%
-                      </span>
-                      <Progress value={project.progress} />
-                    </div>
-                  </td> */}
 
-                  {/* <td className="px-6 py-4">
+                  <td className="px-6 py-4 flex items-center gap-3">
                     <button
                       onClick={() => {
-                        setEditProject(project);
                         setEditModalOpen(true);
                       }}
                     >
                       <FaEdit className="text-blue-600" />
                     </button>
-                  </td> */}
+                    <button
+                      onClick={() => {
+                        setEditModalOpen(true);
+                      }}
+                    >
+                      <FaEdit className="text-blue-600" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditModalOpen(true);
+                      }}
+                    >
+                      <FaEdit className="text-blue-600" />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
