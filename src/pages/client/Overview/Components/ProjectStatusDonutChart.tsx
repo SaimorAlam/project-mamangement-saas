@@ -25,9 +25,7 @@ const STATUS_CONFIG = [
 const ProjectStatusDonutChart = () => {
   const [period, setPeriod] = useState<Period>("month");
   const { data, isLoading } = useGetStatusQuery({ period });
-  console.log(data);
   const response = data?.data;
-
   const donutData: DonutItem[] = useMemo(() => {
     return STATUS_CONFIG.map((cfg) => ({
       label: cfg.label,

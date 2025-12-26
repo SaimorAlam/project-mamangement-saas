@@ -4,12 +4,12 @@ import {
   useGetEmployeeTaskByIdQuery,
   useGetEmployeeTaskStatisticsQuery,
 } from "@/store/Api/EmployeeApi/EmployeeApi";
-import { IEmployeeProfile } from "@/types";
+import { UserType } from "@/types/Auth/Auth";
 
 const EmployeeTaskData = ({
   selectedEmployee,
 }: {
-  selectedEmployee: IEmployeeProfile;
+  selectedEmployee: UserType;
 }) => {
   const { data, isLoading: isTasksLoading } = useGetEmployeeTaskByIdQuery(
     selectedEmployee?.id
@@ -191,7 +191,7 @@ const EmployeeTaskData = ({
         {/* Header */}
         <div className="flex items-center justify-between p-6">
           <h1 className="text-2xl font-semibold text-gray-900">
-            {selectedEmployee?.user?.name}'s Task
+            {selectedEmployee?.name}'s Task
           </h1>
           <div className="flex gap-2">
             <button

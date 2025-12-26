@@ -39,6 +39,7 @@ export const {
   useGetOverviewStackQuery,
   useGetEmployeeActivityQuery,
   useGetTimelineQuery,
+  useLazyGetTimelineQuery,
   useGetStatusQuery,
   useGetOverdueQuery,
   useGetUpcomingDeadlineQuery,
