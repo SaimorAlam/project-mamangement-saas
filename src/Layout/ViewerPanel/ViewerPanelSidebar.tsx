@@ -26,12 +26,14 @@ import {
 
 import { ChevronRight } from "lucide-react";
 import { getViewerPanelSidebarItems } from "./viewerPanelSidebarItems";
+import useFavoriteProjects from "@/utils/useFavoriteProjects";
 
 const ViewerPanelSidebar = () => {
   const location = useLocation();
   const groups = getViewerPanelSidebarItems();
   const [open, setOpen] = useState(false);
-
+  const favoriteProjects = useFavoriteProjects();
+  console.log(favoriteProjects);
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
     const fullPath = item.index
@@ -58,7 +60,6 @@ const ViewerPanelSidebar = () => {
 
     // Dropdown (parent with children)
     if (item.children && item.children.length > 0) {
-
       return (
         <SidebarMenuItem key={fullPath}>
           <DropdownMenu onOpenChange={(v) => setOpen(v)}>
@@ -158,7 +159,6 @@ const ViewerPanelSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter className="!bg-white">
         <UserProfile />
       </SidebarFooter>

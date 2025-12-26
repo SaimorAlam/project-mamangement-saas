@@ -262,7 +262,7 @@ const ViewerPanelAllProgram = ({
 
           {sortedPrograms.length === 0 && (
             <div className="w-full h-[60vh] flex items-center justify-center">
-              <h2 className="text-center text-5xl font-semibold text-gray-200 uppercase">
+              <h2 className="text-center text-6xl font-semibold text-gray-200 uppercase">
                 No Program Data Available
               </h2>
             </div>

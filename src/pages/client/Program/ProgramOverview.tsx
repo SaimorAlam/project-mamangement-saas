@@ -4,19 +4,18 @@ import ProgramManager from "@/components/client/AllHighway/ProgramManage";
 import { useParams } from "react-router-dom";
 import {
   useGetProgramByIdQuery,
-  useGetProjectsByProgramIdQuery,
+  // useGetProjectsByProgramIdQuery,
 } from "@/store/Api/ProgramApi/ProgramApi";
 import AllProject from "./AllProject";
 
 const ProgramOverview = () => {
   const { id } = useParams();
-  console.log(id);
   const { data: program } = useGetProgramByIdQuery(id);
-  console.log(program?.data);
-  const { data: allProjects } = useGetProjectsByProgramIdQuery({
-    programId: id,
-  });
-  console.log(allProjects?.data);
+  console.log(program)
+  // const { data: allProjects } = useGetProjectsByProgramIdQuery({
+  //   programId: id,
+  // });
+  // console.log(allProjects?.data);
   return (
     <div className="">
       <h1 className="text-2xl font-semibold my-6">

@@ -13,13 +13,11 @@ import EmailCode from "@/pages/EmailCode";
 import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
-
 // Layout imports
 import AdminDashboardLayout from "@/Layout/adminPanel/AdminDashboardLayout";
 import ClientDashboardLayout from "@/Layout/clientPanel/ClientDashboardLayout";
 import StaffManagerDashboardLayout from "@/Layout/staffManagerPanel/StaffManagerDashboardLayout";
 // import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
-
 // Route list imports
 import { getAdminRoutes } from "./AdminRoutes";
 import { getClientRoutes } from "./ClientRoute";
@@ -30,6 +28,7 @@ import getViewerPanelRoutes from "./ViewerRoute";
 import Unauthorized from "@/common/Unauthorized";
 import StaffEmployeeDashboardLayout from "@/Layout/staffEmployeePanel/StaffEmployeeDashboardLayout";
 import getStaffEmployeeRoutes from "./StaffEmployeeRoute";
+import ProtectedRoute from "./ProtectedRoute";
 
 const routes = createBrowserRouter([
   {
@@ -130,9 +129,9 @@ const routes = createBrowserRouter([
       {
         path: "/viewer-panel",
         element: (
-          // <ProtectedRoute allowedRoles={["VIEWER"]}>
-          <ViewerPanelDashboardLayout />
-          // </ProtectedRoute>
+          <ProtectedRoute allowedRoles={["VIEWER"]}>
+            <ViewerPanelDashboardLayout />
+          </ProtectedRoute>
         ),
         children: getViewerPanelRoutes(),
       },

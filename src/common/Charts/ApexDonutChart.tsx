@@ -141,17 +141,12 @@ const ApexDonutChart = () => {
           {/* Legend */}
           <div className="grid grid-cols-2 gap-3 text-sm">
             {data.map((status, index) => (
-              <div
-                key={index}
-                className="flex items-center space-x-2"
-              >
+              <div key={index} className="flex items-center space-x-2">
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: status.color }}
                 />
-                <span className="text-muted-foreground">
-                  {status.name}
-                </span>
+                <span className="text-muted-foreground">{status.name}</span>
                 <span className="font-medium ml-auto">
                   {status.percentage}%
                 </span>

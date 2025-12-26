@@ -78,9 +78,7 @@ interface Program {
 }
 
 const AllProgramProject = () => {
-  const [viewMode, setViewMode] = useState<"table" | "board">(
-    "board"
-  );
+  const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [, setStatusFilter] = useState<string>("all");
   const [, setPriorityFilter] = useState<string>("all");
 
@@ -131,7 +129,6 @@ const AllProgramProject = () => {
       {/* Header  */}
       <div className="flex items-center justify-between pb-6">
         <h4 className=" text-gray-900">All Program & Project</h4>
-
         <div className="flex items-center gap-3">
           {/* View Toggle */}
           <div className="flex items-center  bg-white gap-3">
@@ -182,9 +179,7 @@ const AllProgramProject = () => {
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "startDate"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
+                  sortBy === "startDate" ? "bg-indigo-50 text-indigo-600" : ""
                 }`}
                 onClick={() => setSortBy("startDate")}
               >
@@ -192,9 +187,7 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "endDate"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
+                  sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""
                 }`}
                 onClick={() => setSortBy("endDate")}
               >
@@ -209,9 +202,7 @@ const AllProgramProject = () => {
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "asc"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
+                  sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
                 }`}
                 onClick={() => setSortOrder("asc")}
               >
@@ -219,9 +210,7 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "desc"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
+                  sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
                 }`}
                 onClick={() => setSortOrder("desc")}
               >
@@ -271,9 +260,7 @@ const AllProgramProject = () => {
       {/* Content */}
       {viewMode === "table" ? (
         <>
-          <StaffEmployeeProgramTable
-            programs={paginatedData as Program[]}
-          />
+          <StaffEmployeeProgramTable programs={paginatedData as Program[]} />
 
           <Pagination
             currentPage={currentPage}

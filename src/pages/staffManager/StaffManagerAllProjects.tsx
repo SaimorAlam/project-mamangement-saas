@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaSpinner, FaEdit, FaTrash } from "react-icons/fa";
+import { FaSpinner, FaEdit } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import //   useUpdateProjectMutation,
 "@/store/Api/ProjectApi/ProjectApi";
@@ -15,12 +15,10 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { Progress } from "@/components/ui/progress";
-import UpdateProjectModal from "./UpdateProjectModal";
-// import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
+import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
-import Swal from "sweetalert2";
-import { useDeleteProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
-// import { toast } from "sonner";
+import { toast } from "sonner";
+import UpdateProjectModal from "../client/Program/UpdateProjectModal";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -66,27 +64,25 @@ const AllProject = ({
     },
   });
 
-  const [deleteProject] = useDeleteProjectMutation();
+  const [updateProject] = useUpdateProjectMutation();
 
-  // const [updateProject] = useUpdateProjectMutation();
-
-  // const handleUpdateProject = async (project: UpdateProjectPayload) => {
-  //   console.log(project);
-  //   console.log(editProject);
-  //   try {
-  //     const res = await updateProject({
-  //       id: editProject?.id,
-  //       ...project,
-  //     }).unwrap();
-  //     console.log(res);
-  //     if (res.success) {
-  //       toast.success("Project updated successfully");
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     toast.error("Failed to update project");
-  //   }
-  // };
+  const handleUpdateProject = async (project: UpdateProjectPayload) => {
+    console.log(project);
+    console.log(editProject);
+    try {
+      const res = await updateProject({
+        id: editProject?.id,
+        ...project,
+      }).unwrap();
+      console.log(res);
+      if (res.success) {
+        toast.success("Project updated successfully");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to update project");
+    }
+  };
 
   const projects = useMemo(() => data?.data?.data ?? [], [data]);
   const meta = data?.data?.meta;
@@ -147,27 +143,6 @@ const AllProject = ({
           day: "numeric",
         })
       : "-";
-
-
-      const handleDelete = async (project: UpdateProjectPayload) => {
-         try {
-              const result = await Swal.fire({
-                title: "Are you sure?",
-                text: "This action cannot be undone!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-              });
-        
-              if (result.isConfirmed) {
-                await deleteProject(project.id).unwrap();
-                Swal.fire("Deleted!", "Project removed.", "success");
-              }
-            } catch (err: any) {
-              Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
-            }
-
-      };
 
   if (isLoading) {
     return (
@@ -275,7 +250,7 @@ const AllProject = ({
                   </div>
                 </td>
 
-                <td className="px-6 py-4 space-x-2">
+                <td className="px-6 py-4">
                   <button
                     onClick={() => {
                       setEditProject(project);
@@ -283,13 +258,6 @@ const AllProject = ({
                     }}
                   >
                     <FaEdit className="text-blue-600" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleDelete(project);
-                    }}
-                  >
-                    <FaTrash className="text-red-600" />
                   </button>
                 </td>
               </tr>
@@ -311,7 +279,7 @@ const AllProject = ({
           project={editProject}
           open={editModalOpen}
           onClose={() => setEditModalOpen(false)}
-          // onSubmit={handleUpdateProject}
+          onSubmit={handleUpdateProject}
         />
       )}
     </div>

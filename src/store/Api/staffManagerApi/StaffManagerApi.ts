@@ -1,20 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import baseApi from "../BaseApi/BaseApi";
 
-// interface GetProjectsParams {
-// page?: number;
-// limit?: number;
-// status?: string;
-// priority?: string;
-// name?: string;
-// programId?: string;
-// managerId?: string;
-// startDate?: string;
-// endDate?: string;
-// sortBy?: string;
-// sortOrder?: string;
-// }
-
 const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getStaffEmpStateCarts: builder.query({
@@ -30,10 +16,58 @@ const userApi = baseApi.injectEndpoints({
     //   providesTags: ["Manager"],
     // }),
     getTopOverdueProjects: builder.query({
-      query: () => `/manager/charts/top-overdue-projects`
+      query: () => `/manager/charts/top-overdue-projects`,
+      providesTags: ["Manager"],
     }),
     getSubmissionStatus: builder.query({
-      query: () => `/manager/submission-status`
+      query: () => `/manager/submission-status`,
+      providesTags: ["Manager"],
+    }),
+    getUpcomingDeadlines: builder.query({
+      query: (params) => ({
+        url: "/manager/projects/upcoming-deadlines",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
+    getAllActivityLogs: builder.query({
+      query: (params) => ({
+        url: "/activities",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
+    getAllLatestSubmissions: builder.query({
+      query: (params) => ({
+        url: "/manager/all-manager-submission",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
+    // for project page
+    getProjectPageStateCarts: builder.query({
+      query: () => `/manager/project-dashboard`,
+      providesTags: ["Manager"],
+    }),
+    getAllProjects: builder.query({ // it is for temporary
+      query: () => `/project`,
+      providesTags: ["Manager"],
+    }),
+    getProgramAllProjects: builder.query({ // it is main for this page
+      query: () => `/manager/program-dashboard`,
+      providesTags: ["Manager"],
+    }),
+    // for program review
+    getAllReviewProjects: builder.query({ // it is main for this page
+      query: () => `/manager/submissions`,
+      providesTags: ["Manager"],
+    }),
+    getAllReviewProjectsReviewerActivity: builder.query({ // it is main for this page
+      query: () => `/manager/activity`,
+      providesTags: ["Manager"],
     }),
   }),
 });
@@ -41,7 +75,15 @@ const userApi = baseApi.injectEndpoints({
 export const {
   useGetStaffEmpStateCartsQuery,
   useGetTopOverdueProjectsQuery,
-  useGetSubmissionStatusQuery
+  useGetSubmissionStatusQuery,
+  useGetUpcomingDeadlinesQuery,
+  useGetAllActivityLogsQuery,
+  useGetAllLatestSubmissionsQuery,
+  useGetProjectPageStateCartsQuery,
+  useGetAllProjectsQuery,
+  useGetProgramAllProjectsQuery,
+  useGetAllReviewProjectsQuery,
+  useGetAllReviewProjectsReviewerActivityQuery
 } = userApi;
 
 export default userApi;

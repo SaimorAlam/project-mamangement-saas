@@ -18,17 +18,19 @@ import StaffManagerCarlyleHall from '@/pages/staffManager/StaffManagerCarlyleHal
 import StaffManagerEmployees from '@/pages/staffManager/StaffManagerEmployees';
 import StaffManagerAlfalaBuilders from '@/pages/staffManager/StaffManagerAlfalaBuilders';
 import StaffManagerAllProgram from '@/pages/staffManager/StaffManagerAllProgram';
-import AllProjectReview from '@/components/client/ProjectReview/AllProjectReview';
 import StaffManagerActivityLog from '@/pages/staffManager/StaffManagerActivityLog';
 import StaffManagerCreateTicket from '@/pages/staffManager/StaffManagerCreateTicket';
 import StaffManagerContactUs from '@/pages/staffManager/StaffManagerContactUs';
 // import CommingSoonPage from "@/common/CommingSoonPage";
 import StaffManagerStateCardDetails from "@/pages/staffManager/StaffManagerStateCardDetails";
+import StaffManagerUploadSubmission from "@/pages/staffManager/StaffManagerUploadSubmission";
+import AllProjectsReview from "@/pages/staffManager/AllProjectsReview";
 
 export function getStaffManagerRoutes() {
   return [
     { index: true, element: <StaffManagerOverview /> },
     { path: "projects", element: <StaffManagerProjects /> },
+    { path: "projects/upload-submission", element: <StaffManagerUploadSubmission />  },
     { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
     { path: "employees", element: <StaffManagerEmployees /> },
     {
@@ -54,7 +56,7 @@ export function getStaffManagerRoutes() {
       path: "project-review",
       element: <StaffManagerProjectReview />,
       children: [
-        { path: "all-projects", element: <AllProjectReview /> },
+        { path: "all-projects", element: <AllProjectsReview /> },
         { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
       ],
     },
