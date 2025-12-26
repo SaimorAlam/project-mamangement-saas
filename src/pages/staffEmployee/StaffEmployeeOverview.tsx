@@ -8,9 +8,8 @@ import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import { useGetEmployeeDashboardStatsQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 import DashboardStatsCard from "@/components/staffEmployee/DashboardStatsCard";
 import { Loader2 as Loader } from "lucide-react";
-import BoxContainer from './../../common/BoxContainer';
+import BoxContainer from "./../../common/BoxContainer";
 import OverDueChart from "@/components/staffEmployee/Overview/OverdueChart";
-
 
 const iconMap: { [key: string]: string } = {
   totalAssignedProject: "FolderIcon",

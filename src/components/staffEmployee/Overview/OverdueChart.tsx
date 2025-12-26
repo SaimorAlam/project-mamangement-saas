@@ -3,6 +3,7 @@ import Chart from "react-apexcharts";
 import { useState, useEffect } from "react";
 import { useGetTopOverdueProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import { Spinner } from "@/components/ui/spinner";
+import { useGetStaffEmployeeTopOverDueQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 
 const OverDueChart = () => {
   const [overDueChartData, setOverDueChartData] = useState<{
@@ -18,6 +19,10 @@ const OverDueChart = () => {
     isLoading: overdueLoading,
     error: overdueError,
   } = useGetTopOverdueProjectsQuery({});
+
+  const { data } = useGetStaffEmployeeTopOverDueQuery({});
+
+  console.log(data?.data, "staff emp data");
 
   useEffect(() => {
     if (!overdueData?.data || overdueData.data.length === 0) {

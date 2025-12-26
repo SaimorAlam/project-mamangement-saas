@@ -21,7 +21,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import RenderStaffAvatars from "../client/RenderStaffAvater";
-import { progress } from "framer-motion";
 import { Progress } from "../ui/progress";
 
 /* -------------------------------------------------------------------------- */
