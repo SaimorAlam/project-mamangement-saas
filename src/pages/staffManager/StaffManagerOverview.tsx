@@ -4,12 +4,10 @@ import ActivityLog from "@/components/client/Overview/ActivityLog";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
-import {
-  useGetStaffEmpStateCartsQuery,
-} from "@/store/Api/staffManagerApi/StaffManagerApi";
+import { useGetStaffEmpStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import BoxContainer from "@/common/BoxContainer";
 import OverDueChart from "./../../components/staffManager/overview/OverDueChart";
-import ProjectStatusChart from './../../components/staffManager/overview/ProjectStatusChart';
+import ProjectStatusChart from "./../../components/staffManager/overview/ProjectStatusChart";
 
 const clientData = [
   {
@@ -64,18 +62,12 @@ const clientData = [
   },
 ];
 
-
-
 const StaffManagerOverview = () => {
-  
-
   const {
     data: staffData,
     isLoading: staffLoading,
     error: staffError,
   } = useGetStaffEmpStateCartsQuery("");
-
-  
 
   const dashboardData = staffData?.data;
 

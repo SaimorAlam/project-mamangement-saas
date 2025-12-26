@@ -8,6 +8,8 @@ import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import { useGetEmployeeDashboardStatsQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 import DashboardStatsCard from "@/components/staffEmployee/DashboardStatsCard";
 import { Loader2 as Loader } from "lucide-react";
+import BoxContainer from './../../common/BoxContainer';
+import OverDueChart from "@/components/staffEmployee/Overview/OverdueChart";
 
 const iconMap: { [key: string]: string } = {
   totalAssignedProject: "FolderIcon",
@@ -64,7 +66,16 @@ const StaffEmployeeOverview = () => {
       <div className="grid grid-cols-3 gap-8 ">
         <div className="space-y-8 col-span-2">
           <div className="flex items-center justify-center gap-8">
-            <ApexBarChart />
+            <div className="flex items-center justify-center gap-8">
+              <BoxContainer>
+                <h2 className="text-2xl font-semibold mb-4">
+                  Top Overdue Projects
+                </h2>
+                <OverDueChart />
+              </BoxContainer>
+
+              {/* <ProjectStatusChart /> */}
+            </div>
             <ApexDonutChart />
           </div>
           <LatestSubmission />
