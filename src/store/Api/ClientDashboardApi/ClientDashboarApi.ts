@@ -32,6 +32,10 @@ const clientDashboardApi = baseApi.injectEndpoints({
       query: () => "/client-dashboard/upcoming-deadline",
       providesTags: ["Dashboard"],
     }),
+    getAllSubmission: builder.query({
+      query: () => "/client-dashboard/all-submissions",
+      providesTags: ["Dashboard"],
+    }),
   }),
 });
 
@@ -43,5 +47,6 @@ export const {
   useGetStatusQuery,
   useGetOverdueQuery,
   useGetUpcomingDeadlineQuery,
+  useGetAllSubmissionQuery,
 } = clientDashboardApi;
 export default clientDashboardApi;

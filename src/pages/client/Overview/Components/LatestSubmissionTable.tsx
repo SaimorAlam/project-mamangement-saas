@@ -12,23 +12,15 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Eye, FileText } from "lucide-react";
+import { useGetAllSubmissionQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
 
-export interface Submission {
-  id: number;
-  submission: string;
-  submittedBy: {
-    name: string;
-    avatar: string;
-  };
-  date: string;
-  status: "approved" | "in_review" | "returned" | "draft";
-}
-
-type SubmissionTableProps = {
-  submissions: Submission[];
-};
-
-export default function SubmissionTable({ submissions }: SubmissionTableProps) {
+export default function SubmissionTable({
+  submissions,
+}: {
+  submissions: ISubmission[];
+}) {
+  const { data } = useGetAllSubmissionQuery({});
+  console.log(data);
   const getInitials = (name: string) =>
     name
       .split(" ")

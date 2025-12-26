@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { CardHeader } from "@/components/ui/card";
-import SubmissionTable from "../SubmissionTable";
-import BoxContainer from "../../../common/BoxContainer";
+
 import { ISubmission } from "@/types";
 import {
   DropdownMenu,
@@ -11,7 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
-import { useGetAllSubmissionQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
+import BoxContainer from "@/common/BoxContainer";
+import SubmissionTable from "./LatestSubmissionTable";
 
 const submissionsData = [
   {
@@ -237,8 +237,6 @@ const submissionsData = [
 ];
 
 const LatestSubmission = () => {
-  const { data } = useGetAllSubmissionQuery();
-  console.log(data);
   const [submissions, setSubmissions] = useState<ISubmission[]>([]);
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
