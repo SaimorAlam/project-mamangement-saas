@@ -44,7 +44,7 @@ const ReviewerActivity = () => {
       <div className="relative">
         {activities.length === 0 && (
           <p className="text-sm text-gray-500 text-center py-4">
-            No reviewer activity found
+            Not yet any reviewer activity found
           </p>
         )}
 
@@ -101,9 +101,11 @@ const ReviewerActivity = () => {
       </div>
 
       {/* View All Footer */}
+      {activities.length > 0 && (
       <button className="w-full flex items-center justify-center gap-2 pt-4 mt-2 text-[#2563EB] font-semibold text-lg hover:underline decoration-2 underline-offset-4">
         View All Activity <ArrowRight size={20} />
       </button>
+      )}
     </div>
   );
 };

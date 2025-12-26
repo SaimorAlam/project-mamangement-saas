@@ -148,7 +148,7 @@ const StaffManagerProjects = ({
   if (!projects) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <h1 className="text-gray-400 text-center">No Projects Found.</h1>
+        <h1 className="text-gray-400 text-center">Not yet any Projects Found.</h1>
       </div>
     );
   }

@@ -66,6 +66,14 @@ export default function SubmissionTable({
     DRAFT: "DRAFT",
   };
 
+  if(submissions.length === 0){
+    return(
+      <div className="flex items-center justify-center h-[60vh]">
+                <h1 className="text-gray-400 text-center">Not yet any projects submitted.</h1>
+              </div>
+    )
+  }
+
   return (
     <Card className="w-full shadow-none border-none">
       <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full">

@@ -121,9 +121,7 @@ const StaffManagerOverview = () => {
 
             <ProjectStatusChart />
           </div>
-          {/* need to integrate api ----------------------- */}
           <LatestSubmission /> 
-          {/* <ApexColumnChart /> */}
         </div>
         <div className="space-y-8 mb-8">
           <SmUpcomingDeadline />

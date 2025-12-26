@@ -63,7 +63,7 @@ const AllProjectsReview = ({
   const [updateProject] = useUpdateProjectMutation();
 
   const projects = useMemo(() => data?.data ?? [], [data]);
-//   const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]); // Sidebar data
+  //   const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]); // Sidebar data
 
   const meta = data?.data?.meta;
 
@@ -149,13 +149,6 @@ const AllProjectsReview = ({
       </div>
     );
   }
-  if (sortedProjects.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <h1 className="text-gray-400 text-center">Still Now, No Projects For Review.</h1>
-      </div>
-    );
-  }
   const statusClasses: Record<string, string> = {
     APPROVED: "text-[#0B5A4A] bg-[#EBFFF2] border border-[#ABEFD5]",
     PENDING: "text-[#665CFF] bg-[#F2F2FF] border border-[#C7C2FF]",
@@ -163,7 +156,7 @@ const AllProjectsReview = ({
     DRAFT: "text-[#6B7280] bg-[#F3F4F6] border border-[#D1D5DB]",
   };
 
-  const statusLabels : any = {
+  const statusLabels: any = {
     APPROVED: "APPROVED",
     PENDING: "PENDING",
     RETURNED: "RETURNED",
@@ -174,170 +167,182 @@ const AllProjectsReview = ({
     <div className="min-h-screen py-6">
       <div className="flex gap-3 justify-between">
         <div className="bg-white rounded-lg border border-gray-200  grow">
-          {/* Header */}
-          <div className="flex justify-between px-6 py-4 border-b border-gray-200">
-            <h1 className="text-lg font-semibold">{title}</h1>
+          {
+            sortedProjects.length === 0 ? (
+              <div className="flex items-center justify-center h-[60vh]">
+                <h1 className="text-gray-400 text-center">Still now, no projects has come for review.</h1>
+              </div>
+            ) : (
+              <>
 
-            <div className="flex gap-3">
-              <input
-                value={search}
-                onChange={(e) => {
-                  setCurrentPage(1);
-                  setSearch(e.target.value);
-                }}
-                placeholder="Search project..."
-                className="border border-gray-200 rounded px-4 py-2 text-sm"
-              />
 
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex gap-3 items-center border border-gray-200 px-4 py-2 rounded">
-                  {priorityFilter} <ChevronDown className="text-gray-600" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
-                    <>
-                      <DropdownMenuItem
-                        key={p}
-                        onClick={() => {
-                          setCurrentPage(1);
-                          setPriorityFilter(p as any);
-                        }}
-                      >
-                        {p}
-                      </DropdownMenuItem>
-                    </>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
+                {/* Header */}
+                <div className="flex justify-between px-6 py-4 border-b border-gray-200">
+                  <h1 className="text-lg font-semibold">{title}</h1>
 
-          {/* Table */}
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                {[
-                  "name",
-                  "assignStaff",
-                  "status",
-                  "priority",
-                  // "startDate",
-                  "submitDate",
-                //   "progress",
-                  "actions",
-                ].map(
-                  (col) =>
-                    col && (
-                      <th
-                        key={col}
-                        onClick={
-                          col !== "actions"
-                            ? () => handleSort(col as any)
-                            : undefined
-                        }
-                        className="px-6 py-3 text-left text-xs font-semibold cursor-pointer capitalize"
-                      >
-                        {col.replace(/([A-Z])/g, " $1")}
-                      </th>
-                    )
-                )}
-              </tr>
-            </thead>
+                  <div className="flex gap-3">
+                    <input
+                      value={search}
+                      onChange={(e) => {
+                        setCurrentPage(1);
+                        setSearch(e.target.value);
+                      }}
+                      placeholder="Search project..."
+                      className="border border-gray-200 rounded px-4 py-2 text-sm"
+                    />
 
-            <tbody>
-              {sortedProjects.map((project) => (
-                <tr key={project.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">{project.project.name}</td>
-                  <td className="px-6 py-4">
-                    {project.assignStuff?.avatars?.length > 0 ? (
-                      <div className="flex items-center">
-                        <div className="flex -space-x-2">
-                          {project.assignStuff.avatars
-                            .slice(0, 3)
-                            .map((staff: any, index: number) => (
-                              <img
-                                key={staff.name + index}
-                                src={
-                                  staff.image ??
-                                  "https://images.pexels.com/photos/4126749/pexels-photo-4126749.jpeg"
-                                }
-                                alt={staff.name}
-                                className="w-8 h-8 rounded-full border-2 border-white object-cover"
-                                style={{ zIndex: 10 - index }}
-                              />
-                            ))}
-
-                          {/* +N Avatar */}
-                          {project.assignStuff.avatars.length > 3 && (
-                            <div
-                              className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white 
-                       flex items-center justify-center text-xs font-semibold text-gray-700"
-                              style={{ zIndex: 6 }}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="flex gap-3 items-center border border-gray-200 px-4 py-2 rounded">
+                        {priorityFilter} <ChevronDown className="text-gray-600" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
+                          <>
+                            <DropdownMenuItem
+                              key={p}
+                              onClick={() => {
+                                setCurrentPage(1);
+                                setPriorityFilter(p as any);
+                              }}
                             >
-                              +{project.assignStuff.avatars.length - 3}
+                              {p}
+                            </DropdownMenuItem>
+                          </>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+
+                {/* Table */}
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      {[
+                        "name",
+                        "assignStaff",
+                        "status",
+                        "priority",
+                        // "startDate",
+                        "submitDate",
+                        //   "progress",
+                        "actions",
+                      ].map(
+                        (col) =>
+                          col && (
+                            <th
+                              key={col}
+                              onClick={
+                                col !== "actions"
+                                  ? () => handleSort(col as any)
+                                  : undefined
+                              }
+                              className="px-6 py-3 text-left text-xs font-semibold cursor-pointer capitalize"
+                            >
+                              {col.replace(/([A-Z])/g, " $1")}
+                            </th>
+                          )
+                      )}
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {sortedProjects.map((project) => (
+                      <tr key={project.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4">{project.project.name}</td>
+                        <td className="px-6 py-4">
+                          {project.assignStuff?.avatars?.length > 0 ? (
+                            <div className="flex items-center">
+                              <div className="flex -space-x-2">
+                                {project.assignStuff.avatars
+                                  .slice(0, 3)
+                                  .map((staff: any, index: number) => (
+                                    <img
+                                      key={staff.name + index}
+                                      src={
+                                        staff.image ??
+                                        "https://images.pexels.com/photos/4126749/pexels-photo-4126749.jpeg"
+                                      }
+                                      alt={staff.name}
+                                      className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                                      style={{ zIndex: 10 - index }}
+                                    />
+                                  ))}
+
+                                {/* +N Avatar */}
+                                {project.assignStuff.avatars.length > 3 && (
+                                  <div
+                                    className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white 
+                       flex items-center justify-center text-xs font-semibold text-gray-700"
+                                    style={{ zIndex: 6 }}
+                                  >
+                                    +{project.assignStuff.avatars.length - 3}
+                                  </div>
+                                )}
+                              </div>
                             </div>
+                          ) : (
+                            <span className="text-gray-500 text-sm">No Staff</span>
                           )}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-gray-500 text-sm">No Staff</span>
-                    )}
-                  </td>
+                        </td>
 
-                <td className="px-6 py-4">
-                    <Badge
-                      variant="outline"
-                      className={`py-1.5 px-3 min-w-20 ${statusClasses[project.status]
-                        }`}
-                    >
-                      {statusLabels[project.project.status]}
-                    </Badge>
-                  </td>
+                        <td className="px-6 py-4">
+                          <Badge
+                            variant="outline"
+                            className={`py-1.5 px-3 min-w-20 ${statusClasses[project.status]
+                              }`}
+                          >
+                            {statusLabels[project.project.status]}
+                          </Badge>
+                        </td>
 
-                  <td className="px-6 py-4">
-                    <PriorityDropdown defaultPriority={project.project.priority} />
-                  </td>
+                        <td className="px-6 py-4">
+                          <PriorityDropdown defaultPriority={project.project.priority} />
+                        </td>
 
-                  {/* <td className="px-6 py-4">{formatDate(project.startDate)}</td> */}
+                        {/* <td className="px-6 py-4">{formatDate(project.startDate)}</td> */}
 
-                  <td className="px-6 py-4">{formatDate(project.createdAt)}</td>
+                        <td className="px-6 py-4">{formatDate(project.createdAt)}</td>
 
 
-                  <td className="px-6 py-4 flex items-center gap-3">
-                    <button
-                      onClick={() => {
-                        setEditModalOpen(true);
-                      }}
-                    >
-                      <FaEdit className="text-blue-600" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditModalOpen(true);
-                      }}
-                    >
-                      <FaEdit className="text-blue-600" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditModalOpen(true);
-                      }}
-                    >
-                      <FaEdit className="text-blue-600" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        <td className="px-6 py-4 flex items-center gap-3">
+                          <button
+                            onClick={() => {
+                              setEditModalOpen(true);
+                            }}
+                          >
+                            <FaEdit className="text-blue-600" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditModalOpen(true);
+                            }}
+                          >
+                            <FaEdit className="text-blue-600" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditModalOpen(true);
+                            }}
+                          >
+                            <FaEdit className="text-blue-600" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            itemsPerPage={itemsPerPage}
-            totalPrograms={totalProjects}
-            onPageChange={setCurrentPage}
-          />
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  itemsPerPage={itemsPerPage}
+                  totalPrograms={totalProjects}
+                  onPageChange={setCurrentPage}
+                />
+              </>
+            )
+          }
         </div>
         <div className="w-110 space-y-6">
           <SmUpcomingDeadline />
