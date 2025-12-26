@@ -3,91 +3,104 @@ import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/common/Charts/ApexBarChart";
-import ApexColumnChart from "@/common/Charts/ApexColumnChart";
-import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import ProjectStatusDonutChart from "./Components/ProjectStatusDonutChart";
-
-const clientData = [
-  {
-    title: "Total Program",
-    value: 56,
-    growth: "+5%",
-    growth_type: "up",
-    description: "24 program Running this month",
-    link_text: "View all",
-    icon: "FolderIcon",
-    icon_bg_color: "#069576",
-  },
-  {
-    title: "Total Project",
-    value: 156,
-    growth: "+5%",
-    growth_type: "up",
-    description: "24 project Running this month",
-    link_text: "View all",
-    icon: "FolderIcon",
-    icon_bg_color: "#069576",
-  },
-  {
-    title: "Live Project",
-    value: 36,
-    growth: "+2%",
-    growth_type: "up",
-    description: "150 New user joined",
-    link_text: "View all",
-    icon: "LiveProject",
-    icon_bg_color: "#756CF5",
-  },
-  {
-    title: "Project in draft",
-    value: 15,
-    growth: "+1.1%",
-    growth_type: "up",
-    description: "5 new clients joined",
-    link_text: "View all",
-    icon: "ProjectInDraft",
-    icon_bg_color: "#4881FF",
-  },
-  {
-    title: "Pending Review",
-    value: 75,
-    growth: "+5%",
-    growth_type: "up",
-    description: "25 score growth",
-    link_text: "View all",
-    icon: "PendingReview",
-    icon_bg_color: "#069576",
-  },
-  {
-    title: "Submission Overdue",
-    value: "7.8%",
-    growth: undefined,
-    growth_type: "down",
-    description: "50 Clients left",
-    link_text: "View all",
-    icon: "SubmissionOverdue",
-    icon_bg_color: "#DA4352",
-  },
-];
+import ProjectTimelineColumnChart from "./Components/ProjectTimelineColumnChart";
+import { useGetOverviewStackQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
+import DashboardPanelStatsCardSkeleton from "@/common/Skeleton/DashboardPanelStatsCardSkeleton";
 
 const ClientOverview = () => {
-  const { data: allPrograms } = useGetAllProgramQuery({});
-  const updatedClientData = clientData.map((item) => {
-    if (item.title === "Total Program") {
-      item.value = allPrograms?.data?.data?.length;
-    }
-    return item;
-  });
+  const { data: overview, isLoading } = useGetOverviewStackQuery({});
+  console.log(overview);
+  const totalProgram = overview?.data?.programs?.total;
+  const programThisMonth = overview?.data.programs.thisMonth;
+  const totalProject = overview?.data?.projects?.total;
+  const projectThisMonth = overview?.data?.projects?.thisMonth;
+  const liveProject = overview?.data?.liveProjects?.total;
+  const liveProjectThisMonth = overview?.data?.liveProjects?.thisMonth;
+  const draftProject = overview?.data?.draftProjects?.total;
+  const draftProjectThisMonth = overview?.data?.draftProjects?.thisMonth;
+  const pendingReview = overview?.data?.pendingReview?.total;
+  const growth = overview?.data?.pendingReview?.growth;
+  const submitOverdue = overview?.data?.submitOverdue?.total;
+  const projectOverduePercentage =
+    overview?.data?.submitOverdue?.projectOverduePercentage;
+  const clientData = [
+    {
+      title: "Total Program",
+      value: totalProgram,
+      growth: "+5%",
+      growth_type: "up",
+      description: `${programThisMonth} program Running this month`,
+      link_text: "View all",
+      icon: "FolderIcon",
+      icon_bg_color: "#069576",
+    },
+    {
+      title: "Total Project",
+      value: totalProject,
+      growth: "+5%",
+      growth_type: "up",
+      description: `${projectThisMonth} project Running this month`,
+      link_text: "View all",
+      icon: "FolderIcon",
+      icon_bg_color: "#069576",
+    },
+    {
+      title: "Live Project",
+      value: liveProject,
+      growth: "+2%",
+      growth_type: "up",
+      description: `${liveProjectThisMonth} New user joined`,
+      link_text: "View all",
+      icon: "LiveProject",
+      icon_bg_color: "#756CF5",
+    },
+    {
+      title: "Project in draft",
+      value: draftProject,
+      growth: "+1.1%",
+      growth_type: "up",
+      description: `${draftProjectThisMonth} new clients joined`,
+      link_text: "View all",
+      icon: "ProjectInDraft",
+      icon_bg_color: "#4881FF",
+    },
+    {
+      title: "Pending Review",
+      value: pendingReview,
+      growth: growth,
+      growth_type: "up",
+      description: `${growth} score growth`,
+      link_text: "View all",
+      icon: "PendingReview",
+      icon_bg_color: "#069576",
+    },
+    {
+      title: "Submission Overdue",
+      value: submitOverdue,
+      growth: undefined,
+      growth_type: "down",
+      description: `${projectOverduePercentage}% of projects are overdue`,
+      link_text: "View all",
+      icon: "SubmissionOverdue",
+      icon_bg_color: "#DA4352",
+    },
+  ];
 
   return (
     <div className="">
       {/* Icon and Home */}
 
       <div className="grid grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 my-6">
-        {updatedClientData.map((item) => (
-          <DashboardPanelStatsCard key={item.title} item={item} />
-        ))}
+        {isLoading
+          ? Array.from({ length: 6 }).map((_, index) => (
+              <DashboardPanelStatsCardSkeleton key={index} />
+            ))
+          : clientData.map((item) => (
+              <DashboardPanelStatsCard key={item.title} item={item} />
+            ))}
       </div>
 
       <div className="py-4">
@@ -101,7 +114,7 @@ const ClientOverview = () => {
               <ProjectStatusDonutChart />
             </div>
           </div>
-          <ApexColumnChart />
+          <ProjectTimelineColumnChart />
         </div>
         <div className="space-y-8">
           <UpcomingDeadline />

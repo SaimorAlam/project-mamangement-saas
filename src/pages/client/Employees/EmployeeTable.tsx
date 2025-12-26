@@ -1,15 +1,36 @@
 import { Eye, Edit, Trash2 } from "lucide-react";
-import { IEmployeeProfile } from "@/types/client-panel";
+import { UserType } from "@/types/Auth/Auth";
+import { useLazyGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import { useEffect, useState, useMemo } from "react";
+
+// Project interface
+export interface Project {
+  id: string;
+  programId: string;
+  name: string;
+  description: string;
+  status: string;
+  priority: string;
+  startDate: string;
+  deadline: string;
+  progress: number;
+  managerId: string;
+  chartList: unknown[];
+  estimatedCompletedDate: string;
+  projectCompleteDate: string | null;
+  currentRate: string;
+  budget: string;
+  latitude: number | null;
+  longitude: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface ITableProps {
-  employees: IEmployeeProfile[];
-  selectedEmployees: Set<string>;
-  selectAll: boolean;
+  employees: UserType[];
   visibleColumns?: string[];
-  handleSelectAll: () => void;
-  handleSelectEmployee: (id: string) => void;
   handleViewClick: (employeeId: string) => void;
-  handleEditClick?: (employee: IEmployeeProfile) => void;
+  handleEditClick?: (employee: UserType) => void;
   handleDeleteEmployee?: (id: string) => void;
   handleSort?: (field: string) => void;
   sortBy?: string;
@@ -20,8 +41,6 @@ interface ITableProps {
 
 const EmployeeTable = ({
   employees,
-  selectedEmployees,
-  selectAll,
   visibleColumns = [
     "employeeName",
     "email",
@@ -31,8 +50,6 @@ const EmployeeTable = ({
     "level",
     "action",
   ],
-  handleSelectAll,
-  handleSelectEmployee,
   handleViewClick,
   handleEditClick,
   handleDeleteEmployee,
@@ -42,6 +59,54 @@ const EmployeeTable = ({
   getRoleBadgeColor,
   getStatusBadgeColor,
 }: ITableProps) => {
+  const [employeeProjects, setEmployeeProjects] = useState<
+    Record<string, Project[]>
+  >({});
+  const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+  const [getProjects] = useLazyGetAllProjectsQuery();
+
+  // Fetch projects for all employees in parallel
+  useEffect(() => {
+    const fetchProjectsForEmployees = async () => {
+      setIsLoadingProjects(true);
+
+      const entries = await Promise.all(
+        employees.map(async (employee) => {
+          const queryParams =
+            employee.role === "MANAGER"
+              ? { managerId: employee.id }
+              : employee.role === "VIEWER"
+              ? { viewerId: employee.id }
+              : { employeeId: employee.id };
+
+          try {
+            const result = await getProjects(queryParams).unwrap();
+            return [employee.id, result?.data || []] as const;
+          } catch {
+            return [employee.id, []] as const;
+          }
+        })
+      );
+
+      setEmployeeProjects(Object.fromEntries(entries));
+      setIsLoadingProjects(false);
+    };
+
+    if (employees.length) {
+      fetchProjectsForEmployees();
+    }
+  }, [employees, getProjects]);
+
+  // Memoize derived project stats
+  const employeeProjectStats = useMemo(() => {
+    const stats: Record<string, { count: number }> = {};
+    for (const employeeId in employeeProjects) {
+      const projects = employeeProjects[employeeId] ?? [];
+      stats[employeeId] = { count: projects.length };
+    }
+    return stats;
+  }, [employeeProjects]);
+  console.log(employeeProjectStats);
   const renderSortIcon = (field: string) => {
     if (sortBy !== field) return null;
     return sortOrder === "asc" ? " ▲" : " ▼";
@@ -63,15 +128,6 @@ const EmployeeTable = ({
       <table className="w-full">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left">
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={handleSelectAll}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
-              />
-            </th>
-
             {visibleColumns.includes("employeeName") &&
               sortableHeader("Employee Name", "userName")}
             {visibleColumns.includes("email") &&
@@ -90,124 +146,121 @@ const EmployeeTable = ({
         </thead>
 
         <tbody className="bg-white divide-y divide-gray-200">
-          {employees.map((employee) => (
-            <tr
-              key={employee.id}
-              className="hover:bg-gray-50 transition-colors"
-            >
-              <td className="px-6 py-4">
-                <input
-                  type="checkbox"
-                  checked={selectedEmployees.has(employee.id)}
-                  onChange={() => handleSelectEmployee(employee.id)}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2"
-                />
-              </td>
+          {employees?.map((employee) => {
+            const projectStats = employeeProjectStats[employee.id];
 
-              {visibleColumns.includes("employeeName") && (
-                <td className="px-6 py-4">
-                  <div className="flex items-center">
-                    <img
-                      src={employee.user.profileImage || ""}
-                      alt="Employee Avatar"
-                      className="w-10 h-10 rounded-full mr-3 bg-gray-100"
-                    />
-                    <span className="text-sm font-medium text-gray-900">
-                      {employee.user.name}
-                    </span>
-                  </div>
-                </td>
-              )}
-
-              {visibleColumns.includes("email") && (
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  {employee.user.email}
-                </td>
-              )}
-
-              {visibleColumns.includes("role") && (
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getRoleBadgeColor(
-                      employee.user.role
-                    )}`}
-                  >
-                    {employee.user.role}
-                  </span>
-                </td>
-              )}
-
-              {visibleColumns.includes("projects") && (
-                <td className="px-6 py-4">
-                  <div className="grid grid-cols-3 gap-2">
-                    {employee.projects?.map((project, index) => (
-                      <span
-                        key={index}
-                        className="text-xs border bg-gray-50 px-2 py-1 rounded-lg"
-                      >
-                        {project}
+            return (
+              <tr
+                key={employee.id}
+                className="hover:bg-gray-50 transition-colors"
+              >
+                {visibleColumns.includes("employeeName") && (
+                  <td className="px-6 py-4">
+                    <div className="flex items-center">
+                      <img
+                        src={employee?.profileImage || ""}
+                        alt="Employee Avatar"
+                        className="w-10 h-10 rounded-full mr-3 bg-gray-100"
+                      />
+                      <span className="text-sm font-medium text-gray-900">
+                        {employee?.name}
                       </span>
-                    ))}
-                  </div>
-                </td>
-              )}
+                    </div>
+                  </td>
+                )}
 
-              {visibleColumns.includes("lastActive") && (
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  {employee.user.updatedAt
-                    ? new Date(employee.user.updatedAt).toLocaleDateString()
-                    : "N/A"}
-                </td>
-              )}
+                {visibleColumns.includes("email") && (
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {employee.email}
+                  </td>
+                )}
 
-              {visibleColumns.includes("level") && getStatusBadgeColor && (
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
-                      employee.user.userStatus === "ACTIVE"
+                {visibleColumns.includes("role") && (
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getRoleBadgeColor(
+                        employee.role
+                      )}`}
+                    >
+                      {employee.role}
+                    </span>
+                  </td>
+                )}
+
+                {visibleColumns.includes("projects") && (
+                  <td className="px-6 py-4">
+                    {isLoadingProjects ? (
+                      <span className="text-xs text-gray-400">Loading...</span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900">
+                          {projectStats?.count ?? 0}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {projectStats?.count === 1 ? "project" : "projects"}
+                        </span>
+                      </div>
+                    )}
+                  </td>
+                )}
+
+                {visibleColumns.includes("lastActive") && (
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {employee.updatedAt
+                      ? new Date(employee.updatedAt).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                )}
+
+                {visibleColumns.includes("level") && getStatusBadgeColor && (
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
+                        employee.userStatus === "ACTIVE"
+                          ? "Active"
+                          : "In Active"
+                      )}`}
+                    >
+                      {employee.userStatus === "ACTIVE"
                         ? "Active"
-                        : "In Active"
-                    )}`}
-                  >
-                    {employee.user.userStatus === "ACTIVE"
-                      ? "Active"
-                      : "In Active"}
-                  </span>
-                </td>
-              )}
+                        : "In Active"}
+                    </span>
+                  </td>
+                )}
 
-              {visibleColumns.includes("action") && (
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                    {handleViewClick && (
-                      <button
-                        onClick={() => handleViewClick(employee.id)}
-                        className="p-1 text-blue-500"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    )}
-                    {handleEditClick && (
-                      <button
-                        className="p-1 text-green-600"
-                        onClick={() => handleEditClick(employee)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                    )}
-                    {handleDeleteEmployee && (
-                      <button
-                        className="p-1 text-red-600"
-                        onClick={() => handleDeleteEmployee(employee.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                </td>
-              )}
-            </tr>
-          ))}
+                {visibleColumns.includes("action") && (
+                  <td className="px-6 py-4">
+                    <div className="flex gap-2">
+                      {handleViewClick && (
+                        <button
+                          onClick={() => handleViewClick(employee.id)}
+                          className="p-1 text-blue-500"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                      )}
+                      {handleEditClick && (
+                        <button
+                          className="p-1 text-green-600"
+                          onClick={() => handleEditClick(employee)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      )}
+                      {handleDeleteEmployee && (
+                        <button
+                          className="p-1 text-red-600"
+                          onClick={() => handleDeleteEmployee(employee.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                )}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

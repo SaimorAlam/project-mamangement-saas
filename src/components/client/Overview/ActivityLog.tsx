@@ -35,7 +35,7 @@ const ActivityLog = () => {
                   {/* Status Indicator */}
                   <div
                     className={`size-2.5 rounded-full shrink-0 z-1 bg-green-600`}
-                  />s
+                  />
                   <div className="absolute transform inset-x-1/2 left-1 border-1 w-px h-full border-[#CBD5E1]" />
                 </div>
 

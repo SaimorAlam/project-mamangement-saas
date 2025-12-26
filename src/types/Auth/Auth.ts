@@ -23,3 +23,22 @@ export interface Role {
   CLIENT: "client-panel";
   SUPERADMIN: "superadmin";
 }
+
+export type UserType = {
+  id: string;
+  email: string;
+  phoneNumber: string;
+  name: string;
+  role: "CLIENT" | "EMPLOYEE" | "VIEWER" | "MANAGER";
+  profileImage: string | null;
+  language?: "ENGLISH" | "FRENCH" | "SPANISH";
+  timezone?: string | null;
+  verification2FA?: boolean;
+  status: boolean;
+  lastActive?: boolean | string;
+  createdAt: string;
+  updatedAt?: string;
+  userStatus?: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+  projects?: string[];
+  skills?: string[];
+};

@@ -14,7 +14,6 @@ const programApi = baseApi.injectEndpoints({
     getAllProgram: builder.query({
       query: (args) => {
         const params = new URLSearchParams();
-        console.log(args);
         Object.entries(args).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== "") {
             params.append(key, value.toString());
@@ -29,18 +28,17 @@ const programApi = baseApi.injectEndpoints({
       providesTags: (result) =>
         result?.data?.data
           ? [
-            ...result.data.data.map((program: IProgram) => ({
-              type: "Program",
-              id: program.id,
-            })),
-            { type: "Program", id: "LIST" },
-          ]
+              ...result.data.data.map((program: IProgram) => ({
+                type: "Program",
+                id: program.id,
+              })),
+              { type: "Program", id: "LIST" },
+            ]
           : [{ type: "Program", id: "LIST" }],
     }),
 
     getProgramById: builder.query({
       query: (id) => {
-        console.log(id);
         return {
           url: `/program/${id}`,
           method: "GET",
@@ -83,33 +81,33 @@ const programApi = baseApi.injectEndpoints({
       ],
     }),
     getChartTitleId: builder.mutation({
-      query:(bodyData)=>({
-        url:`/chart`,
-        method:"POST",
-        body:bodyData
-      })
+      query: (bodyData) => ({
+        url: `/chart`,
+        method: "POST",
+        body: bodyData,
+      }),
     }),
     getStackBarChartCSVfilesTitleId: builder.query({
-      query: () => `/charts/stack-bar-chart`
+      query: () => `/charts/stack-bar-chart`,
     }),
     getHeatmapChartCSVfilesTitleId: builder.query({
-      query: () => `/charts/heat-map-chart`
+      query: () => `/charts/heat-map-chart`,
     }),
     getMultiAxisLineChartCSVfilesTitleId: builder.query({
-      query: () => `/charts/multi-axis-line-chart`
+      query: () => `/charts/multi-axis-line-chart`,
     }),
-  })
-})
-  export const {
-    useCreateProgramMutation,
-    useGetAllProgramQuery,
-    useGetProgramByIdQuery,
-    useGetProjectsByProgramIdQuery,
-    useUpdateProgramNameMutation,
-    useGetChartTitleIdMutation,
-    useGetStackBarChartCSVfilesTitleIdQuery,
-    useGetHeatmapChartCSVfilesTitleIdQuery,
-    useGetMultiAxisLineChartCSVfilesTitleIdQuery
-  } = programApi;
+  }),
+});
+export const {
+  useCreateProgramMutation,
+  useGetAllProgramQuery,
+  useGetProgramByIdQuery,
+  useGetProjectsByProgramIdQuery,
+  useUpdateProgramNameMutation,
+  useGetChartTitleIdMutation,
+  useGetStackBarChartCSVfilesTitleIdQuery,
+  useGetHeatmapChartCSVfilesTitleIdQuery,
+  useGetMultiAxisLineChartCSVfilesTitleIdQuery,
+} = programApi;
 
-  export default programApi;
+export default programApi;
