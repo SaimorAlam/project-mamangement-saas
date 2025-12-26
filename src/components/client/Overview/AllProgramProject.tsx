@@ -19,10 +19,10 @@ import Pagination from "../Pagination";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "../../../common/PrimaryButton";
 import DropdownSelect from "../../../common/DropdownSelect";
-import StaffEmployeeProjectCard from "../../staffEmployee/StaffEmployeeProjectCard";
 import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
 import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import StaffManagerProjectCard from "@/components/staffManager/StaffManagerProjectCard";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -271,7 +271,7 @@ const AllProgramProject = () => {
             {projects?.map((projectData: StaffEmployeeProject) => {
               return (
                 <div key={projectData.id}>
-                  <StaffEmployeeProjectCard project={projectData} />
+                  <StaffManagerProjectCard project={projectData} />
                 </div>
               );
             })}

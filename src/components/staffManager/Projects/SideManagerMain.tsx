@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
-/* ---------------- TYPES ---------------- */
+/*   TYPES   */
 
 interface SidebarProps {
   sidebar: {
@@ -38,7 +38,7 @@ interface Alert {
   color: string;
 }
 
-/* ---------------- HELPERS ---------------- */
+/*   HELPERS   */
 
 const formatDate = (date: string) =>
   new Date(date).toLocaleDateString("en-GB", {
@@ -47,7 +47,7 @@ const formatDate = (date: string) =>
     year: "numeric",
   });
 
-/* ---------------- COMPONENT ---------------- */
+/*   COMPONENT   */
 
 const SideManagerMain: React.FC<SidebarProps> = ({ sidebar }) => {
   const [showTagInput, setShowTagInput] = useState(false);
