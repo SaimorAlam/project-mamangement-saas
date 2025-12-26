@@ -42,12 +42,16 @@ const UpcomingDeadline = () => {
         </div>
 
         {/* View Calendar Button */}
-        <ViewCalender
+        {
+          deadlineData.length > 0 && (
+            <ViewCalender
           showCalendar={showCalendar}
           setShowCalendar={setShowCalendar}
           onChange={onChange}
           value={value}
         />
+          )
+        }
       </div>
 
       {/* Deadline Cards */}
@@ -56,26 +60,30 @@ const UpcomingDeadline = () => {
           <div className="flex justify-center items-center h-32">
             <Loader2 className="animate-spin h-6 w-6 text-gray-600" />
           </div>
+        ) : deadlineData.length > 0 ? (
+          deadlineData.map((project: IUpcomingDeadlineFromBackend) => (
+            <div key={project.programName} className="pb-6">
+              <UpcomingDeadlineCard deadlineData={project} />
+            </div>
+          ))
         ) : (
-          deadlineData?.map(
-            (project: IUpcomingDeadlineFromBackend, i: number) => (
-              <div key={i} className="pb-6">
-                <UpcomingDeadlineCard deadlineData={project} />
-              </div>
-            )
-          )
+          <div className="flex justify-center items-center h-32">
+            No Data Found
+          </div>
         )}
       </div>
 
       {/* View All Button */}
       <div>
-        <Button
-          variant="ghost"
-          className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-        >
-          View all {deadlineData.length}
-          <ArrowRight className="h-4 w-4 ml-2" />
-        </Button>
+        {deadlineData.length > 0 && (
+          <Button
+            variant="ghost"
+            className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+          >
+            View all {deadlineData.length}
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        )}
       </div>
     </BoxContainer>
   );

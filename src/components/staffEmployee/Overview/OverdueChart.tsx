@@ -97,7 +97,7 @@ const OverDueChart = () => {
     if (err?.error) return err.error;
     try {
       return JSON.stringify(err);
-    } catch (e) {
+    } catch {
       return "An error occurred while fetching overdue projects";
     }
   };

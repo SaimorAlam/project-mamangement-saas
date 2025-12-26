@@ -1,7 +1,7 @@
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
-import LatestSubmission from "@/components/client/Overview/LatestSubmission";
+// import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import ProjectStatusDonutChart from "./Components/ProjectStatusDonutChart";
 import ProjectTimelineColumnChart from "./Components/ProjectTimelineColumnChart";
@@ -121,7 +121,7 @@ const ClientOverview = () => {
         </div>
       </div>
       <div className="my-6">
-        <LatestSubmission />
+        {/* <LatestSubmission /> */}
       </div>
     </div>
   );

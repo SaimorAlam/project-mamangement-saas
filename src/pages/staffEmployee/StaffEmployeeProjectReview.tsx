@@ -1,11 +1,12 @@
-import AllProjectReview from "@/components/client/ProjectReview/AllProjectReview";
+
 import ProjectReviewStats from "@/components/client/ProjectReview/ProjectReviewStats";
+import AllProjectsReview from "../staffManager/AllProjectsReview";
 
 const StaffEmployeeProjectReview = () => {
   return (
     <>
       <ProjectReviewStats />
-      <AllProjectReview />
+      <AllProjectsReview />
     </>
   );
 };

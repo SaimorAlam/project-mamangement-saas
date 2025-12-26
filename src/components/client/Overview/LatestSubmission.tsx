@@ -237,7 +237,7 @@ const submissionsData = [
 ];
 
 const LatestSubmission = () => {
-  const { data } = useGetAllSubmissionQuery();
+  const { data } = useGetAllSubmissionQuery({});
   console.log(data);
   const [submissions, setSubmissions] = useState<ISubmission[]>([]);
   const [sortBy, setSortBy] = useState("date");

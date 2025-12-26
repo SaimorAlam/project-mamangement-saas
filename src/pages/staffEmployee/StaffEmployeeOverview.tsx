@@ -2,14 +2,14 @@ import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
 import ActivityLog from "@/components/staffEmployee/ActivityLog";
 import ApexDonutChart from "@/common/Charts/ApexDonutChart";
-import LatestSubmission from "@/components/client/Overview/LatestSubmission";
-import ApexBarChart from "@/common/Charts/ApexBarChart";
+
 import ApexColumnChart from "@/common/Charts/ApexColumnChart";
 import { useGetEmployeeDashboardStatsQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 import DashboardStatsCard from "@/components/staffEmployee/DashboardStatsCard";
 import { Loader2 as Loader } from "lucide-react";
 import BoxContainer from './../../common/BoxContainer';
 import OverDueChart from "@/components/staffEmployee/Overview/OverdueChart";
+import LatestSubmission from "@/components/staffManager/overview/LatestSubmission";
 
 
 const iconMap: { [key: string]: string } = {
