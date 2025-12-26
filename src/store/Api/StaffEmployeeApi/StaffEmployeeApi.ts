@@ -8,10 +8,26 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getStaffEmployeeUpcomingDeadlines: builder.query({
+      query: (params) => ({
+        url: "/employeeDashboard/projects/upcoming-deadlines",
+        method: "GET",
+        params,
+      }),
+    }),
+    getStaffEmployeeLatestSubmissions: builder.query({
+      query: () => ({
+        url: `/submitted`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetStaffEmployeeTopOverDueQuery } =
-  staffEmployeeApi;
+export const {
+  useGetStaffEmployeeTopOverDueQuery,
+  useGetStaffEmployeeUpcomingDeadlinesQuery,
+  useGetStaffEmployeeLatestSubmissionsQuery,
+} = staffEmployeeApi;
 
 export default staffEmployeeApi;

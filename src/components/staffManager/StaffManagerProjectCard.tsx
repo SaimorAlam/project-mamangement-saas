@@ -94,8 +94,6 @@ const StaffManagerProjectCard = ({
     status,
   } = project;
 
-  console.log(project);
-
   const priorityColor =
     priority === "HIGH"
       ? "text-[#DA4352]"

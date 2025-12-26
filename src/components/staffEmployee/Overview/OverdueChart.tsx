@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Chart from "react-apexcharts";
 import { useState, useEffect } from "react";
-import { useGetTopOverdueProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import { Spinner } from "@/components/ui/spinner";
 import { useGetStaffEmployeeTopOverDueQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
+import { Spinner } from "@/components/ui/spinner";
 
 const OverDueChart = () => {
+  // Initialize with default structure to ensure chart renders
   const [overDueChartData, setOverDueChartData] = useState<{
     series: { name: string; data: number[] }[];
     options: any;
@@ -18,28 +18,38 @@ const OverDueChart = () => {
     data: overdueData,
     isLoading: overdueLoading,
     error: overdueError,
-  } = useGetTopOverdueProjectsQuery({});
+  } = useGetStaffEmployeeTopOverDueQuery({});
 
-  const { data } = useGetStaffEmployeeTopOverDueQuery({});
-
-  console.log(data?.data, "staff emp data");
+  const overDueDataList = overdueData?.data?.projects || [];
 
   useEffect(() => {
-    if (!overdueData?.data || overdueData.data.length === 0) {
-      setOverDueChartData({ series: [], options: {} });
+    if (!overDueDataList || overDueDataList.length === 0) {
+      // Reset to empty state if no data
+      setOverDueChartData((prev) => ({
+        ...prev,
+        series: [{ name: "Overdue Days", data: [] }],
+        options: {
+          ...prev.options,
+          xaxis: { categories: [] },
+          colors: [],
+        },
+      }));
       return;
     }
 
-    const categories = overdueData.data.map(
-      (item: any) => item.projectName
+    const categories = overDueDataList.map(
+      (item: any) => item.name || "Unnamed Project"
     );
-    const values = overdueData.data.map(
+
+    const values = overDueDataList.map(
       (item: any) => item.overdueDays
     );
-    const colors = overdueData.data.map((item: any) => {
-      if (item.priority === "High") return "#DA4352";
-      if (item.priority === "Medium") return "#FF974B";
-      if (item.priority === "Low") return "#F5B31A";
+
+    const colors = overDueDataList.map((item: any) => {
+      const priority = item.priority?.toLowerCase() || "";
+      if (priority === "high") return "#DA4352";
+      if (priority === "medium") return "#FF974B";
+      if (priority === "low") return "#F5B31A";
       return "#888";
     });
 
@@ -64,7 +74,7 @@ const OverDueChart = () => {
             distributed: true,
           },
         },
-        colors,
+        colors: colors,
         dataLabels: {
           enabled: true,
           formatter: (val: number) => `${val}d`,
@@ -75,7 +85,23 @@ const OverDueChart = () => {
           },
         },
         xaxis: {
-          categories,
+          categories: categories,
+          labels: {
+            style: {
+              colors: "#666",
+              fontSize: "12px",
+              fontWeight: 500,
+            },
+          },
+        },
+        yaxis: {
+          labels: {
+            style: {
+              colors: "#666",
+              fontSize: "12px",
+              fontWeight: 500,
+            },
+          },
         },
         legend: {
           show: true,
@@ -91,9 +117,12 @@ const OverDueChart = () => {
             formatter: (val: number) => `${val} days overdue`,
           },
         },
+        grid: {
+          borderColor: "#f1f1f1",
+        },
       },
     });
-  }, [overdueData]);
+  }, [overDueDataList]);
 
   const getErrorMessage = (err: any) => {
     if (!err) return "Unknown error";
@@ -106,6 +135,11 @@ const OverDueChart = () => {
       return "An error occurred while fetching overdue projects";
     }
   };
+
+  // Check if we have valid data to display
+  const hasChartData =
+    overDueChartData.series?.[0]?.data?.length > 0 &&
+    overDueChartData.options?.xaxis?.categories?.length > 0;
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
@@ -121,13 +155,19 @@ const OverDueChart = () => {
         </div>
       )}
 
+      {!overdueLoading && !overdueError && !hasChartData && (
+        <div className="text-center text-sm text-gray-500 py-6">
+          No overdue data to display
+        </div>
+      )}
+
       {!overdueLoading &&
         !overdueError &&
         (!overDueChartData.series ||
           overDueChartData.series.length === 0 ||
           overDueChartData.series[0].data.length === 0) && (
           <div className="text-center text-sm text-gray-500 py-6">
-            No overdue data to display
+            Yet no overdue projects.
           </div>
         )}
 

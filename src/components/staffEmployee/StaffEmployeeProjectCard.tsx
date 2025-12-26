@@ -82,7 +82,7 @@ const renderStatusBadge = (status: ProjectStatus) => (
   </Badge>
 );
 
-const StaffEmployeeProgramCard = ({
+const StaffEmployeeProjectCard = ({
   project,
 }: StaffEmployeeProgramCardProps) => {
   const {
@@ -95,8 +95,6 @@ const StaffEmployeeProgramCard = ({
     progress,
     status,
   } = project;
-
-  console.log(project);
 
   const priorityColor =
     priority === "HIGH"
@@ -196,4 +194,4 @@ const StaffEmployeeProgramCard = ({
   );
 };
 
-export default StaffEmployeeProgramCard;
+export default StaffEmployeeProjectCard;
