@@ -5,6 +5,7 @@ import { Flag, Layers } from "lucide-react";
 import { Link } from "react-router-dom";
 import PrimaryButton from "../../common/PrimaryButton";
 import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
+import { FaStar } from "react-icons/fa6";
 
 export type ProjectStatus =
   | "LIVE"
@@ -21,6 +22,7 @@ export interface StaffEmployeeProject {
   id: string;
   programId: string;
 
+  programName?: string;
   name: string;
   description: string;
 
@@ -61,18 +63,40 @@ const formatDate = (date: string) =>
     year: "numeric",
   });
 
+const statusStyles: Record<ProjectStatus, string> = {
+  LIVE: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  SUBMITTED: "bg-blue-50 text-blue-700 border-blue-200",
+  IN_REVIEW: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  RETURNED: "bg-orange-50 text-orange-700 border-orange-200",
+  OVERDUE: "bg-red-50 text-red-700 border-red-200",
+  DRAFT: "bg-slate-100 text-slate-600 border-slate-200",
+};
+
+const renderStatusBadge = (status: ProjectStatus) => (
+  <Badge
+    variant="outline"
+    className={`text-xs px-2 py-1 font-medium ${statusStyles[status]}`}
+  >
+    {status.replace("_", " ")}
+  </Badge>
+);
+
 const StaffEmployeeProgramCard = ({
   project,
 }: StaffEmployeeProgramCardProps) => {
   const {
     id,
     name,
-    description,
+    programName,
     priority,
     deadline,
     startDate,
     progress,
+    status,
   } = project;
+
+  console.log(project);
 
   const priorityColor =
     priority === "HIGH"
@@ -93,20 +117,18 @@ const StaffEmployeeProgramCard = ({
 
             <div>
               <h4 className="font-semibold text-gray-900 leading-tight">
-                {name}
+                {programName || "Program Name"}
               </h4>
-              <p className="text-sm text-gray-600 line-clamp-2 mt-1">
-                {description || "No description"}
+              <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2">
+                <span>{name || "Project Name"}</span>{" "}
+                <button>
+                  <FaStar className="text-yellow-500" size={18} />
+                </button>
               </p>
             </div>
           </div>
 
-          <Badge
-            variant="outline"
-            className="text-xs px-2 py-1 border-gray-200 text-gray-500"
-          >
-            Project
-          </Badge>
+          {renderStatusBadge(status)}
         </div>
 
         {/* Assigned People */}

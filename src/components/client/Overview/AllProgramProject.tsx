@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,8 +19,8 @@ import Pagination from "../Pagination";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "../../../common/PrimaryButton";
 import DropdownSelect from "../../../common/DropdownSelect";
-import StaffEmployeeProgramCard from "./../../staffEmployee/StaffEmployeeProgramCard";
-import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProgramTable";
+import StaffEmployeeProjectCard from "../../staffEmployee/StaffEmployeeProjectCard";
+import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
 import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 
@@ -82,8 +82,6 @@ const AllProgramProject = () => {
   const itemsPerPage = 6;
 
   const { data, isLoading } = useGetAllProjectsQuery({});
-
-  console.log("All Projects Data:", data?.data?.projects?.data);
 
   const projects = data?.data?.projects?.data || [];
 
@@ -255,7 +253,7 @@ const AllProgramProject = () => {
       {/* Content */}
       {viewMode === "table" ? (
         <>
-          <StaffEmployeeProgramTable
+          <StaffEmployeeProjectTable
             projects={projects as StaffEmployeeProject[]}
           />
 
@@ -273,7 +271,7 @@ const AllProgramProject = () => {
             {projects?.map((projectData: StaffEmployeeProject) => {
               return (
                 <div key={projectData.id}>
-                  <StaffEmployeeProgramCard project={projectData} />
+                  <StaffEmployeeProjectCard project={projectData} />
                 </div>
               );
             })}

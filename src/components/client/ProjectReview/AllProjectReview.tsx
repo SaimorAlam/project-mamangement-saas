@@ -21,8 +21,8 @@ import Pagination from "../Pagination";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
-import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProgramTable";
-import StaffEmployeeProgramCard from "@/components/staffEmployee/StaffEmployeeProgramCard";
+import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
+import StaffEmployeeProgramCard from "@/components/staffEmployee/StaffEmployeeProjectCard";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =

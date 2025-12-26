@@ -11,6 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
 import {
   Dialog,
   DialogContent,
@@ -18,6 +20,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import RenderStaffAvatars from "../client/RenderStaffAvater";
+import { progress } from "framer-motion";
+import { Progress } from "../ui/progress";
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -38,6 +43,7 @@ export interface StaffEmployeeProject {
   id: string;
   programId: string;
 
+  programName?: string;
   name: string;
   description: string;
 
@@ -74,6 +80,25 @@ interface StaffEmployeeProjectTableProps {
 /* -------------------------------------------------------------------------- */
 /*                                   UTILS                                    */
 /* -------------------------------------------------------------------------- */
+
+const statusStyles: Record<ProjectStatus, string> = {
+  LIVE: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  SUBMITTED: "bg-blue-50 text-blue-700 border-blue-200",
+  IN_REVIEW: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  RETURNED: "bg-orange-50 text-orange-700 border-orange-200",
+  OVERDUE: "bg-red-50 text-red-700 border-red-200",
+  DRAFT: "bg-slate-100 text-slate-600 border-slate-200",
+};
+
+const renderStatusBadge = (status: ProjectStatus) => (
+  <Badge
+    variant="outline"
+    className={`text-xs px-2 py-1 font-medium ${statusStyles[status]}`}
+  >
+    {status.replace("_", " ")}
+  </Badge>
+);
 
 const formatDate = (date: string) =>
   new Date(date).toLocaleDateString("en-GB", {
@@ -133,9 +158,7 @@ const ProjectModal = ({
 
         <div className="text-sm">
           <p className="text-muted-foreground mb-1">Status</p>
-          <p className="font-medium text-gray-900">
-            {project.status}
-          </p>
+          {renderStatusBadge(project.status)}
         </div>
 
         <div className="text-sm">
@@ -202,10 +225,18 @@ const StaffEmployeeProjectTable = ({
         <Table>
           <TableHeader>
             <TableRow className="border-b border-gray-200 bg-[#F7F9FA]">
+              <TableHead className="px-6 py-3.5">Program</TableHead>
               <TableHead className="px-6 py-3.5">Project</TableHead>
-              <TableHead className="px-6 py-3.5">Priority</TableHead>
-              <TableHead className="px-6 py-3.5">Deadline</TableHead>
               <TableHead className="px-6 py-3.5">Status</TableHead>
+              <TableHead className="px-6 py-3.5">
+                Assigned People
+              </TableHead>
+              <TableHead className="px-6 py-3.5">Priority</TableHead>
+              <TableHead className="px-6 py-3.5">
+                Started On
+              </TableHead>
+              <TableHead className="px-6 py-3.5">Deadline</TableHead>
+              <TableHead className="px-6 py-3.5">Progress</TableHead>
               <TableHead className="px-6 py-3.5">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -217,7 +248,26 @@ const StaffEmployeeProjectTable = ({
                 className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
               >
                 <TableCell className="px-6 py-3.5 font-medium">
+                  {project.programName || "Program Name"}
+                </TableCell>
+
+                <TableCell className="px-6 py-3.5 font-medium">
                   {project.name}
+                </TableCell>
+
+                <TableCell className="px-6 py-3.5">
+                  {renderStatusBadge(project.status)}
+                </TableCell>
+
+                <TableCell className="px-6 py-3.5">
+                  <RenderStaffAvatars
+                    staff={Array.from({ length: 3 }, (_, i) => ({
+                      id: i.toString(),
+                      name: `Staff ${i + 1}`,
+                      avatar:
+                        "https://randomuser.me/api/portraits/men/19.jpg",
+                    }))}
+                  />
                 </TableCell>
 
                 <TableCell className="px-6 py-3.5">
@@ -225,11 +275,21 @@ const StaffEmployeeProjectTable = ({
                 </TableCell>
 
                 <TableCell className="px-6 py-3.5 text-muted-foreground">
+                  {formatDate(project.startDate)}
+                </TableCell>
+
+                <TableCell className="px-6 py-3.5 text-muted-foreground">
                   {formatDate(project.deadline)}
                 </TableCell>
 
-                <TableCell className="px-6 py-3.5">
-                  {project.status}
+                <TableCell className="px-6 py-3.5 text-muted-foreground flex items-center gap-2">
+                  <Progress
+                    value={project.progress}
+                    className="h-2"
+                  />
+                  <span className="font-medium">
+                    {project.progress}%
+                  </span>
                 </TableCell>
 
                 <TableCell className="px-6 py-3.5">

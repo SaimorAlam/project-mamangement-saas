@@ -19,8 +19,8 @@ import Pagination from "../client/Pagination";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
-import StaffEmployeeProgramCard from "./StaffEmployeeProgramCard";
-import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProgramTable";
+import StaffEmployeeProgramCard from "./StaffEmployeeProjectCard";
+import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
 import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 
