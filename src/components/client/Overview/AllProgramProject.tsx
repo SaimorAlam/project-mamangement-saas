@@ -268,7 +268,7 @@ const AllProgramProject = () => {
           </div>
           {projects.length > 4 && (
             <div className="pt-6">
-              <Link to="/work-in-progress">
+              <Link to="all-program">
                 <Button
                   variant="ghost"
                   className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"

@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import {
   ChevronDown,
   Filter,
-  ListChecks,
+  // ListChecks,
   LucideTable2,
   Search,
 } from "lucide-react";
@@ -93,7 +93,7 @@ export default function EmployeeTableHeader({
             <span>Tables</span>
           </button>
 
-          <button
+          {/* <button
             onClick={() => setActiveTab("task")}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg cursor-pointer transition-colors ${
               activeTab === "task"
@@ -103,7 +103,7 @@ export default function EmployeeTableHeader({
           >
             <ListChecks className="w-4 h-4" />
             <span>Task</span>
-          </button>
+          </button> */}
 
           {/* Filter Dropdown */}
           <div className="relative">

@@ -55,9 +55,7 @@ const ProjectDueDate = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Clock4 size={20} className="text-gray-700" />
-            <h3 className="text-lg font-semibold text-gray-900">
-              Due Date
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Due Date</h3>
           </div>
           <ViewCalender
             showCalendar={showCalendar}
@@ -72,18 +70,13 @@ const ProjectDueDate = () => {
 
         <div className="space-y-3">
           {dueDateCards.map((card, idx) => (
-            <div
-              key={idx}
-              className="border border-gray-200 rounded-lg p-3"
-            >
+            <div key={idx} className="border border-gray-200 rounded-lg p-3">
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <h4 className="text-sm font-semibold text-gray-900">
                     {card.programName}
                   </h4>
-                  <p className="text-xs text-gray-500">
-                    {card.projectName}
-                  </p>
+                  <p className="text-xs text-gray-500">{card.projectName}</p>
                 </div>
                 <span
                   className={`text-xs font-semibold px-2 py-1 rounded ${getDaysLeftColor(
@@ -93,16 +86,13 @@ const ProjectDueDate = () => {
                   {card.daysLeft} Days left
                 </span>
               </div>
-              <div className="text-xs text-gray-600 mb-2">
-                Assigned to
-              </div>
+              <div className="text-xs text-gray-600 mb-2">Assigned to</div>
               <div className="flex items-center justify-between">
                 <div className="flex -space-x-2">
                   {card.assignedTo.map((_, idx) => (
                     <img
                       key={idx}
-                      src={`https://i.pravatar.cc/150?img=${20 + idx
-                        }`}
+                      src={`https://i.pravatar.cc/150?img=${20 + idx}`}
                       alt="User"
                       className="w-7 h-7 rounded-full border-2 border-white"
                     />

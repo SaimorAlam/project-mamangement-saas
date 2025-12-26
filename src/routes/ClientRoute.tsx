@@ -34,7 +34,7 @@ const ClientCarlyleHall = lazy(
   () => import("@/pages/client/ClientCarlyleHall")
 );
 const ClientProjectReview = lazy(
-  () => import("@/pages/client/ClientProjectReview")
+  () => import("@/pages/client/ProjectReview/ClientProjectReview")
 );
 const ClientProjectBuilder = lazy(
   () => import("@/pages/client/ClientProjectBuilder")

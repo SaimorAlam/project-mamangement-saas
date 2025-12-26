@@ -78,9 +78,7 @@ interface Program {
 }
 
 const AllProjectReview: React.FC = () => {
-  const [viewMode, setViewMode] = useState<"table" | "board">(
-    "board"
-  );
+  const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
@@ -179,9 +177,7 @@ const AllProjectReview: React.FC = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className={`rounded-md cursor-pointer ${
-                      sortBy === "endDate"
-                        ? "bg-indigo-50 text-indigo-600"
-                        : ""
+                      sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""
                     }`}
                     onClick={() => setSortBy("submitDate")}
                   >
@@ -196,9 +192,7 @@ const AllProjectReview: React.FC = () => {
                   </div>
                   <DropdownMenuItem
                     className={`rounded-md cursor-pointer ${
-                      sortOrder === "asc"
-                        ? "bg-indigo-50 text-indigo-600"
-                        : ""
+                      sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
                     }`}
                     onClick={() => setSortOrder("asc")}
                   >
@@ -206,9 +200,7 @@ const AllProjectReview: React.FC = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className={`rounded-md cursor-pointer ${
-                      sortOrder === "desc"
-                        ? "bg-indigo-50 text-indigo-600"
-                        : ""
+                      sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
                     }`}
                     onClick={() => setSortOrder("desc")}
                   >
@@ -222,9 +214,7 @@ const AllProjectReview: React.FC = () => {
                 <PrimaryButton
                   type="Primary"
                   title="Boards"
-                  leftIcon={
-                    <AlignStartHorizontal className="w-4 h-4" />
-                  }
+                  leftIcon={<AlignStartHorizontal className="w-4 h-4" />}
                   className={`${
                     viewMode === "board"
                       ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
@@ -266,9 +256,7 @@ const AllProjectReview: React.FC = () => {
                 {programs?.map((programData: Program) => {
                   return (
                     <div key={programData.id}>
-                      <StaffEmployeeProgramCard
-                        program={programData}
-                      />
+                      <StaffEmployeeProgramCard program={programData} />
                     </div>
                   );
                 })}

@@ -148,26 +148,24 @@ const AllProject = ({
         })
       : "-";
 
+  const handleDelete = async (project: UpdateProjectPayload) => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+      });
 
-      const handleDelete = async (project: UpdateProjectPayload) => {
-         try {
-              const result = await Swal.fire({
-                title: "Are you sure?",
-                text: "This action cannot be undone!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-              });
-        
-              if (result.isConfirmed) {
-                await deleteProject(project.id).unwrap();
-                Swal.fire("Deleted!", "Project removed.", "success");
-              }
-            } catch (err: any) {
-              Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
-            }
-
-      };
+      if (result.isConfirmed) {
+        await deleteProject(project.id).unwrap();
+        Swal.fire("Deleted!", "Project removed.", "success");
+      }
+    } catch (err: any) {
+      Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -178,7 +176,7 @@ const AllProject = ({
   }
 
   return (
-    <div className="min-h-screen py-6">
+    <div className="min-h-screen py-6 w-full">
       <div className="bg-white rounded-lg border border-gray-200">
         {/* Header */}
         <div className="flex justify-between px-6 py-4 border-b border-gray-200">

@@ -19,7 +19,7 @@ import ContactUs from "@/pages/client/ClientContactUs";
 import ClientHighwayExpansion from "@/pages/client/ClientHighwayExpansion";
 import CarlyleHall from "@/pages/client/ClientCarlyleHall";
 import AllProjectReview from "@/components/client/ProjectReview/AllProjectReview";
-import ClientProjectReview from "@/pages/client/ClientProjectReview";
+import ClientProjectReview from "@/pages/client/ProjectReview/ClientProjectReview";
 import ClientProjectBuilder from "@/pages/client/ClientProjectBuilder";
 import StaffManagerProjects from "@/pages/staffManager/StaffManagerProjects";
 

@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Flag, Layers } from "lucide-react";
 import { Link } from "react-router-dom";
-import PrimaryButton from "../../common/PrimaryButton";
-import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
+import RenderStaffAvatars from "@/components/ViewerPanel/RenderStaffAvater";
+import PrimaryButton from "@/common/PrimaryButton";
+import { Project } from "./AllProject";
 
 export type ProjectStatus =
   | "LIVE"
@@ -19,43 +20,39 @@ export type ProjectStatus =
 
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-export interface StaffEmployeeProject {
-  id: string;
-  programId: string;
+// export interface Project {
+//   id: string;
+//   programId: string;
 
-  programName?: string;
-  name: string;
-  description: string;
+//   programName?: string;
+//   name: string;
+//   description: string;
 
-  status: ProjectStatus;
-  priority: ProjectPriority;
+//   status: ProjectStatus;
+//   priority: ProjectPriority;
 
-  startDate: string;
-  deadline: string;
+//   startDate: string;
+//   deadline: string;
 
-  progress: number;
+//   progress: number;
 
-  managerId: string;
-  viewerId: string;
+//   managerId: string;
+//   viewerId: string;
 
-  chartList: unknown[];
+//   chartList: unknown[];
 
-  estimatedCompletedDate: string;
-  projectCompleteDate: string | null;
+//   estimatedCompletedDate: string;
+//   projectCompleteDate: string | null;
 
-  currentRate: string;
-  budget: string;
+//   currentRate: string;
+//   budget: string;
 
-  latitude: number | null;
-  longitude: number | null;
+//   latitude: number | null;
+//   longitude: number | null;
 
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface StaffEmployeeProgramCardProps {
-  project: StaffEmployeeProject;
-}
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 const formatDate = (date: string) =>
   new Date(date).toLocaleDateString("en-GB", {
@@ -79,24 +76,15 @@ const renderStatusBadge = (status: ProjectStatus) => (
     variant="outline"
     className={`text-xs px-2 py-1 font-medium ${statusStyles[status]}`}
   >
-    {status.replace("_", " ")}
+    {status?.replace("_", " ")}
   </Badge>
 );
 
-const StaffEmployeeProgramCard = ({
-  project,
-}: StaffEmployeeProgramCardProps) => {
+const AllProjectCard = ({ project }: { project: Project }) => {
   if (!project) return null;
-  const {
-    id,
-    name,
-    programName,
-    priority,
-    deadline,
-    startDate,
-    progress,
-    status,
-  } = project;
+  console.log(project);
+  const { name, programName, priority, deadline, startDate, progress, status } =
+    project;
 
   const priorityColor =
     priority === "HIGH"
@@ -183,7 +171,7 @@ const StaffEmployeeProgramCard = ({
         {/* CTA */}
         <div className="py-2 px-4">
           {/* <Link to={`/projects/${id}`}> */}
-          <Link to={`work-in-progress`}>
+          <Link to={`/client-panel/work-in-progress`}>
             <PrimaryButton
               title="View Project"
               type="Primary"
@@ -196,4 +184,4 @@ const StaffEmployeeProgramCard = ({
   );
 };
 
-export default StaffEmployeeProgramCard;
+export default AllProjectCard;
