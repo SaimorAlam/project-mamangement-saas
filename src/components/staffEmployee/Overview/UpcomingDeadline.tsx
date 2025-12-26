@@ -7,7 +7,6 @@ import ViewCalender from "@/common/ViewCalender";
 import { Loader2 } from "lucide-react";
 
 import UpcomingDeadlineCard from "./UpcomingDeadlineCard";
-import { useGetUpcomingDeadlinesQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import { useGetStaffEmployeeUpcomingDeadlinesQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 
 type ValuePiece = Date | null;

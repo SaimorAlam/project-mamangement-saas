@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CardHeader } from "@/components/ui/card";
 import SubmissionTable from "./SubmissionTable";
 import BoxContainer from "../../../common/BoxContainer";
-import { ISubmission } from "@/types";
 import {
   DropdownMenu,
   DropdownMenuContent,

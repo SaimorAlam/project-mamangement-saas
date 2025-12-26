@@ -8,21 +8,21 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Pagination from "../client/Pagination";
+import Pagination from "@/common/Pagination";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
-import StaffEmployeeProgramCard from "./StaffEmployeeProjectCard";
-import StaffEmployeeProgramTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
+import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
 import { Loader2 as Loader } from "lucide-react";
-import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import StaffManagerProjectCard from "@/components/staffManager/StaffManagerProjectCard";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -35,7 +35,7 @@ export type ProjectStatus =
   | "SUBMITTED";
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-export interface Project {
+export interface StaffEmployeeProject {
   id: string;
   programId: string;
 
@@ -51,6 +51,7 @@ export interface Project {
   progress: number;
 
   managerId: string;
+  viewerId: string;
 
   chartList: unknown[];
 
@@ -67,16 +68,6 @@ export interface Project {
   updatedAt: string;
 }
 
-interface Program {
-  id: string;
-  programName: string;
-  programDescription: string;
-  priority: Priority;
-  deadline: string;
-  progress: number;
-  projects: Project[];
-}
-
 const AllProgramProject = () => {
   const [viewMode, setViewMode] = useState<"table" | "board">(
     "board"
@@ -90,19 +81,11 @@ const AllProgramProject = () => {
 
   const itemsPerPage = 6;
 
-  // const { data, isLoading } = useGetAllProjectsQuery({});
-  const { data, isLoading } = useGetAllProgramQuery({});
+  const { data, isLoading } = useGetAllProjectsQuery({});
 
-  const program = data?.data?.data || [];
+  const projects = data?.data?.projects?.data || [];
 
-  console.log("All Programs Data:", program);
-
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return program.slice(startIndex, startIndex + itemsPerPage);
-  }, [program, currentPage]);
-
-  const totalPages = Math.ceil(program.length / itemsPerPage);
+  const totalPages = Math.ceil(projects.length / itemsPerPage);
 
   const statusOptions = [
     { value: "all", title: "All Status" },
@@ -131,7 +114,6 @@ const AllProgramProject = () => {
       {/* Header  */}
       <div className="flex items-center justify-between pb-6">
         <h4 className=" text-gray-900">All Program & Project</h4>
-
         <div className="flex items-center gap-3">
           {/* View Toggle */}
           <div className="flex items-center  bg-white gap-3">
@@ -271,30 +253,30 @@ const AllProgramProject = () => {
       {/* Content */}
       {viewMode === "table" ? (
         <>
-          <StaffEmployeeProgramTable
-            programs={paginatedData as Program[]}
+          <StaffEmployeeProjectTable
+            projects={projects as StaffEmployeeProject[]}
           />
 
-          <Pagination
+          {/* <Pagination
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             itemsPerPage={itemsPerPage}
             totalPages={totalPages}
-            filteredDataLength={program.length}
-          />
+            filteredDataLength={projects.length}
+          /> */}
         </>
       ) : (
         <>
           <div className="grid grid-cols-4 gap-5">
-            {program?.map((programData: Program) => {
+            {projects?.map((projectData: StaffEmployeeProject) => {
               return (
-                <div key={programData.id}>
-                  <StaffEmployeeProgramCard program={programData} />
+                <div key={projectData.id}>
+                  <StaffManagerProjectCard project={projectData} />
                 </div>
               );
             })}
           </div>
-          {program.length > 4 && (
+          {projects.length > 4 && (
             <div className="pt-6">
               <Link to="/work-in-progress">
                 <Button
@@ -302,7 +284,7 @@ const AllProgramProject = () => {
                   className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                 >
                   {/* Display total count */}
-                  View all {program.length}
+                  View all {projects.length}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
