@@ -69,9 +69,7 @@ export interface StaffEmployeeProject {
 }
 
 const AllProgramProject = () => {
-  const [viewMode, setViewMode] = useState<"table" | "board">(
-    "board"
-  );
+  const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [, setStatusFilter] = useState<string>("all");
   const [, setPriorityFilter] = useState<string>("all");
 
@@ -164,9 +162,7 @@ const AllProgramProject = () => {
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "startDate"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
+                  sortBy === "startDate" ? "bg-indigo-50 text-indigo-600" : ""
                 }`}
                 onClick={() => setSortBy("startDate")}
               >
@@ -174,9 +170,7 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "endDate"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
+                  sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""
                 }`}
                 onClick={() => setSortBy("endDate")}
               >
@@ -191,9 +185,7 @@ const AllProgramProject = () => {
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "asc"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
+                  sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
                 }`}
                 onClick={() => setSortOrder("asc")}
               >
@@ -201,9 +193,7 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "desc"
-                    ? "bg-indigo-50 text-indigo-600"
-                    : ""
+                  sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
                 }`}
                 onClick={() => setSortOrder("desc")}
               >
