@@ -1,5 +1,5 @@
-import ViewerPanelOverview from "@/pages/viewerPanel/ViewerPanelOverview";
-import ViewerPanelProjects from "@/pages/viewerPanel/ViewerPanelProjects";
+import ViewerPanelOverview from "@/pages/viewerPanel/ViewerPanelOverview/ViewerPanelOverview";
+import ViewerPanelProjects from "@/pages/viewerPanel/ViewerPanelOverview/Components/ViewerPanelProjects";
 import ViewerPanelMarketingStrategy from "@/pages/viewerPanel/ViewerPanelMarketingStrategy";
 import ViewerPanelTimosSuperShop from "@/pages/viewerPanel/ViewerPanelTimosSuperShop";
 import ViewerPanelProgramName from "@/pages/viewerPanel/ViewerPanelProgramName";
@@ -19,11 +19,13 @@ import ViewerPanelCarlyleHall from "@/pages/viewerPanel/ViewerPanelCarlyleHall";
 import ViewerPanelEmployees from "@/pages/viewerPanel/ViewerPanelEmployees";
 import ViewerPanelAlfalaBuilders from "@/pages/viewerPanel/ViewerPanelAlfalaBuilders";
 import ViewerPanelAllProgram from "@/pages/viewerPanel/ViewerPanelAllProgram";
+import FavoriteProjects from "@/pages/viewerPanel/Favorite/FavoriteProjects";
 
 export default function getViewerPanelRoutes() {
   return [
     { index: true, element: <ViewerPanelOverview /> },
     { path: "projects", element: <ViewerPanelProjects /> },
+    { path: "project-details/:id", element: <FavoriteProjects /> },
     { path: "carlyle-hall", element: <ViewerPanelCarlyleHall /> },
     { path: "employees", element: <ViewerPanelEmployees /> },
     {

@@ -4,7 +4,7 @@ import {
   DueDateHeaderSkeleton,
 } from "@/common/Skeleton/ProjectDueSkeleton";
 import ViewCalender from "@/common/ViewCalender";
-import { useGetUpcomingDeadlineQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
+import { useGetUpcomingDeadlineQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 import { Clock4 } from "lucide-react";
 import { useState } from "react";
 

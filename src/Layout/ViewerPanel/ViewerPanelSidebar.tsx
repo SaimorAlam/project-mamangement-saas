@@ -23,17 +23,44 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { ChevronRight } from "lucide-react";
 import { getViewerPanelSidebarItems } from "./viewerPanelSidebarItems";
-import useFavoriteProjects from "@/utils/useFavoriteProjects";
+import { useGetFavoriteProjectsQuery } from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
+import { useMemo } from "react";
+import { Star } from "lucide-react";
 
 const ViewerPanelSidebar = () => {
   const location = useLocation();
-  const groups = getViewerPanelSidebarItems();
   const [open, setOpen] = useState(false);
-  const favoriteProjects = useFavoriteProjects();
-  console.log(favoriteProjects);
+  const { data, isLoading } = useGetFavoriteProjectsQuery({});
+
+  /**
+   * 01. Build favorite items
+   */
+  const favoriteItems = useMemo(() => {
+    return (
+      data?.data?.map((item: any) => ({
+        icon: <Star className="size-6" />,
+        name: item.project.name,
+        path: `/viewer-panel/project-details/${item.project.id}`,
+      })) || []
+    );
+  }, [data]);
+
+  /**
+   * 02. Inject favorites immutably
+   */
+  const groups = useMemo(() => {
+    return getViewerPanelSidebarItems().map((group) => {
+      if (group.label !== "Favorites") return group;
+
+      return {
+        ...group,
+        items: favoriteItems,
+      };
+    });
+  }, [favoriteItems]);
+
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
     const fullPath = item.index
@@ -129,6 +156,18 @@ const ViewerPanelSidebar = () => {
       </SidebarMenuItem>
     );
   };
+  /**
+   * Favorites skeleton rows
+   */
+  const renderFavoritesSkeleton = () =>
+    Array.from({ length: 3 }).map((_, idx) => (
+      <SidebarMenuItem key={`fav-skeleton-${idx}`}>
+        <div className="px-4 py-5 rounded-[10px] flex items-center gap-2 animate-pulse">
+          <div className="h-6 w-6 bg-slate-200 rounded" />
+          <div className="h-4 w-32 bg-slate-200 rounded" />
+        </div>
+      </SidebarMenuItem>
+    ));
 
   return (
     <Sidebar className="border-1 border-slate-200 px-2 py-8 space-y-8 !bg-white overflow-y-auto">
@@ -148,8 +187,10 @@ const ViewerPanelSidebar = () => {
                     {group.label}
                   </SidebarGroupLabel>
 
-                  <SidebarMenu className="space-y-[10px]">
-                    {group.items.map((item) => renderSidebarItem(item))}
+                  <SidebarMenu className="space-y-2.5">
+                    {group.label === "Favorites" && isLoading
+                      ? renderFavoritesSkeleton()
+                      : group.items.map((item: any) => renderSidebarItem(item))}
                   </SidebarMenu>
 
                   <hr className="w-56 text-slate-300 my-5" />
@@ -159,7 +200,7 @@ const ViewerPanelSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="!bg-white">
+      <SidebarFooter className="bg-white!">
         <UserProfile />
       </SidebarFooter>
     </Sidebar>

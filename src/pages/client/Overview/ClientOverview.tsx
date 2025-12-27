@@ -1,14 +1,14 @@
-import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
 // import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import ProjectStatusDonutChart from "./Components/ProjectStatusDonutChart";
 import ProjectTimelineColumnChart from "./Components/ProjectTimelineColumnChart";
-import { useGetOverviewStackQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
+import { useGetOverviewStackQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 import DashboardPanelStatsCardSkeleton from "@/common/Skeleton/DashboardPanelStatsCardSkeleton";
 import ProjectOverdueBarChart from "./Components/ProjectOverdueBarChart";
 import LatestSubmission from "./Components/LatestSubmission/LatestSubmission";
+import AllProgramProject from "./Components/AllProgramProjects/AllProgramProjects";
 
 const ClientOverview = () => {
   const { data: overview, isLoading } = useGetOverviewStackQuery({});
@@ -121,7 +121,10 @@ const ClientOverview = () => {
           <ActivityLog />
         </div>
       </div>
-      <div className="my-6"> <LatestSubmission /></div>
+      <div className="my-6">
+        {" "}
+        <LatestSubmission />
+      </div>
     </div>
   );
 };

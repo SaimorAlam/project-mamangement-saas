@@ -28,7 +28,7 @@ const clientDashboardApi = baseApi.injectEndpoints({
       providesTags: ["Dashboard"],
     }),
 
-    getUpcomingDeadline: builder.query({
+    getDeadline: builder.query({
       query: () => "/client-dashboard/upcoming-deadline",
       providesTags: ["Dashboard"],
     }),
@@ -46,7 +46,7 @@ export const {
   useLazyGetTimelineQuery,
   useGetStatusQuery,
   useGetOverdueQuery,
-  useGetUpcomingDeadlineQuery,
+  useGetDeadlineQuery,
   useGetAllSubmissionQuery,
 } = clientDashboardApi;
 export default clientDashboardApi;

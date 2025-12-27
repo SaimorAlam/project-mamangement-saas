@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { List, LayoutGrid, Clock, FileText, AlertTriangle } from "lucide-react";
-import GanttTab from "../../components/AllDataTab/GanttTab";
-import SheetTab from "../../components/AllDataTab/SheetTab";
-import FileTab from "../../components/AllDataTab/FileTab";
-import RaidLogTab from "../../components/AllDataTab/RaidLogTab";
-import DashboardTab from "../../components/AllDataTab/DashboardTab";
+import SheetTab from "./AllDataTab/SheetTab";
+import GanttTab from "./AllDataTab/GanttTab";
+import DashboardTab from "./AllDataTab/DashboardTab";
+import FileTab from "./AllDataTab/FileTab";
+import RaidLogTab from "./AllDataTab/RaidLogTab";
+import { useParams } from "react-router-dom";
 
-const ClientCarlyleHall: React.FC = () => {
-  // Check localStorage for last active tab, default to 'gantt'
+const ProjectDetails: React.FC = () => {
+  const { id } = useParams();
+  console.log(id);
   const [activeTab, setActiveTab] = useState<string>(() => {
     return localStorage.getItem("activeCarlyleTab") || "gantt";
   });
@@ -20,7 +22,6 @@ const ClientCarlyleHall: React.FC = () => {
     { id: "raidlog", name: "Raid Log", icon: AlertTriangle },
   ];
 
-  // Save selected tab in localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("activeCarlyleTab", activeTab);
   }, [activeTab]);
@@ -64,4 +65,4 @@ const ClientCarlyleHall: React.FC = () => {
   );
 };
 
-export default ClientCarlyleHall;
+export default ProjectDetails;

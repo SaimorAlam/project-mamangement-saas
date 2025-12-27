@@ -5,7 +5,6 @@ import ClientDashboardHeader from "./ClientDashboardHeader";
 import ClientSidebar from "./ClientSidebar";
 import GlobalLoader from "@/common/GlobalLoader";
 
-
 export default function ClientDashboardLayout() {
   return (
     <SidebarProvider
@@ -19,7 +18,7 @@ export default function ClientDashboardLayout() {
 
       <main className="w-full px-8">
         <div className="pb-6">
-          <ClientDashboardHeader name="Timo" />
+          <ClientDashboardHeader />
         </div>
 
         <Suspense fallback={<GlobalLoader />}>
