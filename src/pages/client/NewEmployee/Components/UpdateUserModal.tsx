@@ -9,6 +9,14 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
+import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface UpdateUserModalProps {
   isOpen: boolean;
@@ -17,6 +25,13 @@ interface UpdateUserModalProps {
 }
 
 const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
+  const { data, isLoading } = useGetAllProjectsQuery({});
+  console.log(data);
+  const projectData = data?.data?.projects?.data?.map((project: any) => ({
+    id: project.id,
+    name: project.name,
+  }));
+  console.log(projectData);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -120,20 +135,36 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
                 </span>
               ))}
             </div>
-            <input
-              type="text"
-              placeholder="Add project name and press Enter"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && e.currentTarget.value.trim()) {
-                  handleChange("assignedProjects", [
-                    ...formData.assignedProjects,
-                    { id: Date.now(), name: e.currentTarget.value.trim() },
-                  ]);
-                  e.currentTarget.value = "";
-                }
-              }}
-              className="w-full border rounded px-3 py-2"
-            />
+            {isLoading ? (
+              <div className="h-10 w-full rounded-md" />
+            ) : (
+              <Select
+                value=""
+                onValueChange={(val) => {
+                  const project = projectData?.find((p: any) => p.id === val);
+                  if (
+                    project &&
+                    !formData.assignedProjects.some((p) => p.id === val)
+                  ) {
+                    handleChange("assignedProjects", [
+                      ...formData.assignedProjects,
+                      project,
+                    ]);
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full border rounded px-3 py-2">
+                  <SelectValue placeholder="Select a project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectData?.map((project: any) => (
+                    <SelectItem key={project.id} value={project.id} className="hover:bg-gray-100">
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
 
@@ -141,7 +172,7 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button onClick={handleSubmit}>Update</Button>
+          <Button variant="default" className="bg-blue-500 text-white" onClick={handleSubmit}>Update</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
