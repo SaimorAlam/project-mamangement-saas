@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   useDeleteUserMutation,
   useGetAllUsersQuery,
 } from "@/store/Api/UserApi/UserApi";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ViewUserModal from "./ViewUserModal";
@@ -22,17 +22,35 @@ const EmployeeTable = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [deleteUser] = useDeleteUserMutation();
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageLoading, setPageLoading] = useState(false);
+
   const PAGE_SIZE = 10;
 
-  const { data, isLoading } = useGetAllUsersQuery({
+  const { data, isLoading, isFetching } = useGetAllUsersQuery({
     page: currentPage,
     limit: PAGE_SIZE,
   });
+  const loading = isLoading || isFetching || pageLoading;
 
-  const users =
-    data?.data?.data.filter((user: any) => user.role !== "CLIENT") || [];
+  const users = data?.data?.data || [];
   const meta = data?.data?.meta;
-  console.log(meta);
+
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setPageLoading(true);
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (!isFetching) {
+      setPageLoading(false);
+    }
+  }, [isFetching]);
+  // Compute total users and current page range
+  const totalUsers = meta?.total || 0;
+  const totalPages = meta?.totalPages || 1;
+  const startUser = (currentPage - 1) * PAGE_SIZE + 1;
+  const endUser = Math.min(currentPage * PAGE_SIZE, totalUsers);
 
   // Filtered & searched data
   const filteredUsers = useMemo(() => {
@@ -117,8 +135,13 @@ const EmployeeTable = () => {
     }
   };
 
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
   return (
-    <div className="overflow-x-auto border border-gray-200 w-full rounded-xl my-10  ">
+    <div className="overflow-x-auto border border-gray-200 w-full rounded-xl my-10">
       {/* Header + Filters */}
       <div className="flex flex-col md:flex-row justify-between items-center py-4 px-6 gap-4">
         <h2 className="text-2xl font-medium">Employee List</h2>
@@ -192,8 +215,7 @@ const EmployeeTable = () => {
         <tbody>
           {isLoading
             ? renderSkeleton()
-            : filteredUsers?.length
-            ? filteredUsers?.map((user: any) => (
+            : filteredUsers.map((user: any) => (
                 <tr
                   key={user.id}
                   className="even:bg-gray-50 odd:bg-white hover:bg-gray-100 transition h-12"
@@ -240,13 +262,13 @@ const EmployeeTable = () => {
                               {p.name}
                             </Badge>
                           ))
-                        : "-"}
+                        : ""}
                     </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {user.lastActive
                       ? new Date(user.lastActive).toLocaleDateString("en-US")
-                      : "-"}
+                      : "N/A"}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <Badge
@@ -294,38 +316,68 @@ const EmployeeTable = () => {
                     </div>
                   </td>
                 </tr>
-              ))
-            : // Empty rows to maintain table height
-              Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                <tr key={i} className="h-12 even:bg-gray-50 odd:bg-white">
+              ))}
+
+          {/* Fill remaining rows to maintain table height */}
+          {!loading &&
+            filteredUsers.length < PAGE_SIZE &&
+            Array.from({ length: PAGE_SIZE - filteredUsers.length }).map(
+              (_, i) => (
+                <tr
+                  key={`empty-${i}`}
+                  className="h-12 even:bg-gray-50 odd:bg-white"
+                >
                   {Array(7)
                     .fill(0)
                     .map((_, idx) => (
                       <td key={idx} className="px-4 py-3">
-                        {idx === 0 ? "-" : ""}
+                        {idx === 0 ? "" : ""}
                       </td>
                     ))}
                 </tr>
-              ))}
+              )
+            )}
         </tbody>
       </table>
 
       {/* Pagination */}
-      <div className="flex justify-end items-center py-4 gap-2 pr-20 border-t border-gray-200">
-        {Array.from({ length: meta?.totalPages || 1 }, (_, i) => i + 1).map(
-          (page) => (
+      <div className="flex justify-between items-center py-4 px-6 border-t border-gray-200">
+        <div className="text-sm text-gray-600">
+          Showing {startUser}-{endUser} of {totalUsers} users
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft />
+          </Button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <Button
               key={page}
               size="sm"
               variant={page === currentPage ? "default" : "outline"}
-              onClick={() => setCurrentPage(page)}
-              className="p-4 border border-gray-200 rounded-xl"
+              className={` ${
+                page === currentPage ? "bg-blue-500 text-white" : ""
+              }`}
+              onClick={() => goToPage(page)}
             >
               {page}
             </Button>
-          )
-        )}
+          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight />
+          </Button>
+        </div>
       </div>
+
       <ViewUserModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
