@@ -3,10 +3,10 @@ import UpcomingDeadline from "@/components/staffEmployee/Overview/UpcomingDeadli
 import LatestSubmission from "@/components/staffEmployee/Overview/LatestSubmissions";
 import { useGetEmployeeDashboardStatsQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 import DashboardStatsCard from "@/components/staffEmployee/DashboardStatsCard";
-import { Loader2 as Loader } from "lucide-react";
 import BoxContainer from "./../../common/BoxContainer";
 import OverDueChart from "@/components/staffEmployee/Overview/OverdueChart";
-import ProjectStatusChart from '@/components/staffEmployee/ProjectStatusChart';
+import ProjectStatusChart from "@/components/staffEmployee/ProjectStatusChart";
+import ContentLoader from "react-content-loader";
 
 const iconMap: { [key: string]: string } = {
   totalAssignedProject: "FolderIcon",
@@ -36,23 +36,54 @@ const StaffEmployeeOverview = () => {
         growth_type: dataObj.growth > 0 ? "up" : "down",
         link_text: "View all",
         icon: iconMap[key] || "FolderIcon",
-        icon_bg_color: key === "overdueProjects" ? "#DA4352" : "#069576",
+        icon_bg_color:
+          key === "overdueProjects" ? "#DA4352" : "#069576",
       };
     }
   );
-
-  if (isLoading) {
-    return <Loader className="animate-spin" />;
-  }
 
   return (
     <div className="">
       {/* Icon and Home */}
 
       <div className="grid grid-cols-4 gap-6 my-6">
-        {processedDashboardData.map((item) => (
-          <DashboardStatsCard key={item.title} item={item} />
-        ))}
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <ContentLoader
+                height="300"
+                width="300"
+                viewBox="0 0 265 230"
+                key={index}
+              >
+                <rect
+                  x="15"
+                  y="50"
+                  rx="2"
+                  ry="2"
+                  width="350"
+                  height="150"
+                />
+                <rect
+                  x="15"
+                  y="230"
+                  rx="2"
+                  ry="2"
+                  width="170"
+                  height="20"
+                />
+                <rect
+                  x="60"
+                  y="230"
+                  rx="2"
+                  ry="2"
+                  width="170"
+                  height="20"
+                />
+              </ContentLoader>
+            ))
+          : processedDashboardData.map((item) => (
+              <DashboardStatsCard key={item.title} item={item} />
+            ))}
       </div>
 
       <div className="py-4">
@@ -69,9 +100,8 @@ const StaffEmployeeOverview = () => {
                 </h2>
                 <OverDueChart />
               </BoxContainer>
-
             </div>
-              <ProjectStatusChart />
+            <ProjectStatusChart />
           </div>
           <LatestSubmission />
         </div>

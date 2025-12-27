@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import type { ApexOptions } from "apexcharts";
 import { useGetStaffEmployeeTopOverDueQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
+import ContentLoader from "react-content-loader";
 
 const OverDueChart = () => {
   const { overdueList, isLoading, error } =
@@ -93,14 +94,20 @@ const OverDueChart = () => {
     return "Failed to load overdue projects";
   };
 
+  if (isLoading) {
+    return (
+      <ContentLoader width={200} height={200} viewBox="0 0 200 200">
+        <rect x="0" y="160" rx="0" ry="0" width="25" height="40" />
+        <rect x="30" y="145" rx="0" ry="0" width="25" height="55" />
+        <rect x="60" y="126" rx="0" ry="0" width="25" height="74" />
+        <rect x="90" y="80" rx="0" ry="0" width="25" height="120" />
+        <rect x="120" y="142" rx="0" ry="0" width="25" height="58" />
+      </ContentLoader>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
-      {isLoading && (
-        <div className="flex items-center justify-center h-40">
-          <Spinner />
-        </div>
-      )}
-
       {error && (
         <div className="text-center text-sm text-red-600 py-6">
           {getErrorMessage(error)}

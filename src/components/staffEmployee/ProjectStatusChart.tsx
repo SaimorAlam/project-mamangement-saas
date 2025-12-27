@@ -4,6 +4,7 @@ import Chart from "react-apexcharts";
 
 import { useMemo, useState } from "react";
 import { useGetStaffEmployeeSubmissionStatusQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
+import ContentLoader from "react-content-loader";
 
 export interface ProjectStatus {
   name: string;
@@ -125,6 +126,14 @@ export default function ProjectStatusChart() {
   const handleChange = (e: string) => {
     setSortBy(e);
   };
+
+  if (submissionLoading) {
+    return (
+      <ContentLoader viewBox="0 0 400 160" height={160} width={400}>
+        <circle cx="64" cy="64" r="64" />
+      </ContentLoader>
+    );
+  }
 
   return (
     <Card className="w-full border-[#E2E8F0] shadow-none">
