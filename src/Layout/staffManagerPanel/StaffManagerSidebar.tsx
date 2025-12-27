@@ -27,7 +27,6 @@ import {
 import { ChevronRight, Heart } from "lucide-react";
 import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
 import { useGetFavoriteProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import { icon } from 'leaflet/dist/images/marker-icon.png';
 
 interface favorite {
   id: string,
@@ -40,7 +39,7 @@ const StaffManagerSidebar = () => {
   const groups = getStaffManagerSidebarItems();
   console.log("g",groups);
 
-  const {data, error} = useGetFavoriteProjectsQuery();
+  const {data} = useGetFavoriteProjectsQuery();
 
 
   const favorites:favorite[] = []
