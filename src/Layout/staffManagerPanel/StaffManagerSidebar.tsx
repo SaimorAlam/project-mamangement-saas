@@ -28,8 +28,9 @@ import { ChevronRight, Heart } from "lucide-react";
 import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
 import { useGetFavoriteProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 interface favorite {
-  id: string,
-  name: string,
+  id: string;
+  name: string;
+  path: string;
   icon?: React.ReactElement;
 }
 
@@ -39,9 +40,9 @@ const StaffManagerSidebar = () => {
   const groups = getStaffManagerSidebarItems();
   console.log("g",groups);
 
-  const {data, error} = useGetFavoriteProjectsQuery();
+  const {data} = useGetFavoriteProjectsQuery();
 
-  if(error) return (<div className="text-xs text-wrap">Error loading favorite projects</div>);
+  // if(error) return (<div className="text-xs text-wrap">Error loading favorite projects</div>);
 
   const favorites:favorite[] = []
   
@@ -49,6 +50,7 @@ const StaffManagerSidebar = () => {
     favorites.push({
       id: item.project.id,
       name: item.project.name,
+      path: `/staff-manager-panel/projects/${item.project.id}`,
       icon: <Heart />
     });
   });

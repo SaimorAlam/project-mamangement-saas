@@ -27,6 +27,26 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getFavoriteProjects: builder.query<any, void>({
+      query: () => `/favorites-project/me`,
+      providesTags: [{ type: "menuItems", id: "LIST" }],
+    }),
+    addToFavouriteProject: builder.mutation<any, string>({
+      query: (projectId) => ({
+        url: `/favorites-project`,
+        method: "POST",
+        body: { projectId },
+      }),
+      invalidatesTags: [{ type: "menuItems", id: "LIST" }],
+    }),
+    removeFavouriteProject: builder.mutation({
+      query: (projectId) => ({
+        url: "/favorites-project",
+        method: "DELETE",
+        body: { projectId: projectId },
+      }),
+      invalidatesTags: [{ type: "menuItems", id: "LIST" }],
+    }),
   }),
 });
 
@@ -35,6 +55,9 @@ export const {
   useGetStaffEmployeeUpcomingDeadlinesQuery,
   useGetStaffEmployeeLatestSubmissionsQuery,
   useGetStaffEmployeeSubmissionStatusQuery,
+  useGetFavoriteProjectsQuery,
+  useAddToFavouriteProjectMutation,
+  useRemoveFavouriteProjectMutation,
 } = staffEmployeeApi;
 
 export default staffEmployeeApi;

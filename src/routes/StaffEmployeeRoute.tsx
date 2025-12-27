@@ -21,6 +21,7 @@ import StaffEmployeeActivityLog from "@/pages/staffEmployee/StaffEmployeeActivit
 import StaffEmployeeContactUs from "@/pages/staffEmployee/StaffEmployeeContactUs";
 import StaffEmployeeCreateTicket from "@/pages/staffEmployee/StaffEmployeeCreateTicket";
 import StaffEmployeeStateCardDetails from "@/pages/staffEmployee/StaffEmployeeStateCardDetails";
+import StaffEmployeeProjectDetail from "@/pages/staffEmployee/StaffEmployeeProjectDetail";
 
 export default function getStaffEmployeeRoutes() {
   return [
@@ -85,8 +86,11 @@ export default function getStaffEmployeeRoutes() {
     },
     {
       path: "state-card/:cardTitle",
-      element: <StaffEmployeeStateCardDetails/>,
+      element: <StaffEmployeeStateCardDetails />,
     },
-    
+    {
+      path: "projects/:id",
+      element: <StaffEmployeeProjectDetail />,
+    },
   ];
 }
