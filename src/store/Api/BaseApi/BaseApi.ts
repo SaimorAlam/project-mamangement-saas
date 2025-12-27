@@ -66,6 +66,7 @@ const baseApi = createApi({
     "Project",
     "Dashboard",
     "menuItems",
+    "Favorite",
   ],
 });
 export default baseApi;

@@ -26,9 +26,10 @@ import {
 import { getClientSidebarItems } from "./clientSidebarItems";
 // import CreateProjectModal from "./CreateProjectModal";
 import CreateProject from "./CreateProject";
+import { useGetUser } from "@/hooks/useGetUser";
 
 interface ClientDashboardHeaderProps {
-  name: string;
+  name?: string;
 }
 
 const DROPDOWN_ITEMS = ["Create Program"];
@@ -36,6 +37,7 @@ const DROPDOWN_ITEMS = ["Create Program"];
 const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   name,
 }) => {
+  const { name: userName } = useGetUser();
   const { id: programId } = useParams();
   const location = useLocation();
   const currentPath = location.pathname;
@@ -151,10 +153,12 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             programId={programId as string}
             onClose={() => setIsProjectModalOpen(false)}
           /> */}
-          {isProjectModalOpen && <CreateProject
-            programId={programId as string}
-            onClose={() => setIsProjectModalOpen(false)}
-          />}
+          {isProjectModalOpen && (
+            <CreateProject
+              programId={programId as string}
+              onClose={() => setIsProjectModalOpen(false)}
+            />
+          )}
         </>
       );
 
@@ -234,7 +238,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
         {currentPath === "/client-panel" && (
           <div>
             <h1 className="text-[32px] font-semibold">
-              Good Morning 👋, {name}
+              Good Morning 👋, {userName || name}
             </h1>
             <p className="text-base text-gray-500">
               This is dashboard overview of Acme Corporation

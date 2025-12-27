@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DonutChartSkeleton } from "@/common/Skeleton/DonutChartSkeleton";
-import { useGetStatusQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
+import { useGetStatusQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 import { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 

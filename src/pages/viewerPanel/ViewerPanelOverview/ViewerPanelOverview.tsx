@@ -1,10 +1,10 @@
-import AllProgramProject from "@/components/staffEmployee/AllProgramProject";
+import AllProject from "./Components/AllProject";
 
 const ViewerPanelOverview = () => {
   return (
     <div>
       <div className="py-4">
-        <AllProgramProject />
+        <AllProject />
       </div>
     </div>
   );

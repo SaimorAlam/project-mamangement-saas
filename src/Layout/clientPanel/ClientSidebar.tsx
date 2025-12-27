@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "@/assets/client/logo.png";
 import UserProfile from "@/components/client/UserProfile";
+
 import {
   Sidebar,
   SidebarContent,
@@ -15,20 +16,54 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronRight } from "lucide-react";
+
+import { ChevronRight, Star } from "lucide-react";
 import { getClientSidebarItems } from "./clientSidebarItems";
+import { useGetFavoriteProjectsQuery } from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
 
 const ClientSidebar = () => {
   const location = useLocation();
-  const groups = getClientSidebarItems();
   const [open, setOpen] = useState(false);
-  // Active logic — active if route matches current path or any child route matches
+
+  const { data, isLoading } = useGetFavoriteProjectsQuery({});
+
+  /**
+   * 01. Build favorite items
+   */
+  const favoriteItems = useMemo(() => {
+    return (
+      data?.data?.map((item: any) => ({
+        icon: <Star className="size-6" />,
+        name: item.project.name,
+        path: `/client-panel/project-details/${item.project.id}`,
+      })) || []
+    );
+  }, [data]);
+
+  /**
+   * 02. Inject favorites immutably
+   */
+  const groups = useMemo(() => {
+    return getClientSidebarItems().map((group) => {
+      if (group.label !== "Favorites") return group;
+
+      return {
+        ...group,
+        items: favoriteItems,
+      };
+    });
+  }, [favoriteItems]);
+
+  /**
+   * Active route logic
+   */
   const isRouteActive = (item: any, parentPath = ""): boolean => {
     const fullPath = item.index
       ? parentPath
@@ -37,6 +72,7 @@ const ClientSidebar = () => {
       : `${parentPath}/${item.path}`;
 
     if (location.pathname === fullPath) return true;
+
     if (item.children) {
       return item.children.some((child: any) => isRouteActive(child, fullPath));
     }
@@ -51,7 +87,7 @@ const ClientSidebar = () => {
       : `${parentPath}/${item.path}`;
 
     const active = isRouteActive(item, parentPath);
-    // Dropdown (parent with children)
+
     if (item.children && item.children.length > 0) {
       return (
         <SidebarMenuItem key={fullPath}>
@@ -100,7 +136,6 @@ const ClientSidebar = () => {
       );
     }
 
-    // Normal link (leaf)
     return (
       <SidebarMenuItem key={fullPath}>
         <Link to={fullPath}>
@@ -122,6 +157,19 @@ const ClientSidebar = () => {
       </SidebarMenuItem>
     );
   };
+
+  /**
+   * Favorites skeleton rows
+   */
+  const renderFavoritesSkeleton = () =>
+    Array.from({ length: 3 }).map((_, idx) => (
+      <SidebarMenuItem key={`fav-skeleton-${idx}`}>
+        <div className="px-4 py-5 rounded-[10px] flex items-center gap-2 animate-pulse">
+          <div className="h-6 w-6 bg-slate-200 rounded" />
+          <div className="h-4 w-32 bg-slate-200 rounded" />
+        </div>
+      </SidebarMenuItem>
+    ));
 
   return (
     <Sidebar className="border-1 border-slate-200 px-2 py-8 space-y-8 bg-white overflow-y-auto">
@@ -146,7 +194,9 @@ const ClientSidebar = () => {
                   </SidebarGroupLabel>
 
                   <SidebarMenu className="space-y-[10px]">
-                    {group.items.map((item) => renderSidebarItem(item))}
+                    {group.label === "Favorites" && isLoading
+                      ? renderFavoritesSkeleton()
+                      : group.items.map((item: any) => renderSidebarItem(item))}
                   </SidebarMenu>
 
                   <hr className="w-56 text-slate-300 my-5" />

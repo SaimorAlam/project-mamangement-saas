@@ -6,7 +6,6 @@ import {
   Filter,
   TableIcon,
 } from "lucide-react";
-
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -15,14 +14,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// import Pagination from "@/common/Pagination";
 import { Button } from "@/components/ui/button";
+import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
+import { Loader2 as Loader } from "lucide-react";
+import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import StaffManagerProjectCard from "@/components/staffManager/StaffManagerProjectCard";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
-import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
-import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import StaffEmployeeProjectCard from "./StaffEmployeeProjectCard";
-import ContentLoader from "react-content-loader";
+import Pagination from "@/components/client/Pagination";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -75,15 +74,15 @@ const AllProgramProject = () => {
 
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
-  // const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // const itemsPerPage = 6;
+  const itemsPerPage = 6;
 
   const { data, isLoading } = useGetAllProjectsQuery({});
 
   const projects = data?.data?.projects?.data || [];
 
-  // const totalPages = Math.ceil(projects.length / itemsPerPage);
+  const totalPages = Math.ceil(projects.length / itemsPerPage);
 
   const statusOptions = [
     { value: "all", title: "All Status" },
@@ -104,60 +103,14 @@ const AllProgramProject = () => {
   ];
 
   if (isLoading) {
-    return (
-      <div className="grid grid-cols-4 gap-1">
-        {Array.from({ length: 9 }).map((_, index) => (
-          <ContentLoader
-            viewBox="0 0 500 280"
-            height={280}
-            width={500}
-            key={index}
-          >
-            <rect
-              x="3"
-              y="3"
-              rx="10"
-              ry="10"
-              width="300"
-              height="180"
-            />
-            <rect
-              x="6"
-              y="190"
-              rx="0"
-              ry="0"
-              width="292"
-              height="20"
-            />
-            <rect
-              x="4"
-              y="215"
-              rx="0"
-              ry="0"
-              width="239"
-              height="20"
-            />
-            <rect
-              x="4"
-              y="242"
-              rx="0"
-              ry="0"
-              width="274"
-              height="20"
-            />
-          </ContentLoader>
-        ))}
-      </div>
-    );
+    return <Loader className="animate-spin" />;
   }
 
   return (
     <div className="pb-6 min-h-[500px]">
       {/* Header  */}
       <div className="flex items-center justify-between pb-6">
-        <h4 className=" text-gray-900 text-xl font-semibold">
-          All Program & Project
-        </h4>
+        <h4 className=" text-gray-900">All Program & Project</h4>
         <div className="flex items-center gap-3">
           {/* View Toggle */}
           <div className="flex items-center  bg-white gap-3">
@@ -293,13 +246,13 @@ const AllProgramProject = () => {
             projects={projects as StaffEmployeeProject[]}
           />
 
-          {/* <Pagination
+          <Pagination
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             itemsPerPage={itemsPerPage}
             totalPages={totalPages}
             filteredDataLength={projects.length}
-          /> */}
+          />
         </>
       ) : (
         <>
@@ -307,14 +260,14 @@ const AllProgramProject = () => {
             {projects?.map((projectData: StaffEmployeeProject) => {
               return (
                 <div key={projectData.id}>
-                  <StaffEmployeeProjectCard project={projectData} />
+                  <StaffManagerProjectCard project={projectData} />
                 </div>
               );
             })}
           </div>
           {projects.length > 4 && (
             <div className="pt-6">
-              <Link to="/work-in-progress">
+              <Link to="all-program">
                 <Button
                   variant="ghost"
                   className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"

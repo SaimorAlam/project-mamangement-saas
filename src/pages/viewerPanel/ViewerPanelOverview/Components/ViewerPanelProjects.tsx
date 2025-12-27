@@ -11,7 +11,6 @@ import { useLocation } from "react-router-dom";
 const ViewerPanelProjects = () => {
   const location = useLocation();
   const { id } = location.state || {};
-
   const { data, isLoading } = useGetProjectByIdQuery(id, { skip: !id });
   const projectData = data?.data?.project;
 

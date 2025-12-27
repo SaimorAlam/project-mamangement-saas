@@ -5,7 +5,7 @@ import { ApexOptions } from "apexcharts";
 
 import BoxContainer from "@/common/BoxContainer";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
-import { useLazyGetTimelineQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
+import { useLazyGetTimelineQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 
 import {
   Select,

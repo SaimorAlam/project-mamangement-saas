@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
-import { useGetAllSubmissionQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
+import { useGetAllSubmissionQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 
 const submissionsData = [
   {
