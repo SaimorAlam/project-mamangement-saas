@@ -13,8 +13,8 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import { useRemoveFavouriteProjectMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRemoveProjectFromFavoriteMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
 const formatDate = (date: string | null) => {
     if (!date) return "—";
@@ -54,7 +54,7 @@ export default function StaffManagerProjectDetail() {
         id!
     );
     const [deleteProject, { isLoading: isDeleting }] =
-        useRemoveFavouriteProjectMutation();
+        useRemoveProjectFromFavoriteMutation();
 
     const project = data?.data?.project || {};
 
