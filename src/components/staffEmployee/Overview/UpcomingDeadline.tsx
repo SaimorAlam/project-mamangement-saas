@@ -4,7 +4,7 @@ import BoxContainer from "../../../common/BoxContainer";
 import { useState } from "react";
 import "react-calendar/dist/Calendar.css"; // important!
 import ViewCalender from "@/common/ViewCalender";
-import { Loader2 } from "lucide-react";
+import ContentLoader from "react-content-loader";
 
 import UpcomingDeadlineCard from "./UpcomingDeadlineCard";
 import { useGetStaffEmployeeUpcomingDeadlinesQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
@@ -94,19 +94,90 @@ const UpcomingDeadline = () => {
 
       {/* Deadline Cards */}
       <div className="w-full">
-        {isLoading ? (
-          <div className="flex justify-center items-center h-32">
-            <Loader2 className="animate-spin h-6 w-6 text-gray-600" />
-          </div>
-        ) : (
-          deadlineData?.map(
-            (project: IUpcomingDeadlineFromBackend, i: number) => (
-              <div key={i} className="pb-6">
-                <UpcomingDeadlineCard deadlineData={project} />
+        {isLoading
+          ? Array.from({ length: 6 }).map((_, index) => (
+              <div className="flex items-start gap-y-2">
+                <ContentLoader
+                  width={355}
+                  height={600}
+                  viewBox="0 0 355 600"
+                  key={index}
+                  className="flex  gap-y-2"
+                >
+                  <rect
+                    x="4"
+                    y="8"
+                    rx="16"
+                    ry="16"
+                    width="7"
+                    height="86"
+                  />
+                  <rect
+                    x="6"
+                    y="8"
+                    rx="16"
+                    ry="16"
+                    width="675"
+                    height="8"
+                  />
+                  <rect
+                    x="6"
+                    y="86"
+                    rx="16"
+                    ry="16"
+                    width="669"
+                    height="8"
+                  />
+                  <rect
+                    x="350"
+                    y="8"
+                    rx="16"
+                    ry="16"
+                    width="6"
+                    height="86"
+                  />
+                  <rect
+                    x="25"
+                    y="25"
+                    rx="16"
+                    ry="16"
+                    width="200"
+                    height="50"
+                  />
+                  <rect
+                    x="240"
+                    y="25"
+                    rx="3"
+                    ry="3"
+                    width="100"
+                    height="10"
+                  />
+                  <rect
+                    x="240"
+                    y="45"
+                    rx="3"
+                    ry="3"
+                    width="100"
+                    height="10"
+                  />
+                  <rect
+                    x="240"
+                    y="65"
+                    rx="3"
+                    ry="3"
+                    width="100"
+                    height="10"
+                  />
+                </ContentLoader>
               </div>
-            )
-          )
-        )}
+            ))
+          : deadlineData?.map(
+              (project: IUpcomingDeadlineFromBackend, i: number) => (
+                <div key={i} className="pb-6">
+                  <UpcomingDeadlineCard deadlineData={project} />
+                </div>
+              )
+            )}
       </div>
 
       {/* View All Button */}

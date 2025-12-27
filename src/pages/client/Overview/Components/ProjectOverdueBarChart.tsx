@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Chart from "react-apexcharts";
 import BoxContainer from "@/common/BoxContainer";
-import { useGetOverdueQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
+import { useGetOverdueQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 
 const ProjectOverdueBarChart = () => {
   const { data, isLoading } = useGetOverdueQuery({});

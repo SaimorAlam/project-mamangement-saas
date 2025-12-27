@@ -188,14 +188,22 @@ const AllProject: React.FC = () => {
                 type="Primary"
                 title="Boards"
                 leftIcon={<AlignStartHorizontal />}
-                className={viewMode === "board" ? "bg-black text-white" : ""}
+                className={
+                  viewMode === "board"
+                    ? "bg-black text-white border-none"
+                    : "bg-white text-black! border border-gray-200"
+                }
                 onClick={() => setViewMode("board")}
               />
               <PrimaryButton
                 type="Primary"
                 title="Tables"
                 leftIcon={<TableIcon />}
-                className={viewMode === "table" ? "bg-black text-white" : ""}
+                className={
+                  viewMode === "table"
+                    ? "bg-black text-white border-none"
+                    : "bg-white text-black! border border-gray-200"
+                }
                 onClick={() => setViewMode("table")}
               />
             </div>

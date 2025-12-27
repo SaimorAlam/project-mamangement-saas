@@ -64,7 +64,7 @@ export default function StaffEmployeeProjectDetail() {
       window.confirm("Are you sure you want to delete this project?")
     ) {
       await deleteProject(id).unwrap();
-      navigate("/staff-employee-panel"); // Redirect after delete
+      navigate("/staff-employee-panel");
     }
   };
 
@@ -102,32 +102,16 @@ export default function StaffEmployeeProjectDetail() {
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
         </div>
 
-        <div className="flex flex-col items-end gap-3">
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusStyles(
-              project.status
-            )}`}
+        <div className="flex items-center gap-9">
+          <div
+            className="p-3 rounded-lg flex items-center gap-3 cursor-pointer bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
+            onClick={handleDelete}
           >
-            {project.status}
-          </span>
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold border ${getPriorityStyles(
-              project.priority
-            )}`}
-          >
-            {project.priority} Priority
-          </span>
+            <Trash2 size={18} />
+            {isDeleting ? "Removing..." : "Remove from Favourites"}
+          </div>
         </div>
       </div>
 
@@ -138,19 +122,21 @@ export default function StaffEmployeeProjectDetail() {
         </h1>
         <p className="text-slate-500">{project.description}</p>
       </div>
-
-      {/* Progress */}
-      <div className="p-5 rounded-xl bg-slate-50 border border-slate-100 mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-primary" />
-            Project Progress
-          </span>
-          <span className="text-sm font-bold text-primary">
-            {project.progress}%
-          </span>
-        </div>
-        <Progress value={project.progress} className="h-2" />
+      <div className="mb-8 flex items-end gap-3">
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusStyles(
+            project.status
+          )}`}
+        >
+          {project.status}
+        </span>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-semibold border ${getPriorityStyles(
+            project.priority
+          )}`}
+        >
+          {project.priority} Priority
+        </span>
       </div>
 
       {/* Content Grid */}
@@ -207,6 +193,20 @@ export default function StaffEmployeeProjectDetail() {
             />
           </div>
         </section>
+      </div>
+
+      {/* Progress */}
+      <div className="p-5 mt-5 rounded-xl bg-slate-50 border border-slate-100 mb-6">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            Project Progress
+          </span>
+          <span className="text-sm font-bold text-primary">
+            {project.progress}%
+          </span>
+        </div>
+        <Progress value={project.progress} className="h-2" />
       </div>
 
       {/* Footer */}

@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
 import BoxContainer from "@/common/BoxContainer";
-import { useGetAllSubmissionQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
+import { useGetAllSubmissionQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 import ViewSubmissionDialog from "./ViewSubmissionDialog";
 
 type SortField = "date" | "submission" | "status";

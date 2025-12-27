@@ -1,9 +1,5 @@
 import React, { useMemo } from "react";
-import {
-  GoogleMap,
-  Marker,
-  useLoadScript,
-} from "@react-google-maps/api";
+import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 
 /* ---------------- TYPES ---------------- */
 
@@ -33,7 +29,6 @@ const ProjectLocationsMap: React.FC<ProjectLocationsMapProps> = ({
   });
 
   console.log("ggle map data: ", projects);
-  
 
   const center = useMemo(() => {
     if (projects.length === 0) {
@@ -55,11 +50,7 @@ const ProjectLocationsMap: React.FC<ProjectLocationsMapProps> = ({
   }
 
   return (
-    <GoogleMap
-      mapContainerStyle={containerStyle}
-      center={center}
-      zoom={6}
-    >
+    <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={6}>
       {projects.map((project) => (
         <Marker
           key={project.id}

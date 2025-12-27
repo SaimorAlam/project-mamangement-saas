@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import "react-calendar/dist/Calendar.css";
 import ViewCalender from "@/common/ViewCalender";
-import { useGetUpcomingDeadlinesQuery } from "@/store/Api/DeadlineApi/DeadlineApi";
 import BoxContainer from "@/common/BoxContainer";
 import UpcomingDeadlineCard from "@/components/client/Overview/UpcomingDeadlineCard";
+import { useGetDeadlineQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -43,8 +43,8 @@ const UpcomingDeadlineSkeleton = () => {
 const UpcomingDeadline = () => {
   const [value, onChange] = useState<Value>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
-
-  const { data, isLoading } = useGetUpcomingDeadlinesQuery({});
+  const { data, isLoading } = useGetDeadlineQuery({});
+  console.log(data);
   const deadlineData: IUpcomingDeadlineFromBackend[] =
     data?.data?.projects ?? [];
 

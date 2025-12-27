@@ -1,5 +1,6 @@
 // src/routes/clientRoutes.tsx
 import Employee from "@/pages/client/NewEmployee/Employee";
+import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
 import { lazy } from "react";
 
 const ClientOverview = lazy(
@@ -96,6 +97,7 @@ export function getClientRoutes() {
     { path: "program-overview/:id", element: <ProgramOverview /> },
     { path: "program-builder", element: <ClientProgramBuilder /> },
     { path: "program-name", element: <ClientProgramName /> },
+    { path: "project-details/:id", element: <ProjectDetails /> },
     {
       path: "highway-expansion",
       element: <ClientHighwayExpansion />,
