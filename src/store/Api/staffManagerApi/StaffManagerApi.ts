@@ -69,6 +69,27 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/activity`,
       providesTags: ["Manager"],
     }),
+    // for favorite projects
+    getFavoriteProjects: builder.query<any, void>({
+      query: ()=> `/favorites-project/me`,
+      providesTags: ["Manager"],
+    }),
+    addProjectToFavorite: builder.mutation<any, {projectId: string}>({
+      query: (body)=> ({
+        url: `/favorites-project`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Manager"],
+    }),
+    removeProjectFromFavorite: builder.mutation<any, {projectId: string}>({
+      query: (body)=> ({
+        url: `/favorites-project`,
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: ["Manager"],
+    }),
   }),
 });
 
@@ -83,7 +104,10 @@ export const {
   useGetProgramAllProjectsQuery,
   useGetProjectReviewPageCardsQuery,
   useGetAllReviewProjectsQuery,
-  useGetAllReviewProjectsReviewerActivityQuery
+  useGetAllReviewProjectsReviewerActivityQuery,
+  useGetFavoriteProjectsQuery,
+  useAddProjectToFavoriteMutation,
+  useRemoveProjectFromFavoriteMutation
 } = userApi;
 
 export default userApi;

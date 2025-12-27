@@ -24,12 +24,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Heart } from "lucide-react";
 import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
+import { useGetFavoriteProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import { icon } from 'leaflet/dist/images/marker-icon.png';
+
+interface favorite {
+  id: string,
+  name: string,
+  icon?: React.ReactElement;
+}
 
 const StaffManagerSidebar = () => {
   const location = useLocation();
   const groups = getStaffManagerSidebarItems();
+  console.log("g",groups);
+
+  const {data, error} = useGetFavoriteProjectsQuery();
+
+
+  const favorites:favorite[] = []
+  
+  data?.data.forEach((item:any) => {
+    favorites.push({
+      id: item.project.id,
+      name: item.project.name,
+      icon: <Heart />
+    });
+  });
+
+  groups[1].items= favorites || groups[1].items;
+  
   const [open, setOpen] = useState(false);
 
   // Active logic — active if route matches current path or any child route matches
@@ -138,14 +163,14 @@ const StaffManagerSidebar = () => {
   };
 
   return (
-    <Sidebar className="border-1 border-slate-200 px-2 py-8 space-y-8 !bg-white overflow-y-auto">
+    <Sidebar className="border border-slate-200 px-2 py-8 space-y-8 bg-white! overflow-y-auto">
       <SidebarHeader className="!bg-white">
         <Link to="/">
-          <img src={Logo} alt="Logo" className="w-[176px] h-[50px]" />
+          <img src={Logo} alt="Logo" className="w-44 h-[50px]" />
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="!bg-white">
+      <SidebarContent className="bg-white!">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
