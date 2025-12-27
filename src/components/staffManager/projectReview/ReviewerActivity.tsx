@@ -82,7 +82,7 @@ const ReviewerActivity = () => {
               {/* Status Pills */}
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <span className="px-3 py-1 bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0] rounded-full text-sm font-medium">
-                  {String(item.statusSummary.APPROVED).padStart(2, '0')} Approved
+                  {item.statusSummary.APPROVED} Approved
                 </span>
                 <span className="px-3 py-1 bg-[#FFFBEB] text-[#B45309] border border-[#FEF3C7] rounded-full text-sm font-medium">
                   {item.statusSummary.PENDING} In Review
