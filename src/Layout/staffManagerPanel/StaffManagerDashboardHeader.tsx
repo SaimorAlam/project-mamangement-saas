@@ -1,7 +1,6 @@
 import React, { cloneElement, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
 import { Bell, Eye, FileText, Home, Megaphone, Upload } from "lucide-react";
-import NotificationModal from "@/components/client/NotificationModal";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
   Breadcrumb,
@@ -14,6 +13,7 @@ import {
 import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffManagerHeaderContext";
+import NotificationModalNew from "@/components/staffManager/NotificationModalNew";
 
 const StaffManagerDashboardHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -96,7 +96,7 @@ const StaffManagerDashboardHeader = () => {
             type={"Outline"}
             onClick={() => setIsOpen(true)}
           />
-          <NotificationModal
+          <NotificationModalNew
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
           />
