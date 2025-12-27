@@ -1,18 +1,18 @@
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
 import ActivityLog from "@/components/client/Overview/ActivityLog";
-import LatestSubmission from "@/components/client/Overview/LatestSubmission";
-import ApexBarChart from "@/common/Charts/ApexBarChart";
-
+// import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import ProjectStatusDonutChart from "./Components/ProjectStatusDonutChart";
 import ProjectTimelineColumnChart from "./Components/ProjectTimelineColumnChart";
 import { useGetOverviewStackQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
 import DashboardPanelStatsCardSkeleton from "@/common/Skeleton/DashboardPanelStatsCardSkeleton";
+import ProjectOverdueBarChart from "./Components/ProjectOverdueBarChart";
+import LatestSubmission from "./Components/LatestSubmission/LatestSubmission";
 
 const ClientOverview = () => {
   const { data: overview, isLoading } = useGetOverviewStackQuery({});
-  console.log(overview);
+
   const totalProgram = overview?.data?.programs?.total;
   const programThisMonth = overview?.data.programs.thisMonth;
   const totalProject = overview?.data?.projects?.total;
@@ -109,7 +109,7 @@ const ClientOverview = () => {
       <div className="grid xl:grid-cols-3 w-full gap-8 ">
         <div className="space-y-8 xl:col-span-2">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-center justify-center ">
-            <ApexBarChart />
+            <ProjectOverdueBarChart />
             <div className="h-full!">
               <ProjectStatusDonutChart />
             </div>
@@ -121,9 +121,7 @@ const ClientOverview = () => {
           <ActivityLog />
         </div>
       </div>
-      <div className="my-6">
-        <LatestSubmission />
-      </div>
+      <div className="my-6"> <LatestSubmission /></div>
     </div>
   );
 };

@@ -5,7 +5,7 @@ export interface ButtonProps {
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
   onClick?: () => void;
-  type: string;
+  type?: string;
   className?: string;
 }
 

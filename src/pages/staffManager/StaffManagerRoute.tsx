@@ -1,75 +1,98 @@
-import AlfalaBuilders from "@/pages/client/ClientAlfalaBuilders";
-import ClientMarketingStrategy from "@/pages/client/ClientMarketingStrategy";
-import ClientTimosSuperShop from "@/pages/client/ClientTimosSuperShop";
-import Employees from "@/pages/client/Employees/ClientEmployees";
-import ClientOverview from "@/pages/client/Overview/ClientOverview";
-import AllProgram from "@/pages/client/Program/ClientAllProgram";
-import ClientProgramName from "@/pages/client/ClientProgramName";
-import ActivityLog from "@/components/client/Overview/ActivityLog";
-import ClientHelp from "@/pages/client/ClientHelp";
-import ClientSettings from "@/pages/client/ClientSettings";
-import ClientWorkInProgress from "@/pages/client/ClientWorkInProgress";
-import ClientUserActivityLog from "@/pages/client/ClientUsersActivityLog";
-import ClientSupport from "@/pages/client/ClientSupport";
-import ClientSupportTickets from "@/pages/client/ClientSupportTickets";
-import CreateTicket from "@/pages/client/ClientCreateTicket";
-import ClientFeedback from "@/pages/client/ClientFeedBack";
-import ClientProductTour from "@/pages/client/ClientProductTour";
-import ContactUs from "@/pages/client/ClientContactUs";
-import ClientHighwayExpansion from "@/pages/client/ClientHighwayExpansion";
-import CarlyleHall from "@/pages/client/ClientCarlyleHall";
-import AllProjectReview from "@/components/client/ProjectReview/AllProjectReview";
-import ClientProjectReview from "@/pages/client/ClientProjectReview";
-import ClientProjectBuilder from "@/pages/client/ClientProjectBuilder";
+import StaffManagerOverview from "@/pages/staffManager/StaffManagerOverview";
 import StaffManagerProjects from "@/pages/staffManager/StaffManagerProjects";
+import StaffManagerMarketingStrategy from "@/pages/staffManager/StaffManagerMarketingStrategy";
+import StaffManagerTimosSuperShop from "@/pages/staffManager/StaffManagerTimosSuperShop";
+import StaffManagerProgramName from "@/pages/staffManager/StaffManagerProgramName";
+import StaffManagerProjectBuilder from "@/pages/staffManager/StaffManagerProjectBuilder";
+import StaffManagerHighwayExpansion from "@/pages/staffManager/StaffManagerHighwayExpansion";
+import StaffManagerProjectReview from "@/pages/staffManager/StaffManagerProjectReview";
+import StaffManagerHelp from "@/pages/staffManager/StaffManagerHelp";
+import StaffManagerSupport from "@/pages/staffManager/StaffManagerSupport";
+import StaffManagerSupportTickets from "@/pages/staffManager/StaffManagerSupportTickets";
+import StaffManagerFeedback from "@/pages/staffManager/StaffManagerFeedBack";
+import StaffManagerProductTour from "@/pages/staffManager/StaffManagerProductTour";
+import StaffManagerSettings from "@/pages/staffManager/StaffManagerSettings";
+import StaffManagerWorkInProgress from "@/pages/staffManager/StaffManagerWorkInProgress";
+import StaffManagerUserActivityLog from "@/pages/staffManager/StaffManagerUsersActivityLog";
+import StaffManagerCarlyleHall from '@/pages/staffManager/StaffManagerCarlyleHall';
+import StaffManagerEmployees from '@/pages/staffManager/StaffManagerEmployees';
+import StaffManagerAlfalaBuilders from '@/pages/staffManager/StaffManagerAlfalaBuilders';
+import StaffManagerAllProgram from '@/pages/staffManager/StaffManagerAllProgram';
+import StaffManagerActivityLog from '@/pages/staffManager/StaffManagerActivityLog';
+import StaffManagerCreateTicket from '@/pages/staffManager/StaffManagerCreateTicket';
+import StaffManagerContactUs from '@/pages/staffManager/StaffManagerContactUs';
+// import CommingSoonPage from "@/common/CommingSoonPage";
+import StaffManagerStateCardDetails from "@/pages/staffManager/StaffManagerStateCardDetails";
+import StaffManagerUploadSubmission from "@/pages/staffManager/StaffManagerUploadSubmission";
+import AllProjectsReview from "@/pages/staffManager/AllProjectsReview";
 
 export function getStaffManagerRoutes() {
   return [
-    { index: true, element: <ClientOverview /> },
+    { index: true, element: <StaffManagerOverview /> },
     { path: "projects", element: <StaffManagerProjects /> },
-    { path: "carlyle-hall", element: <CarlyleHall /> },
-    { path: "employees", element: <Employees /> },
+    { path: "projects/upload-submission", element: <StaffManagerUploadSubmission />  },
+    { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
+    { path: "employees", element: <StaffManagerEmployees /> },
     {
       path: "marketing-strategy",
-      element: <ClientMarketingStrategy />,
+      element: <StaffManagerMarketingStrategy />,
     },
-    { path: "alfala-building", element: <AlfalaBuilders /> },
-    { path: "timos-super-shop", element: <ClientTimosSuperShop /> },
-    { path: "all-program", element: <AllProgram /> },
-    { path: "program-name", element: <ClientProgramName /> },
-    { path: "project-builder", element: <ClientProjectBuilder /> },
+    { path: "alfala-building", element: <StaffManagerAlfalaBuilders /> },
+    {
+      path: "timos-super-shop",
+      element: <StaffManagerTimosSuperShop />,
+    },
+    { path: "all-program", element: <StaffManagerAllProgram /> },
+    { path: "program-name", element: <StaffManagerProgramName /> },
+    {
+      path: "project-builder",
+      element: <StaffManagerProjectBuilder />,
+    },
     {
       path: "highway-expansion",
-      element: <ClientHighwayExpansion />,
+      element: <StaffManagerHighwayExpansion />,
     },
     {
       path: "project-review",
-      element: <ClientProjectReview />,
+      element: <StaffManagerProjectReview />,
       children: [
-        { path: "all-projects", element: <AllProjectReview /> },
-        { path: "carlyle-hall", element: <CarlyleHall /> },
+        { path: "all-projects", element: <AllProjectsReview /> },
+        { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
       ],
     },
-    { path: "activity-log", element: <ActivityLog /> },
+    { path: "activity-log", element: <StaffManagerActivityLog /> },
     {
       path: "help",
-      element: <ClientHelp />,
+      element: <StaffManagerHelp />,
       children: [
         {
           path: "support",
-          element: <ClientSupport />,
+          element: <StaffManagerSupport />,
           children: [
-            { index: true, element: <ClientSupportTickets /> },
-            { path: "create-tickets", element: <CreateTicket /> },
+            { index: true, element: <StaffManagerSupportTickets /> },
+            { path: "create-tickets", element: <StaffManagerCreateTicket /> },
           ],
         },
-        { path: "feedback", element: <ClientFeedback /> },
-        { path: "product-tour", element: <ClientProductTour /> },
-        { path: "contact-us", element: <ContactUs /> },
+        { path: "feedback", element: <StaffManagerFeedback /> },
+        {
+          path: "product-tour",
+          element: <StaffManagerProductTour />,
+        },
+        { path: "contact-us", element: <StaffManagerContactUs /> },
       ],
     },
-    { path: "settings", element: <ClientSettings /> },
-    { path: "work-in-progress", element: <ClientWorkInProgress /> },
-    { path: "user-activity-log", element: <ClientUserActivityLog /> },
+    { path: "settings", element: <StaffManagerSettings /> },
+    {
+      path: "work-in-progress",
+      element: <StaffManagerWorkInProgress />,
+    },
+    {
+      path: "user-activity-log",
+      element: <StaffManagerUserActivityLog />,
+    },
+    {
+      path: "state-card/:cardTitle",
+      element: <StaffManagerStateCardDetails/>,
+    },
   ];
 }

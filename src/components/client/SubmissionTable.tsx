@@ -9,11 +9,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Eye, FileText } from "lucide-react";
 
@@ -32,9 +28,7 @@ type SubmissionTableProps = {
   submissions: Submission[];
 };
 
-export default function SubmissionTable({
-  submissions,
-}: SubmissionTableProps) {
+export default function SubmissionTable({ submissions }: SubmissionTableProps) {
   const getInitials = (name: string) =>
     name
       .split(" ")
@@ -90,13 +84,13 @@ export default function SubmissionTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {submissions.map((submission) => (
+              {submissions?.map((submission) => (
                 <TableRow
                   key={submission.id}
                   className="border-b border-[#E2E8F0] hover:bg-muted/30 transition-colors odd:bg-white even:bg-[#F7F9FA]"
                 >
                   <TableCell className="text-base font-medium px-6 py-3.5">
-                    {submission.submission}
+                    {submission?.submission}
                   </TableCell>
                   <TableCell className="px-6 py-3.5">
                     <div className="flex items-center space-x-3">
@@ -137,9 +131,7 @@ export default function SubmissionTable({
                         title="View submission"
                       >
                         <Eye className="size-6 text-[#1C73E0] " />
-                        <span className="sr-only">
-                          View submission
-                        </span>
+                        <span className="sr-only">View submission</span>
                       </Button>
                       <Button
                         variant="ghost"
@@ -149,9 +141,7 @@ export default function SubmissionTable({
                         title="Edit submission"
                       >
                         <FileText className="size-6 text-[#169E7B]" />
-                        <span className="sr-only">
-                          Edit submission
-                        </span>
+                        <span className="sr-only">Edit submission</span>
                       </Button>
                     </div>
                   </TableCell>
