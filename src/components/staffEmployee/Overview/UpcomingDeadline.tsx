@@ -27,22 +27,17 @@ interface IUpcomingDeadlineFromBackend {
 
 const UpcomingDeadline = () => {
   const [value, setValue] = useState<Value>([null, null]); // Set initial value as [null, null]
-  const [selectedDays, setSelectedDays] = useState<number | null>(
-    null
-  ); // To store the selected number of days
+  const [selectedDays, setSelectedDays] = useState<number | null>(null); // To store the selected number of days
   const [showCalendar, setShowCalendar] = useState(false);
 
   // Fetch data for upcoming deadlines
-  const { data, isLoading, error } =
-    useGetStaffEmployeeUpcomingDeadlinesQuery({
-      days: selectedDays !== null ? selectedDays : "2025",
-    });
+  const { data, isLoading, error } = useGetStaffEmployeeUpcomingDeadlinesQuery({
+    days: selectedDays !== null ? selectedDays : "2025",
+  });
 
   if (error)
     return (
-      <div className="text-gray-400 text-center">
-        Something went wrong.
-      </div>
+      <div className="text-gray-400 text-center">Something went wrong.</div>
     );
 
   const deadlineData = data?.data?.projects || [];
@@ -56,9 +51,7 @@ const UpcomingDeadline = () => {
       const endDate = newValue[1] as Date;
 
       // Calculate the difference in days between start and end date
-      const diffTime = Math.abs(
-        endDate.getTime() - startDate.getTime()
-      );
+      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // Convert to days
 
       setSelectedDays(diffDays); // Update selectedDays
@@ -71,9 +64,7 @@ const UpcomingDeadline = () => {
         {/* Header */}
         <div className="flex gap-1 items-center justify-center">
           <Clock className="size-8 text-gray-600 w-6 h-6" />
-          <h4 className="text-lg font-semibold">
-            Upcoming Deadlines
-          </h4>
+          <h4 className="text-lg font-semibold">Upcoming Deadlines</h4>
         </div>
 
         {/* View Calendar Button */}
