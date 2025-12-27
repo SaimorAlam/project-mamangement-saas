@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaEdit, FaSpinner } from "react-icons/fa";
+import { FaSpinner } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import Pagination from "@/common/Pagination";
 // import { IProject } from "@/types/project";
@@ -10,18 +10,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-// import { useDebounce } from "@/hooks/useDebounce";
-// import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
-// import { Progress } from "@/components/ui/progress";
-import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
-import { UpdateProjectPayload } from "@/types/Projects";
-import { toast } from "sonner";
-import UpdateProjectModal from "../client/Program/UpdateProjectModal";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Eye, PencilLine, Trash2 } from "lucide-react";
 import { useGetAllReviewProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
 import ReviewerActivity from "@/components/staffManager/projectReview/ReviewerActivity";
 import { Badge } from "@/components/ui/badge";
+import ViewSubmissionModal from "@/components/staffManager/projectReview/ViewSubmissionModal";
+import ReviewSubmissionModal from "@/components/staffManager/projectReview/ReviewSubmissionModal";
+import DeleteSubmissionModal from "@/components/staffManager/projectReview/DeleteSubmissionModal";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -50,17 +46,19 @@ const AllProjectsReview = ({
   const [sortColumn, setSortColumn] = useState<any | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
+  const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
+
+  const [viewOpen, setViewOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+
   // const debouncedSearch = useDebounce(search, 500);
 
-  const [editProject] = useState<UpdateProjectPayload | null>(
-    null
-  );
-  const [editModalOpen, setEditModalOpen] = useState(false);
 
   // const { data, isLoading } = useGetAllProjectsQuery({});
   const { data, isLoading } = useGetAllReviewProjectsQuery({});
 
-  const [updateProject] = useUpdateProjectMutation();
 
   const projects = useMemo(() => data?.data ?? [], [data]);
   //   const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]); // Sidebar data
@@ -115,6 +113,9 @@ const AllProjectsReview = ({
     });
   }, [projects, sortColumn, sortOrder]);
 
+  console.log("r p :", sortedProjects);
+
+
   const formatDate = (date?: string) =>
     date
       ? new Date(date).toLocaleDateString(undefined, {
@@ -123,24 +124,6 @@ const AllProjectsReview = ({
         day: "numeric",
       })
       : "-";
-
-  const handleUpdateProject = async (project: UpdateProjectPayload) => {
-    console.log(project);
-    console.log(editProject);
-    try {
-      const res = await updateProject({
-        id: editProject?.id,
-        ...project,
-      }).unwrap();
-      console.log(res);
-      if (res.success) {
-        toast.success("Project updated successfully");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to update project");
-    }
-  };
 
   if (isLoading) {
     return (
@@ -154,6 +137,7 @@ const AllProjectsReview = ({
     PENDING: "text-[#665CFF] bg-[#F2F2FF] border border-[#C7C2FF]",
     RETURNED: "text-[#B00020] bg-[#FFEAEA] border border-[#FFB3B3]",
     DRAFT: "text-[#6B7280] bg-[#F3F4F6] border border-[#D1D5DB]",
+    OVERDUE: "text-[#6B7280] bg-[#F3F4F6] border border-[#D1D5DB]",
   };
 
   const statusLabels: any = {
@@ -161,6 +145,7 @@ const AllProjectsReview = ({
     PENDING: "PENDING",
     RETURNED: "RETURNED",
     DRAFT: "DRAFT",
+    OVERDUE: "OVERDUE",
   };
 
   return (
@@ -304,30 +289,39 @@ const AllProjectsReview = ({
 
                         <td className="px-6 py-4">{formatDate(project.createdAt)}</td>
 
+                        <td className="px-6 py-4 flex gap-3">
+                          {/* View */}
+                          <button
+                            onClick={() => {
+                              setSelectedSubmission(project);
+                              setViewOpen(true);
+                            }}
+                          >
+                            <Eye className="text-blue-600 cursor-pointer" size={20}/>
+                          </button>
 
-                        <td className="px-6 py-4 flex items-center gap-3">
+                          {/* Review */}
                           <button
                             onClick={() => {
-                              setEditModalOpen(true);
+                              setSelectedSubmission(project);
+                              setReviewOpen(true);
                             }}
                           >
-                            <FaEdit className="text-blue-600" />
+                            <PencilLine className="text-green-600 cursor-pointer" size={20}/>
                           </button>
+
+                          {/* Delete */}
                           <button
                             onClick={() => {
-                              setEditModalOpen(true);
+                              setSelectedSubmission(project);
+                              setDeleteOpen(true);
                             }}
                           >
-                            <FaEdit className="text-blue-600" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditModalOpen(true);
-                            }}
-                          >
-                            <FaEdit className="text-blue-600" />
+                            <Trash2 className="text-red-600 cursor-pointer"  size={20}/>
                           </button>
                         </td>
+
+
                       </tr>
                     ))}
                   </tbody>
@@ -349,15 +343,32 @@ const AllProjectsReview = ({
           <ReviewerActivity />
         </div>
       </div>
+      <ViewSubmissionModal
+        open={viewOpen}
+        onClose={() => setViewOpen(false)}
+        submission={selectedSubmission}
+      />
 
-      {editModalOpen && editProject && (
-        <UpdateProjectModal
-          project={editProject}
-          open={editModalOpen}
-          onClose={() => setEditModalOpen(false)}
-          onSubmit={handleUpdateProject}
-        />
-      )}
+      <ReviewSubmissionModal
+        open={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+        submission={selectedSubmission}
+        onSubmit={(status) => {
+          console.log("Update status:", status, selectedSubmission.id);
+          setReviewOpen(false);
+        }}
+      />
+
+      <DeleteSubmissionModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onDelete={() => {
+          console.log("Delete:", selectedSubmission.id);
+          setDeleteOpen(false);
+        }}
+      />
+
+
     </div>
   );
 };

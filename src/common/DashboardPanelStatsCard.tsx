@@ -10,7 +10,7 @@ import {
 import { JSX, useState } from "react";
 import { FaChartPie, FaUsers } from "react-icons/fa";
 import { IClientPanelStats } from "@/types";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface IProps {
   item: IClientPanelStats;
@@ -44,14 +44,20 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
     ? IconCollection[iconType as string]
     : null;
 
+  // getting path
+  const location = useLocation();
+
+  // Get the path after the domain name (e.g., '/products/5')
+  const currentPathname = location.pathname;
+  const isInStaffManager = currentPathname === "/staff-manager-panel/project-review/all-projects";
+
   return (
     <div>
       <div
-        className={`${
-          growth_type === "up"
-            ? "bg-[#EBFFF2] text-green-600"
-            : "bg-[#FDF4F5] text-red-600"
-        }  bg-[#EBFFF2] rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102`}
+        className={`${growth_type === "up"
+          ? "bg-[#EBFFF2] text-green-600"
+          : "bg-[#FDF4F5] text-red-600"
+          }  bg-[#EBFFF2] rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102`}
       >
         <div className="bg-white shadow-xs shadow-gray-100 rounded-lg p-5 ">
           {/* Icon & Title */}
@@ -72,11 +78,10 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
 
             {growth && (
               <span
-                className={`flex items-center gap-1 text-sm font-medium px-2 py-1 rounded ${
-                  growth_type === "up"
-                    ? "bg-green-100 text-[#169E7B]"
-                    : "bg-red-100 text-red-600"
-                }`}
+                className={`flex items-center gap-1 text-sm font-medium px-2 py-1 rounded ${growth_type === "up"
+                  ? "bg-green-100 text-[#169E7B]"
+                  : "bg-red-100 text-red-600"
+                  }`}
               >
                 {growth}
                 <TrendingUp className=" size-4" />
@@ -85,15 +90,18 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
           </div>
         </div>
         {/* Description & Link */}
-        <div className="flex items-center justify-between text-sm text-gray-700 px-6 py-4">
-          <span className="">{description && description}</span>
-          <Link
-            to={`work-in-progress`}
-            className="text-blue-500 hover:underline"
-          >
-            {link_text} &rarr;
-          </Link>
-        </div>
+          <div className="flex items-center justify-between text-sm text-gray-700 px-6 py-4">
+        {
+              !isInStaffManager && (
+                <>
+              <span className="">{description && description}</span>
+              <Link to={`#`} className="text-blue-500 hover:underline">
+                {link_text} &rarr;
+              </Link>
+              </>
+          )
+        }
+            </div>
       </div>
     </div>
   );

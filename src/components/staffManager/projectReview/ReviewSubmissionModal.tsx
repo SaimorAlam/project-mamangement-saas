@@ -1,0 +1,64 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  submission: any;
+  onSubmit: (status: "APPROVED" | "RETURNED") => void;
+}
+
+const ReviewSubmissionModal = ({
+  open,
+  onClose,
+  submission,
+  onSubmit,
+}: Props) => {
+  if (!submission) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Review Submission</DialogTitle>
+        </DialogHeader>
+
+        <p className="text-sm text-gray-600">
+          Are you sure you want to update the status for{" "}
+          <strong>{submission.employee.user.name}</strong>?
+        </p>
+
+        <DialogFooter className="flex gap-3 mt-4">
+          <button
+            className="px-4 py-2 rounded border"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+
+          <button
+            className="px-4 py-2 rounded bg-red-600 text-white"
+            onClick={() => onSubmit("RETURNED")}
+          >
+            Return
+          </button>
+
+          <button
+            className="px-4 py-2 rounded bg-green-600 text-white"
+            onClick={() => onSubmit("APPROVED")}
+          >
+            Approve
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default ReviewSubmissionModal;
