@@ -1,4 +1,4 @@
-import ProjectReviewStats from "@/components/client/ProjectReview/ProjectReviewStats";
+import ProjectReviewStats from "@/components/staffManager/projectReview/ProjectReviewStats";
 import { Outlet } from "react-router-dom";
 
 const StaffManagerProjectReview = () => {
