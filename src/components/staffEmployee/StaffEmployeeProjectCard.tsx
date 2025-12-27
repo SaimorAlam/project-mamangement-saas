@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import PrimaryButton from "../../common/PrimaryButton";
 import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
+import { useAddToFavouriteProjectMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
+import { toast } from "sonner";
 
 export type ProjectStatus =
   | "LIVE"
@@ -103,6 +105,48 @@ const StaffEmployeeProjectCard = ({
       ? "text-[#F59E0B]"
       : "text-[#16A34A]";
 
+  const [addToFavouriteProject] = useAddToFavouriteProjectMutation();
+
+  const handleAddToFavourite = async (projectId: string) => {
+    try {
+      const res = await addToFavouriteProject(projectId);
+
+      // Handle error response
+      if ("error" in res) {
+        const errorData = res.error as any;
+        const errorMessage =
+          errorData?.data?.message ||
+          errorData?.message ||
+          "Failed to add project to favorites";
+
+        toast.error(errorMessage);
+        return;
+      }
+
+      // Handle success response
+      if ("data" in res) {
+        const successData = res.data as any;
+
+        if (successData?.success === false) {
+          const errorMessage =
+            successData?.message ||
+            "Failed to add project to favorites";
+          toast.error(errorMessage);
+          return;
+        }
+
+        toast.success("Project added to favorites successfully");
+        return;
+      }
+
+      toast.error("Unexpected response from server");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An error occurred";
+      toast.error(errorMessage);
+    }
+  };
+
   return (
     <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">
       <CardContent className="flex flex-col justify-between p-0">
@@ -119,7 +163,7 @@ const StaffEmployeeProjectCard = ({
               </h4>
               <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2">
                 <span>{name || "Project Name"}</span>{" "}
-                <button>
+                <button onClick={() => handleAddToFavourite(id)}>
                   <FaStar className="text-yellow-500" size={18} />
                 </button>
               </p>
