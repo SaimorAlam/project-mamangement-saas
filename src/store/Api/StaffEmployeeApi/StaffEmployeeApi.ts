@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import baseApi from "../BaseApi/BaseApi";
 
 const staffEmployeeApi = baseApi.injectEndpoints({
@@ -37,7 +38,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: { projectId },
       }),
-      invalidatesTags: ["menuItems"],
+      invalidatesTags: ["menuItems","Manager"],
     }),
     removeFavouriteProject: builder.mutation({
       query: (projectId) => ({

@@ -21,6 +21,7 @@ import UpdateProjectModal from "../client/Program/UpdateProjectModal";
 import SideManagerMain from "@/components/staffManager/Projects/SideManagerMain";
 import { ChevronDown } from "lucide-react";
 import { useGetProgramAllProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import ProjectLocationsMap from "@/components/staffManager/Projects/ProjectLocationsMap";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -60,6 +61,8 @@ const StaffManagerProjects = ({
   const { data, isLoading } = useGetProgramAllProjectsQuery({});
 
   const [updateProject] = useUpdateProjectMutation();
+  console.log("p p: ", data?.data);
+  
 
   const projects = useMemo(() => data?.data?.projects ?? [], [data]);
   const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]); // Sidebar data
@@ -309,6 +312,10 @@ const StaffManagerProjects = ({
         </div>
         <SideManagerMain sidebar={programDetails} />
       </div>
+
+      {/* <div className="bg-green-200 h-[80vh]"></div> */}
+      {/* google map according to longitude and latitude  */}
+      <ProjectLocationsMap projects={projects} />
 
       {editModalOpen && editProject && (
         <UpdateProjectModal
