@@ -20,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
 import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
-import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import StaffEmployeeProjectCard from "./StaffEmployeeProjectCard";
 import ContentLoader from "react-content-loader";

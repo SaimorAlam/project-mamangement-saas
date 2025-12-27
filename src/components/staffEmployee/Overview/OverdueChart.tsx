@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Chart from "react-apexcharts";
 import { useMemo } from "react";
-import { Spinner } from "@/components/ui/spinner";
 import type { ApexOptions } from "apexcharts";
 import { useGetStaffEmployeeTopOverDueQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 import ContentLoader from "react-content-loader";
