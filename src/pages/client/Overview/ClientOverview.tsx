@@ -8,6 +8,7 @@ import ProjectTimelineColumnChart from "./Components/ProjectTimelineColumnChart"
 import { useGetOverviewStackQuery } from "@/store/Api/ClientDashboardApi/ClientDashboarApi";
 import DashboardPanelStatsCardSkeleton from "@/common/Skeleton/DashboardPanelStatsCardSkeleton";
 import ProjectOverdueBarChart from "./Components/ProjectOverdueBarChart";
+import LatestSubmission from "./Components/LatestSubmission/LatestSubmission";
 
 const ClientOverview = () => {
   const { data: overview, isLoading } = useGetOverviewStackQuery({});
@@ -120,9 +121,7 @@ const ClientOverview = () => {
           <ActivityLog />
         </div>
       </div>
-      <div className="my-6">
-        {/* <LatestSubmission /> */}
-      </div>
+      <div className="my-6"> <LatestSubmission /></div>
     </div>
   );
 };
