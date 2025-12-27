@@ -90,6 +90,11 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Manager"],
     }),
+    // for notification
+    getNotification: builder.query<any, void>({
+      query: ()=> `/notification/received`,
+      providesTags: ["Manager"],
+    }),
   }),
 });
 
@@ -107,7 +112,8 @@ export const {
   useGetAllReviewProjectsReviewerActivityQuery,
   useGetFavoriteProjectsQuery,
   useAddProjectToFavoriteMutation,
-  useRemoveProjectFromFavoriteMutation
+  useRemoveProjectFromFavoriteMutation,
+  useGetNotificationQuery
 } = userApi;
 
 export default userApi;
