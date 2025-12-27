@@ -131,7 +131,7 @@ const StaffManagerProjectCard = ({
             successData?.message ||
             "Failed to add project to favorites";
           toast.error(errorMessage);
-          return;  
+          return;
         }
 
         toast.success("Project added to favorites successfully");

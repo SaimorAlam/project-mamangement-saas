@@ -39,6 +39,14 @@ const staffEmployeeApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "menuItems", id: "LIST" }],
     }),
+    removeFavouriteProject: builder.mutation({
+      query: (projectId) => ({
+        url: "/favorites-project",
+        method: "DELETE",
+        body: { projectId: projectId },
+      }),
+      invalidatesTags: [{ type: "menuItems", id: "LIST" }],
+    }),
   }),
 });
 
@@ -49,6 +57,7 @@ export const {
   useGetStaffEmployeeSubmissionStatusQuery,
   useGetFavoriteProjectsQuery,
   useAddToFavouriteProjectMutation,
+  useRemoveFavouriteProjectMutation,
 } = staffEmployeeApi;
 
 export default staffEmployeeApi;
