@@ -19,7 +19,10 @@ import {
   Ticket,
   TicketPlus,
 } from "lucide-react";
-import { IoExtensionPuzzleOutline, IoSettingsOutline } from "react-icons/io5";
+import {
+  IoExtensionPuzzleOutline,
+  IoSettingsOutline,
+} from "react-icons/io5";
 import { ISidebarItem } from "@/types";
 
 interface SidebarGroup {
@@ -93,7 +96,9 @@ export const getClientSidebarItems = (): SidebarGroup[] => {
         },
         {
           icon: <BriefcaseBusiness />,
-          name: <span className="text-[15px]">Highway Expansion</span>,
+          name: (
+            <span className="text-[15px]">Highway Expansion</span>
+          ),
           className: "text-sm",
           path: "/client-panel/highway-expansion",
           hidden: !showHighwayExpansion,
