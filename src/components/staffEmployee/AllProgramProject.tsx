@@ -22,7 +22,7 @@ import DropdownSelect from "@/common/DropdownSelect";
 import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
 import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import StaffManagerProjectCard from "@/components/staffManager/StaffManagerProjectCard";
+import StaffEmployeeProjectCard from "./StaffEmployeeProjectCard";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -263,7 +263,7 @@ const AllProgramProject = () => {
             {projects?.map((projectData: StaffEmployeeProject) => {
               return (
                 <div key={projectData.id}>
-                  <StaffManagerProjectCard project={projectData} />
+                  <StaffEmployeeProjectCard project={projectData} />
                 </div>
               );
             })}

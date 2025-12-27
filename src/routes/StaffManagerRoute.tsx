@@ -25,11 +25,13 @@ import StaffManagerContactUs from '@/pages/staffManager/StaffManagerContactUs';
 import StaffManagerStateCardDetails from "@/pages/staffManager/StaffManagerStateCardDetails";
 import StaffManagerUploadSubmission from "@/pages/staffManager/StaffManagerUploadSubmission";
 import AllProjectsReview from "@/pages/staffManager/AllProjectsReview";
+import StaffManagerProjectDetail from "@/pages/staffManager/StaffManagerProjectDetail";
 
 export function getStaffManagerRoutes() {
   return [
     { index: true, element: <StaffManagerOverview /> },
     { path: "projects", element: <StaffManagerProjects /> },
+    { path: "projects/:id", element: <StaffManagerProjectDetail /> },
     { path: "projects/upload-submission", element: <StaffManagerUploadSubmission />  },
     { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
     { path: "employees", element: <StaffManagerEmployees /> },

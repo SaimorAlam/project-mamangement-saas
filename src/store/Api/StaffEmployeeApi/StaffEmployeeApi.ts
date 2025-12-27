@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import baseApi from "../BaseApi/BaseApi";
 
 const staffEmployeeApi = baseApi.injectEndpoints({
@@ -29,7 +30,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
     }),
     getFavoriteProjects: builder.query<any, void>({
       query: () => `/favorites-project/me`,
-      providesTags: [{ type: "menuItems", id: "LIST" }],
+      providesTags: ["menuItems"],
     }),
     addToFavouriteProject: builder.mutation<any, string>({
       query: (projectId) => ({
@@ -37,7 +38,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: { projectId },
       }),
-      invalidatesTags: [{ type: "menuItems", id: "LIST" }],
+      invalidatesTags: ["menuItems","Manager"],
     }),
     removeFavouriteProject: builder.mutation({
       query: (projectId) => ({
@@ -45,7 +46,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "DELETE",
         body: { projectId: projectId },
       }),
-      invalidatesTags: [{ type: "menuItems", id: "LIST" }],
+      invalidatesTags: ["menuItems"],
     }),
   }),
 });

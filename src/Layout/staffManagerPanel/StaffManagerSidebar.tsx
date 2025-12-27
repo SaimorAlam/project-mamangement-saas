@@ -27,21 +27,22 @@ import {
 import { ChevronRight, Heart } from "lucide-react";
 import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
 import { useGetFavoriteProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import { icon } from 'leaflet/dist/images/marker-icon.png';
-
 interface favorite {
-  id: string,
-  name: string,
+  id: string;
+  name: string;
+  path: string;
   icon?: React.ReactElement;
 }
 
 const StaffManagerSidebar = () => {
   const location = useLocation();
+  const [open, setOpen] = useState<boolean>(false);
   const groups = getStaffManagerSidebarItems();
   console.log("g",groups);
 
-  const {data, error} = useGetFavoriteProjectsQuery();
+  const {data} = useGetFavoriteProjectsQuery();
 
+  // if(error) return (<div className="text-xs text-wrap">Error loading favorite projects</div>);
 
   const favorites:favorite[] = []
   
@@ -49,13 +50,12 @@ const StaffManagerSidebar = () => {
     favorites.push({
       id: item.project.id,
       name: item.project.name,
+      path: `/staff-manager-panel/projects/${item.project.id}`,
       icon: <Heart />
     });
   });
 
   groups[1].items= favorites || groups[1].items;
-  
-  const [open, setOpen] = useState(false);
 
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
@@ -164,7 +164,7 @@ const StaffManagerSidebar = () => {
 
   return (
     <Sidebar className="border border-slate-200 px-2 py-8 space-y-8 bg-white! overflow-y-auto">
-      <SidebarHeader className="!bg-white">
+      <SidebarHeader className="bg-white!">
         <Link to="/">
           <img src={Logo} alt="Logo" className="w-44 h-[50px]" />
         </Link>
@@ -180,7 +180,7 @@ const StaffManagerSidebar = () => {
                     {group.label}
                   </SidebarGroupLabel>
 
-                  <SidebarMenu className="space-y-[10px]">
+                  <SidebarMenu className="space-y-2.5">
                     {group.items.map((item) =>
                       renderSidebarItem(item)
                     )}
@@ -194,7 +194,7 @@ const StaffManagerSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="!bg-white">
+      <SidebarFooter className="bg-white!">
         <UserProfile />
       </SidebarFooter>
     </Sidebar>
