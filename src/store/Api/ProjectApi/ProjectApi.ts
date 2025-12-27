@@ -5,7 +5,7 @@ import baseApi from "../BaseApi/BaseApi";
 const projectApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createProject: builder.mutation({
-      query: ({ employeeIds, ...data }) => ({
+      query: ({ ...data }) => ({
         url: "/project",
         method: "POST",
         body: data,

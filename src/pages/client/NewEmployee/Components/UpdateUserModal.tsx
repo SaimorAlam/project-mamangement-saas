@@ -26,12 +26,10 @@ interface UpdateUserModalProps {
 
 const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
   const { data, isLoading } = useGetAllProjectsQuery({});
-  console.log(data);
   const projectData = data?.data?.projects?.data?.map((project: any) => ({
     id: project.id,
     name: project.name,
   }));
-  console.log(projectData);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -158,7 +156,11 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
                 </SelectTrigger>
                 <SelectContent>
                   {projectData?.map((project: any) => (
-                    <SelectItem key={project.id} value={project.id} className="hover:bg-gray-100">
+                    <SelectItem
+                      key={project.id}
+                      value={project.id}
+                      className="hover:bg-gray-100"
+                    >
                       {project.name}
                     </SelectItem>
                   ))}
@@ -172,7 +174,13 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button variant="default" className="bg-blue-500 text-white" onClick={handleSubmit}>Update</Button>
+          <Button
+            variant="default"
+            className="bg-blue-500 text-white"
+            onClick={handleSubmit}
+          >
+            Update
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

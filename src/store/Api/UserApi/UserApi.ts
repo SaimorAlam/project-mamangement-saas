@@ -3,10 +3,19 @@ import baseApi from "../BaseApi/BaseApi";
 const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUsers: builder.query({
-      query: () => ({
-        url: "/users",
-        method: "GET",
-      }),
+      query: (args) => {
+        const params = new URLSearchParams();
+        Object.entries(args).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== "") {
+            params.append(key, value.toString());
+          }
+        });
+        return {
+          url: "/users",
+          method: "GET",
+          params: params,
+        };
+      },
       providesTags: ["Users"],
     }),
     getProfile: builder.query({
@@ -47,13 +56,6 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Employee"],
     }),
-    /* getAllEmployees: builder.query({
-      query: () => ({
-        url: "/users/employees",
-        method: "GET",
-      }),
-      providesTags: ["Employee"],
-    }), */
     createViewer: builder.mutation({
       query: (data) => ({
         url: "/users/viewers/create",
