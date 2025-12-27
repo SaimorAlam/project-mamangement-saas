@@ -1,50 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Chart from "react-apexcharts";
-import { useState, useEffect } from "react";
-import { useGetTopOverdueProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import { useMemo } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import type { ApexOptions } from "apexcharts";
+import { useGetStaffEmployeeTopOverDueQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 
 const OverDueChart = () => {
-  const [overDueChartData, setOverDueChartData] = useState<{
+  const { overdueList, isLoading, error } =
+    useGetStaffEmployeeTopOverDueQuery(
+      {},
+      {
+        selectFromResult: ({ data, isLoading, error }) => ({
+          overdueList: data?.data?.projects ?? [],
+          isLoading,
+          error,
+        }),
+      }
+    );
+
+  const chartData = useMemo<{
     series: { name: string; data: number[] }[];
-    options: any;
-  }>({
-    series: [],
-    options: {},
-  });
-
-  const {
-    data: overdueData,
-    isLoading: overdueLoading,
-    error: overdueError,
-  } = useGetTopOverdueProjectsQuery({});
-
-  useEffect(() => {
-    if (!overdueData?.data || overdueData.data.length === 0) {
-      setOverDueChartData({ series: [], options: {} });
-      return;
+    options: ApexOptions;
+  } | null>(() => {
+    if (!Array.isArray(overdueList) || overdueList.length === 0) {
+      return null;
     }
 
-    const categories = overdueData.data.map(
-      (item: any) => item.projectName
-    );
-    const values = overdueData.data.map(
-      (item: any) => item.overdueDays
-    );
-    const colors = overdueData.data.map((item: any) => {
-      if (item.priority === "High") return "#DA4352";
-      if (item.priority === "Medium") return "#FF974B";
-      if (item.priority === "Low") return "#F5B31A";
+    const normalized = overdueList.map((item: any) => ({
+      name: item.projectName ?? item.name ?? "Unnamed",
+      days: Number(item.overdueDays ?? item.overdue_days ?? 0),
+      priority: String(
+        item.priority ?? item.priority_level ?? ""
+      ).toLowerCase(),
+    }));
+
+    const categories = normalized.map((i) => i.name);
+    const values = normalized.map((i) => i.days);
+    const colors = normalized.map((i) => {
+      if (i.priority === "high") return "#DA4352";
+      if (i.priority === "medium") return "#FF974B";
+      if (i.priority === "low") return "#F5B31A";
       return "#888";
     });
 
-    setOverDueChartData({
-      series: [
-        {
-          name: "Overdue Days",
-          data: values,
-        },
-      ],
+    return {
+      series: [{ name: "Overdue Days", data: values }],
       options: {
         chart: {
           type: "bar",
@@ -60,83 +60,67 @@ const OverDueChart = () => {
           },
         },
         colors,
+        xaxis: {
+          categories,
+        },
         dataLabels: {
           enabled: true,
           formatter: (val: number) => `${val}d`,
-          style: {
-            colors: ["#FFF"],
-            fontSize: "13px",
-            fontWeight: "500",
-          },
-        },
-        xaxis: {
-          categories,
         },
         legend: {
           show: true,
           position: "top",
           horizontalAlign: "left",
+          fontSize: "13px",
+          fontWeight: 500,
           customLegendItems: ["Low", "Medium", "High"],
           markers: {
+            width: 10,
+            height: 10,
+            radius: 12,
             fillColors: ["#F5B31A", "#FF974B", "#DA4352"],
           },
         },
-        tooltip: {
-          y: {
-            formatter: (val: number) => `${val} days overdue`,
-          },
-        },
       },
-    });
-  }, [overdueData]);
+    };
+  }, [overdueList]);
 
   const getErrorMessage = (err: any) => {
     if (!err) return "Unknown error";
     if (typeof err === "string") return err;
     if (err?.data?.message) return err.data.message;
     if (err?.error) return err.error;
-    try {
-      return JSON.stringify(err);
-    } catch {
-      return "An error occurred while fetching overdue projects";
-    }
+    return "Failed to load overdue projects";
   };
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
-      {overdueLoading && (
+      {isLoading && (
         <div className="flex items-center justify-center h-40">
           <Spinner />
         </div>
       )}
 
-      {overdueError && (
+      {error && (
         <div className="text-center text-sm text-red-600 py-6">
-          {getErrorMessage(overdueError)}
+          {getErrorMessage(error)}
         </div>
       )}
 
-      {!overdueLoading &&
-        !overdueError &&
-        (!overDueChartData.series ||
-          overDueChartData.series.length === 0 ||
-          overDueChartData.series[0].data.length === 0) && (
-          <div className="text-center text-sm text-gray-500 py-6">
-            No overdue data to display
-          </div>
-        )}
+      {!isLoading && !error && !chartData && (
+        <div className="text-center text-sm text-gray-500 py-6">
+          Yet no overdue projects.
+        </div>
+      )}
 
-      {!overdueLoading &&
-        !overdueError &&
-        overDueChartData.series &&
-        overDueChartData.series.length > 0 && (
-          <Chart
-            options={overDueChartData.options}
-            series={overDueChartData.series}
-            type="bar"
-            height={350}
-          />
-        )}
+      {!isLoading && !error && chartData && (
+        <Chart
+          options={chartData.options}
+          series={chartData.series}
+          type="bar"
+          height={350}
+        />
+      )}
     </div>
   );
 };
