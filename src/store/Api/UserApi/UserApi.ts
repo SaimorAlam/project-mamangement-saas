@@ -47,13 +47,6 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Employee"],
     }),
-    /* getAllEmployees: builder.query({
-      query: () => ({
-        url: "/users/employees",
-        method: "GET",
-      }),
-      providesTags: ["Employee"],
-    }), */
     createViewer: builder.mutation({
       query: (data) => ({
         url: "/users/viewers/create",

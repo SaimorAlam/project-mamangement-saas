@@ -11,24 +11,28 @@ import ViewUserModal from "./ViewUserModal";
 import UpdateUserModal from "./UpdateUserModal";
 import Swal from "sweetalert2";
 
-const PAGE_SIZE = 10;
-
 const EmployeeTable = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const { data, isLoading } = useGetAllUsersQuery({});
-  const [deleteUser] = useDeleteUserMutation();
-  const users =
-    data?.data?.data.filter((user: any) => user.role !== "CLIENT") || [];
-
-  // Table states
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("All");
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [sortBy, setSortBy] = useState<keyof any | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [deleteUser] = useDeleteUserMutation();
   const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
+
+  const { data, isLoading } = useGetAllUsersQuery({
+    page: currentPage,
+    limit: PAGE_SIZE,
+  });
+
+  const users =
+    data?.data?.data.filter((user: any) => user.role !== "CLIENT") || [];
+  const meta = data?.data?.meta;
+  console.log(meta);
 
   // Filtered & searched data
   const filteredUsers = useMemo(() => {
@@ -66,13 +70,6 @@ const EmployeeTable = () => {
 
     return filtered;
   }, [users, search, roleFilter, statusFilter, sortBy, sortOrder]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
 
   const handleSort = (field: keyof any) => {
     if (sortBy === field) {
@@ -195,8 +192,8 @@ const EmployeeTable = () => {
         <tbody>
           {isLoading
             ? renderSkeleton()
-            : paginatedUsers.length
-            ? paginatedUsers.map((user: any) => (
+            : filteredUsers?.length
+            ? filteredUsers?.map((user: any) => (
                 <tr
                   key={user.id}
                   className="even:bg-gray-50 odd:bg-white hover:bg-gray-100 transition h-12"
@@ -313,19 +310,21 @@ const EmployeeTable = () => {
         </tbody>
       </table>
 
-      {/* Number Pagination */}
+      {/* Pagination */}
       <div className="flex justify-end items-center py-4 gap-2 pr-20 border-t border-gray-200">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-          <Button
-            key={page}
-            size="sm"
-            variant={page === currentPage ? "default" : "outline"}
-            onClick={() => setCurrentPage(page)}
-            className="p-4 border border-gray-200"
-          >
-            {page}
-          </Button>
-        ))}
+        {Array.from({ length: meta?.totalPages || 1 }, (_, i) => i + 1).map(
+          (page) => (
+            <Button
+              key={page}
+              size="sm"
+              variant={page === currentPage ? "default" : "outline"}
+              onClick={() => setCurrentPage(page)}
+              className="p-4 border border-gray-200 rounded-xl"
+            >
+              {page}
+            </Button>
+          )
+        )}
       </div>
       <ViewUserModal
         isOpen={isModalOpen}
