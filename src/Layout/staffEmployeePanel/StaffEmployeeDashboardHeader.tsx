@@ -1,7 +1,6 @@
 import React, { cloneElement, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
 import { Bell, Eye, FileText, Megaphone } from "lucide-react";
-import NotificationModal from "@/components/client/NotificationModal";
 import { useLocation, Link } from "react-router-dom";
 import {
   Breadcrumb,
@@ -15,6 +14,7 @@ import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffEmployeeHeaderContext";
 import { getStaffEmployeeSidebarItems } from "./staffEmployeeSidebarMenuItems";
 import UploadSubmission from "@/components/staffManager/overview/UploadSubmission";
+import StaffEmployeeNotificationModal from "./../../components/staffEmployee/StaffEmployeeNotificationModal";
 
 const StaffEmployeeDashboardHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -54,7 +54,7 @@ const StaffEmployeeDashboardHeader = () => {
             type={"Outline"}
             onClick={() => setIsOpen(true)}
           />
-          <NotificationModal
+          <StaffEmployeeNotificationModal
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
           />
@@ -79,19 +79,19 @@ const StaffEmployeeDashboardHeader = () => {
           <PrimaryButton
             leftIcon={<Megaphone className="text-2xl" />}
             title="Publish"
-            type={currentPath==="/staff-manager-panel" ? "Outline":"Primary"}
+            type={
+              currentPath === "/staff-manager-panel"
+                ? "Outline"
+                : "Primary"
+            }
             onClick={() => setIsOpen(true)}
           />
 
           {/* Conditional Quick Action */}
-          {currentPath==="/staff-employee-panel" && (
-          <div className="relative">
-            <>
-              {showButton && (
-                <UploadSubmission />
-              )}
-            </>
-          </div>
+          {currentPath === "/staff-employee-panel" && (
+            <div className="relative">
+              <>{showButton && <UploadSubmission />}</>
+            </div>
           )}
         </div>
       </div>

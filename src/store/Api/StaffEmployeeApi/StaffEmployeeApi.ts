@@ -38,7 +38,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: { projectId },
       }),
-      invalidatesTags: ["menuItems","Manager"],
+      invalidatesTags: ["menuItems", "Manager"],
     }),
     removeFavouriteProject: builder.mutation({
       query: (projectId) => ({
@@ -47,6 +47,9 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         body: { projectId: projectId },
       }),
       invalidatesTags: ["menuItems"],
+    }),
+    getNotifications: builder.query({
+      query: () => `/notification/received`,
     }),
   }),
 });
@@ -59,6 +62,7 @@ export const {
   useGetFavoriteProjectsQuery,
   useAddToFavouriteProjectMutation,
   useRemoveFavouriteProjectMutation,
+  useGetNotificationsQuery,
 } = staffEmployeeApi;
 
 export default staffEmployeeApi;
