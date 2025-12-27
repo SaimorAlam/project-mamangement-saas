@@ -17,6 +17,8 @@ interface ProjectLocationsMapProps {
 const containerStyle = {
   width: "100%",
   height: "80vh",
+  margin: "20px 0px",
+  borderRadius: "8px",
 };
 
 const ProjectLocationsMap: React.FC<ProjectLocationsMapProps> = ({
