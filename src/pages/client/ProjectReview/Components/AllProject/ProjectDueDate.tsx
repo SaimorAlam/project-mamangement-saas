@@ -4,7 +4,7 @@ import {
   DueDateHeaderSkeleton,
 } from "@/common/Skeleton/ProjectDueSkeleton";
 import ViewCalender from "@/common/ViewCalender";
-import { useGetUpcomingDeadlineQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
+import { useGetDeadlineQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 import { Clock4 } from "lucide-react";
 import { useState } from "react";
 
@@ -20,7 +20,7 @@ type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const ProjectDueDate = () => {
-  const { data, isLoading } = useGetUpcomingDeadlineQuery({});
+  const { data, isLoading } = useGetDeadlineQuery({});
   const [showCalendar, setShowCalendar] = useState(false);
   const [dateRange, setDateRange] = useState<Value>(null);
   const projects = data?.data?.projects;
