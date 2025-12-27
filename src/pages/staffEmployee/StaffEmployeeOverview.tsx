@@ -1,4 +1,4 @@
-import AllProgramProject from "@/components/client/Overview/AllProgramProject";
+import AllProgramProject from "@/components/staffEmployee/AllProgramProject";
 import UpcomingDeadline from "@/components/staffEmployee/Overview/UpcomingDeadline";
 import LatestSubmission from "@/components/staffEmployee/Overview/LatestSubmissions";
 import { useGetEmployeeDashboardStatsQuery } from "@/store/Api/EmployeeApi/EmployeeApi";

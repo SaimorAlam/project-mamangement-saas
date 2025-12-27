@@ -54,7 +54,14 @@ const StaffEmployeeSidebar = () => {
     });
   });
 
-  groups[1].items = favorites || groups[1].items;
+  const updatedGroups = groups.map((group, index) =>
+    index === 1
+      ? {
+          ...group,
+          items: favorites.length ? favorites : group.items,
+        }
+      : group
+  );
 
   // Active logic — active if route matches current path or any child route matches
   const isRouteActive = (item: any, parentPath = ""): boolean => {
@@ -172,7 +179,7 @@ const StaffEmployeeSidebar = () => {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {groups.map((group) => (
+              {updatedGroups.map((group) => (
                 <div key={group.label}>
                   <SidebarGroupLabel className="text-[#64748B] text-sm font-medium">
                     {group.label}

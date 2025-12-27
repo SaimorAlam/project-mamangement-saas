@@ -1,14 +1,11 @@
 import {
-  Building2,
   ChartPie,
   FileChartColumnIncreasing,
   Folder,
   Headphones,
   Info,
-  Megaphone,
   Milestone,
   Phone,
-  Store,
   UserStar,
   Ticket,
   TicketPlus,
@@ -55,19 +52,7 @@ export const getStaffEmployeeSidebarItems = (): SidebarGroup[] => {
       label: "Favorites",
       items: [
         {
-          icon: <Megaphone />,
-          name: "Marketing Strategy",
-          path: "/staff-employee-panel/marketing-strategy",
-        },
-        {
-          icon: <Building2 />,
-          name: "Alfala Building",
-          path: "/staff-employee-panel/alfala-building",
-        },
-        {
-          icon: <Store />,
-          name: "Timo's Super Shop",
-          path: "/staff-employee-panel/timos-super-shop",
+          name: "No favorite projects",
         },
       ],
     },
