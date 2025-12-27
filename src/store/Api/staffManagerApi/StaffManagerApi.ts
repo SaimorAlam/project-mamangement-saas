@@ -82,11 +82,11 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Manager"],
     }),
-    removeProjectFromFavorite: builder.mutation<any, {projectId: string}>({
-      query: (body)=> ({
-        url: `/favorites-project`,
+    removeProjectFromFavorite: builder.mutation({
+      query: (projectId) => ({
+        url: "/favorites-project",
         method: "DELETE",
-        body,
+        body: { projectId: projectId },
       }),
       invalidatesTags: ["Manager"],
     }),
