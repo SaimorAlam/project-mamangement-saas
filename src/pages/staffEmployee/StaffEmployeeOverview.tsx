@@ -36,8 +36,7 @@ const StaffEmployeeOverview = () => {
         growth_type: dataObj.growth > 0 ? "up" : "down",
         link_text: "View all",
         icon: iconMap[key] || "FolderIcon",
-        icon_bg_color:
-          key === "overdueProjects" ? "#DA4352" : "#069576",
+        icon_bg_color: key === "overdueProjects" ? "#DA4352" : "#069576",
       };
     }
   );

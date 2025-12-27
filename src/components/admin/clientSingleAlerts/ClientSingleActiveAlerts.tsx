@@ -94,29 +94,31 @@ const ClientSingleActiveAlerts = ({ alerts }: { alerts: any[] }) => {
                                     key={index}
                                     className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 transition-colors`}
                                 >
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 align-middle">
                                         {alert.alertType}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 align-middle">
                                         <Badge
                                             className={`${priorityColors[alert.priority] || priorityColors.Default}`}
                                         >
                                             {alert.priority}
                                         </Badge>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 align-middle">
                                         {alert.timeStamp}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 align-middle">
                                         <Badge
                                             className={`${statusColors[alert.status] || statusColors.New}`}
                                         >
                                             {alert.status}
                                         </Badge>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 flex gap-3">
-                                        <Eye className="h-4 w-4 text-blue-600 cursor-pointer hover:scale-110 transition-transform" />
-                                        <RotateCcw className="h-4 w-4 text-green-600 cursor-pointer hover:scale-110 transition-transform" />
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 align-middle">
+                                        <div className="flex gap-3">
+                                            <Eye className="h-4 w-4 text-blue-600 cursor-pointer hover:scale-110 transition-transform" />
+                                            <RotateCcw className="h-4 w-4 text-green-600 cursor-pointer hover:scale-110 transition-transform" />
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

@@ -304,26 +304,26 @@ const ClientAllProgram = ({
                     onClick={() => handleRowClick(program.id)}
                     className="hover:bg-gray-50 h-[60px] cursor-pointer"
                   >
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-6 py-4 text-sm align-middle">
                       {program.programName}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 align-middle">
                       <PriorityDropdown
                         defaultPriority={program.priority}
                       />
                     </td>
                     {!hideCreatedOn && (
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-gray-600 align-middle">
                         {formatDate(program.createdAt)}
                       </td>
                     )}
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-600 align-middle">
                       {formatDate(program.updatedAt)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {formatDate(program.deadline)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 align-middle">
                       <div className="flex items-center gap-3">
                         <div className="flex-1 max-w-[120px] h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
@@ -336,18 +336,20 @@ const ClientAllProgram = ({
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 flex gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditClick(program);
-                        }}
-                      >
-                        <FaEdit className="text-blue-600" />
-                      </button>
-                      {/* <button onClick={() => handleDeleteClick(program.id)}>
-                        <FaTrash className="text-red-600" />
-                      </button> */}
+                    <td className="px-6 py-4 align-middle">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditClick(program);
+                          }}
+                        >
+                          <FaEdit className="text-blue-600" />
+                        </button>
+                        {/* <button onClick={() => handleDeleteClick(program.id)}>
+                          <FaTrash className="text-red-600" />
+                        </button> */}
+                      </div>
                     </td>
                   </tr>
                 ) : (

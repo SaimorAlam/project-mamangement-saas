@@ -1,4 +1,5 @@
 // src/routes/clientRoutes.tsx
+import Employee from "@/pages/client/NewEmployee/Employee";
 import { lazy } from "react";
 
 const ClientOverview = lazy(
@@ -7,9 +8,9 @@ const ClientOverview = lazy(
 const ClientAllProgram = lazy(
   () => import("@/pages/client/Program/ClientAllProgram")
 );
-const ClientEmployees = lazy(
-  () => import("@/pages/client/Employees/ClientEmployees")
-);
+// const ClientEmployees = lazy(
+//   () => import("@/pages/client/Employees/ClientEmployees")
+// );
 const ClientMarketingStrategy = lazy(
   () => import("@/pages/client/ClientMarketingStrategy")
 );
@@ -34,7 +35,7 @@ const ClientCarlyleHall = lazy(
   () => import("@/pages/client/ClientCarlyleHall")
 );
 const ClientProjectReview = lazy(
-  () => import("@/pages/client/ClientProjectReview")
+  () => import("@/pages/client/ProjectReview/ClientProjectReview")
 );
 const ClientProjectBuilder = lazy(
   () => import("@/pages/client/ClientProjectBuilder")
@@ -79,7 +80,8 @@ export function getClientRoutes() {
   return [
     { index: true, element: <ClientOverview /> },
     // { path: "works", element: <ClientWorks /> },
-    { path: "employees", element: <ClientEmployees /> },
+    // { path: "employees", element: <ClientEmployees /> },
+    { path: "employees", element: <Employee /> },
     {
       path: "marketing-strategy",
       element: <ClientMarketingStrategy />,
