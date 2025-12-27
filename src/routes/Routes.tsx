@@ -135,7 +135,6 @@ const routes = createBrowserRouter([
         ),
         children: getViewerPanelRoutes(),
       },
-      
     ],
   },
   {

@@ -1,6 +1,4 @@
-import { ArrowRight, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
+import { Clock } from "lucide-react";
 import { useState } from "react";
 import "react-calendar/dist/Calendar.css";
 import ViewCalender from "@/common/ViewCalender";
@@ -44,7 +42,6 @@ const UpcomingDeadline = () => {
   const [value, onChange] = useState<Value>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   const { data, isLoading } = useGetDeadlineQuery({});
-  console.log(data);
   const deadlineData: IUpcomingDeadlineFromBackend[] =
     data?.data?.projects ?? [];
 
@@ -85,7 +82,7 @@ const UpcomingDeadline = () => {
       </div>
 
       {/* Footer */}
-      {deadlineData.length > 0 && (
+      {/* {deadlineData.length > 0 && (
         <Button
           variant="ghost"
           className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
@@ -93,7 +90,7 @@ const UpcomingDeadline = () => {
           View all {deadlineData.length}
           <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
-      )}
+      )} */}
     </BoxContainer>
   );
 };

@@ -6,7 +6,7 @@ import {
   Filter,
   TableIcon,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -18,10 +18,10 @@ import { Button } from "@/components/ui/button";
 import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
 import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import StaffManagerProjectCard from "@/components/staffManager/StaffManagerProjectCard";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
 import Pagination from "@/components/client/Pagination";
+import ProjectCard from "./ProjectCard";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -71,7 +71,7 @@ const AllProgramProject = () => {
   const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [, setStatusFilter] = useState<string>("all");
   const [, setPriorityFilter] = useState<string>("all");
-
+  const navigate = useNavigate();
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
@@ -257,26 +257,25 @@ const AllProgramProject = () => {
       ) : (
         <>
           <div className="grid grid-cols-4 gap-5">
-            {projects?.map((projectData: StaffEmployeeProject) => {
+            {projects?.slice(0, 8).map((projectData: StaffEmployeeProject) => {
               return (
                 <div key={projectData.id}>
-                  <StaffManagerProjectCard project={projectData} />
+                  <ProjectCard project={projectData} />
                 </div>
               );
             })}
           </div>
-          {projects.length > 4 && (
+          {projects.length > 8 && (
             <div className="pt-6">
-              <Link to="all-program">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                >
-                  {/* Display total count */}
-                  View all {projects.length}
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/client-panel/all-program")}
+                className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              >
+                {/* Display total count */}
+                View all {projects.length}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
             </div>
           )}
         </>
