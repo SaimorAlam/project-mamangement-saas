@@ -65,6 +65,7 @@ const baseApi = createApi({
     "Employees",
     "Project",
     "Dashboard",
+    "menuItems",
   ],
 });
 export default baseApi;
