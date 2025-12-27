@@ -21,6 +21,12 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getStaffEmployeeSubmissionStatus: builder.query({
+      query: () => ({
+        url: `/employeeDashboard/submission-status`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -28,6 +34,7 @@ export const {
   useGetStaffEmployeeTopOverDueQuery,
   useGetStaffEmployeeUpcomingDeadlinesQuery,
   useGetStaffEmployeeLatestSubmissionsQuery,
+  useGetStaffEmployeeSubmissionStatusQuery,
 } = staffEmployeeApi;
 
 export default staffEmployeeApi;
