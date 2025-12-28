@@ -20,7 +20,7 @@ const TierChartModal: React.FC<TierChartModalProps> = ({
   const zIndex = 50 + tierLevel * 10;
 
   return (
-    <div
+    <div 
       className="fixed inset-0 backdrop-blur-sm bg-opacity-30 flex items-center justify-center"
       style={{ zIndex }}
     >
