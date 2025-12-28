@@ -106,7 +106,9 @@ const ClientProjectBuilder = () => {
           />
         )}
 
-        {selectedWidget === "pie-chart" && <ChartModuleTwo chartName="pie-chart" />}
+        {selectedWidget === "pie-chart" && (
+          <ChartModuleTwo chartName="pie-chart" />
+        )}
 
         {selectedWidget === "line-chart" && <LineChartModule />}
 
@@ -128,13 +130,13 @@ const ClientProjectBuilder = () => {
           </div>
         )}
 
-        {selectedWidget === "horizontal-bar-chart" && (
-          <HorizontalBarChart />
-        )}
+        {selectedWidget === "horizontal-bar-chart" && <HorizontalBarChart />}
 
         {selectedWidget === "heat-map-chart" && <HeatmapChart />}
 
-        {selectedWidget === "area-chart" && <ChartModuleOne chartName="area-chart" />}
+        {selectedWidget === "area-chart" && (
+          <ChartModuleOne chartName="area-chart" />
+        )}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
