@@ -9,16 +9,34 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Copy, Trash2, Download } from "lucide-react";
-import { generateChartData } from "@/utils";
-import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
+import { BsThreeDots } from "react-icons/bs";
+import { MdOutlineWidgets } from "react-icons/md";
+import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
+import { generateChartData } from "@/utils";
+import AddTierModal from "../Modal/AddTierModal";
+import TierChartModal from "../Modal/TierChartModal";
 
 /*       TYPES       */
 
 export type ChartData = {
   name: string;
   [key: string]: number | string;
+};
+
+type LegendValue = {
+  label: string;
+  field: string;
+  color: string;
+};
+
+export type TierChart = {
+  id: string;
+  name: string;
+  xAxisValues: string[];
+  legendValues: LegendValue[];
+  children: TierChart[];
 };
 
 type Props = {
@@ -28,6 +46,9 @@ type Props = {
   numOfLegendDataSet?: number;
   startingRange: number;
   endingRange: number;
+  onToggleWidget?: () => void;
+  tierLevel?: number;
+  chartId?: string;
 };
 
 /*       COMPONENT       */
@@ -39,8 +60,19 @@ export default function StackedBarChart({
   numOfLegendDataSet = 1,
   startingRange,
   endingRange,
+  onToggleWidget,
+  tierLevel = 0,
+  chartId = "root",
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showPopover, setShowPopover] = useState(false);
+
+  // Tier management states
+  const [showAddTierModal, setShowAddTierModal] = useState(false);
+  const [childTiers, setChildTiers] = useState<TierChart[]>([]);
+  const [activeTier, setActiveTier] = useState<TierChart | null>(null);
+
+  const [getChartTitleId] = useGetChartTitleIdMutation();
 
   /*   DATA   */
   const chartData: ChartData[] = useMemo(() => {
@@ -52,30 +84,36 @@ export default function StackedBarChart({
       startingRange,
       endingRange
     );
-  }, [xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange]);
+  }, [
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+  ]);
 
   /*   TOTAL   */
   const totalEmployees = useMemo(() => {
     return chartData.reduce((sum, row) => {
       return (
         sum +
-        legendValues.reduce(
-          (inner, l) => inner + Number(row[l.field] || 0),
-          0
-        )
+        legendValues.reduce((inner, l) => inner + Number(row[l.field] || 0), 0)
       );
     }, 0);
   }, [chartData, legendValues]);
 
-  /*   API calling + DOWNLOAD csv with id   */
-  const [getChartTitleId, { error, isLoading }] = useGetChartTitleIdMutation();
+  /*   ACTIONS   */
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
+  };
 
   const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
       lastFiledDAtaset: endingRange,
-      showWidgets: legendValues.map(l => ({
+      showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
       })),
@@ -89,21 +127,46 @@ export default function StackedBarChart({
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
     };
-    setIsDownloading(true)
+    setIsDownloading(true);
 
-    DownloadAndSaveCSVforModuleOneWidget(payload, getChartTitleId, widgetTitle, xAxisValues, legendValues)
+    DownloadAndSaveCSVforModuleOneWidget(
+      payload,
+      getChartTitleId,
+      widgetTitle,
+      xAxisValues,
+      legendValues
+    );
 
-    setIsDownloading(false)
-};
+    setIsDownloading(false);
+  };
 
+  const handleWidgetClick = () => {
+    if (onToggleWidget) {
+      onToggleWidget();
+    }
+    setShowPopover(false);
+  };
 
-  if (isLoading) return <p>Fetching id...</p>;
-  if (error) return <p>Error occurred while fetching data</p>;
+  const handleAddTierClick = () => {
+    setShowAddTierModal(true);
+    setShowPopover(false);
+  };
 
-  /*   ACTIONS   */
+  const handleSaveTier = (tierName: string) => {
+    const newTier: TierChart = {
+      id: `${chartId}-tier-${Date.now()}`,
+      name: tierName,
+      xAxisValues: xAxisValues,
+      legendValues: legendValues,
+      children: [],
+    };
+    setChildTiers([...childTiers, newTier]);
+    setShowAddTierModal(false);
+    setActiveTier(newTier);
+  };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
+  const handleCloseTierModal = () => {
+    setActiveTier(null);
   };
 
   /*   TOOLTIP   */
@@ -115,7 +178,7 @@ export default function StackedBarChart({
     return (
       <div className="bg-white p-3 border rounded shadow-lg">
         <p className="font-semibold mb-2">{row.name}</p>
-        {legendValues.map(l => (
+        {legendValues.map((l) => (
           <p key={l.field} style={{ color: l.color }} className="text-sm">
             {l.label}: {row[l.field]}
           </p>
@@ -127,70 +190,168 @@ export default function StackedBarChart({
   /*   RENDER   */
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg p-6">
-      <div className="flex justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-          <div className="flex gap-6 mt-3">
-            {legendValues.map(l =>
-              l.label ? (
-                <div key={l.field} className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: l.color }}
-                  />
-                  <span className="text-sm">{l.label}</span>
+    <>
+      <div className="w-full bg-white border border-gray-200 rounded-lg p-6">
+        {/* Tier level indicator */}
+        {tierLevel > 0 && (
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-sm text-gray-500">
+              {"→ ".repeat(tierLevel)}Tier Level {tierLevel}
+            </span>
+          </div>
+        )}
+
+        <div className="flex justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
+            <div className="flex gap-6 mt-3">
+              {legendValues.map((l) =>
+                l.label ? (
+                  <div key={l.field} className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: l.color }}
+                    />
+                    <span className="text-sm">{l.label}</span>
+                  </div>
+                ) : null
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-gray-500">Total {totalEmployees}</p>
+
+            <div className="flex gap-2 border-l pl-4 relative">
+              <button
+                onClick={() => setShowPopover(!showPopover)}
+                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
+              >
+                <BsThreeDots size={18} />
+              </button>
+
+              {showPopover && (
+                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
+                  <button
+                    onClick={() => {
+                      handleCopy();
+                      setShowPopover(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <Copy size={18} />
+                    <span>Copy</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      handleDownload();
+                      setShowPopover(false);
+                    }}
+                    disabled={isDownloading}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <Download size={18} />
+                    <span>Download</span>
+                  </button>
+
+                  <button
+                    onClick={() => setShowPopover(false)}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
+                  >
+                    <Trash2 size={18} />
+                    <span>Delete</span>
+                  </button>
+
+                  {onToggleWidget && (
+                    <button
+                      onClick={handleWidgetClick}
+                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                    >
+                      <MdOutlineWidgets size={18} />
+                      <span>Widget</span>
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleAddTierClick}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <GoPlus size={18} />
+                    <span>Add Tier</span>
+                  </button>
                 </div>
-              ) : null
-            )}
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <p className="text-sm text-gray-500">
-            Total {totalEmployees}
-          </p>
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="name" />
+            <YAxis domain={[startingRange, endingRange]} />
+            <Tooltip content={<CustomTooltip />} />
+            {legendValues.map((l, i) => (
+              <Bar
+                key={l.field}
+                dataKey={l.field}
+                stackId="a"
+                fill={l.color}
+                radius={i === legendValues.length - 1 ? [4, 4, 0, 0] : 0}
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
 
-          <div className="flex gap-2 border-l pl-4">
-            <button
-              onClick={handleCopy}
-              className="p-2 border rounded hover:bg-gray-50"
-            >
-              <Copy size={18} />
-            </button>
-
-            <button
-              onClick={handleDownload}
-              disabled={isDownloading}
-              className="p-2 border rounded hover:bg-gray-50"
-            >
-              <Download size={18} />
-            </button>
-
-            <button className="p-2 border rounded hover:bg-gray-50 text-red-600">
-              <Trash2 size={18} />
-            </button>
+        {/* Show child tiers */}
+        {childTiers.length > 0 && (
+          <div className="mt-6 space-y-4">
+            <h3 className="text-sm font-semibold text-gray-700">
+              Child Tiers:
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {childTiers.map((tier) => (
+                <button
+                  key={tier.id}
+                  onClick={() => setActiveTier(tier)}
+                  className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm font-medium"
+                >
+                  {tier.name}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      <ResponsiveContainer width="100%" height={350}>
-        <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="name" />
-          <YAxis domain={[startingRange, endingRange]} />
-          <Tooltip content={<CustomTooltip />} />
-          {legendValues.map((l, i) => (
-            <Bar
-              key={l.field}
-              dataKey={l.field}
-              stackId="a"
-              fill={l.color}
-              radius={i === legendValues.length - 1 ? [4, 4, 0, 0] : 0}
-            />
-          ))}
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+      {/* Add Tier Modal */}
+      <AddTierModal
+        isOpen={showAddTierModal}
+        onClose={() => setShowAddTierModal(false)}
+        onSave={handleSaveTier}
+        parentChartName={widgetTitle}
+      />
+
+      {/* Tier Chart Modal */}
+      {activeTier && (
+        <TierChartModal
+          isOpen={true}
+          onClose={handleCloseTierModal}
+          tierLevel={tierLevel + 1}
+        >
+          <StackedBarChart
+            widgetTitle={activeTier.name}
+            xAxisValues={activeTier.xAxisValues}
+            legendValues={activeTier.legendValues}
+            numOfLegendDataSet={activeTier.legendValues.length}
+            startingRange={startingRange}
+            endingRange={endingRange}
+            tierLevel={tierLevel + 1}
+            chartId={activeTier.id}
+          />
+        </TierChartModal>
+      )}
+    </>
   );
 }

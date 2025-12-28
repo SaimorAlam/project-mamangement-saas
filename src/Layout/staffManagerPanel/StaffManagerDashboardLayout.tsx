@@ -8,9 +8,11 @@ const StaffManagerDashboardLayout = () => {
   return (
     <HeaderProvider>
       <SidebarProvider
+        defaultOpen={true}
         style={
           {
             "--sidebar-width": "296px",
+            "--sidebar-width-icon": "80px",
           } as React.CSSProperties
         }
       >
