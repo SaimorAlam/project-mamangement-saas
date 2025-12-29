@@ -1,4 +1,4 @@
-import AdminDashboard from "@/pages/Admin/AdminDashboard";
+import AdminDashboard from "@/pages/Admin/Overview/AdminDashboard";
 import Help from "@/pages/Admin/Help";
 import Clients from "@/pages/Admin/Clients";
 import Analytics from "@/pages/Admin/Analytics";
