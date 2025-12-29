@@ -71,7 +71,7 @@ export default function AreaChart({
 
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
-  const [activeTier, setActiveTier] = useState<TierChart | null>(null);
+  const [showChildrenModal, setShowChildrenModal] = useState(false);
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
@@ -107,7 +107,7 @@ export default function AreaChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -118,7 +118,7 @@ export default function AreaChart({
       })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "AREA",
+      category: "BAR",
       xAxis: JSON.stringify({
         labels: xAxisValues,
         values: [],
@@ -126,10 +126,9 @@ export default function AreaChart({
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
     };
-
     setIsDownloading(true);
 
-    await DownloadAndSaveCSVforModuleOneWidget(
+    DownloadAndSaveCSVforModuleOneWidget(
       payload,
       getChartTitleId,
       widgetTitle,
@@ -140,18 +139,34 @@ export default function AreaChart({
     setIsDownloading(false);
   };
 
-  const handleAddTier = (tierName: string) => {
+  const handleWidgetClick = () => {
+    if (onToggleWidget) {
+      onToggleWidget();
+    }
+    setShowPopover(false);
+  };
+
+  const handleAddTierClick = () => {
+    setShowAddTierModal(true);
+    setShowPopover(false);
+  };
+
+  const handleSaveTier = (tierName: string) => {
     const newTier: TierChart = {
       id: `${chartId}-tier-${Date.now()}`,
       name: tierName,
-      xAxisValues,
-      legendValues,
+      xAxisValues: xAxisValues,
+      legendValues: legendValues,
       children: [],
     };
-
     setChildTiers([...childTiers, newTier]);
-    setActiveTier(newTier);
     setShowAddTierModal(false);
+  };
+
+  const handleChartClick = () => {
+    if (childTiers.length > 0) {
+      setShowChildrenModal(true);
+    }
   };
 
   /* ========= TOOLTIP ========= */
@@ -176,13 +191,12 @@ export default function AreaChart({
 
   return (
     <>
-      <div className="w-full bg-white border border-gray-200 rounded-lg p-6">
-        {tierLevel > 0 && (
-          <div className="mb-4 text-sm text-gray-500">
-            {"→ ".repeat(tierLevel)} Tier Level {tierLevel}
-          </div>
-        )}
-
+      <div
+        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
+          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+        }`}
+        onClick={handleChartClick}
+      >
         {/* HEADER */}
         <div className="flex justify-between mb-6">
           <div>
@@ -205,39 +219,81 @@ export default function AreaChart({
           </div>
 
           {/* ACTION MENU */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
             <p className="text-sm text-gray-500">Total {totalValue}</p>
 
-            <div className="relative border-l pl-4">
+            <div className="flex gap-2 border-l pl-4 relative">
               <button
-                onClick={() => setShowPopover(!showPopover)}
-                className="p-2 border rounded hover:bg-gray-50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowPopover(!showPopover);
+                }}
+                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
               >
                 <BsThreeDots size={18} />
               </button>
 
               {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border rounded-lg shadow-lg p-2 w-48 z-10">
-                  <MenuItem icon={<Copy />} label="Copy" onClick={handleCopy} />
-                  <MenuItem
-                    icon={<Download />}
-                    label="Download"
-                    onClick={handleDownload}
+                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopy();
+                      setShowPopover(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <Copy size={18} />
+                    <span>Copy</span>
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownload();
+                      setShowPopover(false);
+                    }}
                     disabled={isDownloading}
-                  />
-                  <MenuItem icon={<Trash2 />} label="Delete" danger />
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <Download size={18} />
+                    <span>Download</span>
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPopover(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
+                  >
+                    <Trash2 size={18} />
+                    <span>Delete</span>
+                  </button>
+
                   {onToggleWidget && (
-                    <MenuItem
-                      icon={<MdOutlineWidgets />}
-                      label="Widget"
-                      onClick={onToggleWidget}
-                    />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleWidgetClick();
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                    >
+                      <MdOutlineWidgets size={18} />
+                      <span>Widget</span>
+                    </button>
                   )}
-                  <MenuItem
-                    icon={<GoPlus />}
-                    label="Add Tier"
-                    onClick={() => setShowAddTierModal(true)}
-                  />
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddTierClick();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <GoPlus size={18} />
+                    <span>Add Tier</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -265,57 +321,50 @@ export default function AreaChart({
             ))}
           </ReAreaChart>
         </ResponsiveContainer>
+
+        {/* Indicator if chart has children */}
+        {childTiers.length > 0 && (
+          <div className="mt-4 text-center">
+            <p className="text-sm text-blue-600 font-medium">
+              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* TIER MODALS */}
+      {/* Add Tier Modal */}
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        onSave={handleAddTier}
+        onSave={handleSaveTier}
         parentChartName={widgetTitle}
       />
 
-      {activeTier && (
+      {/* Children Grid Modal */}
+      {showChildrenModal && (
         <TierChartModal
-          isOpen
-          onClose={() => setActiveTier(null)}
+          isOpen={showChildrenModal}
+          onClose={() => setShowChildrenModal(false)}
           tierLevel={tierLevel + 1}
+          title={widgetTitle}
         >
-          <AreaChart
-            widgetTitle={activeTier.name}
-            xAxisValues={activeTier.xAxisValues}
-            legendValues={activeTier.legendValues}
-            numOfLegendDataSet={activeTier.legendValues.length}
-            startingRange={startingRange}
-            endingRange={endingRange}
-            tierLevel={tierLevel + 1}
-            chartId={activeTier.id}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {childTiers.map((tier) => (
+              <AreaChart
+                key={tier.id}
+                widgetTitle={tier.name}
+                xAxisValues={tier.xAxisValues}
+                legendValues={tier.legendValues}
+                numOfLegendDataSet={tier.legendValues.length}
+                startingRange={startingRange}
+                endingRange={endingRange}
+                tierLevel={tierLevel + 1}
+                chartId={tier.id}
+              />
+            ))}
+          </div>
         </TierChartModal>
       )}
     </>
-  );
-}
-
-/* ===== SMALL MENU ITEM ===== */
-
-function MenuItem({
-  icon,
-  label,
-  onClick,
-  disabled,
-  danger,
-}: any) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`w-full flex items-center gap-3 px-3 py-2 rounded text-left hover:bg-gray-50 ${
-        danger ? "text-red-600" : ""
-      }`}
-    >
-      {icon}
-      <span>{label}</span>
-    </button>
   );
 }
