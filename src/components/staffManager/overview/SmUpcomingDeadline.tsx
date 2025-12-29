@@ -102,6 +102,7 @@ import { Loader2 } from "lucide-react";
 
 import UpcomingDeadlineCard from "./UpcomingDeadlineCard";
 import { useGetUpcomingDeadlinesQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import ErrorPage from "@/common/ErrorPage";
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -129,7 +130,7 @@ const SmUpcomingDeadline = () => {
     selectedDays: selectedDays !== null ? selectedDays : null,
   });
 
-  if (error) return <div className="text-gray-400 text-center">Something went wrong.</div>;
+  if (error) return <ErrorPage/>;
 
   const deadlineData = data?.data?.projects || [];
 
