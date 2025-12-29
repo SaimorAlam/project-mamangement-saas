@@ -95,7 +95,7 @@ const LineChartModule = () => {
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
           setLegendValues={setLegendValues}
-          startingRange={startingRange}
+          startingRange={startingRange} 
           setStartingRange={setStartingRange}
           endingRange={endingRange}
           setEndingRange={setEndingRange}
