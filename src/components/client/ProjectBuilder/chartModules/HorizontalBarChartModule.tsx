@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
-import StackedBarChart from "@/common/Charts/StackedBarChart";
+import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 
-const StackedBarChartModule = () => {
+const HorizontalBarChartModule = () => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -72,7 +72,7 @@ const StackedBarChartModule = () => {
 
   return (
     <div className="flex gap-3">
-      <StackedBarChart
+      <HorizontalBarChart
         widgetTitle={widgetTitle}
         xAxisValues={xAxisValues}
         legendValues={legendValues}
@@ -83,9 +83,9 @@ const StackedBarChartModule = () => {
       />
       {showWidget && (
         <ProjectConfiguration
-          widgedName="Stack Bar Chart"
+          widgedName="Horizontal Bar Chart"
           widgetTitle={widgetTitle}
-          widgetCategory="BAR"
+          widgetCategory="HORIZONTAL_BAR"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -106,4 +106,4 @@ const StackedBarChartModule = () => {
   );
 };
 
-export default StackedBarChartModule;
+export default HorizontalBarChartModule;

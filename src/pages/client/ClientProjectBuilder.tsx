@@ -4,10 +4,10 @@ import { useState } from "react";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
-import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
+// import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 // import MultiAxisLineChart from "@/common/Charts/LineChart";
 // import PieChart from "@/common/Charts/PieChart";
-import ProgressRing from "@/common/Charts/ProgressRing";
+import ProgressRing from "@/common/Charts/ProgressRingTest";
 import RadarCharts from "@/common/Charts/RadarChart";
 // import StackedBarChart from "@/common/Charts/StackedBarChart";
 // import ProjectConfiguration from "@/components/client/ProjectBuilder/ProjectConfiguration";
@@ -17,6 +17,7 @@ import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModul
 import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
+import HorizontalBarChartModule from './../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule';
 
 const ClientProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -130,7 +131,9 @@ const ClientProjectBuilder = () => {
           </div>
         )}
 
-        {selectedWidget === "horizontal-bar-chart" && <HorizontalBarChart />}
+        {selectedWidget === "horizontal-bar-chart" && (
+          <HorizontalBarChartModule />
+        )}
 
         {selectedWidget === "heat-map-chart" && <HeatmapChart />}
 

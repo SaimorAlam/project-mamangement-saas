@@ -1,27 +1,30 @@
 import React, { useState } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../WidgetForChartModuleOne";
 import MultiAxisLineChart from "@/common/Charts/LineChart";
 
 const LineChartModule = () => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
-  const [showWidget, setShowWidget] = useState(false);
+  const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
+  const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
+    useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] =
+    useState<number>(3);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#13A490" },
     { label: "", field: "", color: "#35B6EE" },
     { label: "", field: "", color: "#6F78F9" },
   ]);
-  const [startingRange, setStartingRange] = useState<number>(0);
-  const [endingRange, setEndingRange] = useState<number>(100);
+  const [startingRange, setStartingRange] = useState<number>(0); //for y axis
+  const [endingRange, setEndingRange] = useState<number>(100); // for y axis
 
   const minXaxisField = 1;
   const maxXaxisField = 7;
-
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -39,9 +42,11 @@ const LineChartModule = () => {
 
     setXAxisValues((prev) => {
       const updated = [...prev];
+      // Adding empty values if increased
       while (updated.length < value) {
         updated.push("");
       }
+      // Removing extra values if decreased
       return updated.slice(0, value);
     });
   };
@@ -52,12 +57,15 @@ const LineChartModule = () => {
       updated[index] = value;
       return updated;
     });
+    console.log("parant x values: ", xAxisValues);
   };
 
+  // Toggle widget visibility
   const handleToggleWidget = () => {
     setShowWidget(!showWidget);
   };
 
+  // Close widget (for X button)
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
@@ -75,7 +83,7 @@ const LineChartModule = () => {
       />
       {showWidget && (
         <ProjectConfiguration
-          widgedName="Line Chart"
+          widgedName="Multi Axis Line Chart"
           widgetTitle={widgetTitle}
           widgetCategory="LINE"
           setWidgetTitle={setWidgetTitle}

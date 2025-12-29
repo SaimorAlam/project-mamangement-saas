@@ -2,9 +2,9 @@ import { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
-import ProgressRing from "@/common/Charts/ProgressRing";
+import PieChartWidget from "@/common/Charts/PieChart";
 
-const ProgressRingModule = () => {
+const PieChartModule = () => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -17,19 +17,19 @@ const ProgressRingModule = () => {
     { label: "", field: "", color: "#6F78F9" },
   ]);
 
-  // Progress Ring doesn't use X-axis values or Y-axis ranges, but we need placeholders for ProjectConfiguration
+  // Pie charts don't use X-axis values or Y-axis ranges, but we need placeholders for ProjectConfiguration
   const [numOfXAxisDataSet] = useState<number>(0);
   const [xAxisValues] = useState<string[]>([]);
   const [startingRange] = useState<number>(0);
   const [endingRange] = useState<number>(100);
 
-  // Dummy handler for X-axis (not used in progress ring)
+  // Dummy handler for X-axis (not used in pie chart)
   const handleSetNumOfXAxisDataSet = () => {
-    // Not used for progress ring
+    // Not used for pie chart
   };
 
   const handleXAxisValueChange = () => {
-    // Not used for progress ring
+    // Not used for pie chart
   };
 
   // Toggle widget visibility
@@ -44,19 +44,17 @@ const ProgressRingModule = () => {
 
   return (
     <div className="flex gap-3">
-      <ProgressRing
+      <PieChartWidget
         widgetTitle={widgetTitle}
         legendValues={legendValues}
         numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
         onToggleWidget={handleToggleWidget}
       />
       {showWidget && (
         <ProjectConfiguration
-          widgedName="Progress Ring"
+          widgedName="Pie Chart"
           widgetTitle={widgetTitle}
-          widgetCategory="PROGRESS_RING"
+          widgetCategory="PIE"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -77,4 +75,4 @@ const ProgressRingModule = () => {
   );
 };
 
-export default ProgressRingModule;
+export default PieChartModule;

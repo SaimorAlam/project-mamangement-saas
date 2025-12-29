@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import {
   LineChart,
@@ -19,9 +18,9 @@ import { generateLineChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 
-/*     TYPES     */
+/*       TYPES       */
 
-type ChartData = {
+export type ChartData = {
   name: string;
   [key: string]: number | string;
 };
@@ -52,7 +51,7 @@ type Props = {
   chartId?: string;
 };
 
-/*     COMPONENT     */
+/*       COMPONENT       */
 
 export default function MultiAxisLineChart({
   widgetTitle = "My CSV",
@@ -78,7 +77,7 @@ export default function MultiAxisLineChart({
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
   /*   DATA   */
-  const data: ChartData[] = useMemo(() => {
+  const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateLineChartData(
       xAxisValues,
@@ -91,7 +90,7 @@ export default function MultiAxisLineChart({
   /*   ACTIONS   */
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
   const handleDownload = () => {
@@ -105,7 +104,7 @@ export default function MultiAxisLineChart({
       })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "BAR",
+      category: "LINE",
       xAxis: JSON.stringify({
         labels: xAxisValues,
         values: [],
@@ -157,14 +156,21 @@ export default function MultiAxisLineChart({
   };
 
   /*   TOOLTIP   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
 
     return (
       <div className="bg-white p-3 border rounded shadow-lg">
-        <p className="font-semibold mb-2">{payload[0].payload.name}</p>
+        <p className="font-semibold mb-2">
+          {payload[0].payload.name}
+        </p>
         {payload.map((p: any) => (
-          <p key={p.dataKey} style={{ color: p.color }} className="text-sm">
+          <p
+            key={p.dataKey}
+            style={{ color: p.color }}
+            className="text-sm"
+          >
             {p.name}: {p.value}
           </p>
         ))}
@@ -178,39 +184,21 @@ export default function MultiAxisLineChart({
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+          childTiers.length > 0
+            ? "cursor-pointer hover:shadow-lg transition-shadow"
+            : ""
         }`}
         onClick={handleChartClick}
       >
         <div className="flex justify-between mb-6">
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <div className="flex gap-6 mt-3">
-              {legendValues.map((l) =>
-                l.label ? (
-                  <div key={l.field} className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-1"
-                      style={{ backgroundColor: l.color }}
-                    />
-                    <span className="text-sm">{l.label}</span>
-                  </div>
-                ) : null
-              )}
-            </div>
           </div>
 
-          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowLineOnly(!showLineOnly);
-              }}
-              className="text-blue-500 text-sm hover:text-blue-700"
-            >
-              Show Line Only {showLineOnly ? "✓" : ""}
-            </button>
-
+          <div
+            className="flex items-center gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex gap-2 border-l pl-4 relative">
               <button
                 onClick={(e) => {
@@ -289,36 +277,81 @@ export default function MultiAxisLineChart({
           </div>
         </div>
 
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis domain={[startingRange, endingRange]} />
-            <Tooltip content={<CustomTooltip />} />
+        {/* Legend */}
+        <div className="flex justify-between mb-6">
+          <div className="flex gap-6 mt-3">
+            {legendValues.map((l) =>
+              l.label ? (
+                <div
+                  key={l.field}
+                  className="flex items-center gap-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-1"
+                      style={{ backgroundColor: l.color }}
+                    ></div>
+                    <span className="text-sm text-gray-600">
+                      {l.label}
+                    </span>
+                  </div>
+                </div>
+              ) : null
+            )}
+          </div>
 
-            {legendValues.map((l) => (
-              <Line
-                key={l.field}
-                type="monotone"
-                dataKey={l.field}
-                stroke={l.color}
-                dot={!showLineOnly}
-                strokeWidth={2}
-                opacity={
-                  hoveredLine === null || hoveredLine === l.field ? 1 : 0.3
-                }
-                onMouseEnter={() => setHoveredLine(l.field)}
-                onMouseLeave={() => setHoveredLine(null)}
-              />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowLineOnly(!showLineOnly);
+            }}
+            className="text-blue-500 text-sm"
+          >
+            Show Line Only {showLineOnly ? "✓" : ""}
+          </button>
+        </div>
+
+        {/* Chart */}
+        {chartData.length ? (
+          <ResponsiveContainer width="100%" height={350}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis domain={[startingRange, endingRange]} />
+              <Tooltip content={<CustomTooltip />} />
+
+              {legendValues.map((l) => (
+                <Line
+                  key={l.field}
+                  type="monotone"
+                  dataKey={l.field}
+                  stroke={l.color}
+                  dot={!showLineOnly}
+                  strokeWidth={2}
+                  opacity={
+                    hoveredLine === null || hoveredLine === l.field
+                      ? 1
+                      : 0.3
+                  }
+                  onMouseEnter={() => setHoveredLine(l.field)}
+                  onMouseLeave={() => setHoveredLine(null)}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-96 flex items-center justify-center text-gray-400">
+            No data available, Please fill the input field to generate
+            the chart and then download the csv.
+          </div>
+        )}
 
         {/* Indicator if chart has children */}
         {childTiers.length > 0 && (
           <div className="mt-4 text-center">
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           </div>
         )}
