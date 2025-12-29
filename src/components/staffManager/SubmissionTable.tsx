@@ -171,9 +171,6 @@ export default function SubmissionTable({
                         >
                           <EditSubmissionModal
                             data={submission}
-                            onSubmit={(payload) => {
-                              console.log("RTK query will integrate here :", payload);
-                            }}
                           />
                           
                           <span className="sr-only">
