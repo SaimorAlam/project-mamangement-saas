@@ -73,8 +73,8 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
           </div>
 
           {/* Value and growth */}
-          <div className="flex items-center justify-between ">
-            <span className="text-4xl font-medium text-gray-900">{value}</span>
+          <div className="flex items-center justify-between overflow-hidden">
+            <span className="text-4xl font-medium text-gray-900 w-2/3 overflow-hidden">{value}{title==="Overdue" && "%"}</span>
 
             {growth && (
               <span
