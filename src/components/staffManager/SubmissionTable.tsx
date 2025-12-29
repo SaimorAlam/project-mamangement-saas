@@ -28,7 +28,7 @@ export interface Submission {
     user: {
       name: string;
       profileImage: string;
-    }
+    };
   };
   createdAt: string;
   status: "APPROVED" | "PENDING" | "RETURNED" | "DRAFT";
@@ -42,8 +42,8 @@ export default function SubmissionTable({
   submissions,
 }: SubmissionTableProps) {
   const [viewOpen, setViewOpen] = useState(false);
-  const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
-
+  const [selectedSubmission, setSelectedSubmission] =
+    useState<any>(null);
 
   const getInitials = (name: string) =>
     name
@@ -73,9 +73,11 @@ export default function SubmissionTable({
   if (submissions.length === 0) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <h1 className="text-gray-400 text-center">Not yet any projects submitted.</h1>
+        <h1 className="text-gray-400 text-center">
+          Not yet any projects submitted.
+        </h1>
       </div>
-    )
+    );
   }
 
   return (
@@ -118,11 +120,15 @@ export default function SubmissionTable({
                         {submission.employee.user.profileImage && (
                           <Avatar className="size-10">
                             <AvatarImage
-                              src={submission.employee.user.profileImage}
+                              src={
+                                submission.employee.user.profileImage
+                              }
                               alt={submission.employee.user.name}
                             />
                             <AvatarFallback className="text-base font-normal">
-                              {getInitials(submission.employee.user.name)}
+                              {getInitials(
+                                submission.employee.user.name
+                              )}
                             </AvatarFallback>
                           </Avatar>
                         )}
@@ -138,8 +144,9 @@ export default function SubmissionTable({
                     <TableCell className="px-6 py-3.5">
                       <Badge
                         variant="outline"
-                        className={`py-1.5 px-3 min-w-20 ${statusClasses[submission.status]
-                          }`}
+                        className={`py-1.5 px-3 min-w-20 ${
+                          statusClasses[submission.status]
+                        }`}
                       >
                         {statusLabels[submission.status]}
                       </Badge>
@@ -169,10 +176,8 @@ export default function SubmissionTable({
                           className="size-6 p-0 hover:bg-muted hover:scale-105 hover:cursor-pointer"
                           title="Edit submission"
                         >
-                          <EditSubmissionModal
-                            data={submission}
-                          />
-                          
+                          <EditSubmissionModal data={submission} />
+
                           <span className="sr-only">
                             Edit submission
                           </span>
