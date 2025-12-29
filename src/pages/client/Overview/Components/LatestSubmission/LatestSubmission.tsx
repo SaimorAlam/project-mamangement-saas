@@ -21,6 +21,7 @@ import { ArrowDownUp, ChevronDown } from "lucide-react";
 import BoxContainer from "@/common/BoxContainer";
 import { useGetAllSubmissionQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 import ViewSubmissionDialog from "./ViewSubmissionDialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type SortField = "date" | "submission" | "status";
 type SortOrder = "asc" | "desc";
@@ -30,6 +31,8 @@ const statusStyles: Record<string, string> = {
   APPROVED: "bg-green-50 text-green-700 border-green-200",
   RETURNED: "bg-red-50 text-red-700 border-red-200",
 };
+
+const TABLE_SKELETON_ROWS = 6;
 
 const LatestSubmission = () => {
   const { data, isLoading } = useGetAllSubmissionQuery({});
@@ -67,7 +70,7 @@ const LatestSubmission = () => {
     <BoxContainer>
       <Card className="border-none shadow-none p-0!">
         {/* Header */}
-        <CardHeader className="flex flex-row items-center justify-between px-0 ">
+        <CardHeader className="flex flex-row items-center justify-between px-0">
           <h4 className="text-2xl font-medium">Latest Submission</h4>
 
           <DropdownMenu>
@@ -141,28 +144,24 @@ const LatestSubmission = () => {
           </DropdownMenu>
         </CardHeader>
 
-        {/* Table Container */}
+        {/* Table */}
         <CardContent className="p-0 border border-gray-200 rounded-xl overflow-hidden">
           <ScrollArea className="h-[500px] w-full">
             <table className="w-full caption-bottom text-sm">
               <TableHeader className="sticky top-0 bg-gray-50 z-20 shadow-sm">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="sticky top-0 bg-gray-50 px-6 py-4 text-left font-semibold text-gray-900 z-20 w-[20%]">
+                  <TableHead className="px-6 py-4 w-[20%]">
                     Submission
                   </TableHead>
-                  <TableHead className="sticky top-0 bg-gray-50 px-6 py-4 text-left font-semibold text-gray-900 z-20 w-[20%]">
-                    Project
-                  </TableHead>
-                  <TableHead className="sticky top-0 bg-gray-50 px-6 py-4 text-left font-semibold text-gray-900 z-20 w-[20%]">
+                  <TableHead className="px-6 py-4 w-[20%]">Project</TableHead>
+                  <TableHead className="px-6 py-4 w-[20%]">
                     Submitted By
                   </TableHead>
-                  <TableHead className="sticky top-0 bg-gray-50 px-6 py-4 text-left font-semibold text-gray-900 z-20 w-[15%]">
-                    Date
-                  </TableHead>
-                  <TableHead className="sticky top-0 bg-gray-50 px-6 py-4 text-center font-semibold text-gray-900 z-20 w-[15%]">
+                  <TableHead className="px-6 py-4 w-[15%]">Date</TableHead>
+                  <TableHead className="px-6 py-4 text-center w-[15%]">
                     Status
                   </TableHead>
-                  <TableHead className="sticky top-0 bg-gray-50 px-6 py-4 text-right font-semibold text-gray-900 z-20 w-[10%]">
+                  <TableHead className="px-6 py-4 text-right w-[10%]">
                     Action
                   </TableHead>
                 </TableRow>
@@ -170,33 +169,47 @@ const LatestSubmission = () => {
 
               <TableBody className="border border-gray-200">
                 {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="py-20 text-center">
-                      <div className="flex flex-col items-center justify-center text-gray-500 gap-2">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                        <span>Loading submissions...</span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  Array.from({ length: TABLE_SKELETON_ROWS }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="px-6 py-4">
+                        <Skeleton className="h-4 w-[70%]" />
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <Skeleton className="h-4 w-[60%]" />
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <Skeleton className="h-4 w-[65%]" />
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <Skeleton className="h-4 w-[50%]" />
+                      </TableCell>
+                      <TableCell className="px-6 py-4 text-center">
+                        <Skeleton className="h-6 w-20 rounded-full mx-auto" />
+                      </TableCell>
+                      <TableCell className="px-6 py-4 text-right">
+                        <Skeleton className="h-8 w-8 rounded-md ml-auto" />
+                      </TableCell>
+                    </TableRow>
+                  ))
                 ) : sortedSubmissions.length > 0 ? (
                   sortedSubmissions.map((item: any) => (
                     <TableRow
                       key={item.id}
                       className="hover:bg-gray-50/50 transition-colors"
                     >
-                      <TableCell className="px-6 py-4 text-left font-medium text-gray-900 truncate">
+                      <TableCell className="px-6 py-4 font-medium truncate">
                         {item.submission}
                       </TableCell>
 
-                      <TableCell className="px-6 py-4 text-left text-gray-600 truncate">
+                      <TableCell className="px-6 py-4 truncate text-gray-600">
                         {item.project?.name ?? "-"}
                       </TableCell>
 
-                      <TableCell className="px-6 py-4 text-left text-gray-600 truncate">
+                      <TableCell className="px-6 py-4 truncate text-gray-600">
                         {item.employee?.user?.name ?? "-"}
                       </TableCell>
 
-                      <TableCell className="px-6 py-4 text-left text-gray-600 whitespace-nowrap">
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-gray-600">
                         {new Date(item.createdAt).toLocaleDateString("en-GB", {
                           day: "numeric",
                           month: "short",
@@ -225,7 +238,7 @@ const LatestSubmission = () => {
                   <TableRow>
                     <TableCell
                       colSpan={6}
-                      className="text-center py-20 text-gray-500"
+                      className="py-20 text-center text-gray-500"
                     >
                       No submissions found
                     </TableCell>

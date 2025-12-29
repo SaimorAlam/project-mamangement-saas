@@ -1,4 +1,4 @@
-import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
+
 import ActivityLog from "@/components/client/Overview/ActivityLog";
 // import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
@@ -9,6 +9,7 @@ import DashboardPanelStatsCardSkeleton from "@/common/Skeleton/DashboardPanelSta
 import ProjectOverdueBarChart from "./Components/ProjectOverdueBarChart";
 import LatestSubmission from "./Components/LatestSubmission/LatestSubmission";
 import AllProgramProject from "./Components/AllProgramProjects/AllProgramProjects";
+import UpcomingDeadline from "./Components/UpcomingDeadline";
 
 const ClientOverview = () => {
   const { data: overview, isLoading } = useGetOverviewStackQuery({});
