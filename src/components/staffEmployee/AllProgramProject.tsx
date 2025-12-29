@@ -23,6 +23,7 @@ import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeP
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import StaffEmployeeProjectCard from "./StaffEmployeeProjectCard";
 import ContentLoader from "react-content-loader";
+import Pagination from "./../../common/Pagination";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -69,21 +70,30 @@ export interface StaffEmployeeProject {
 }
 
 const AllProgramProject = () => {
-  const [viewMode, setViewMode] = useState<"table" | "board">("board");
-  const [, setStatusFilter] = useState<string>("all");
-  const [, setPriorityFilter] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"table" | "board">(
+    "board"
+  );
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [priorityFilter, setPriorityFilter] = useState<string>("all");
 
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
-  // const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // const itemsPerPage = 6;
+  const itemsPerPage = 6;
 
-  const { data, isLoading } = useGetAllProjectsQuery({});
+  const { data, isLoading } = useGetAllProjectsQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    status: statusFilter === "all" ? "" : statusFilter.toUpperCase(),
+    priority:
+      priorityFilter === "all" ? "" : priorityFilter.toUpperCase(),
+  });
 
+  
   const projects = data?.data?.projects?.data || [];
 
-  // const totalPages = Math.ceil(projects.length / itemsPerPage);
+  const totalPages = Math.ceil(projects.length / itemsPerPage);
 
   const statusOptions = [
     { value: "all", title: "All Status" },
@@ -208,7 +218,9 @@ const AllProgramProject = () => {
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "startDate" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortBy === "startDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortBy("startDate")}
               >
@@ -216,7 +228,9 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortBy === "endDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortBy("endDate")}
               >
@@ -231,7 +245,9 @@ const AllProgramProject = () => {
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortOrder === "asc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortOrder("asc")}
               >
@@ -239,7 +255,9 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortOrder === "desc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortOrder("desc")}
               >
@@ -293,13 +311,13 @@ const AllProgramProject = () => {
             projects={projects as StaffEmployeeProject[]}
           />
 
-          {/* <Pagination
+          <Pagination
             currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            itemsPerPage={itemsPerPage}
             totalPages={totalPages}
-            filteredDataLength={projects.length}
-          /> */}
+            itemsPerPage={itemsPerPage}
+            totalPrograms={projects.length}
+            onPageChange={setCurrentPage}
+          />
         </>
       ) : (
         <>
