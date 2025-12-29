@@ -7,7 +7,11 @@ import { FaStar } from "react-icons/fa6";
 import { toast } from "sonner";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import ProjectDetailsModal from "@/components/staffManager/overview/ProjectDetailsModal";
-import { useAddFavoriteProjectMutation } from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
+import {
+  useAddFavoriteProjectMutation,
+  useGetFavoriteProjectsQuery,
+  useRemoveFavoriteProjectMutation,
+} from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
 
 export type ProjectStatus =
   | "LIVE"
@@ -95,9 +99,11 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     progress,
     status,
   } = project;
-
   const [addFavoriteProject] = useAddFavoriteProjectMutation();
-
+  const [removeFavoriteProject] = useRemoveFavoriteProjectMutation();
+  const { data, isLoading } = useGetFavoriteProjectsQuery({});
+  const FavoriteProjects = data?.data.map((item: any) => item?.projectId);
+  const isFavorite = FavoriteProjects?.includes(id);
   const priorityColor =
     priority === "HIGH"
       ? "text-[#DA4352]"
@@ -106,44 +112,28 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       : "text-[#16A34A]";
 
   const handleAddToFavorite = async (projectId: string) => {
-    
+    let res: any;
+    const toastId = toast.loading(
+      isFavorite ? "Removing from favorites..." : "Adding to favorites..."
+    );
     try {
-      const res = await addFavoriteProject(projectId);
-      // Handle error response
-      if ("error" in res) {
-        const errorData = res.error as any;
-        const errorMessage =
-          errorData?.data?.message ||
-          errorData?.message ||
-          "Failed to add project to favorites";
-
-        toast.error(errorMessage);
-        return;
+      if (isFavorite) {
+        res = await removeFavoriteProject(projectId).unwrap();
+      } else {
+        res = await addFavoriteProject(projectId).unwrap();
       }
-
-      // Handle success response
-      if ("data" in res) {
-        const successData = res.data as any;
-
-        if (successData?.success === false) {
-          const errorMessage =
-            successData?.message || "Failed to add project to favorites";
-          toast.error(errorMessage);
-          return;
-        }
-
-        toast.success("Project added to favorites successfully");
-        return;
+      if (res.success) {
+        toast.success(
+          isFavorite
+            ? "Project removed from favorites successfully"
+            : "Project added to favorites successfully",
+          { id: toastId }
+        );
       }
-
-      toast.error("Unexpected response from server");
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "An error occurred";
-      toast.error(errorMessage);
+    } catch (error: any) {
+      toast.error(error?.data?.message, { id: toastId });
     }
   };
-
   return (
     <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">
       <CardContent className="flex flex-col justify-between p-0">
@@ -161,7 +151,13 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
               <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2">
                 <span>{name || "Project Name"}</span>{" "}
                 <button onClick={() => handleAddToFavorite(id)}>
-                  <FaStar className="text-yellow-500" size={18} />
+                  {isLoading ? (
+                    <FaStar className="text-gray-200 animate-pulse" size={18} />
+                  ) : isFavorite ? (
+                    <FaStar className="text-yellow-500" size={18} />
+                  ) : (
+                    <FaStar className="text-gray-500" size={18} />
+                  )}
                 </button>
               </p>
             </div>
