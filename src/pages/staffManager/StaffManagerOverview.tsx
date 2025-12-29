@@ -7,7 +7,7 @@ import ProjectStatusChart from './../../components/staffManager/overview/Project
 import { FaSpinner } from "react-icons/fa";
 import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
 import LatestSubmission from "@/components/staffManager/overview/LatestSubmission";
-import AllProgramProject from "@/components/staffEmployee/AllProgramProject";
+import AllProgramProject from "@/components/staffManager/overview/AllProgramProject";
 // import ActivityLog from "@/components/staffManager/overview/ActivityLog";
 
 const clientData = [

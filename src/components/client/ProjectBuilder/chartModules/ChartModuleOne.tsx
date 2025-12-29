@@ -10,6 +10,7 @@ import HeatmapChartNew from '@/common/Charts/HeatmapChartNew';
 
 const ChartModuleOne = ({ chartName }: { chartName: string }) => {
     const [widgetTitle, setWidgetTitle] = useState("My-CSV");
+    const [showWidget, setShowWidget] = useState(false);
 
     const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1)
     const [xAxisValues, setXAxisValues] = useState<string[]>([]);
@@ -58,6 +59,10 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
             return updated;
         });
     };
+
+    const handleToggleWidget = () => {
+        setShowWidget(!showWidget);
+    };
     return (
         <div className="flex justify-between gap-3">
             {(() => {
@@ -80,6 +85,7 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                             legendValues={legendValues}
                             startingRange={startingRange}
                             endingRange={endingRange}
+                            onToggleWidget={handleToggleWidget}
                         />
                     );
                 } else if (chartName === "line-chart") {
@@ -100,38 +106,41 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                             legendValues={legendValues}
                             startingRange={startingRange}
                             endingRange={endingRange}
+                            onToggleWidget={handleToggleWidget}
                         />
                     )
                 }
                 return null;
             })()}
 
-            <WidgetForChartModuleOne
-                widgedName={chartName === "stacked-bar-chart" ? "Stacked Bar Chart" :
-                    chartName === "area-chart" ? "Area Chart" :
-                        chartName === "line-chart" ? "Line Chart" :
-                            chartName === "heat-map-chart" ? "Heatmap Chart" :
-                                ""}
-                widgetTitle={widgetTitle}
-                widgetCategory={chartName === "stacked-bar-chart" ? "BAR" :
-                    chartName === "area-chart" ? "AREA" :
-                        chartName === "line-chart" ? "LINE" :
-                            chartName === "heat-map-chart" ? "HEATMAP" :
-                                "BAR"}
-                setWidgetTitle={setWidgetTitle}
-                numOfXAxisDataSet={numOfXAxisDataSet}
-                handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
-                xAxisValues={xAxisValues}
-                handleXAxisValueChange={handleXAxisValueChange}
-                numOfLegendDataSet={numOfLegendDataSet}
-                setNumOfLegendDataSet={setNumOfLegendDataSet}
-                legendValues={legendValues}
-                setLegendValues={setLegendValues}
-                startingRange={startingRange}
-                setStartingRange={setStartingRange}
-                endingRange={endingRange}
-                setEndingRange={setEndingRange}
-            />
+            {showWidget && (
+                <WidgetForChartModuleOne
+                    widgedName={chartName === "stacked-bar-chart" ? "Stacked Bar Chart" :
+                        chartName === "area-chart" ? "Area Chart" :
+                            chartName === "line-chart" ? "Line Chart" :
+                                chartName === "heat-map-chart" ? "Heatmap Chart" :
+                                    ""}
+                    widgetTitle={widgetTitle}
+                    widgetCategory={chartName === "stacked-bar-chart" ? "BAR" :
+                        chartName === "area-chart" ? "AREA" :
+                            chartName === "line-chart" ? "LINE" :
+                                chartName === "heat-map-chart" ? "HEATMAP" :
+                                    "BAR"}
+                    setWidgetTitle={setWidgetTitle}
+                    numOfXAxisDataSet={numOfXAxisDataSet}
+                    handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
+                    xAxisValues={xAxisValues}
+                    handleXAxisValueChange={handleXAxisValueChange}
+                    numOfLegendDataSet={numOfLegendDataSet}
+                    setNumOfLegendDataSet={setNumOfLegendDataSet}
+                    legendValues={legendValues}
+                    setLegendValues={setLegendValues}
+                    startingRange={startingRange}
+                    setStartingRange={setStartingRange}
+                    endingRange={endingRange}
+                    setEndingRange={setEndingRange}
+                />
+            )}
         </div>
     );
 };
