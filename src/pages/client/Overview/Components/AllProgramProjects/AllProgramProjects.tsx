@@ -1,12 +1,10 @@
 import {
   AlignStartHorizontal,
   ArrowDownUp,
-  ArrowRight,
   ChevronDown,
   Filter,
   TableIcon,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -15,13 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
 import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
 import Pagination from "@/components/client/Pagination";
 import ProjectCard from "./ProjectCard";
+import AllProgramTable from "./AllProgramTable";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -71,12 +69,11 @@ const AllProgramProject = () => {
   const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [, setStatusFilter] = useState<string>("all");
   const [, setPriorityFilter] = useState<string>("all");
-  const navigate = useNavigate();
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 6;
+  const itemsPerPage = 8;
 
   const { data, isLoading } = useGetAllProjectsQuery({});
 
@@ -242,9 +239,7 @@ const AllProgramProject = () => {
       {/* Content */}
       {viewMode === "table" ? (
         <>
-          <StaffEmployeeProjectTable
-            projects={projects as StaffEmployeeProject[]}
-          />
+          <AllProgramTable projects={projects as StaffEmployeeProject[]} />
 
           <Pagination
             currentPage={currentPage}
@@ -257,25 +252,27 @@ const AllProgramProject = () => {
       ) : (
         <>
           <div className="grid grid-cols-4 gap-5">
-            {projects?.slice(0, 8).map((projectData: StaffEmployeeProject) => {
-              return (
+            {projects
+              .slice(
+                (currentPage - 1) * itemsPerPage,
+                currentPage * itemsPerPage
+              )
+              .map((projectData: StaffEmployeeProject) => (
                 <div key={projectData.id}>
                   <ProjectCard project={projectData} />
                 </div>
-              );
-            })}
+              ))}
           </div>
-          {projects.length > 8 && (
-            <div className="pt-6">
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/client-panel/all-program")}
-                className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-              >
-                {/* Display total count */}
-                View all {projects.length}
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
+
+          {projects.length > itemsPerPage && (
+            <div className="pt-6 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                totalPages={totalPages}
+                filteredDataLength={projects.length}
+              />
             </div>
           )}
         </>

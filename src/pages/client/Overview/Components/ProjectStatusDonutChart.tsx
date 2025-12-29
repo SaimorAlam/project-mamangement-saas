@@ -4,7 +4,7 @@ import { useGetStatusQuery } from "@/store/Api/ClientDashboardApi/ClientDashboar
 import { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 
-type Period = "week" | "month" | "quarter" | "year";
+type Period = "week" | "month" | "year";
 
 interface DonutItem {
   label: string;
@@ -13,7 +13,7 @@ interface DonutItem {
   color: string;
 }
 
-const PERIOD_OPTIONS: Period[] = ["week", "month", "quarter", "year"];
+const PERIOD_OPTIONS: Period[] = ["week", "month", "year"];
 
 const STATUS_CONFIG = [
   { key: "inProgress", label: "In Progress", color: "#6366F1" },
@@ -96,11 +96,11 @@ const ProjectStatusDonutChart = () => {
             <select
               value={period}
               onChange={(e) => handlePeriodChange(e.target.value as Period)}
-              className="border rounded px-3 py-1 text-sm"
+              className="border rounded px-3 py-1 text-sm capitalize"
             >
               {PERIOD_OPTIONS.map((p) => (
                 <option key={p} value={p}>
-                  This {p}
+                  {p}
                 </option>
               ))}
             </select>

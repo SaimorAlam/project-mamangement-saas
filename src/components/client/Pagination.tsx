@@ -17,7 +17,7 @@ const Pagination = ({
   filteredDataLength,
 }: PaginationProps) => {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between w-full">
       {/* Displaying the current range of items being shown */}
       <p className="text-sm text-gray-600">
         Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}

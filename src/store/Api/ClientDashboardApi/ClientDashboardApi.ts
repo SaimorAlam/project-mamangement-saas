@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import baseApi from "../BaseApi/BaseApi";
 
 const clientDashboardApi = baseApi.injectEndpoints({
@@ -36,7 +37,19 @@ const clientDashboardApi = baseApi.injectEndpoints({
       providesTags: ["Dashboard"],
     }),
     getAllSubmission: builder.query({
-      query: () => "/client-dashboard/all-submissions",
+      query: (args: any) => {
+        const params = new URLSearchParams();
+        Object.entries(args).forEach(([key, value]) => {
+          if (value !== "" && value !== undefined && value !== null) {
+            params.set(key, value as string);
+          }
+        });
+        return {
+          url: "/client-dashboard/all-submissions",
+          method: "GET",
+          params,
+        };
+      },
       providesTags: ["Dashboard"],
     }),
   }),
