@@ -1,13 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Flag, Layers } from "lucide-react";
-import { Link } from "react-router-dom";
 import { FaStar } from "react-icons/fa6";
-import RenderStaffAvatars from "@/components/ViewerPanel/RenderStaffAvater";
+import { toast } from "sonner";
+import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
+import {
+  useAddFavoriteProjectMutation,
+  useGetFavoriteProjectsQuery,
+  useRemoveFavoriteProjectMutation,
+} from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
+import ProjectModal from "./ProjectModal";
+
 import PrimaryButton from "@/common/PrimaryButton";
-import { Project } from "./AllProject";
+import { useState } from "react";
 
 export type ProjectStatus =
   | "LIVE"
@@ -20,39 +27,43 @@ export type ProjectStatus =
 
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-// export interface Project {
-//   id: string;
-//   programId: string;
+export interface Project {
+  id: string;
+  programId: string;
 
-//   programName?: string;
-//   name: string;
-//   description: string;
+  programName?: string;
+  name: string;
+  description: string;
 
-//   status: ProjectStatus;
-//   priority: ProjectPriority;
+  status: ProjectStatus;
+  priority: ProjectPriority;
 
-//   startDate: string;
-//   deadline: string;
+  startDate: string;
+  deadline: string;
 
-//   progress: number;
+  progress: number;
 
-//   managerId: string;
-//   viewerId: string;
+  managerId: string;
+  viewerId?: string;
 
-//   chartList: unknown[];
+  chartList: unknown[];
 
-//   estimatedCompletedDate: string;
-//   projectCompleteDate: string | null;
+  estimatedCompletedDate: string;
+  projectCompleteDate: string | null;
 
-//   currentRate: string;
-//   budget: string;
+  currentRate: string;
+  budget: string;
 
-//   latitude: number | null;
-//   longitude: number | null;
+  latitude: number | null;
+  longitude: number | null;
 
-//   createdAt: string;
-//   updatedAt: string;
-// }
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ProjectCardProps {
+  project: Project;
+}
 
 const formatDate = (date: string) =>
   new Date(date).toLocaleDateString("en-GB", {
@@ -76,16 +87,27 @@ const renderStatusBadge = (status: ProjectStatus) => (
     variant="outline"
     className={`text-xs px-2 py-1 font-medium ${statusStyles[status]}`}
   >
-    {status?.replace("_", " ")}
+    {status.replace("_", " ")}
   </Badge>
 );
 
-const AllProjectCard = ({ project }: { project: Project }) => {
-  if (!project) return null;
-  console.log(project);
-  const { name, programName, priority, deadline, startDate, progress, status } =
-    project;
-
+const AllProjectCard = ({ project }: ProjectCardProps) => {
+  const {
+    id,
+    name,
+    programName,
+    priority,
+    deadline,
+    startDate,
+    progress,
+    status,
+  } = project;
+  const [addFavoriteProject] = useAddFavoriteProjectMutation();
+  const [removeFavoriteProject] = useRemoveFavoriteProjectMutation();
+  const [open, setOpen] = useState(false);
+  const { data, isLoading } = useGetFavoriteProjectsQuery({});
+  const FavoriteProjects = data?.data.map((item: any) => item?.projectId);
+  const isFavorite = FavoriteProjects?.includes(id);
   const priorityColor =
     priority === "HIGH"
       ? "text-[#DA4352]"
@@ -93,6 +115,29 @@ const AllProjectCard = ({ project }: { project: Project }) => {
       ? "text-[#F59E0B]"
       : "text-[#16A34A]";
 
+  const handleAddToFavorite = async (projectId: string) => {
+    let res: any;
+    const toastId = toast.loading(
+      isFavorite ? "Removing from favorites..." : "Adding to favorites..."
+    );
+    try {
+      if (isFavorite) {
+        res = await removeFavoriteProject(projectId).unwrap();
+      } else {
+        res = await addFavoriteProject(projectId).unwrap();
+      }
+      if (res.success) {
+        toast.success(
+          isFavorite
+            ? "Project removed from favorites successfully"
+            : "Project added to favorites successfully",
+          { id: toastId }
+        );
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message, { id: toastId });
+    }
+  };
   return (
     <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">
       <CardContent className="flex flex-col justify-between p-0">
@@ -109,8 +154,14 @@ const AllProjectCard = ({ project }: { project: Project }) => {
               </h4>
               <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2">
                 <span>{name || "Project Name"}</span>{" "}
-                <button>
-                  <FaStar className="text-yellow-500" size={18} />
+                <button onClick={() => handleAddToFavorite(id)}>
+                  {isLoading ? (
+                    <FaStar className="text-gray-200 animate-pulse" size={18} />
+                  ) : isFavorite ? (
+                    <FaStar className="text-yellow-500" size={18} />
+                  ) : (
+                    <FaStar className="text-gray-500" size={18} />
+                  )}
                 </button>
               </p>
             </div>
@@ -160,25 +211,29 @@ const AllProjectCard = ({ project }: { project: Project }) => {
         </div>
 
         {/* Progress */}
-        <div className="py-2 px-4">
+        <div className="py-2 px-4 space-y-4">
           <div className="flex justify-between text-sm mb-1">
             <span className="text-gray-600">Overall Progress</span>
             <span className="font-medium">{progress}%</span>
           </div>
           <Progress value={progress} className="h-2" />
+
+          <PrimaryButton
+            title="View Project Details"
+            type="Primary"
+            className="w-full h-10"
+            onClick={() => setOpen(true)}
+          />
         </div>
 
         {/* CTA */}
-        <div className="py-2 px-4">
-          {/* <Link to={`/projects/${id}`}> */}
-          <Link to={`/client-panel/work-in-progress`}>
-            <PrimaryButton
-              title="View Project"
-              type="Primary"
-              className="w-full h-10"
-            />
-          </Link>
-        </div>
+        {open && (
+          <ProjectModal
+            open={open}
+            setOpen={setOpen}
+            project={project as Project}
+          />
+        )}
       </CardContent>
     </Card>
   );
