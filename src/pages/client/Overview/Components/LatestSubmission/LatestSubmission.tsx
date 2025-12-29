@@ -17,14 +17,14 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowDownUp, ChevronDown } from "lucide-react";
+import { Filter, ArrowDownUp } from "lucide-react";
 import BoxContainer from "@/common/BoxContainer";
 import { useGetAllSubmissionQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 import ViewSubmissionDialog from "./ViewSubmissionDialog";
-import { Skeleton } from "@/components/ui/skeleton";
 
-type SortField = "date" | "submission" | "status";
+type SortField = "submission" | "project" | "submittedBy" | "date" | "status";
 type SortOrder = "asc" | "desc";
+type StatusFilter = "ALL" | "APPROVED" | "PENDING" | "RETURNED";
 
 const statusStyles: Record<string, string> = {
   PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
@@ -35,200 +35,207 @@ const statusStyles: Record<string, string> = {
 const TABLE_SKELETON_ROWS = 6;
 
 const LatestSubmission = () => {
-  const { data, isLoading } = useGetAllSubmissionQuery({});
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [status, setStatus] = useState<StatusFilter>("ALL");
 
   const [sortBy, setSortBy] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
+  const { data, isLoading } = useGetAllSubmissionQuery({
+    startDate: startDate || undefined,
+    endDate: endDate || undefined,
+    status: status !== "ALL" ? status : undefined,
+  });
+
+  /* ---------- client-side sorting ---------- */
   const sortedSubmissions = useMemo(() => {
     const list = [...(data?.data ?? [])];
 
     return list.sort((a: any, b: any) => {
-      if (sortBy === "date") {
-        const aDate = new Date(a.createdAt).getTime();
-        const bDate = new Date(b.createdAt).getTime();
-        return sortOrder === "asc" ? aDate - bDate : bDate - aDate;
+      let aValue: string | number = "";
+      let bValue: string | number = "";
+
+      switch (sortBy) {
+        case "submission":
+          aValue = a.submission;
+          bValue = b.submission;
+          break;
+        case "project":
+          aValue = a.project?.name ?? "";
+          bValue = b.project?.name ?? "";
+          break;
+        case "submittedBy":
+          aValue = a.employee?.user?.name ?? "";
+          bValue = b.employee?.user?.name ?? "";
+          break;
+        case "date":
+          aValue = new Date(a.createdAt).getTime();
+          bValue = new Date(b.createdAt).getTime();
+          break;
+        case "status":
+          aValue = a.status;
+          bValue = b.status;
+          break;
       }
 
-      if (sortBy === "submission") {
+      if (typeof aValue === "string" && typeof bValue === "string") {
         return sortOrder === "asc"
-          ? a.submission.localeCompare(b.submission)
-          : b.submission.localeCompare(a.submission);
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
       }
 
-      if (sortBy === "status") {
-        return sortOrder === "asc"
-          ? a.status.localeCompare(b.status)
-          : b.status.localeCompare(a.status);
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
       }
 
       return 0;
     });
   }, [data?.data, sortBy, sortOrder]);
 
+  const handleSort = (field: SortField) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+  };
+
   return (
     <BoxContainer>
       <Card className="border-none shadow-none p-0!">
         {/* Header */}
-        <CardHeader className="flex flex-row items-center justify-between px-0">
-          <h4 className="text-2xl font-medium">Latest Submission</h4>
+        <CardHeader className="flex flex-col gap-4 px-0">
+          <div className="flex items-center justify-between">
+            <h4 className="text-2xl font-medium">Latest Submission</h4>
+          </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2 h-12"
-              >
-                <ArrowDownUp className="w-5 h-5" />
-                Sort By
-                <ChevronDown className="w-5 h-5" />
-              </Button>
-            </DropdownMenuTrigger>
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="h-10 border rounded-md px-3 text-sm"
+            />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="h-10 border rounded-md px-3 text-sm"
+            />
 
-            <DropdownMenuContent align="end" className="w-52">
-              <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase">
-                Field
-              </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 h-10"
+                >
+                  <Filter className="w-4 h-4" />
+                  Status
+                </Button>
+              </DropdownMenuTrigger>
 
-              <DropdownMenuItem
-                onClick={() => setSortBy("date")}
-                className={
-                  sortBy === "date" ? "bg-indigo-50 text-indigo-600" : ""
-                }
-              >
-                Date
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                onClick={() => setSortBy("submission")}
-                className={
-                  sortBy === "submission" ? "bg-indigo-50 text-indigo-600" : ""
-                }
-              >
-                Submission
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                onClick={() => setSortBy("status")}
-                className={
-                  sortBy === "status" ? "bg-indigo-50 text-indigo-600" : ""
-                }
-              >
-                Status
-              </DropdownMenuItem>
-
-              <div className="my-1 border-t border-gray-200" />
-
-              <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase">
-                Order
-              </div>
-
-              <DropdownMenuItem
-                onClick={() => setSortOrder("asc")}
-                className={
-                  sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
-                }
-              >
-                Ascending
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                onClick={() => setSortOrder("desc")}
-                className={
-                  sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
-                }
-              >
-                Descending
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <DropdownMenuContent>
+                {["ALL", "APPROVED", "PENDING", "RETURNED"].map((s) => (
+                  <DropdownMenuItem
+                    key={s}
+                    onClick={() => setStatus(s as StatusFilter)}
+                  >
+                    {s}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </CardHeader>
 
         {/* Table */}
         <CardContent className="p-0 border border-gray-200 rounded-xl overflow-hidden">
           <ScrollArea className="h-[500px] w-full">
-            <table className="w-full caption-bottom text-sm">
-              <TableHeader className="sticky top-0 bg-gray-50 z-20 shadow-sm">
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="px-6 py-4 w-[20%]">
-                    Submission
-                  </TableHead>
-                  <TableHead className="px-6 py-4 w-[20%]">Project</TableHead>
-                  <TableHead className="px-6 py-4 w-[20%]">
-                    Submitted By
-                  </TableHead>
-                  <TableHead className="px-6 py-4 w-[15%]">Date</TableHead>
-                  <TableHead className="px-6 py-4 text-center w-[15%]">
-                    Status
-                  </TableHead>
-                  <TableHead className="px-6 py-4 text-right w-[10%]">
-                    Action
-                  </TableHead>
+            <table className="w-full text-sm">
+              <TableHeader className="sticky top-0 bg-gray-50 z-20">
+                <TableRow>
+                  {[
+                    { label: "Submission", field: "submission" },
+                    { label: "Project", field: "project" },
+                    { label: "Submitted By", field: "submittedBy" },
+                    { label: "Date", field: "date" },
+                    { label: "Status", field: "status" },
+                  ].map((col) => (
+                    <TableHead
+                      key={col.field}
+                      className={`px-6 py-4 cursor-pointer text-left ${
+                        col.field === "status" ? "text-center" : ""
+                      }`}
+                      onClick={() => handleSort(col.field as SortField)}
+                    >
+                      <span className="inline-flex items-center gap-1">
+                        {col.label}
+                        <ArrowDownUp
+                          className={`w-4 h-4 transition-transform duration-200 ${
+                            sortBy === col.field
+                              ? sortOrder === "asc"
+                                ? "rotate-180"
+                                : "rotate-0"
+                              : "opacity-30"
+                          }`}
+                        />
+                      </span>
+                    </TableHead>
+                  ))}
+                  <TableHead className="px-6 py-4 text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
 
-              <TableBody className="border border-gray-200">
+              <TableBody>
                 {isLoading ? (
                   Array.from({ length: TABLE_SKELETON_ROWS }).map((_, i) => (
                     <TableRow key={i}>
                       <TableCell className="px-6 py-4">
-                        <Skeleton className="h-4 w-[70%]" />
+                        <div className="h-4 bg-gray-200 w-2/3" />
                       </TableCell>
                       <TableCell className="px-6 py-4">
-                        <Skeleton className="h-4 w-[60%]" />
+                        <div className="h-4 bg-gray-200 w-1/2" />
                       </TableCell>
                       <TableCell className="px-6 py-4">
-                        <Skeleton className="h-4 w-[65%]" />
+                        <div className="h-4 bg-gray-200 w-2/3" />
                       </TableCell>
                       <TableCell className="px-6 py-4">
-                        <Skeleton className="h-4 w-[50%]" />
+                        <div className="h-4 bg-gray-200 w-1/3" />
                       </TableCell>
                       <TableCell className="px-6 py-4 text-center">
-                        <Skeleton className="h-6 w-20 rounded-full mx-auto" />
+                        <div className="h-6 bg-gray-200 w-20 mx-auto rounded-full" />
                       </TableCell>
                       <TableCell className="px-6 py-4 text-right">
-                        <Skeleton className="h-8 w-8 rounded-md ml-auto" />
+                        <div className="h-8 bg-gray-200 w-8 ml-auto rounded-md" />
                       </TableCell>
                     </TableRow>
                   ))
-                ) : sortedSubmissions.length > 0 ? (
+                ) : sortedSubmissions.length ? (
                   sortedSubmissions.map((item: any) => (
-                    <TableRow
-                      key={item.id}
-                      className="hover:bg-gray-50/50 transition-colors"
-                    >
-                      <TableCell className="px-6 py-4 font-medium truncate">
+                    <TableRow key={item.id}>
+                      <TableCell className="px-6 py-4 font-medium">
                         {item.submission}
                       </TableCell>
-
-                      <TableCell className="px-6 py-4 truncate text-gray-600">
+                      <TableCell className="px-6 py-4">
                         {item.project?.name ?? "-"}
                       </TableCell>
-
-                      <TableCell className="px-6 py-4 truncate text-gray-600">
+                      <TableCell className="px-6 py-4">
                         {item.employee?.user?.name ?? "-"}
                       </TableCell>
-
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-gray-600">
-                        {new Date(item.createdAt).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                      <TableCell className="px-6 py-4">
+                        {new Date(item.createdAt).toLocaleDateString("en-GB")}
                       </TableCell>
-
                       <TableCell className="px-6 py-4 text-center">
                         <Badge
                           variant="outline"
-                          className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                            statusStyles[item.status] ??
-                            "bg-gray-50 text-gray-600 border-gray-200"
-                          }`}
+                          className={statusStyles[item.status]}
                         >
                           {item.status}
                         </Badge>
                       </TableCell>
-
                       <TableCell className="px-6 py-4 text-right">
                         <ViewSubmissionDialog submission={item} />
                       </TableCell>
@@ -236,10 +243,7 @@ const LatestSubmission = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="py-20 text-center text-gray-500"
-                    >
+                    <TableCell colSpan={6} className="py-20 text-center">
                       No submissions found
                     </TableCell>
                   </TableRow>

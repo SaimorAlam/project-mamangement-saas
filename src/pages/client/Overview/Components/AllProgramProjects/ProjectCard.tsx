@@ -106,7 +106,6 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       : "text-[#16A34A]";
 
   const handleAddToFavorite = async (projectId: string) => {
-    
     try {
       const res = await addFavoriteProject(projectId);
       // Handle error response

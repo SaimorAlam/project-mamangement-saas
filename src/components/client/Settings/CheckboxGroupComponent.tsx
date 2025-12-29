@@ -18,12 +18,8 @@ const CheckboxGroup = ({
   className = "",
 }: CheckboxGroupProps) => {
   return (
-    <div
-      className={`border border-gray-200 rounded-lg p-6 ${className}`}
-    >
-      <h2 className="text-lg font-medium text-gray-900 mb-6">
-        {title}
-      </h2>
+    <div className={`border border-gray-200 rounded-lg p-6 ${className}`}>
+      <h2 className="text-lg font-medium text-gray-900 mb-6">{title}</h2>
       <div className="space-y-4">
         {items.map((item) => (
           <div key={item.id} className="flex items-center gap-3">
@@ -33,9 +29,7 @@ const CheckboxGroup = ({
               onChange={(e) => onChange(item.id, e.target.checked)}
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
-            <label className="text-sm text-gray-700">
-              {item.label}
-            </label>
+            <label className="text-sm text-gray-700">{item.label}</label>
           </div>
         ))}
       </div>
