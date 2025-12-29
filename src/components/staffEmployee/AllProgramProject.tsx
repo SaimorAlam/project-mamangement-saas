@@ -79,6 +79,7 @@ const AllProgramProject = () => {
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showItems, setShowItems] = useState(8);
 
   const itemsPerPage = 6;
 
@@ -90,7 +91,6 @@ const AllProgramProject = () => {
       priorityFilter === "all" ? "" : priorityFilter.toUpperCase(),
   });
 
-  
   const projects = data?.data?.projects?.data || [];
 
   const totalPages = Math.ceil(projects.length / itemsPerPage);
@@ -322,26 +322,35 @@ const AllProgramProject = () => {
       ) : (
         <>
           <div className="grid grid-cols-4 gap-5">
-            {projects?.map((projectData: StaffEmployeeProject) => {
-              return (
-                <div key={projectData.id}>
-                  <StaffEmployeeProjectCard project={projectData} />
-                </div>
-              );
-            })}
+            {projects
+              ?.slice(0, showItems)
+              .map((projectData: StaffEmployeeProject) => {
+                return (
+                  <div key={projectData.id}>
+                    <StaffEmployeeProjectCard project={projectData} />
+                  </div>
+                );
+              })}
           </div>
           {projects.length > 4 && (
             <div className="pt-6">
-              <Link to="/work-in-progress">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                >
-                  {/* Display total count */}
-                  View all {projects.length}
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
+              <Button
+                variant="ghost"
+                className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                onClick={() =>
+                  setShowItems(
+                    showItems !== projects.length
+                      ? projects.length
+                      : 8
+                  )
+                }
+              >
+                {/* Display total count */}
+                {showItems !== projects.length
+                  ? `View All ${projects.length}`
+                  : `View Less`}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
             </div>
           )}
         </>
