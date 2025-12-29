@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-// import { handleDownloadCSV } from "@/utils";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 
@@ -26,26 +25,27 @@ const WidgetForChartModuleOne = ({
   startingRange,
   setStartingRange,
   endingRange,
-  setEndingRange
+  setEndingRange,
+  onClose,
 }: {
-  widgedName: string,
-  widgetTitle: string,
-  widgetCategory: string,
-  setWidgetTitle: React.Dispatch<React.SetStateAction<string>>,
-  numOfXAxisDataSet: number,
-  handleSetNumOfXAxisDataSet: (e: React.ChangeEvent<HTMLInputElement>) => void,
-  xAxisValues: string[],
-  handleXAxisValueChange: (index: number, value: string) => void,
-  numOfLegendDataSet: number,
-  setNumOfLegendDataSet: React.Dispatch<React.SetStateAction<number>>,
-  legendValues: LegendValue[],
-  setLegendValues: React.Dispatch<React.SetStateAction<LegendValue[]>>,
-  startingRange: number,
-  setStartingRange: React.Dispatch<React.SetStateAction<number>>,
-  endingRange: number,
-  setEndingRange: React.Dispatch<React.SetStateAction<number>>
+  widgedName: string;
+  widgetTitle: string;
+  widgetCategory: string;
+  setWidgetTitle: React.Dispatch<React.SetStateAction<string>>;
+  numOfXAxisDataSet: number;
+  handleSetNumOfXAxisDataSet: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  xAxisValues: string[];
+  handleXAxisValueChange: (index: number, value: string) => void;
+  numOfLegendDataSet: number;
+  setNumOfLegendDataSet: React.Dispatch<React.SetStateAction<number>>;
+  legendValues: LegendValue[];
+  setLegendValues: React.Dispatch<React.SetStateAction<LegendValue[]>>;
+  startingRange: number;
+  setStartingRange: React.Dispatch<React.SetStateAction<number>>;
+  endingRange: number;
+  setEndingRange: React.Dispatch<React.SetStateAction<number>>;
+  onClose?: () => void;
 }) => {
-
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
@@ -54,9 +54,9 @@ const WidgetForChartModuleOne = ({
   const assignedBy = {
     name: "Alexis Burg",
     role: "Admin",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
-  }
-
+    image:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+  };
 
   // handler for Legend inputs
   const minLegend = 3;
@@ -88,29 +88,19 @@ const WidgetForChartModuleOne = ({
     });
   };
 
-  const handleLegendLabelChange = (
-    index: number,
-    value: string
-  ) => {
+  const handleLegendLabelChange = (index: number, value: string) => {
     setLegendValues((prev) => {
       const updated = [...prev];
       updated[index].label = value;
 
       // auto-generate field (camelCase)
-      updated[index].field = value
-        .toLowerCase()
-        .replace(/\s+/g, "");
+      updated[index].field = value.toLowerCase().replace(/\s+/g, "");
 
       return updated;
     });
-
-
   };
 
-  const handleLegendColorChange = (
-    index: number,
-    color: string
-  ) => {
+  const handleLegendColorChange = (index: number, color: string) => {
     setLegendValues((prev) => {
       const updated = [...prev];
       updated[index].color = color;
@@ -118,22 +108,7 @@ const WidgetForChartModuleOne = ({
     });
   };
 
-
-  // making this csvTemplate = "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
-  // const csvTemplate = (() => {
-  //   // Header row
-  //   const header =
-  //     ["Day", ...legendValues.map((l) => l.label)].join(",");
-
-  //   // Data rows
-  //   const rows = xAxisValues.map(
-  //     (day) => `${day}${",".repeat(legendValues.length)}`
-  //   );
-
-  //   return [header, ...rows].join("\n");
-  // })();
-
-  const [getChartTitleId, {isLoading }] = useGetChartTitleIdMutation();
+  const [getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const downloadCSV = () => {
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
@@ -159,16 +134,16 @@ const WidgetForChartModuleOne = ({
       alert(`Please add at least ${1} X-Axis value`);
       return;
     }
-    if(!widgetCategory){
-      alert(`Please input category : ${widgetCategory}`)
-      console.log("category: ",widgetCategory);
+    if (!widgetCategory) {
+      alert(`Please input category : ${widgetCategory}`);
+      console.log("category: ", widgetCategory);
       return;
     }
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
       lastFiledDAtaset: endingRange,
-      showWidgets: legendValues.map(l => ({
+      showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
       })),
@@ -182,21 +157,26 @@ const WidgetForChartModuleOne = ({
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
     };
-    DownloadAndSaveCSVforModuleOneWidget(payload, getChartTitleId, widgetTitle, xAxisValues, legendValues)
-
-    // handleDownloadCSV(csvTemplate, widgetTitle)
-  }
-
-
+    DownloadAndSaveCSVforModuleOneWidget(
+      payload,
+      getChartTitleId,
+      widgetTitle,
+      xAxisValues,
+      legendValues
+    );
+  };
 
   return (
-    <div className="w-78 h-full   bg-white border border-gray-100 rounded-lg shadow-lg">
+    <div className="w-78 h-full bg-white border border-gray-100 rounded-lg shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">
           Widget Configuration
         </h2>
-        <button className="text-gray-500 hover:text-gray-700">
+        <button
+          onClick={onClose}
+          className="text-gray-500 hover:text-gray-700"
+        >
           <X size={18} />
         </button>
       </div>
@@ -253,13 +233,15 @@ const WidgetForChartModuleOne = ({
                   key={index}
                   type="text"
                   required
-                  placeholder={`Enter ${index + 1}${index === 0
-                    ? "st"
-                    : index === 1
+                  placeholder={`Enter ${index + 1}${
+                    index === 0
+                      ? "st"
+                      : index === 1
                       ? "nd"
                       : index === 2
-                        ? "rd"
-                        : "th"} field name here...`}
+                      ? "rd"
+                      : "th"
+                  } field name here...`}
                   value={xAxisValues[index] || ""}
                   onChange={(e) =>
                     handleXAxisValueChange(index, e.target.value)
@@ -267,7 +249,6 @@ const WidgetForChartModuleOne = ({
                   className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
                 />
               ))}
-
             </div>
           </div>
         </div>
@@ -286,12 +267,14 @@ const WidgetForChartModuleOne = ({
             />
             <div
               onClick={() => setShowFilter(!showFilter)}
-              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showFilter ? "bg-blue-600" : "bg-gray-300"
-                }`}
+              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
+                showFilter ? "bg-blue-600" : "bg-gray-300"
+              }`}
             >
               <div
-                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showFilter ? "translate-x-5" : "translate-x-0"
-                  }`}
+                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
+                  showFilter ? "translate-x-5" : "translate-x-0"
+                }`}
               />
             </div>
           </div>
@@ -300,9 +283,7 @@ const WidgetForChartModuleOne = ({
         {/* Filter By */}
         {showFilter && (
           <div className="flex items-center">
-            <label className="text-xs text-gray-700 flex-1">
-              Filter By:
-            </label>
+            <label className="text-xs text-gray-700 flex-1">Filter By:</label>
             <div className="relative">
               <select
                 value={filter}
@@ -402,51 +383,53 @@ const WidgetForChartModuleOne = ({
                 />
                 <div
                   onClick={() => setShowLegend(!showLegend)}
-                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showLegend ? "bg-blue-600" : "bg-gray-300"
-                    }`}
+                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
+                    showLegend ? "bg-blue-600" : "bg-gray-300"
+                  }`}
                 >
                   <div
-                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showLegend ? "translate-x-5" : "translate-x-0"
-                      }`}
+                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
+                      showLegend ? "translate-x-5" : "translate-x-0"
+                    }`}
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          {showLegend && Array.from({ length: numOfLegendDataSet }).map((_, index) => (
-            <div key={index}>
-              {/* Legend Name */}
-              <div className="flex items-center justify-between mb-2">
-                <label
-                  className="text-xs text-gray-700"
-                  style={{ width: "110px" }}
-                >
-                  {index + 1}
-                  {index === 0
-                    ? "st"
-                    : index === 1
+          {showLegend &&
+            Array.from({ length: numOfLegendDataSet }).map((_, index) => (
+              <div key={index}>
+                {/* Legend Name */}
+                <div className="flex items-center justify-between mb-2">
+                  <label
+                    className="text-xs text-gray-700"
+                    style={{ width: "110px" }}
+                  >
+                    {index + 1}
+                    {index === 0
+                      ? "st"
+                      : index === 1
                       ? "nd"
                       : index === 2
-                        ? "rd"
-                        : "th"}{" "}
-                  Legend Name:
-                </label>
+                      ? "rd"
+                      : "th"}{" "}
+                    Legend Name:
+                  </label>
 
-                <input
-                  type="text"
-                  placeholder="Enter name here"
-                  value={legendValues[index]?.label || ""}
-                  onChange={(e) =>
-                    handleLegendLabelChange(index, e.target.value)
-                  }
-                  className="w-[50%] px-2 py-1 text-xs border border-gray-300 rounded"
-                />
-              </div>
+                  <input
+                    type="text"
+                    placeholder="Enter name here"
+                    value={legendValues[index]?.label || ""}
+                    onChange={(e) =>
+                      handleLegendLabelChange(index, e.target.value)
+                    }
+                    className="w-[50%] px-2 py-1 text-xs border border-gray-300 rounded"
+                  />
+                </div>
 
-              {/* Legend Color */}
-              {
-                widgedName === "Heatmap Chart" ? null : (
+                {/* Legend Color */}
+                {widgedName === "Heatmap Chart" ? null : (
                   <div className="flex items-center mb-3">
                     <label
                       className="text-xs text-gray-700"
@@ -456,10 +439,10 @@ const WidgetForChartModuleOne = ({
                       {index === 0
                         ? "st"
                         : index === 1
-                          ? "nd"
-                          : index === 2
-                            ? "rd"
-                            : "th"}{" "}
+                        ? "nd"
+                        : index === 2
+                        ? "rd"
+                        : "th"}{" "}
                       Legend Color:
                     </label>
 
@@ -483,12 +466,9 @@ const WidgetForChartModuleOne = ({
                       />
                     </div>
                   </div>
-                )
-              }
-
-            </div>
-          ))}
-
+                )}
+              </div>
+            ))}
         </div>
 
         {/* Assigned By */}
@@ -514,10 +494,17 @@ const WidgetForChartModuleOne = ({
 
       {/* Footer */}
       <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-gray-200">
-        <button className="px-4 py-1.5 text-xs font-medium border border-gray-200 rounded-md cursor-pointer text-gray-700 hover:text-gray-900">
+        <button
+          onClick={onClose}
+          className="px-4 py-1.5 text-xs font-medium border border-gray-200 rounded-md cursor-pointer text-gray-700 hover:text-gray-900"
+        >
           Cancel
         </button>
-        <button disabled={isLoading} className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer" onClick={downloadCSV}>
+        <button
+          disabled={isLoading}
+          className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer"
+          onClick={downloadCSV}
+        >
           {isLoading ? "Saving..." : "Save Changes"}
         </button>
       </div>

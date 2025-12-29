@@ -8,9 +8,11 @@ import GlobalLoader from "@/common/GlobalLoader";
 export default function ClientDashboardLayout() {
   return (
     <SidebarProvider
+      defaultOpen={true}
       style={
         {
           "--sidebar-width": "296px",
+          "--sidebar-width-icon": "90px",
         } as React.CSSProperties
       }
     >

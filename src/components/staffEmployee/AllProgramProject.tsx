@@ -1,21 +1,21 @@
 import {
   AlignStartHorizontal,
-  ArrowDownUp,
+  // ArrowDownUp,
   ArrowRight,
   ChevronDown,
   Filter,
   TableIcon,
 } from "lucide-react";
 
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  // DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// import Pagination from "@/common/Pagination";
+import Pagination from "@/common/Pagination";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
@@ -69,21 +69,30 @@ export interface StaffEmployeeProject {
 }
 
 const AllProgramProject = () => {
-  const [viewMode, setViewMode] = useState<"table" | "board">("board");
-  const [, setStatusFilter] = useState<string>("all");
-  const [, setPriorityFilter] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"table" | "board">(
+    "board"
+  );
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [priorityFilter, setPriorityFilter] = useState<string>("all");
 
-  const [sortOrder, setSortOrder] = useState<string>("asc");
-  const [sortBy, setSortBy] = useState<string>("all");
-  // const [currentPage, setCurrentPage] = useState(1);
+  // const [sortOrder, setSortOrder] = useState<string>("asc");
+  // const [sortBy, setSortBy] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showItems, setShowItems] = useState(8);
 
-  // const itemsPerPage = 6;
+  const itemsPerPage = 6;
 
-  const { data, isLoading } = useGetAllProjectsQuery({});
+  const { data, isLoading } = useGetAllProjectsQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    status: statusFilter === "all" ? "" : statusFilter.toUpperCase(),
+    priority:
+      priorityFilter === "all" ? "" : priorityFilter.toUpperCase(),
+  });
 
   const projects = data?.data?.projects?.data || [];
 
-  // const totalPages = Math.ceil(projects.length / itemsPerPage);
+  const totalPages = Math.ceil(projects.length / itemsPerPage);
 
   const statusOptions = [
     { value: "all", title: "All Status" },
@@ -187,7 +196,7 @@ const AllProgramProject = () => {
           </div>
 
           {/* Sort By Dropdown */}
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
@@ -202,13 +211,14 @@ const AllProgramProject = () => {
               align="end"
               className="w-56 bg-white border border-[#CAD2DB] p-1"
             >
-              {/* Field Selection */}
               <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Field
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "startDate" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortBy === "startDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortBy("startDate")}
               >
@@ -216,7 +226,9 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortBy === "endDate"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortBy("endDate")}
               >
@@ -225,13 +237,14 @@ const AllProgramProject = () => {
 
               <div className="my-1 border-t border-gray-100" />
 
-              {/* Order Selection */}
               <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Order
               </div>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortOrder === "asc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortOrder("asc")}
               >
@@ -239,16 +252,17 @@ const AllProgramProject = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={`rounded-md cursor-pointer ${
-                  sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
+                  sortOrder === "desc"
+                    ? "bg-indigo-50 text-indigo-600"
+                    : ""
                 }`}
                 onClick={() => setSortOrder("desc")}
               >
                 Descending
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
 
-          {/* Filter Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -293,37 +307,46 @@ const AllProgramProject = () => {
             projects={projects as StaffEmployeeProject[]}
           />
 
-          {/* <Pagination
+          <Pagination
             currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            itemsPerPage={itemsPerPage}
             totalPages={totalPages}
-            filteredDataLength={projects.length}
-          /> */}
+            itemsPerPage={itemsPerPage}
+            totalPrograms={projects.length}
+            onPageChange={setCurrentPage}
+          />
         </>
       ) : (
         <>
           <div className="grid grid-cols-4 gap-5">
-            {projects?.map((projectData: StaffEmployeeProject) => {
-              return (
-                <div key={projectData.id}>
-                  <StaffEmployeeProjectCard project={projectData} />
-                </div>
-              );
-            })}
+            {projects
+              ?.slice(0, showItems)
+              .map((projectData: StaffEmployeeProject) => {
+                return (
+                  <div key={projectData.id}>
+                    <StaffEmployeeProjectCard project={projectData} />
+                  </div>
+                );
+              })}
           </div>
           {projects.length > 4 && (
             <div className="pt-6">
-              <Link to="/work-in-progress">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                >
-                  {/* Display total count */}
-                  View all {projects.length}
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
+              <Button
+                variant="ghost"
+                className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                onClick={() =>
+                  setShowItems(
+                    showItems !== projects.length
+                      ? projects.length
+                      : 8
+                  )
+                }
+              >
+                {/* Display total count */}
+                {showItems !== projects.length
+                  ? `View All ${projects.length}`
+                  : `View Less`}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
             </div>
           )}
         </>

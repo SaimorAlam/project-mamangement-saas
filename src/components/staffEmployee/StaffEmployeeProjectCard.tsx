@@ -2,12 +2,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Flag, Layers } from "lucide-react";
-import { Link } from "react-router-dom";
-import PrimaryButton from "../../common/PrimaryButton";
 import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
 import { useAddToFavouriteProjectMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 import { toast } from "sonner";
+import ProjectDetailsModal from "./Overview/ProjectDetailModal";
 
 export type ProjectStatus =
   | "LIVE"
@@ -225,13 +224,7 @@ const StaffEmployeeProjectCard = ({
 
         {/* CTA */}
         <div className="py-2 px-4">
-          <Link to={`/projects/${id}`}>
-            <PrimaryButton
-              title="View Project"
-              type="Primary"
-              className="w-full h-10"
-            />
-          </Link>
+          <ProjectDetailsModal project={project} />
         </div>
       </CardContent>
     </Card>

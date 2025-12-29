@@ -17,10 +17,25 @@ const staffEmployeeApi = baseApi.injectEndpoints({
       }),
     }),
     getStaffEmployeeLatestSubmissions: builder.query({
-      query: () => ({
-        url: `/submitted`,
-        method: "GET",
-      }),
+      query: (query) => {
+        const searchParams = new URLSearchParams();
+
+        Object.keys(query).forEach((key) => {
+          if (
+            query[key] !== undefined &&
+            query[key] !== null &&
+            query[key] !== ""
+          ) {
+            searchParams.append(key, query[key].toString());
+          }
+        });
+
+        return {
+          url: `/submitted`,
+          method: "GET",
+          params: searchParams,
+        };
+      },
     }),
     getStaffEmployeeSubmissionStatus: builder.query({
       query: () => ({
