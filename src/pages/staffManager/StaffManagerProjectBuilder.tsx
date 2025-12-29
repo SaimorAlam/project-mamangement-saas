@@ -5,13 +5,16 @@ import HeatmapChart from "@/common/Charts/HeatmapChart";
 import RadarCharts from "@/common/Charts/RadarChart";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
-import ProgressRing from "@/common/Charts/ProgressRing";
-import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
+// import ProgressRing from "@/common/Charts/ProgressRingTest";
+// import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
 import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
-import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
+// import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
+import PieChartModule from "./../../components/client/ProjectBuilder/chartModules/PieChartModule";
+import HorizontalBarChartModule from "./../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule";
+import ProgressRingModule from "./../../components/client/ProjectBuilder/chartModules/ProgressRingModule";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -68,11 +71,9 @@ const StaffManagerProjectBuilder = () => {
         )}
 
         {selectedWidget === "bar-chart" && <StackedBarChartModule />}
-        {selectedWidget === "progress-ring" && <LineChartModule />}
+        {selectedWidget === "progress-ring" && <ProgressRingModule />}
 
-        {selectedWidget === "pie-chart" && (
-          <ChartModuleTwo chartName="pie-chart" />
-        )}
+        {selectedWidget === "pie-chart" && <PieChartModule />}
 
         {selectedWidget === "line-chart" && <LineChartModule />}
 
@@ -95,7 +96,7 @@ const StaffManagerProjectBuilder = () => {
         )}
 
         {selectedWidget === "horizontal-bar-chart" && (
-          <HorizontalBarChart />
+          <HorizontalBarChartModule />
         )}
 
         {selectedWidget === "heat-map-chart" && <HeatmapChart />}

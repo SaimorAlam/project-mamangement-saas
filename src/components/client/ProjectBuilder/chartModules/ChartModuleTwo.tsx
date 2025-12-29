@@ -4,7 +4,7 @@ import { useState } from "react";
 import { LegendValue } from "../WidgetForChartModuleOne";
 import WidgetForChartModuleTwo from "../WidgetForChartModuleTwo";
 import PieChart from "@/common/Charts/PieChart";
-import ProgressRingNew from "@/common/Charts/ProgressRingNew";
+import ProgressRingNew from "@/common/Charts/ProgressRing";
 import HorizontalBarChartNew from "@/common/Charts/HorizontalBarChartNew";
 
 const ChartModuleTwo = ({ chartName }: { chartName: string }) => {
@@ -27,7 +27,6 @@ const ChartModuleTwo = ({ chartName }: { chartName: string }) => {
         if (chartName === "pie-chart") {
           return (
             <PieChart
-              title={widgetTitle}
               legendValues={legendValues}
             />
           );

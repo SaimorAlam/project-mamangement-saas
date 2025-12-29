@@ -1,16 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
-import StackedBarChart from "@/common/Charts/StackedBarChart";
+import ProgressRing from "@/common/Charts/ProgressRing";
 
-const StackedBarChartModule = () => {
+const ProgressRingModule = () => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
-
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
-    useState<number>(1);
-  const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
   const [numOfLegendDataSet, setNumOfLegendDataSet] =
     useState<number>(3);
@@ -20,44 +16,20 @@ const StackedBarChartModule = () => {
     { label: "", field: "", color: "#35B6EE" },
     { label: "", field: "", color: "#6F78F9" },
   ]);
-  const [startingRange, setStartingRange] = useState<number>(0); //for y axis
-  const [endingRange, setEndingRange] = useState<number>(100); // for y axis
 
-  const minXaxisField = 1;
-  const maxXaxisField = 7;
-  const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = parseInt(e.target.value, 10);
-    if (isNaN(value)) {
-      setNumOfXAxisDataSet(1);
-    } else if (value >= minXaxisField && value <= maxXaxisField) {
-      setNumOfXAxisDataSet(value);
-    } else {
-      setNumOfXAxisDataSet(1);
-      alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
-      );
-    }
+  // Progress Ring doesn't use X-axis values or Y-axis ranges, but we need placeholders for ProjectConfiguration
+  const [numOfXAxisDataSet] = useState<number>(0);
+  const [xAxisValues] = useState<string[]>([]);
+  const [startingRange] = useState<number>(0);
+  const [endingRange] = useState<number>(100);
 
-    setXAxisValues((prev) => {
-      const updated = [...prev];
-      // Adding empty values if increased
-      while (updated.length < value) {
-        updated.push("");
-      }
-      // Removing extra values if decreased
-      return updated.slice(0, value);
-    });
+  // Dummy handler for X-axis (not used in progress ring)
+  const handleSetNumOfXAxisDataSet = () => {
+    // Not used for progress ring
   };
 
-  const handleXAxisValueChange = (index: number, value: string) => {
-    setXAxisValues((prev) => {
-      const updated = [...prev];
-      updated[index] = value;
-      return updated;
-    });
-    console.log("parant x values: ", xAxisValues);
+  const handleXAxisValueChange = () => {
+    // Not used for progress ring
   };
 
   // Toggle widget visibility
@@ -72,9 +44,8 @@ const StackedBarChartModule = () => {
 
   return (
     <div className="flex gap-3">
-      <StackedBarChart
+      <ProgressRing
         widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
         legendValues={legendValues}
         numOfLegendDataSet={numOfLegendDataSet}
         startingRange={startingRange}
@@ -83,9 +54,9 @@ const StackedBarChartModule = () => {
       />
       {showWidget && (
         <ProjectConfiguration
-          widgedName="Stack Bar Chart"
+          widgedName="Progress Ring"
           widgetTitle={widgetTitle}
-          widgetCategory="BAR"
+          widgetCategory="PROGRESS_RING"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -96,9 +67,9 @@ const StackedBarChartModule = () => {
           legendValues={legendValues}
           setLegendValues={setLegendValues}
           startingRange={startingRange}
-          setStartingRange={setStartingRange}
+          setStartingRange={() => {}}
           endingRange={endingRange}
-          setEndingRange={setEndingRange}
+          setEndingRange={() => {}}
           onClose={handleCloseWidget}
         />
       )}
@@ -106,4 +77,4 @@ const StackedBarChartModule = () => {
   );
 };
 
-export default StackedBarChartModule;
+export default ProgressRingModule;

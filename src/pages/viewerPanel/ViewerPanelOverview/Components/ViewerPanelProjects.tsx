@@ -1,7 +1,7 @@
 import CostOverview from "@/common/Charts/CostOverview";
 import PhasePlan from "@/common/Charts/PhasePlan";
 import ProgressChart from "@/common/Charts/Progress";
-import ProgressRing from "@/common/Charts/ProgressRing";
+import ProgressRing from "@/common/Charts/ProgressRingTest";
 import ProjectCostChart from "@/common/Charts/ProjectCost";
 import ProjectInformation from "@/common/Charts/ProjectInfo";
 import EmployeeWorkloadChart from "@/common/Charts/WorkLoad";
@@ -11,7 +11,9 @@ import { useLocation } from "react-router-dom";
 const ViewerPanelProjects = () => {
   const location = useLocation();
   const { id } = location.state || {};
-  const { data, isLoading } = useGetProjectByIdQuery(id, { skip: !id });
+  const { data, isLoading } = useGetProjectByIdQuery(id, {
+    skip: !id,
+  });
   const projectData = data?.data?.project;
 
   return (

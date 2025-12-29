@@ -2,7 +2,7 @@ import ProgressChart from "@/common/Charts/Progress";
 import ProjectCostChart from "@/common/Charts/ProjectCost";
 import ProjectInformation from "@/common/Charts/ProjectInfo";
 import EmployeeWorkloadChart from "@/common/Charts/WorkLoad";
-import TaskStatusChart from "@/common/Charts/ProgressRing";
+import TaskStatusChart from "@/common/Charts/ProgressRingTest";
 
 const DashboardTab = () => {
   return (

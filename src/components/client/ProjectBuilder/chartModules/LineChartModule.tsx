@@ -6,7 +6,7 @@ import MultiAxisLineChart from "@/common/Charts/LineChart";
 
 const LineChartModule = () => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
-  const [showWidget, setShowWidget] = useState(false);
+  const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
     useState<number>(1);
@@ -76,6 +76,7 @@ const LineChartModule = () => {
         widgetTitle={widgetTitle}
         xAxisValues={xAxisValues}
         legendValues={legendValues}
+        numOfLegendDataSet={numOfLegendDataSet}
         startingRange={startingRange}
         endingRange={endingRange}
         onToggleWidget={handleToggleWidget}
@@ -84,8 +85,8 @@ const LineChartModule = () => {
         <ProjectConfiguration
           widgedName="Multi Axis Line Chart"
           widgetTitle={widgetTitle}
+          widgetCategory="LINE"
           setWidgetTitle={setWidgetTitle}
-          widgetCategory=""
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
           xAxisValues={xAxisValues}

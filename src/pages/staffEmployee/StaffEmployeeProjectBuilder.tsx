@@ -7,15 +7,16 @@ import RadarCharts from "@/common/Charts/RadarChart";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
 // import StackedBarChart from "@/common/Charts/StackedBarChart";
-import ProgressRing from "@/common/Charts/ProgressRing";
+import ProgressRing from "@/common/Charts/ProgressRingTest";
 // import MultiAxisLineChart from "@/common/Charts/LineChart";
-import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
+// import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 // import AreaChart from "@/common/Charts/AreaChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
 import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
+import HorizontalBarChartModule from './../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule';
 
 const StaffEmployeeProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -105,7 +106,9 @@ const StaffEmployeeProjectBuilder = () => {
           />
         )}
 
-        {selectedWidget === "pie-chart" && <ChartModuleTwo chartName="pie-chart" />}
+        {selectedWidget === "pie-chart" && (
+          <ChartModuleTwo chartName="pie-chart" />
+        )}
 
         {selectedWidget === "line-chart" && <LineChartModule />}
 
@@ -128,12 +131,14 @@ const StaffEmployeeProjectBuilder = () => {
         )}
 
         {selectedWidget === "horizontal-bar-chart" && (
-          <HorizontalBarChart />
+          <HorizontalBarChartModule />
         )}
 
         {selectedWidget === "heat-map-chart" && <HeatmapChart />}
 
-        {selectedWidget === "area-chart" && <ChartModuleOne chartName="area-chart" />}
+        {selectedWidget === "area-chart" && (
+          <ChartModuleOne chartName="area-chart" />
+        )}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
