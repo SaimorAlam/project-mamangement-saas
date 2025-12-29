@@ -70,7 +70,9 @@ export default function StackedBarChart({
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
-  const [activeTier, setActiveTier] = useState<TierChart | null>(null);
+  const [activeTier, setActiveTier] = useState<TierChart | null>(
+    null
+  );
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
@@ -97,7 +99,10 @@ export default function StackedBarChart({
     return chartData.reduce((sum, row) => {
       return (
         sum +
-        legendValues.reduce((inner, l) => inner + Number(row[l.field] || 0), 0)
+        legendValues.reduce(
+          (inner, l) => inner + Number(row[l.field] || 0),
+          0
+        )
       );
     }, 0);
   }, [chartData, legendValues]);
@@ -179,7 +184,11 @@ export default function StackedBarChart({
       <div className="bg-white p-3 border rounded shadow-lg">
         <p className="font-semibold mb-2">{row.name}</p>
         {legendValues.map((l) => (
-          <p key={l.field} style={{ color: l.color }} className="text-sm">
+          <p
+            key={l.field}
+            style={{ color: l.color }}
+            className="text-sm"
+          >
             {l.label}: {row[l.field]}
           </p>
         ))}
@@ -207,7 +216,10 @@ export default function StackedBarChart({
             <div className="flex gap-6 mt-3">
               {legendValues.map((l) =>
                 l.label ? (
-                  <div key={l.field} className="flex items-center gap-2">
+                  <div
+                    key={l.field}
+                    className="flex items-center gap-2"
+                  >
                     <div
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: l.color }}
@@ -220,7 +232,9 @@ export default function StackedBarChart({
           </div>
 
           <div className="flex items-center gap-4">
-            <p className="text-sm text-gray-500">Total {totalEmployees}</p>
+            <p className="text-sm text-gray-500">
+              Total {totalEmployees}
+            </p>
 
             <div className="flex gap-2 border-l pl-4 relative">
               <button
@@ -298,7 +312,9 @@ export default function StackedBarChart({
                 dataKey={l.field}
                 stackId="a"
                 fill={l.color}
-                radius={i === legendValues.length - 1 ? [4, 4, 0, 0] : 0}
+                radius={
+                  i === legendValues.length - 1 ? [4, 4, 0, 0] : 0
+                }
               />
             ))}
           </BarChart>

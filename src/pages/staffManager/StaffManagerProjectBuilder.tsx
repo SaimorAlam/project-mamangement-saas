@@ -68,40 +68,11 @@ const StaffManagerProjectBuilder = () => {
         )}
 
         {selectedWidget === "bar-chart" && <StackedBarChartModule />}
-        {selectedWidget === "progress-ring" && (
-          <ProgressRing
-            title="Project Progress"
-            centerLabel="Total Progress"
-            data={[
-              {
-                name: "In Progress",
-                value: 65,
-                count: 12,
-                color: "#5D8AF3",
-              },
-              {
-                name: "Completed",
-                value: 14,
-                count: 30,
-                color: "#169E7B",
-              },
-              {
-                name: "Overdue",
-                value: 13,
-                count: 8,
-                color: "#DA4352",
-              },
-              {
-                name: "Not Started",
-                value: 8,
-                count: 8,
-                color: "#E2E8F0",
-              },
-            ]}
-          />
-        )}
+        {selectedWidget === "progress-ring" && <LineChartModule />}
 
-        {selectedWidget === "pie-chart" && <ChartModuleTwo chartName="pie-chart" />}
+        {selectedWidget === "pie-chart" && (
+          <ChartModuleTwo chartName="pie-chart" />
+        )}
 
         {selectedWidget === "line-chart" && <LineChartModule />}
 
@@ -129,7 +100,9 @@ const StaffManagerProjectBuilder = () => {
 
         {selectedWidget === "heat-map-chart" && <HeatmapChart />}
 
-        {selectedWidget === "area-chart" && <ChartModuleOne chartName="area-chart" />}
+        {selectedWidget === "area-chart" && (
+          <ChartModuleOne chartName="area-chart" />
+        )}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
