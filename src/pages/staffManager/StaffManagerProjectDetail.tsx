@@ -13,8 +13,9 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useRemoveProjectFromFavoriteMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import ErrorPage from "@/common/ErrorPage";
+import { FaSpinner } from "react-icons/fa";
 
 const formatDate = (date: string | null) => {
   if (!date) return "—";
@@ -70,23 +71,15 @@ export default function StaffManagerProjectDetail() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-6 space-y-4">
-        <Skeleton className="h-8 w-1/3" />
-        <Skeleton className="h-6 w-full" />
-        <Skeleton className="h-6 w-full" />
-        <Skeleton className="h-48 w-full rounded-xl" />
-        <Skeleton className="h-48 w-full rounded-xl" />
+      <div className="flex items-center justify-center h-full">
+        <FaSpinner className="animate-spin" size={24} />
       </div>
     );
   }
 
-  if (isError || !project) {
+  if (isError || error || !project) {
     return (
-      <div className="container mx-auto px-4 py-6 text-center text-red-500">
-        {error
-          ? "Failed to load project details."
-          : "Project not found."}
-      </div>
+      <ErrorPage />
     );
   }
 
@@ -238,9 +231,8 @@ const InfoItem = ({
         {label}
       </p>
       <p
-        className={`text-sm font-semibold ${
-          highlight ? "text-rose-600" : "text-slate-700"
-        }`}
+        className={`text-sm font-semibold ${highlight ? "text-rose-600" : "text-slate-700"
+          }`}
       >
         {value}
       </p>
