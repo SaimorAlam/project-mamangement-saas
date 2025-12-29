@@ -1,21 +1,21 @@
 import {
   AlignStartHorizontal,
-  ArrowDownUp,
+  // ArrowDownUp,
   ArrowRight,
   ChevronDown,
   Filter,
   TableIcon,
 } from "lucide-react";
 
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  // DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// import Pagination from "@/common/Pagination";
+import Pagination from "@/common/Pagination";
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
@@ -23,7 +23,6 @@ import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeP
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import StaffEmployeeProjectCard from "./StaffEmployeeProjectCard";
 import ContentLoader from "react-content-loader";
-import Pagination from "./../../common/Pagination";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -76,8 +75,8 @@ const AllProgramProject = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
 
-  const [sortOrder, setSortOrder] = useState<string>("asc");
-  const [sortBy, setSortBy] = useState<string>("all");
+  // const [sortOrder, setSortOrder] = useState<string>("asc");
+  // const [sortBy, setSortBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [showItems, setShowItems] = useState(8);
 
@@ -197,7 +196,7 @@ const AllProgramProject = () => {
           </div>
 
           {/* Sort By Dropdown */}
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
@@ -212,7 +211,6 @@ const AllProgramProject = () => {
               align="end"
               className="w-56 bg-white border border-[#CAD2DB] p-1"
             >
-              {/* Field Selection */}
               <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Field
               </div>
@@ -239,7 +237,6 @@ const AllProgramProject = () => {
 
               <div className="my-1 border-t border-gray-100" />
 
-              {/* Order Selection */}
               <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Order
               </div>
@@ -264,9 +261,8 @@ const AllProgramProject = () => {
                 Descending
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
 
-          {/* Filter Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
