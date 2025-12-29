@@ -273,7 +273,6 @@ const AllProgramTable = ({
     }
   };
 
-  /* ---------- table columns ---------- */
   const columns: { label: string; field?: SortField; align?: string }[] = [
     { label: "Program", field: "programName" },
     { label: "Project", field: "name" },
@@ -289,107 +288,115 @@ const AllProgramTable = ({
   return (
     <Card className="w-full shadow-none border-none">
       <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full min-h-[420px]">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b border-gray-200 bg-[#F7F9FA]">
-              {columns.map((col) => (
-                <TableHead
-                  key={col.label}
-                  className={`px-6 py-3.5 ${
-                    col.field ? "cursor-pointer select-none" : ""
-                  } ${col.align === "center" ? "text-center" : ""} ${
-                    col.align === "right" ? "text-right" : ""
-                  }`}
-                  onClick={col.field ? () => handleSort(col.field!) : undefined}
-                >
-                  <div className="inline-flex items-center gap-1">
-                    {col.label}
-                    {col.field && (
-                      <ArrowDownUp
-                        className={`w-4 h-4 transition-transform duration-200 ${
-                          sortBy === col.field
-                            ? sortOrder === "asc"
-                              ? "rotate-180"
-                              : "rotate-0"
-                            : "opacity-30"
-                        }`}
-                      />
-                    )}
-                  </div>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {isLoading
-              ? Array.from({ length: TABLE_SKELETON_ROWS }).map((_, i) => (
-                  <TableRow key={i} className="animate-pulse">
-                    {columns.map((_, j) => (
-                      <TableCell key={j} className="px-6 py-3.5">
-                        <div className="h-4 bg-gray-200 rounded w-full"></div>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              : sortedProjects.map((project) => (
-                  <TableRow
-                    key={project.id}
-                    className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
+        {projects.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-gray-200 bg-[#F7F9FA]">
+                {columns.map((col) => (
+                  <TableHead
+                    key={col.label}
+                    className={`px-6 py-3.5 ${
+                      col.field ? "cursor-pointer select-none" : ""
+                    } ${col.align === "center" ? "text-center" : ""} ${
+                      col.align === "right" ? "text-right" : ""
+                    }`}
+                    onClick={
+                      col.field ? () => handleSort(col.field!) : undefined
+                    }
                   >
-                    <TableCell className="px-6 py-3.5 font-medium">
-                      {project.programName || "Program Name"}
-                    </TableCell>
-                    <TableCell className="px-6 py-3.5 font-medium">
-                      {project.name}
-                    </TableCell>
-                    <TableCell className="px-6 py-3.5">
-                      {renderStatusBadge(project.status)}
-                    </TableCell>
-                    <TableCell className="px-6 py-3.5">
-                      <RenderStaffAvatars
-                        staff={Array.from({ length: 3 }, (_, i) => ({
-                          id: i.toString(),
-                          name: `Staff ${i + 1}`,
-                          avatar:
-                            "https://randomuser.me/api/portraits/men/19.jpg",
-                        }))}
-                      />
-                    </TableCell>
-                    <TableCell className="px-6 py-3.5">
-                      {renderPriority(project.priority)}
-                    </TableCell>
-                    <TableCell className="px-6 py-3.5 text-muted-foreground">
-                      {formatDate(project.startDate)}
-                    </TableCell>
-                    <TableCell className="px-6 py-3.5 text-muted-foreground">
-                      {formatDate(project.deadline)}
-                    </TableCell>
-                    <TableCell className="px-6 py-3.5 text-muted-foreground flex items-center gap-2">
-                      <Progress value={project.progress} className="h-2" />
-                      <span className="font-medium">{project.progress}%</span>
-                    </TableCell>
-                    <TableCell className="px-6 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewProject(project)}
-                        >
-                          <Eye className="w-4 h-4 text-[#1C73E0]" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Edit className="w-4 h-4 text-[#169E7B]" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Trash2 className="w-4 h-4 text-[#B00020]" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                    <div className="inline-flex items-center gap-1">
+                      {col.label}
+                      {col.field && (
+                        <ArrowDownUp
+                          className={`w-4 h-4 transition-transform duration-200 ${
+                            sortBy === col.field
+                              ? sortOrder === "asc"
+                                ? "rotate-180"
+                                : "rotate-0"
+                              : "opacity-30"
+                          }`}
+                        />
+                      )}
+                    </div>
+                  </TableHead>
                 ))}
-          </TableBody>
-        </Table>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {isLoading
+                ? Array.from({ length: TABLE_SKELETON_ROWS }).map((_, i) => (
+                    <TableRow key={i} className="animate-pulse">
+                      {columns.map((_, j) => (
+                        <TableCell key={j} className="px-6 py-3.5">
+                          <div className="h-4 bg-gray-200 rounded w-full"></div>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                : sortedProjects.map((project) => (
+                    <TableRow
+                      key={project.id}
+                      className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
+                    >
+                      <TableCell className="px-6 py-3.5 font-medium">
+                        {project.programName || "Program Name"}
+                      </TableCell>
+                      <TableCell className="px-6 py-3.5 font-medium">
+                        {project.name}
+                      </TableCell>
+                      <TableCell className="px-6 py-3.5">
+                        {renderStatusBadge(project.status)}
+                      </TableCell>
+                      <TableCell className="px-6 py-3.5">
+                        <RenderStaffAvatars
+                          staff={Array.from({ length: 3 }, (_, i) => ({
+                            id: i.toString(),
+                            name: `Staff ${i + 1}`,
+                            avatar:
+                              "https://randomuser.me/api/portraits/men/19.jpg",
+                          }))}
+                        />
+                      </TableCell>
+                      <TableCell className="px-6 py-3.5">
+                        {renderPriority(project.priority)}
+                      </TableCell>
+                      <TableCell className="px-6 py-3.5 text-muted-foreground">
+                        {formatDate(project.startDate)}
+                      </TableCell>
+                      <TableCell className="px-6 py-3.5 text-muted-foreground">
+                        {formatDate(project.deadline)}
+                      </TableCell>
+                      <TableCell className="px-6 py-3.5 text-muted-foreground flex items-center gap-2">
+                        <Progress value={project.progress} className="h-2" />
+                        <span className="font-medium">{project.progress}%</span>
+                      </TableCell>
+                      <TableCell className="px-6 py-3.5">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewProject(project)}
+                          >
+                            <Eye className="w-4 h-4 text-[#1C73E0]" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="w-4 h-4 text-[#169E7B]" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Trash2 className="w-4 h-4 text-[#B00020]" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="flex items-center justify-center h-96 text-gray-500 text-xl">
+            No projects found
+          </div>
+        )}
       </CardContent>
 
       {selectedProject && (
