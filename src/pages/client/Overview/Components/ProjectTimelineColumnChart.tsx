@@ -14,13 +14,11 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-
-/* ---------- skeleton ---------- */
+import ChartSkeleton from "@/common/Skeleton/ChartSkeleton";
 
 const ProgramSelectSkeleton = () => {
   return <div className="w-64 h-10 rounded-md bg-gray-200 animate-pulse" />;
 };
-
 /* ---------- component ---------- */
 
 const ProjectTimelineColumnChart = () => {
@@ -149,28 +147,26 @@ const ProjectTimelineColumnChart = () => {
               <SelectValue placeholder="Select Program" />
             </SelectTrigger>
             <SelectContent>
-              {programs.map((program: any) => {
-                return (
-                  <SelectItem key={program.id} value={program.id}>
-                    {program.programName}
-                  </SelectItem>
-                );
-              })}
+              {programs.map((program: any) => (
+                <SelectItem key={program.id} value={program.id}>
+                  {program.programName}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         )}
       </div>
 
-      <Chart
-        options={chartState.options}
-        series={chartState.series}
-        type="bar"
-        height={350}
-      />
-
-      {/* {isFetching && (
-        <p className="text-sm text-gray-500 mt-2">Loading timeline...</p>
-      )} */}
+      {isFetching ? (
+        <ChartSkeleton />
+      ) : (
+        <Chart
+          options={chartState.options}
+          series={chartState.series}
+          type="bar"
+          height={350}
+        />
+      )}
     </BoxContainer>
   );
 };
