@@ -192,15 +192,19 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
         </div>
       </div>
 
-      {/* Widget Library */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4">
-          <h2 className="text-xl font-semibold text-gray-900 mb-1">
+      <div className="px-4 pt-4">
+        <h2 className="text-xl font-semibold text-gray-900 mb-1">
             Widget Library
           </h2>
           <p className="text-xs text-gray-500 mb-4">
             Drag widgets to the canvas
           </p>
+      </div>
+
+      {/* Widget Library */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4">
+          
 
           {/* Widget List */}
           <div className="flex flex-col gap-3">
