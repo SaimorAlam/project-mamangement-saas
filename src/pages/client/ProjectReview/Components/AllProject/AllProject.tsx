@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useState } from "react";
-import {
-  ArrowDownUp,
-  ChevronDown,
-  TableIcon,
-  AlignStartHorizontal,
-} from "lucide-react";
+import { ArrowDownUp, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,13 +8,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import PrimaryButton from "@/common/PrimaryButton";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import Pagination from "@/common/Pagination";
 import ProjectDueDate from "./ProjectDueDate";
 import AllProjectTable from "./AllProjectTable";
-import AllProjectCard from "./AllProjectCard";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import ReviewerActivity from "./ReviewerActivity";
 
@@ -62,7 +53,7 @@ export interface Project {
 /* -------------------- Component -------------------- */
 
 const AllProject: React.FC = () => {
-  const [viewMode, setViewMode] = useState<"table" | "board">("board");
+  // const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [sortBy, setSortBy] = useState<keyof Project | "all">("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -124,12 +115,12 @@ const AllProject: React.FC = () => {
   /* -------------------- Render -------------------- */
 
   return (
-    <div className="min-h-screen border border-gray-200 rounded-lg my-6 p-6">
+    <div className="min-h-screen my-6">
       <div className="flex gap-6">
         {/* Main */}
-        <div className="flex-1">
+        <div className="flex-1 border border-gray-200 rounded-lg p-6">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">
               All Project Review
             </h1>
@@ -142,7 +133,7 @@ const AllProject: React.FC = () => {
                   setSelectedStatus(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-4 py-2 text-sm border rounded-lg bg-white"
+                className="px-4 py-2 text-sm border border-gray-200 rounded-lg bg-white"
               >
                 <option value="">All Status</option>
                 <option value="LIVE">Live</option>
@@ -182,65 +173,18 @@ const AllProject: React.FC = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              {/* View Toggle */}
-              <PrimaryButton
-                type="Primary"
-                title="Boards"
-                leftIcon={<AlignStartHorizontal />}
-                className={
-                  viewMode === "board"
-                    ? "bg-black text-white border-none"
-                    : "bg-white text-black! border border-gray-200"
-                }
-                onClick={() => setViewMode("board")}
-              />
-              <PrimaryButton
-                type="Primary"
-                title="Tables"
-                leftIcon={<TableIcon />}
-                className={
-                  viewMode === "table"
-                    ? "bg-black text-white border-none"
-                    : "bg-white text-black! border border-gray-200"
-                }
-                onClick={() => setViewMode("table")}
-              />
             </div>
           </div>
-
-          {/* Content */}
-          {viewMode === "table" ? (
-            <>
-              <AllProjectTable projects={paginatedProjects} />
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                itemsPerPage={ITEMS_PER_PAGE}
-                onPageChange={setCurrentPage}
-                totalPrograms={filteredProjects.length}
-              />
-            </>
-          ) : (
-            <>
-              <div className="grid grid-cols-3 gap-5">
-                {paginatedProjects.map((project) => (
-                  <AllProjectCard key={project.id} project={project} />
-                ))}
-              </div>
-
-              {filteredProjects.length > ITEMS_PER_PAGE && (
-                <div className="pt-6">
-                  <Link to="/client-panel/work-in-progress">
-                    <Button variant="ghost" className="w-full text-blue-600">
-                      View all {filteredProjects.length}
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </>
-          )}
+          <div className="">
+          <AllProjectTable projects={paginatedProjects} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={setCurrentPage}
+            totalPrograms={filteredProjects.length}
+          />
+          </div>
         </div>
 
         {/* Sidebar */}

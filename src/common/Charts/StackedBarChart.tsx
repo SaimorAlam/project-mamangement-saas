@@ -70,9 +70,7 @@ export default function StackedBarChart({
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
-  const [activeTier, setActiveTier] = useState<TierChart | null>(
-    null
-  );
+  const [showChildrenModal, setShowChildrenModal] = useState(false);
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
@@ -86,13 +84,7 @@ export default function StackedBarChart({
       startingRange,
       endingRange
     );
-  }, [
-    xAxisValues,
-    legendValues,
-    numOfLegendDataSet,
-    startingRange,
-    endingRange,
-  ]);
+  }, [xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange]);
 
   /*   TOTAL   */
   const totalEmployees = useMemo(() => {
@@ -167,11 +159,12 @@ export default function StackedBarChart({
     };
     setChildTiers([...childTiers, newTier]);
     setShowAddTierModal(false);
-    setActiveTier(newTier);
   };
 
-  const handleCloseTierModal = () => {
-    setActiveTier(null);
+  const handleChartClick = () => {
+    if (childTiers.length > 0) {
+      setShowChildrenModal(true);
+    }
   };
 
   /*   TOOLTIP   */
@@ -200,16 +193,12 @@ export default function StackedBarChart({
 
   return (
     <>
-      <div className="w-full bg-white border border-gray-200 rounded-lg p-6">
-        {/* Tier level indicator */}
-        {tierLevel > 0 && (
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-sm text-gray-500">
-              {"→ ".repeat(tierLevel)}Tier Level {tierLevel}
-            </span>
-          </div>
-        )}
-
+      <div
+        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
+          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+        }`}
+        onClick={handleChartClick}
+      >
         <div className="flex justify-between mb-6">
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
@@ -231,14 +220,15 @@ export default function StackedBarChart({
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <p className="text-sm text-gray-500">
-              Total {totalEmployees}
-            </p>
+          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+            <p className="text-sm text-gray-500">Total {totalEmployees}</p>
 
             <div className="flex gap-2 border-l pl-4 relative">
               <button
-                onClick={() => setShowPopover(!showPopover)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowPopover(!showPopover);
+                }}
                 className="p-2 border border-gray-300 rounded hover:bg-gray-50"
               >
                 <BsThreeDots size={18} />
@@ -247,7 +237,8 @@ export default function StackedBarChart({
               {showPopover && (
                 <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       handleCopy();
                       setShowPopover(false);
                     }}
@@ -258,7 +249,8 @@ export default function StackedBarChart({
                   </button>
 
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       handleDownload();
                       setShowPopover(false);
                     }}
@@ -270,7 +262,10 @@ export default function StackedBarChart({
                   </button>
 
                   <button
-                    onClick={() => setShowPopover(false)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPopover(false);
+                    }}
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
                   >
                     <Trash2 size={18} />
@@ -279,7 +274,10 @@ export default function StackedBarChart({
 
                   {onToggleWidget && (
                     <button
-                      onClick={handleWidgetClick}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleWidgetClick();
+                      }}
                       className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
                     >
                       <MdOutlineWidgets size={18} />
@@ -288,7 +286,10 @@ export default function StackedBarChart({
                   )}
 
                   <button
-                    onClick={handleAddTierClick}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddTierClick();
+                    }}
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
                   >
                     <GoPlus size={18} />
@@ -320,23 +321,12 @@ export default function StackedBarChart({
           </BarChart>
         </ResponsiveContainer>
 
-        {/* Show child tiers */}
+        {/* Indicator if chart has children */}
         {childTiers.length > 0 && (
-          <div className="mt-6 space-y-4">
-            <h3 className="text-sm font-semibold text-gray-700">
-              Child Tiers:
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {childTiers.map((tier) => (
-                <button
-                  key={tier.id}
-                  onClick={() => setActiveTier(tier)}
-                  className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm font-medium"
-                >
-                  {tier.name}
-                </button>
-              ))}
-            </div>
+          <div className="mt-4 text-center">
+            <p className="text-sm text-blue-600 font-medium">
+              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+            </p>
           </div>
         )}
       </div>
@@ -349,23 +339,29 @@ export default function StackedBarChart({
         parentChartName={widgetTitle}
       />
 
-      {/* Tier Chart Modal */}
-      {activeTier && (
+      {/* Children Grid Modal */}
+      {showChildrenModal && (
         <TierChartModal
-          isOpen={true}
-          onClose={handleCloseTierModal}
+          isOpen={showChildrenModal}
+          onClose={() => setShowChildrenModal(false)}
           tierLevel={tierLevel + 1}
+          title={widgetTitle}
         >
-          <StackedBarChart
-            widgetTitle={activeTier.name}
-            xAxisValues={activeTier.xAxisValues}
-            legendValues={activeTier.legendValues}
-            numOfLegendDataSet={activeTier.legendValues.length}
-            startingRange={startingRange}
-            endingRange={endingRange}
-            tierLevel={tierLevel + 1}
-            chartId={activeTier.id}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {childTiers.map((tier) => (
+              <StackedBarChart
+                key={tier.id}
+                widgetTitle={tier.name}
+                xAxisValues={tier.xAxisValues}
+                legendValues={tier.legendValues}
+                numOfLegendDataSet={tier.legendValues.length}
+                startingRange={startingRange}
+                endingRange={endingRange}
+                tierLevel={tierLevel + 1}
+                chartId={tier.id}
+              />
+            ))}
+          </div>
         </TierChartModal>
       )}
     </>

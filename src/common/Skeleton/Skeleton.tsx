@@ -1,5 +1,5 @@
 const Skeleton = ({ className }: { className?: string }) => (
-  <div className={`bg-gray-200 rounded-md ${className}`} />
+  <div className={`bg-gray-200  rounded-md ${className}`} />
 );
 export const HeaderSkeleton = () => (
   <div className="flex items-center justify-between pb-6">
@@ -16,10 +16,7 @@ export const HeaderSkeleton = () => (
 export const ProjectGridSkeleton = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     {Array.from({ length: 6 }).map((_, i) => (
-      <div
-        key={i}
-        className="border border-gray-200 rounded-xl p-5 space-y-4"
-      >
+      <div key={i} className="border border-gray-200 rounded-xl p-5 space-y-4">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <Skeleton className="h-4 w-40" />

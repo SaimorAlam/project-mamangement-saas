@@ -2,28 +2,24 @@ import { useEffect, useState } from "react";
 import ToggleSwitchComponent from "@/components/client/Settings/ToggleSwitchComponent";
 import ColorPickerComponent from "@/components/client/Settings/ColorPickerComponent";
 import FileUploadComponent from "@/components/client/Settings/FileUploadComponent";
-import CheckboxGroupComponent from "@/components/client/Settings/CheckboxGroupComponent";
 import BoxContainer from "@/common/BoxContainer";
 import DropdownSelect from "@/common/DropdownSelect";
 import PrimaryButton from "@/common/PrimaryButton";
 import APIConnectionCard from "@/components/client/Settings/APIConnectionCard";
+import Notification from "./Components/Notification";
 
 const ClientSettings = () => {
-  const [defaultLanguage, setDefaultLanguage] =
-    useState("English (US)");
+  const [defaultLanguage, setDefaultLanguage] = useState("English (US)");
   const [defaultTimezone, setDefaultTimezone] = useState(
     "(UTC-06:00) Pacific Time (US & Canada)"
   );
-  const [allowTimezoneOverride, setAllowTimezoneOverride] =
-    useState(true);
-  const [showRelativeTimestamps, setShowRelativeTimestamps] =
-    useState(true);
+  const [allowTimezoneOverride, setAllowTimezoneOverride] = useState(true);
+  const [showRelativeTimestamps, setShowRelativeTimestamps] = useState(true);
   const [dateFormat, setDateFormat] = useState("DD/MM/YYYY");
   const [timeFormat, setTimeFormat] = useState("12 hour");
   const [firstDayOfWeek, setFirstDayOfWeek] = useState("Sun Day");
   const [primaryColor, setPrimaryColor] = useState("#7F56D9");
   const [secondaryColor, setSecondaryColor] = useState("#6366F1");
-
   // Additional states for other sections
   const [currentPlan, setCurrentPlan] = useState("Business");
   const [billingCycle, setBillingCycle] = useState("Yearly");
@@ -34,13 +30,7 @@ const ClientSettings = () => {
   const [sessionTimeout, setSessionTimeout] = useState("10 min");
 
   // Notification checkboxes
-  const [notifications, setNotifications] = useState({
-    onProjectApproval: true,
-    onProjectRejection: true,
-    fileImportByEmployees: true,
-    weeklySummary: true,
-    storageLimit: true,
-  });
+
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -121,50 +111,16 @@ const ClientSettings = () => {
     { value: "bank-transfer", title: "Bank Transfer" },
   ];
 
-  const notificationItems = [
-    {
-      id: "onProjectApproval",
-      label: "On project Approval",
-      checked: notifications.onProjectApproval,
-    },
-    {
-      id: "onProjectRejection",
-      label: "On project Rejection",
-      checked: notifications.onProjectRejection,
-    },
-    {
-      id: "fileImportByEmployees",
-      label: "File import by employees",
-      checked: notifications.fileImportByEmployees,
-    },
-    {
-      id: "weeklySummary",
-      label: "Weekly Summary",
-      checked: notifications.weeklySummary,
-    },
-    {
-      id: "storageLimit",
-      label: "Storage Limit",
-      checked: notifications.storageLimit,
-    },
-  ];
-
-  const handleNotificationChange = (id: string, checked: boolean) => {
-    setNotifications({ ...notifications, [id]: checked });
-  };
-
   const handleUpgrade = () => {};
 
   return (
     <div className="p-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Left Column */}
         <div className="space-y-8">
           {/* Language, Date & Time zone Settings */}
           <BoxContainer>
-            <h4 className="mb-6">
-              Language, Date & Time zone Settings
-            </h4>
+            <h4 className="mb-6">Language, Date & Time zone Settings</h4>
 
             <div className="space-y-6">
               <DropdownSelect
@@ -227,11 +183,7 @@ const ClientSettings = () => {
             </div>
           </BoxContainer>
 
-          <CheckboxGroupComponent
-            title="Notification Settings"
-            items={notificationItems}
-            onChange={handleNotificationChange}
-          />
+          <Notification title="Notification Settings" />
 
           <div className="border border-gray-200 rounded-lg p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">
@@ -345,8 +297,7 @@ const ClientSettings = () => {
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-900 mb-2">
-                Billing Address *{" "}
-                <span className="text-red-500">*</span>
+                Billing Address * <span className="text-red-500">*</span>
               </label>
               <textarea
                 className="w-full h-[100px] px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
@@ -385,12 +336,7 @@ San Francisco, CA 94105"
                 <DropdownSelect
                   label="Session Timeout Duration"
                   placeholderText={sessionTimeout}
-                  dropdownItem={[
-                    "10 min",
-                    "30 min",
-                    "1 hour",
-                    "2 hours",
-                  ]}
+                  dropdownItem={["10 min", "30 min", "1 hour", "2 hours"]}
                   onChange={setSessionTimeout}
                 />
               </div>
