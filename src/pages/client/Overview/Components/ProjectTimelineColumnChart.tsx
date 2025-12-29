@@ -25,23 +25,21 @@ const ProgramSelectSkeleton = () => {
 
 const ProjectTimelineColumnChart = () => {
   const [selectedProgramId, setSelectedProgramId] = useState<string>("");
-
   const { data: programRes, isLoading: programLoading } = useGetAllProgramQuery(
     {}
   );
 
   const [getTimeline, { data: timelineRes, isFetching }] =
     useLazyGetTimelineQuery();
+  const programs = programRes?.data?.data ?? [];
+  const projectData = timelineRes?.data?.ProjectData ?? [];
 
   /* ---------- fetch timeline on program change ---------- */
 
   useEffect(() => {
     if (!selectedProgramId) return;
-    getTimeline({ program_id: selectedProgramId });
+    getTimeline({ programId: selectedProgramId });
   }, [selectedProgramId, getTimeline]);
-
-  const programs = programRes?.data?.data ?? [];
-  const projectData = timelineRes?.data?.ProjectData ?? [];
 
   /* ---------- chart data ---------- */
 
@@ -140,7 +138,7 @@ const ProjectTimelineColumnChart = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <h2 className="text-2xl font-semibold">Project Timeline</h2>
 
-        {programLoading ? (
+        {programLoading || isFetching ? (
           <ProgramSelectSkeleton />
         ) : (
           <Select
@@ -170,9 +168,9 @@ const ProjectTimelineColumnChart = () => {
         height={350}
       />
 
-      {isFetching && (
+      {/* {isFetching && (
         <p className="text-sm text-gray-500 mt-2">Loading timeline...</p>
-      )}
+      )} */}
     </BoxContainer>
   );
 };

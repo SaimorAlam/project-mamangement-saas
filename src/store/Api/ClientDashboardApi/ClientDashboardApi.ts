@@ -13,7 +13,10 @@ const clientDashboardApi = baseApi.injectEndpoints({
     }),
 
     getTimeline: builder.query({
-      query: () => "/client-dashboard/timeline",
+      query: ({ programId }: { programId: string }) => ({
+        url: `/client-dashboard/timeline?programId=${programId}`,
+        method: "GET",
+      }),
       providesTags: ["Dashboard"],
     }),
 
