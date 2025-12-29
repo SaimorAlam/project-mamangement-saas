@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import { useGetStaffEmpStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import BoxContainer from "@/common/BoxContainer";
@@ -8,6 +7,7 @@ import ProjectStatusChart from './../../components/staffManager/overview/Project
 import { FaSpinner } from "react-icons/fa";
 import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
 import LatestSubmission from "@/components/staffManager/overview/LatestSubmission";
+import AllProgramProject from "@/components/staffManager/overview/AllProgramProject";
 // import ActivityLog from "@/components/staffManager/overview/ActivityLog";
 
 const clientData = [

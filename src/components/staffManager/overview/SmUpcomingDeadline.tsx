@@ -127,7 +127,7 @@ const SmUpcomingDeadline = () => {
 
   // Fetch data for upcoming deadlines
   const { data, isLoading, error } = useGetUpcomingDeadlinesQuery({
-    selectedDays: selectedDays !== null ? selectedDays : null,
+    selectedDays: selectedDays !== null ? selectedDays : 365,
   });
 
   if (error) return <ErrorPage/>;
@@ -160,14 +160,14 @@ const SmUpcomingDeadline = () => {
         </div>
 
         {/* View Calendar Button */}
-        {deadlineData.length !== 0 && (
+        {/* {deadlineData.length !== 0 && ( */}
           <ViewCalender
             showCalendar={showCalendar}
             setShowCalendar={setShowCalendar}
             onChange={handleDateChange} // Pass the handleDateChange to get the selected range
             value={value}
           />
-        )}
+        {/* )} */}
       </div>
 
       {/* Display Selected Range Days */}

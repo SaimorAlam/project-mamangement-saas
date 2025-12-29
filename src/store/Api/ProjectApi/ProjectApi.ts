@@ -31,6 +31,7 @@ const projectApi = baseApi.injectEndpoints({
           params,
         };
       },
+      providesTags: [{ type: "Project", id: "LIST" }],
     }),
 
     searchProjects: builder.query({

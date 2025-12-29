@@ -2,7 +2,6 @@ import {
   ChartPie,
   FileChartColumnIncreasing,
   Folder,
-  FolderClosed,
   Grid2x2,
   Headphones,
   Info,
@@ -54,20 +53,25 @@ export const getStaffManagerSidebarItems = (): SidebarGroup[] => {
         {
           icon: <FileChartColumnIncreasing />,
           name: "Project Review",
-          path: "/staff-manager-panel/project-review",
-          children: [
-            {
-              icon: <FileChartColumnIncreasing />,
-              name: "Project Review",
-              path: "all-projects",
-            },
-            {
-              icon: <FolderClosed />,
-              name: "Carlyle Hall",
-              path: "carlyle-hall",
-            },
-          ],
+          path: "/staff-manager-panel/project-review/all-projects",
         },
+        // {
+        //   icon: <FileChartColumnIncreasing />,
+        //   name: "Project Review",
+        //   path: "/staff-manager-panel/project-review",
+        //   children: [
+        //     {
+        //       icon: <FileChartColumnIncreasing />,
+        //       name: "Project Review",
+        //       path: "all-projects",
+        //     },
+        //     {
+        //       icon: <FolderClosed />,
+        //       name: "Carlyle Hall",
+        //       path: "carlyle-hall",
+        //     },
+        //   ],
+        // },
       ],
     },
     {

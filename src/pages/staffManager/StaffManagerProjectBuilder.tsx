@@ -99,7 +99,7 @@ const StaffManagerProjectBuilder = () => {
           <HorizontalBarChartModule />
         )}
 
-        {selectedWidget === "heat-map-chart" && <HeatmapChart />}
+        {selectedWidget === "heat-map-chart" && <ChartModuleOne chartName="heat-map-chart" />}
 
         {selectedWidget === "area-chart" && (
           <ChartModuleOne chartName="area-chart" />
