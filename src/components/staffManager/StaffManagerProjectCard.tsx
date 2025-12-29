@@ -128,8 +128,7 @@ const StaffManagerProjectCard = ({
 
         if (successData?.success === false) {
           const errorMessage =
-            successData?.message ||
-            "Failed to add project to favorites";
+            successData?.message || "Failed to add project to favorites";
           toast.error(errorMessage);
           return;
         }
@@ -182,8 +181,7 @@ const StaffManagerProjectCard = ({
                 staff={Array.from({ length: 3 }, (_, i) => ({
                   id: i.toString(),
                   name: `Staff ${i + 1}`,
-                  avatar:
-                    "https://randomuser.me/api/portraits/men/19.jpg",
+                  avatar: "https://randomuser.me/api/portraits/men/19.jpg",
                 }))}
               />
             </div>

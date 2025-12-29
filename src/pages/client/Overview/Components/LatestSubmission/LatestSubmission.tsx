@@ -107,47 +107,45 @@ const LatestSubmission = () => {
       <Card className="border-none shadow-none p-0!">
         {/* Header */}
         <CardHeader className="flex flex-col gap-4 px-0">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between w-full">
             <h4 className="text-2xl font-medium">Latest Submission</h4>
-          </div>
-
-          {/* Filters */}
-          <div className="flex flex-wrap gap-3">
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="h-10 border rounded-md px-3 text-sm"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="h-10 border rounded-md px-3 text-sm"
-            />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 h-10"
-                >
-                  <Filter className="w-4 h-4" />
-                  Status
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent>
-                {["ALL", "APPROVED", "PENDING", "RETURNED"].map((s) => (
-                  <DropdownMenuItem
-                    key={s}
-                    onClick={() => setStatus(s as StatusFilter)}
+            {/* Filters */}
+            <div className="flex flex-wrap gap-3">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="h-10 border border-gray-200 rounded-md px-3 text-sm"
+              />
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="h-10 border border-gray-200 rounded-md px-3 text-sm"
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 h-10"
                   >
-                    {s}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                    <Filter className="w-4 h-4" />
+                    Status
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent>
+                  {["ALL", "APPROVED", "PENDING", "RETURNED"].map((s) => (
+                    <DropdownMenuItem
+                      key={s}
+                      onClick={() => setStatus(s as StatusFilter)}
+                    >
+                      {s}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </CardHeader>
 

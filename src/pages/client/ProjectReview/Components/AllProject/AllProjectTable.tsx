@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import RenderStaffAvatars from "@/components/ViewerPanel/RenderStaffAvater";
 import { Progress } from "@/components/ui/progress";
 import { Project } from "./AllProject";
+import ProjectModal from "./ProjectModal";
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -83,7 +83,7 @@ const renderPriority = (priority: Project["priority"]) => (
 
 const AllProjectTable = ({ projects }: { projects: Project[] }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [open, setOpen] = useState(false);
+  const [openProjectModal, setOpenProjectModal] = useState(false);
 
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
@@ -145,8 +145,8 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
   );
 
   return (
-    <Card className="w-full shadow-none border-none">
-      <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full min-h-[420px]">
+    <Card className="shadow-none border-none">
+      <CardContent className="p-0 border border-[#E2E8F0] rounded-lg min-h-[420px]">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-gray-200 bg-[#F7F9FA]">
@@ -176,11 +176,11 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
                   {project.name}
                 </TableCell>
 
-                <TableCell className="px-6 py-3.5">
+                <TableCell className=" py-3.5">
                   {renderStatusBadge(project.status)}
                 </TableCell>
 
-                <TableCell className="px-6 py-3.5">
+                <TableCell className=" py-3.5">
                   <RenderStaffAvatars
                     staff={Array.from({ length: 3 }, (_, i) => ({
                       id: i.toString(),
@@ -190,31 +190,31 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
                   />
                 </TableCell>
 
-                <TableCell className="px-6 py-3.5">
+                <TableCell className=" py-3.5">
                   {renderPriority(project.priority)}
                 </TableCell>
 
-                <TableCell className="px-6 py-3.5 text-muted-foreground">
+                <TableCell className=" py-3.5 text-muted-foreground">
                   {formatDate(project.startDate)}
                 </TableCell>
 
-                <TableCell className="px-6 py-3.5 text-muted-foreground">
+                <TableCell className=" py-3.5 text-muted-foreground">
                   {formatDate(project.deadline)}
                 </TableCell>
 
-                <TableCell className="px-6 py-3.5 flex items-center gap-2">
+                <TableCell className=" py-3.5 flex items-center gap-2">
                   <Progress value={project.progress} className="h-2" />
                   <span className="font-medium">{project.progress}%</span>
                 </TableCell>
 
-                <TableCell className="px-6 py-3.5">
+                <TableCell className=" py-3.5">
                   <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
                         setSelectedProject(project);
-                        setOpen(true);
+                        setOpenProjectModal(true);
                       }}
                     >
                       <Eye className="w-4 h-4 text-[#1C73E0]" />
@@ -235,10 +235,12 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
         </Table>
       </CardContent>
 
-      {selectedProject && (
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent />
-        </Dialog>
+      {openProjectModal && (
+        <ProjectModal
+          project={selectedProject as Project}
+          open={openProjectModal}
+          setOpen={setOpenProjectModal}
+        />
       )}
     </Card>
   );
