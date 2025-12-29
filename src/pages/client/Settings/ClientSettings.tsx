@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import ToggleSwitchComponent from "@/components/client/Settings/ToggleSwitchComponent";
 import ColorPickerComponent from "@/components/client/Settings/ColorPickerComponent";
 import FileUploadComponent from "@/components/client/Settings/FileUploadComponent";
-import CheckboxGroupComponent from "@/components/client/Settings/CheckboxGroupComponent";
 import BoxContainer from "@/common/BoxContainer";
 import DropdownSelect from "@/common/DropdownSelect";
 import PrimaryButton from "@/common/PrimaryButton";
 import APIConnectionCard from "@/components/client/Settings/APIConnectionCard";
+import Notification from "./Components/Notification";
 
 const ClientSettings = () => {
   const [defaultLanguage, setDefaultLanguage] = useState("English (US)");
@@ -183,7 +183,7 @@ const ClientSettings = () => {
             </div>
           </BoxContainer>
 
-          <CheckboxGroupComponent title="Notification Settings" />
+          <Notification title="Notification Settings" />
 
           <div className="border border-gray-200 rounded-lg p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">

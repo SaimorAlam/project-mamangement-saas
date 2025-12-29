@@ -41,7 +41,7 @@ const ClientProjectReview = lazy(
 const ClientProjectBuilder = lazy(
   () => import("@/pages/client/ClientProjectBuilder")
 );
-const ClientSettings = lazy(() => import("@/pages/client/ClientSettings"));
+const ClientSettings = lazy(() => import("@/pages/client/Settings/ClientSettings"));
 const ClientActivityLog = lazy(
   () => import("@/pages/client/ClientActivityLog")
 );
