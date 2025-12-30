@@ -16,6 +16,8 @@ import PieChartModule from "./../../components/client/ProjectBuilder/chartModule
 import HorizontalBarChartModule from "./../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule";
 import ProgressRingModule from "./../../components/client/ProjectBuilder/chartModules/ProgressRingModule";
 import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModules/ColumnBarChartModule";
+import FunnelChartModule from "@/components/client/ProjectBuilder/chartModules/FunnelChartModule";
+import ScatterChartModule from "@/components/client/ProjectBuilder/chartModules/ScatterChartModule";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -107,11 +109,13 @@ const StaffManagerProjectBuilder = () => {
         )}
 
         {selectedWidget === "column-chart" && <ColumnBarChartModule />}
-        {selectedWidget === "funnel-chart" && <ColumnBarChartModule />}
-        {selectedWidget === "scatter-chart" && <ColumnBarChartModule />}
+        {selectedWidget === "funnel-chart" && <FunnelChartModule />}
+        {selectedWidget === "scatter-chart" && <ScatterChartModule />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
   );
 };
 export default StaffManagerProjectBuilder;
+
+
