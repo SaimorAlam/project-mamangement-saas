@@ -6,7 +6,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
+import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 
@@ -107,12 +107,9 @@ export default function FunnelChart({
     data: chartData,
   }], [chartData]);
 
-  /*   TOTAL   */
   const totalValue = useMemo(() => {
     return chartData.reduce((sum, val) => sum + val, 0);
   }, [chartData]);
-
-  /*   ACTIONS   */
 
   const handleCopy = () => {
     const copyData = xAxisValues.map((label, index) => ({
@@ -122,30 +119,32 @@ export default function FunnelChart({
     navigator.clipboard.writeText(JSON.stringify(copyData, null, 2));
   };
 
-  const handleDownload = () => {
+const handleDownload = () => {
     const payload = {
-      numberOfDataset: 1,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
-      showWidgets: [{ legend_name: "Funnel", color: "#00E396" }],
+      numberOfDataset: xAxisValues.length,
+      firstFiledDataset: 0,
+      lastFiledDAtaset: 100,
+      showWidgets: xAxisValues.map((l) => ({
+        legend_name: l,
+      })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "FUNNEL",
+      category: "BAR",
       xAxis: JSON.stringify({
-        labels: xAxisValues,
-        values: chartData,
+        labels: [],
+        values: [],
       }),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
     };
     setIsDownloading(true);
 
-    DownloadAndSaveCSVforModuleOneWidget(
+    // Also save to backend
+    DownloadAndSaveCSVforModuleTwoWidget(
       payload,
       getChartTitleId,
       widgetTitle,
-      xAxisValues,
-      [{ label: "Funnel", field: "funnel", color: "#00E396" }]
+      xAxisValues
     );
 
     setIsDownloading(false);
