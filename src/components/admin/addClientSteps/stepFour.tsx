@@ -57,10 +57,10 @@ export function StepFour() {
         <h3 className="text-xl font-medium text-blue-600 mb-4">Library Assignment</h3>
         <div className="flex items-center space-x-2 mb-4">
           <CustomCheckBox
-            checked={formData.enableCustomChartLibrary || false}
-            onChange={(checked) => setValue("enableCustomChartLibrary", checked)}
+            checked={formData.enableCustomCharts || false}
+            onChange={(checked) => setValue("enableCustomCharts", checked)}
           />
-          <Label htmlFor="enableCustomChartLibrary">Enable Custom chart library</Label>
+          <Label htmlFor="enableCustomCharts">Enable Custom chart library</Label>
         </div>
         <p className="text-sm text-gray-600">
           Enable this to accept and validate extended chart types for this client's dashboards.

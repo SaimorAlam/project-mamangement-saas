@@ -1,29 +1,39 @@
-"use client"
+"use client";
 
-import { useFormContext } from "react-hook-form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import type { FormData } from "@/types/form-types"
-import { CustomCheckBox } from "@/components/ui/CustomCheckBox"
+import { useFormContext } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import type { FormData } from "@/types/form-types";
+import { CustomCheckBox } from "@/components/ui/CustomCheckBox";
 
 export function StepOne() {
-  const { control, watch } = useFormContext<FormData>()
-  const isReferred = watch("isReferred")
-
+  const { control, watch } = useFormContext<FormData>();
+  const isReferred = watch("isReferred");
   return (
     <div className="space-y-8">
       {/* Company Information */}
       <div>
-        <h3 className="text-xl font-medium text-blue-600 mb-4">Company Information</h3>
+        <h3 className="text-xl font-medium text-blue-600 mb-4">
+          Company Information
+        </h3>
         <div className="grid grid-cols-2 gap-6">
           <FormField
             control={control}
-            name="clientName"
+            name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-md">Client Name *</FormLabel>
-                <Input className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500" placeholder="Enter Client company name" value={field.value} onChange={field.onChange} />
+                <Input
+                  className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
+                  placeholder="Enter Client company name"
+                  {...field}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -35,7 +45,12 @@ export function StepOne() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-md">Email *</FormLabel>
-                <Input className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500" type="email" placeholder="Enter your email" value={field.value} onChange={field.onChange} />
+                <Input
+                  className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
+                  type="email"
+                  placeholder="Enter your email"
+                  {...field}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -47,7 +62,11 @@ export function StepOne() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-md">Contact Person Name *</FormLabel>
-                <Input className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500" placeholder="Enter company contact person name" value={field.value} onChange={field.onChange} />
+                <Input
+                  className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
+                  placeholder="Enter company contact person name"
+                  {...field}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -65,11 +84,27 @@ export function StepOne() {
                   </select>
                   <Input
                     placeholder="+1 (555) 000-0000"
-                    value={field.value}
-                    onChange={field.onChange}
+                    {...field}
                     className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 rounded-l-none"
                   />
                 </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-md">Password *</FormLabel>
+                <Input
+                  type="password"
+                  className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
+                  placeholder="Enter a secure password"
+                  {...field}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -88,13 +123,14 @@ export function StepOne() {
             </FormItem>
           )}
         />
-
       </div>
 
       {/* Referrer Information */}
       {isReferred && (
         <div>
-          <h3 className="text-xl font-medium text-blue-600 mb-4">Referrer Information</h3>
+          <h3 className="text-xl font-medium text-blue-600 mb-4">
+            Referrer Information
+          </h3>
           <div className="grid grid-cols-2 gap-6">
             <FormField
               control={control}
@@ -102,7 +138,12 @@ export function StepOne() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-md">Name *</FormLabel>
-                  <Input className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500" placeholder="Enter referrer name" value={field.value || ""} onChange={field.onChange} />
+                  <Input
+                    className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
+                    placeholder="Enter referrer name"
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
@@ -150,10 +191,12 @@ export function StepOne() {
 
             <FormField
               control={control}
-              name="howDidClientHear"
+              name="discoverySource"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-md">How did this client hear about us?</FormLabel>
+                  <FormLabel className="text-md">
+                    How did this client hear about us?
+                  </FormLabel>
                   <Textarea
                     placeholder="e.g. Social Media, Google, Friend, etc"
                     value={field.value || ""}
@@ -161,7 +204,9 @@ export function StepOne() {
                     rows={3}
                     className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Not visible to client</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Not visible to client
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -170,5 +215,5 @@ export function StepOne() {
         </div>
       )}
     </div>
-  )
+  );
 }

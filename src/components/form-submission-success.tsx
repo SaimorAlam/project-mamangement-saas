@@ -14,19 +14,19 @@ export function FormSubmissionSuccess({ formData, onStartOver, onGoHome }: FormS
   const handleDownloadSummary = () => {
     const summary = {
       submissionDate: new Date().toISOString(),
-      clientName: formData.clientName,
+      name: formData.name,
       email: formData.email,
       subdomain: formData.subdomain,
       subscriptionPlan: formData.subscriptionPlan,
       billingCycle: formData.billingCycle,
-      storageQuota: formData.storageQuota,
+      storageQuotaGb: formData.storageQuotaGb,
     }
 
     const blob = new Blob([JSON.stringify(summary, null, 2)], { type: "application/json" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `${formData.clientName}-submission-summary.json`
+    a.download = `${formData.name}-submission-summary.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -56,7 +56,7 @@ export function FormSubmissionSuccess({ formData, onStartOver, onGoHome }: FormS
                   <h3 className="font-semibold text-foreground mb-2">Client Information</h3>
                   <div className="space-y-1 text-sm text-muted-foreground">
                     <p>
-                      <span className="font-medium">Name:</span> {formData.clientName}
+                      <span className="font-medium">Name:</span> {formData.name}
                     </p>
                     <p>
                       <span className="font-medium">Email:</span> {formData.email}
@@ -73,7 +73,7 @@ export function FormSubmissionSuccess({ formData, onStartOver, onGoHome }: FormS
                       <span className="font-medium">Subdomain:</span> {formData.subdomain}
                     </p>
                     <p>
-                      <span className="font-medium">Region:</span> {formData.regionServerLocation}
+                      <span className="font-medium">Region:</span> {formData.region}
                     </p>
                     <p>
                       <span className="font-medium">Timezone:</span> {formData.timeZone}
@@ -92,7 +92,7 @@ export function FormSubmissionSuccess({ formData, onStartOver, onGoHome }: FormS
                       <span className="font-medium">Billing:</span> {formData.billingCycle}
                     </p>
                     <p>
-                      <span className="font-medium">Storage:</span> {formData.storageQuota}
+                      <span className="font-medium">Storage:</span> {formData.storageQuotaGb} GB
                     </p>
                   </div>
                 </div>

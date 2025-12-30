@@ -13,8 +13,8 @@ import { CustomCheckBox } from "@/components/ui/CustomCheckBox"
 
 export function StepTwo() {
   const { control, watch, setValue } = useFormContext<FormData>()
-  const primaryColor = watch("primaryBrandColor")
-  const secondaryColor = watch("secondaryBrandColor")
+  const primaryColor = watch("primaryColor")
+  const secondaryColor = watch("secondaryColor")
   const logoInputRef = useRef<HTMLInputElement>(null)
   const faviconInputRef = useRef<HTMLInputElement>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
@@ -23,7 +23,7 @@ export function StepTwo() {
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      setValue("clientLogo", file)
+      setValue("logo", file)
       const reader = new FileReader()
       reader.onload = (e) => setLogoPreview(e.target?.result as string)
       reader.readAsDataURL(file)
@@ -41,7 +41,7 @@ export function StepTwo() {
   }
 
   const removeLogo = () => {
-    setValue("clientLogo", null)
+    setValue("logo", null)
     setLogoPreview(null)
     if (logoInputRef.current) logoInputRef.current.value = ""
   }
@@ -149,7 +149,7 @@ export function StepTwo() {
         <div className="grid grid-cols-2 gap-6 mt-6">
           <FormField
             control={control}
-            name="primaryBrandColor"
+            name="primaryColor"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-md">Primary brand color *</FormLabel>
@@ -169,7 +169,7 @@ export function StepTwo() {
 
           <FormField
             control={control}
-            name="secondaryBrandColor"
+            name="secondaryColor"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-md">Secondary brand color *</FormLabel>
@@ -195,7 +195,7 @@ export function StepTwo() {
 
         <FormField
           control={control}
-          name="showFooterInViewer"
+          name="showFooter"
           render={({ field }) => (
             <FormItem className="flex items-center space-x-2 mb-4">
               <CustomCheckBox checked={field.value} onChange={field.onChange} />
