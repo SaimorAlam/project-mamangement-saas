@@ -95,7 +95,7 @@ const ClientSidebar = () => {
       return (
         <SidebarMenuItem key={fullPath}>
           <DropdownMenu onOpenChange={(v) => setOpen(v)}>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="border-none py-3!">
               <button
                 className={`self-stretch rounded-[10px] inline-flex items-center w-full
                   ${
@@ -129,6 +129,7 @@ const ClientSidebar = () => {
 
                   {state === "expanded" && (
                     <ChevronRight
+                      size={20}
                       className={`flex-shrink-0 ${
                         open ? "rotate-90 duration-200" : ""
                       }`}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Textarea } from "@/components/ui/textarea";
 import { Paperclip, Smile } from "lucide-react";
 
@@ -5,8 +6,8 @@ const DescriptionTextArea = ({
   handleAttachment,
   handleEmoji,
 }: {
-  handleAttachment: () => void;
-  handleEmoji: () => void;
+  handleAttachment: (data?: any) => void;
+  handleEmoji: (data?: any) => void;
 }) => {
   return (
     <div className="">
@@ -18,11 +19,11 @@ const DescriptionTextArea = ({
         />
         <div className="flex absolute bottom-2 right-5 text-[#475569] gap-2">
           <Paperclip
-            onClick={handleAttachment}
+            onClick={() => handleAttachment()}
             className="size-4 cursor-pointer"
           />
           <Smile
-            onClick={handleEmoji}
+            onClick={() => handleEmoji()}
             className="size-4 cursor-pointer"
           />
         </div>

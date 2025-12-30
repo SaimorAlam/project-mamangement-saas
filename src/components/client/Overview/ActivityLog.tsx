@@ -51,7 +51,7 @@ const ActivityLog = () => {
                 className="flex items-start gap-3"
               >
                 <div className="relative min-h-20 flex">
-                  <div className="size-2.5 rounded-full shrink-0 bg-green-600" />
+                  <div className="size-2.5 rounded-full shrink-0 bg-green-600 z-20" />
                   <div className="absolute inset-x-1/2 left-1 w-px h-full border border-[#CBD5E1]" />
                 </div>
 
