@@ -17,6 +17,7 @@ import {
   Cone,
   ChartColumnBig,
   ChartColumnStacked,
+  ChartLine,
 } from "lucide-react";
 
 interface Widget {
@@ -138,12 +139,18 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Division of same category",
       icon: <ChartScatter className="w-5 h-5" />,
     },
-    // {
-    //   id: "rader-chart",
-    //   name: "Rader Chart",
-    //   description: "Division of same category",
-    //   icon: <ChartScatter className="w-5 h-5" />,
-    // },
+    {
+      id: "pareto-chart",
+      name: "Pareto Chart",
+      description: "Show pareto chart",
+      icon: <ChartLine className="w-5 h-5" />,
+    },
+    {
+      id: "rader-chart",
+      name: "Rader Chart",
+      description: "Division of same category",
+      icon: <ChartScatter className="w-5 h-5" />,
+    },
   ];
 
   return (
