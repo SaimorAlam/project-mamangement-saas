@@ -104,6 +104,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Show gauge chart",
       icon: <Gauge className="w-5 h-5" />,
     },
+    {
+      id: "histogram-chart",
+      name: "Histogram Chart",
+      description: "Show histogram chart",
+      icon: <Gauge className="w-5 h-5" />,
+    },
   ];
 
   return (
