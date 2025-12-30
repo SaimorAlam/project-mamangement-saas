@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { AgCharts } from "ag-charts-react";
-import type { AgChartOptions } from "ag-charts-community";
+import Chart from "react-apexcharts";
 import { Copy, Trash2, Download } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
@@ -10,26 +9,6 @@ import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-
-import {
-  AnimationModule,
-  ContextMenuModule,
-  CrosshairModule,
-  HistogramSeriesModule,
-  LegendModule,
-  ModuleRegistry,
-  NumberAxisModule,
-} from "ag-charts-enterprise";
-
-// ✅ register once (safe even if called multiple times)
-ModuleRegistry.registerModules([
-  AnimationModule,
-  CrosshairModule,
-  HistogramSeriesModule,
-  LegendModule,
-  NumberAxisModule,
-  ContextMenuModule,
-]);
 
 /*       TYPES       */
 
@@ -61,23 +40,20 @@ type Props = {
 
 /*       HELPER FUNCTIONS       */
 
-const generateHistogramData = (
-  startingRange: number,
-  endingRange: number
+const generateBubbleData = (
+  xAxisValues: string[],
+  yrange: { min: number; max: number }
 ) => {
-  // Generate random data points for histogram
-  const dataPoints: { value: number }[] = [];
-  const numPoints = 50; // Generate 50 data points
-
-  for (let i = 0; i < numPoints; i++) {
-    const value = Math.floor(
-      Math.random() * (endingRange - startingRange + 1) +
-        startingRange
-    );
-    dataPoints.push({ value });
+  const series = [];
+  for (let i = 0; i < xAxisValues.length; i++) {
+    const x = xAxisValues[i] || `Point ${i + 1}`;
+    const y =
+      Math.floor(Math.random() * (yrange.max - yrange.min + 1)) +
+      yrange.min;
+    const z = Math.floor(Math.random() * 60) + 15; // Bubble size
+    series.push([x, y, z]);
   }
-
-  return dataPoints;
+  return series;
 };
 
 const generateId = () =>
@@ -86,7 +62,7 @@ const generateId = () =>
 
 /*       COMPONENT       */
 
-export default function HistogramChart({
+export default function BubbleChart({
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
@@ -107,72 +83,72 @@ export default function HistogramChart({
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
-  /*   DATA   */
-  const histogramData = useMemo(() => {
-    return generateHistogramData(startingRange, endingRange);
-  }, [startingRange, endingRange]);
+  /*   APEX CHART STATE   */
+  const chartData: any = useMemo(() => {
+    if (!xAxisValues.length || !legendValues.length) {
+      return { series: [], options: {} };
+    }
 
-  /*   AG CHARTS OPTIONS   */
-  const chartOptions = useMemo((): AgChartOptions | null => {
-    if (!histogramData.length) return null;
+    const yrange = { min: startingRange, max: endingRange };
 
-    const color =
-      legendValues.length > 0 && legendValues[0].color
-        ? legendValues[0].color
-        : "#8D79F6";
+    // Generate series for each legend
+    const series = legendValues
+      .filter((l) => l.label)
+      .map((l) => ({
+        name: l.label,
+        data: generateBubbleData(xAxisValues, yrange),
+      }));
+
+    const colors = legendValues
+      .filter((l) => l.label)
+      .map((l) => l.color);
 
     return {
-      data: histogramData,
-      series: [
-        {
-          type: "histogram",
-          xKey: "value",
-          yKey: "value",
-          xName: legendValues[0]?.label || "Value",
-          fill: color,
-          stroke: color,
-        } as any,
-      ],
-      axes: [
-        {
-          type: "number",
-          position: "bottom",
-          title: {
-            text: xAxisValues[0] || "Value Range",
-          },
-          interval: {
-            step: Math.ceil((endingRange - startingRange) / 10),
+      series,
+      options: {
+        chart: {
+          type: "bubble" as const,
+          height: 350,
+          toolbar: { show: false },
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        fill: {
+          opacity: 0.8,
+        },
+        xaxis: {
+          tickAmount: Math.min(xAxisValues.length, 12),
+          type: "category",
+          labels: {
+            style: {
+              fontSize: "12px",
+            },
           },
         },
-        {
-          type: "number",
-          position: "left",
-          title: {
-            text: "Frequency",
+        yaxis: {
+          min: startingRange,
+          max: endingRange,
+          labels: {
+            style: {
+              fontSize: "12px",
+            },
           },
         },
-      ],
-      legend: {
-        enabled: true,
+        legend: {
+          position: "top",
+          horizontalAlign: "left",
+        },
+        colors: colors,
       },
-    } as AgChartOptions;
-  }, [
-    histogramData,
-    legendValues,
-    xAxisValues,
-    startingRange,
-    endingRange,
-  ]);
-
-  const isAllLegendFieldEmpty = legendValues.filter(
-    (l) => l.field !== ""
-  );
+    };
+  }, [xAxisValues, legendValues, startingRange, endingRange]);
 
   /*   ACTIONS   */
 
   const handleCopy = () => {
     navigator.clipboard.writeText(
-      JSON.stringify(histogramData, null, 2)
+      JSON.stringify(chartData.series, null, 2)
     );
   };
 
@@ -189,7 +165,7 @@ export default function HistogramChart({
       })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "HISTOGRAM",
+      category: "BUBBLE",
       xAxis: JSON.stringify({
         labels: xAxisValues,
         values: [],
@@ -200,8 +176,13 @@ export default function HistogramChart({
     setIsDownloading(true);
 
     // For CSV export
-    const header = "Value";
-    const rows = histogramData.map((item) => `${item.value}`);
+    const header = "Series,X,Y,Size";
+    const rows: string[] = [];
+    chartData.series.forEach((s: any) => {
+      s.data.forEach((point: any) => {
+        rows.push(`${s.name},${point[0]},${point[1]},${point[2]}`);
+      });
+    });
     const csv = [header, ...rows].join("\n");
 
     const blob = new Blob([csv], {
@@ -273,19 +254,22 @@ export default function HistogramChart({
         <div className="flex justify-between mb-4">
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            {legendValues.length > 0 && legendValues[0].label && (
-              <div className="flex gap-6 mt-3">
-                <div className="flex items-center gap-2">
+            <div className="flex gap-6 mt-3">
+              {legendValues.map((l) =>
+                l.label ? (
                   <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: legendValues[0].color }}
-                  />
-                  <span className="text-sm">
-                    {legendValues[0].label}
-                  </span>
-                </div>
-              </div>
-            )}
+                    key={l.field}
+                    className="flex items-center gap-2"
+                  >
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: l.color }}
+                    />
+                    <span className="text-sm">{l.label}</span>
+                  </div>
+                ) : null
+              )}
+            </div>
           </div>
 
           <div
@@ -370,13 +354,16 @@ export default function HistogramChart({
           </div>
         </div>
 
-        {/* Histogram Chart */}
-        {chartOptions && isAllLegendFieldEmpty.length > 0 ? (
-          <div style={{ height: "400px" }}>
-            <AgCharts options={chartOptions} />
-          </div>
+        {/* Bubble Chart */}
+        {chartData.series.length > 0 ? (
+          <Chart
+            options={chartData.options}
+            series={chartData.series}
+            type="bubble"
+            height={350}
+          />
         ) : (
-          <div className="h-[400px] flex items-center justify-center text-gray-400">
+          <div className="h-96 flex items-center justify-center text-gray-400">
             No data available, Please fill the input field to generate
             the chart and then download the csv.
           </div>
@@ -411,7 +398,7 @@ export default function HistogramChart({
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers.map((tier) => (
-              <HistogramChart
+              <BubbleChart
                 key={tier.id}
                 widgetTitle={tier.name}
                 xAxisValues={tier.xAxisValues}

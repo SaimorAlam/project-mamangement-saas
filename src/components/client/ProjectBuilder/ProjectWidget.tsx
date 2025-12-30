@@ -12,6 +12,8 @@ import {
   Flame,
   ChartArea,
   Gauge,
+  Tally4,
+  Bubbles,
 } from "lucide-react";
 
 interface Widget {
@@ -108,7 +110,13 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       id: "histogram-chart",
       name: "Histogram Chart",
       description: "Show histogram chart",
-      icon: <Gauge className="w-5 h-5" />,
+      icon: <Tally4 className="w-5 h-5" />,
+    },
+    {
+      id: "bubble-chart",
+      name: "Bubble Chart",
+      description: "Show bubble chart",
+      icon: <Bubbles className="w-5 h-5" />,
     },
   ];
 

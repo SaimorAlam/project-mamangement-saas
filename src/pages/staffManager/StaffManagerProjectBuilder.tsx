@@ -16,8 +16,8 @@ import PieChartModule from "./../../components/client/ProjectBuilder/chartModule
 import HorizontalBarChartModule from "./../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule";
 import ProgressRingModule from "./../../components/client/ProjectBuilder/chartModules/ProgressRingModule";
 import GaugeChartModule from "./../../components/client/ProjectBuilder/chartModules/GaugeChartModule";
-import HistogramChart from "./../../common/Charts/HistogramChart";
 import HistogramChartModule from "./../../components/client/ProjectBuilder/chartModules/HistogramChartModule";
+import BubbleChartModule from "./../../components/client/ProjectBuilder/chartModules/BubbleChartModule";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -115,6 +115,8 @@ const StaffManagerProjectBuilder = () => {
         {selectedWidget === "histogram-chart" && (
           <HistogramChartModule />
         )}
+
+        {selectedWidget === "bubble-chart" && <BubbleChartModule />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
