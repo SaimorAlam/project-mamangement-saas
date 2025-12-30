@@ -193,7 +193,7 @@ const handleDownload = () => {
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
             <p className="text-sm text-gray-500 mt-1">
-              {xAxisValues.filter(Boolean).length} stages
+              {xAxisValues.length} stages
             </p>
           </div>
 
