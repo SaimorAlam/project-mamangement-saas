@@ -22,6 +22,7 @@ import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModule
 import FunnelChartModule from "@/components/client/ProjectBuilder/chartModules/FunnelChartModule";
 import ScatterChartModule from "@/components/client/ProjectBuilder/chartModules/ScatterChartModule";
 import ParetoChartModule from "@/components/client/ProjectBuilder/chartModules/ParetoChartModule";
+import RadarChartModule from "@/components/client/ProjectBuilder/chartModules/RadarChartModule";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -125,6 +126,7 @@ const StaffManagerProjectBuilder = () => {
         {selectedWidget === "funnel-chart" && <FunnelChartModule />}
         {selectedWidget === "scatter-chart" && <ScatterChartModule />}
         {selectedWidget === "pareto-chart" && <ParetoChartModule />}
+        {selectedWidget === "radar-chart" && <RadarChartModule />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>

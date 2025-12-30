@@ -18,6 +18,7 @@ import {
   ChartColumnBig,
   ChartColumnStacked,
   ChartLine,
+  FileChartPie,
 } from "lucide-react";
 
 interface Widget {
@@ -146,10 +147,10 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       icon: <ChartLine className="w-5 h-5" />,
     },
     {
-      id: "rader-chart",
-      name: "Rader Chart",
+      id: "radar-chart",
+      name: "Radar Chart",
       description: "Division of same category",
-      icon: <ChartScatter className="w-5 h-5" />,
+      icon: <FileChartPie className="w-5 h-5" />,
     },
   ];
 
