@@ -19,6 +19,7 @@ import {
   ChartColumnStacked,
   ChartLine,
   FileChartPie,
+  SquareKanban,
 } from "lucide-react";
 
 interface Widget {
@@ -145,6 +146,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       name: "Pareto Chart",
       description: "Show pareto chart",
       icon: <ChartLine className="w-5 h-5" />,
+    },
+    {
+      id: "waterfall-chart",
+      name: "Water Chart",
+      description: "Show waterfall chart",
+      icon: <SquareKanban className="w-5 h-5" />,
     },
     {
       id: "radar-chart",
