@@ -40,32 +40,45 @@ type Props = {
 
 /*       HELPER FUNCTIONS       */
 
-const generateBubbleData = (
-  xAxisValues: string[],
+const generateCandlestickData = (
+  count: number,
   yrange: { min: number; max: number }
 ) => {
-  const series = [];
-  for (let i = 0; i < xAxisValues.length; i++) {
-    // Try to parse X as number, otherwise use index
-    const xValue = xAxisValues[i];
-    const x = !isNaN(Number(xValue)) ? Number(xValue) : i + 1;
+  const seriesData = [];
+  const baseTime = new Date("2024-01-01").getTime();
+  const interval = 1800000; // 30 minutes in milliseconds
 
-    const y =
-      Math.floor(Math.random() * (yrange.max - yrange.min + 1)) +
-      yrange.min;
-    const z = Math.floor(Math.random() * 60) + 15; // Bubble size
-    series.push([x, y, z]);
+  for (let i = 0; i < count; i++) {
+    const timestamp = baseTime + i * interval;
+    
+    // Generate OHLC values (Open, High, Low, Close)
+    const open = Math.random() * (yrange.max - yrange.min) + yrange.min;
+    const variance = (yrange.max - yrange.min) * 0.05; // 5% variance
+    
+    const high = open + Math.random() * variance;
+    const low = open - Math.random() * variance;
+    const close = low + Math.random() * (high - low);
+
+    seriesData.push({
+      x: new Date(timestamp),
+      y: [
+        Math.round(open * 100) / 100,
+        Math.round(high * 100) / 100,
+        Math.round(low * 100) / 100,
+        Math.round(close * 100) / 100,
+      ],
+    });
   }
-  return series;
+
+  return seriesData;
 };
 
 const generateId = () =>
-  crypto.randomUUID?.() ??
-  Math.random().toString(36).substring(2, 10);
+  crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
 
 /*       COMPONENT       */
 
-export default function BubbleChart({
+export default function CandleChart({
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
@@ -88,40 +101,43 @@ export default function BubbleChart({
 
   /*   APEX CHART STATE   */
   const chartData: any = useMemo(() => {
-    if (!xAxisValues.length || !legendValues.length) {
+    if (!xAxisValues.length) {
       return { series: [], options: {} };
     }
 
     const yrange = { min: startingRange, max: endingRange };
+    const seriesData = generateCandlestickData(xAxisValues.length, yrange);
 
-    // Generate series for each legend
-    const series = legendValues
-      .filter((l) => l.label)
-      .map((l) => ({
-        name: l.label,
-        data: generateBubbleData(xAxisValues, yrange),
-      }));
-
-    const colors = legendValues
-      .filter((l) => l.label)
-      .map((l) => l.color);
+    // Use first legend color for candlestick colors if available
+    const upColor = legendValues.length > 0 && legendValues[0].color
+      ? legendValues[0].color
+      : "#00B746";
+    const downColor = legendValues.length > 1 && legendValues[1].color
+      ? legendValues[1].color
+      : "#EF403C";
 
     return {
-      series,
+      series: [
+        {
+          data: seriesData,
+        },
+      ],
       options: {
         chart: {
-          type: "bubble" as const,
+          type: "candlestick" as const,
           height: 350,
           toolbar: { show: false },
         },
-        dataLabels: {
-          enabled: false,
-        },
-        fill: {
-          opacity: 0.8,
+        plotOptions: {
+          candlestick: {
+            colors: {
+              upward: upColor,
+              downward: downColor,
+            },
+          },
         },
         xaxis: {
-          type: "numeric",
+          type: "datetime",
           labels: {
             style: {
               fontSize: "12px",
@@ -131,17 +147,15 @@ export default function BubbleChart({
         yaxis: {
           min: startingRange,
           max: endingRange,
+          tooltip: {
+            enabled: true,
+          },
           labels: {
             style: {
               fontSize: "12px",
             },
           },
         },
-        legend: {
-          position: "top",
-          horizontalAlign: "left",
-        },
-        colors: colors,
       },
     };
   }, [xAxisValues, legendValues, startingRange, endingRange]);
@@ -149,9 +163,7 @@ export default function BubbleChart({
   /*   ACTIONS   */
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(
-      JSON.stringify(chartData.series, null, 2)
-    );
+    navigator.clipboard.writeText(JSON.stringify(chartData.series, null, 2));
   };
 
   const handleDownload = () => {
@@ -167,7 +179,7 @@ export default function BubbleChart({
       })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "BUBBLE",
+      category: "CANDLESTICK",
       xAxis: JSON.stringify({
         labels: xAxisValues,
         values: [],
@@ -178,13 +190,16 @@ export default function BubbleChart({
     setIsDownloading(true);
 
     // For CSV export
-    const header = "Series,X,Y,Size";
+    const header = "Timestamp,Open,High,Low,Close";
     const rows: string[] = [];
-    chartData.series.forEach((s: any) => {
-      s.data.forEach((point: any) => {
-        rows.push(`${s.name},${point[0]},${point[1]},${point[2]}`);
+    if (chartData.series[0]?.data) {
+      chartData.series[0].data.forEach((point: any) => {
+        const timestamp = new Date(point.x).toISOString();
+        rows.push(
+          `${timestamp},${point.y[0]},${point.y[1]},${point.y[2]},${point.y[3]}`
+        );
       });
-    });
+    }
     const csv = [header, ...rows].join("\n");
 
     const blob = new Blob([csv], {
@@ -246,9 +261,7 @@ export default function BubbleChart({
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
+          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
         }`}
         onClick={handleChartClick}
       >
@@ -256,28 +269,31 @@ export default function BubbleChart({
         <div className="flex justify-between mb-4">
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <div className="flex gap-6 mt-3">
-              {legendValues.map((l) =>
-                l.label ? (
-                  <div
-                    key={l.field}
-                    className="flex items-center gap-2"
-                  >
+            {legendValues.length > 0 && (
+              <div className="flex gap-6 mt-3">
+                {legendValues[0]?.label && (
+                  <div className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: l.color }}
+                      style={{ backgroundColor: legendValues[0].color }}
                     />
-                    <span className="text-sm">{l.label}</span>
+                    <span className="text-sm">{legendValues[0].label} (Upward)</span>
                   </div>
-                ) : null
-              )}
-            </div>
+                )}
+                {legendValues[1]?.label && (
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: legendValues[1].color }}
+                    />
+                    <span className="text-sm">{legendValues[1].label} (Downward)</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex gap-2 border-l pl-4 relative">
               <button
                 onClick={(e) => {
@@ -356,18 +372,18 @@ export default function BubbleChart({
           </div>
         </div>
 
-        {/* Bubble Chart */}
+        {/* Candlestick Chart */}
         {chartData.series.length > 0 ? (
           <Chart
             options={chartData.options}
             series={chartData.series}
-            type="bubble"
+            type="candlestick"
             height={350}
           />
         ) : (
           <div className="h-96 flex items-center justify-center text-gray-400">
-            No data available, Please fill the input field to generate
-            the chart and then download the csv.
+            No data available, Please fill the input field to generate the chart
+            and then download the csv.
           </div>
         )}
 
@@ -400,7 +416,7 @@ export default function BubbleChart({
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers.map((tier) => (
-              <BubbleChart
+              <CandleChart
                 key={tier.id}
                 widgetTitle={tier.name}
                 xAxisValues={tier.xAxisValues}

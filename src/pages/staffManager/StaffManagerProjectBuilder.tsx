@@ -21,6 +21,7 @@ import BubbleChartModule from "./../../components/client/ProjectBuilder/chartMod
 import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModules/ColumnBarChartModule";
 import FunnelChartModule from "@/components/client/ProjectBuilder/chartModules/FunnelChartModule";
 import ScatterChartModule from "@/components/client/ProjectBuilder/chartModules/ScatterChartModule";
+import CandleChartModule from "./../../components/client/ProjectBuilder/chartModules/CandleChartModule";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -120,14 +121,15 @@ const StaffManagerProjectBuilder = () => {
         )}
 
         {selectedWidget === "bubble-chart" && <BubbleChartModule />}
-        {selectedWidget === "column-chart" && <ColumnBarChartModule />}
+        {selectedWidget === "column-chart" && (
+          <ColumnBarChartModule />
+        )}
         {selectedWidget === "funnel-chart" && <FunnelChartModule />}
         {selectedWidget === "scatter-chart" && <ScatterChartModule />}
+        {selectedWidget === "candle-chart" && <CandleChartModule />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
   );
 };
 export default StaffManagerProjectBuilder;
-
-
