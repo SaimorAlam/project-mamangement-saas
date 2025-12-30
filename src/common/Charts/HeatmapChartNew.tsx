@@ -50,7 +50,7 @@ type Props = {
 
 /*    COMPONENT    */
 
-export default function HeatmapChart({
+export default function HeatmapChartNew({
   widgetTitle = "Heatmap Chart",
   xAxisValues = [],
   legendValues = [],
@@ -68,7 +68,7 @@ export default function HeatmapChart({
   /*     Tier States     */
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
-  const [activeTier, setActiveTier] = useState<TierChart | null>(null);
+  const [showChildrenModal, setShowChildrenModal] = useState(false);
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
@@ -126,7 +126,7 @@ export default function HeatmapChart({
     setShowPopover(false);
   };
 
-const handleDownload = () => {
+  const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -137,7 +137,7 @@ const handleDownload = () => {
       })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "BAR",
+      category: "HEATMAP",
       xAxis: JSON.stringify({
         labels: xAxisValues,
         values: [],
@@ -158,7 +158,14 @@ const handleDownload = () => {
     setIsDownloading(false);
   };
 
-  const handleAddTier = () => {
+  const handleWidgetClick = () => {
+    if (onToggleWidget) {
+      onToggleWidget();
+    }
+    setShowPopover(false);
+  };
+
+  const handleAddTierClick = () => {
     setShowAddTierModal(true);
     setShowPopover(false);
   };
@@ -167,81 +174,138 @@ const handleDownload = () => {
     const newTier: TierChart = {
       id: `${chartId}-tier-${Date.now()}`,
       name: tierName,
-      xAxisValues,
-      legendValues,
+      xAxisValues: xAxisValues,
+      legendValues: legendValues,
       children: [],
     };
-
-    setChildTiers((prev) => [...prev, newTier]);
-    setActiveTier(newTier);
+    setChildTiers([...childTiers, newTier]);
     setShowAddTierModal(false);
+  };
+
+  const handleChartClick = () => {
+    if (childTiers.length > 0) {
+      setShowChildrenModal(true);
+    }
   };
 
   /*    RENDER    */
 
   return (
     <>
-      <div className="w-full bg-white border border-gray-200 rounded-lg p-6 relative">
-        {/* Tier indicator */}
-        {tierLevel > 0 && (
-          <div className="mb-3 text-sm text-gray-500">
-            {"→ ".repeat(tierLevel)} Tier Level {tierLevel}
-          </div>
-        )}
-
+      <div
+        className={`w-full bg-white border border-gray-200 rounded-lg p-6 relative ${
+          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+        }`}
+        onClick={handleChartClick}
+      >
         {/* Header */}
         <div className="flex justify-between mb-6">
           <h2 className="text-xl font-semibold">{widgetTitle}</h2>
 
-          <div className="relative">
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
-              onClick={() => setShowPopover(!showPopover)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowPopover(!showPopover);
+              }}
               className="p-2 border border-gray-300 rounded hover:bg-gray-50"
             >
               <BsThreeDots size={18} />
             </button>
 
             {showPopover && (
-              <div className="absolute right-0 top-12 bg-white border rounded-lg shadow-lg p-2 w-48 z-10">
-                <MenuItem icon={<Copy />} label="Copy" onClick={handleCopy} />
-                <MenuItem
-                  icon={<Download />}
-                  label="Download"
-                  onClick={handleDownload}
+              <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCopy();
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                >
+                  <Copy size={18} />
+                  <span>Copy</span>
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownload();
+                  }}
                   disabled={isDownloading}
-                />
-                <MenuItem icon={<Trash2 />} label="Delete" danger />
+                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                >
+                  <Download size={18} />
+                  <span>Download</span>
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowPopover(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
+                >
+                  <Trash2 size={18} />
+                  <span>Delete</span>
+                </button>
+
                 {onToggleWidget && (
-                  <MenuItem
-                    icon={<MdOutlineWidgets />}
-                    label="Widget"
-                    onClick={onToggleWidget}
-                  />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleWidgetClick();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <MdOutlineWidgets size={18} />
+                    <span>Widget</span>
+                  </button>
                 )}
-                <MenuItem
-                  icon={<GoPlus />}
-                  label="Add Tier"
-                  onClick={handleAddTier}
-                />
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddTierClick();
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                >
+                  <GoPlus size={18} />
+                  <span>Add Tier</span>
+                </button>
               </div>
             )}
           </div>
         </div>
-        <div className="w-full flex items-center justify-between gap-4 mb-18">
-                <span className="text-sm font-medium text-gray-700 flex items-center gap-2"> Range:
-                </span>
-                <div className="flex items-center justify-end gap-2">
-                    {[
-                        { color: "bg-[#CCE3DE]", range: `${startingRange}-${Math.floor(endingRange / 3)}` },
-                        { color: "bg-[#A4C3B2]", range: `${Math.floor(endingRange / 3) + 1}-${Math.floor(endingRange * 2 / 3)}` },
-                        { color: "bg-[#6B9080]", range: `${Math.floor(endingRange * 2 / 3) + 1}-${endingRange}` }
-                    ].map((item, i) => (
-                        <div key={i} className="flex items-center gap-1">
-                            <div className={`w-6 h-6 rounded ${item.color}`} />
-                            <span className="text-sm text-gray-600"> {item.range} </span>
-                        </div>))}
-                </div>
-            </div>
+
+        {/* Range Legend */}
+        <div className="w-full flex items-center justify-between gap-4 mb-6">
+          <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
+            Range:
+          </span>
+          <div className="flex items-center justify-end gap-2">
+            {[
+              {
+                color: "bg-[#CCE3DE]",
+                range: `${startingRange}-${Math.floor(endingRange / 3)}`,
+              },
+              {
+                color: "bg-[#A4C3B2]",
+                range: `${Math.floor(endingRange / 3) + 1}-${Math.floor(
+                  (endingRange * 2) / 3
+                )}`,
+              },
+              {
+                color: "bg-[#6B9080]",
+                range: `${Math.floor((endingRange * 2) / 3) + 1}-${endingRange}`,
+              },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-1">
+                <div className={`w-6 h-6 rounded ${item.color}`} />
+                <span className="text-sm text-gray-600">{item.range}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Heatmap */}
         <div className="overflow-x-auto">
@@ -259,12 +323,7 @@ const handleDownload = () => {
                       value
                     )}`}
                     onMouseEnter={(e) =>
-                      handleHover(
-                        row.label,
-                        xAxisValues[cIdx],
-                        value,
-                        e
-                      )
+                      handleHover(row.label, xAxisValues[cIdx], value, e)
                     }
                     onMouseLeave={() => setTooltip(null)}
                   />
@@ -303,23 +362,13 @@ const handleDownload = () => {
           </div>
         )}
 
-        {/* Child tiers */}
+        {/* Indicator if chart has children */}
         {childTiers.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">
-              Child Tiers:
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {childTiers.map((tier) => (
-                <button
-                  key={tier.id}
-                  onClick={() => setActiveTier(tier)}
-                  className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm font-medium"
-                >
-                  {tier.name}
-                </button>
-              ))}
-            </div>
+          <div className="mt-4 text-center">
+            <p className="text-sm text-blue-600 font-medium">
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
+            </p>
           </div>
         )}
       </div>
@@ -332,47 +381,31 @@ const handleDownload = () => {
         parentChartName={widgetTitle}
       />
 
-      {/* Tier Chart Modal */}
-      {activeTier && (
+      {/* Children Grid Modal */}
+      {showChildrenModal && (
         <TierChartModal
-          isOpen
-          onClose={() => setActiveTier(null)}
+          isOpen={showChildrenModal}
+          onClose={() => setShowChildrenModal(false)}
           tierLevel={tierLevel + 1}
+          title={widgetTitle}
         >
-          <HeatmapChart
-            widgetTitle={activeTier.name}
-            xAxisValues={activeTier.xAxisValues}
-            legendValues={activeTier.legendValues}
-            startingRange={startingRange}
-            endingRange={endingRange}
-            tierLevel={tierLevel + 1}
-            chartId={activeTier.id}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {childTiers.map((tier) => (
+              <HeatmapChartNew
+                key={tier.id}
+                widgetTitle={tier.name}
+                xAxisValues={tier.xAxisValues}
+                legendValues={tier.legendValues}
+                numOfLegendDataSet={tier.legendValues.length}
+                startingRange={startingRange}
+                endingRange={endingRange}
+                tierLevel={tierLevel + 1}
+                chartId={tier.id}
+              />
+            ))}
+          </div>
         </TierChartModal>
       )}
     </>
-  );
-}
-
-/*    MENU ITEM    */
-
-function MenuItem({
-  icon,
-  label,
-  onClick,
-  disabled,
-  danger,
-}: any) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`w-full flex items-center gap-3 px-3 py-2 rounded text-left hover:bg-gray-50 ${
-        danger ? "text-red-600" : ""
-      }`}
-    >
-      {icon}
-      <span>{label}</span>
-    </button>
   );
 }

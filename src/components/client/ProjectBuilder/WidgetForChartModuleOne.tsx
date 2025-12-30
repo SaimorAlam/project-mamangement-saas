@@ -167,7 +167,7 @@ const WidgetForChartModuleOne = ({
   };
 
   return (
-    <div className="min-w-78 h-full bg-white border border-gray-100 rounded-lg shadow-lg">
+    <div className="max-w-78 min-w-78 h-full bg-white border border-gray-100 rounded-lg shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">

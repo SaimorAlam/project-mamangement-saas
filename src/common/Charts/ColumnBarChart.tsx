@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import {
-  AreaChart as ReAreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -13,16 +13,15 @@ import { Copy, Trash2, Download } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
-
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
-import { generateAreaChartData } from "@/utils";
+import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 
-/*     TYPES     */
+/*       TYPES       */
 
-type ChartData = {
+export type ChartData = {
   name: string;
   [key: string]: number | string;
 };
@@ -53,9 +52,9 @@ type Props = {
   chartId?: string;
 };
 
-/*     COMPONENT     */
+/*       COMPONENT       */
 
-export default function AreaChart({
+export default function ColumnBarChart({
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
@@ -69,6 +68,7 @@ export default function AreaChart({
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
 
+  // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
@@ -76,27 +76,23 @@ export default function AreaChart({
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
   /*   DATA   */
-
   const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
-    return generateAreaChartData(
+    return generateChartData(
       xAxisValues,
       legendValues,
+      numOfLegendDataSet,
       startingRange,
       endingRange
     );
-  }, [xAxisValues, legendValues, startingRange, endingRange]);
+  }, [xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange]);
 
   /*   TOTAL   */
-
-  const totalValue = useMemo(() => {
+  const totalEmployees = useMemo(() => {
     return chartData.reduce((sum, row) => {
       return (
         sum +
-        legendValues.reduce(
-          (inner, l) => inner + Number(row[l.field] || 0),
-          0
-        )
+        legendValues.reduce((inner, l) => inner + Number(row[l.field] || 0), 0)
       );
     }, 0);
   }, [chartData, legendValues]);
@@ -107,7 +103,8 @@ export default function AreaChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = () => {
+  // download csv 
+const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -139,6 +136,7 @@ export default function AreaChart({
     setIsDownloading(false);
   };
 
+  // handle widget click 
   const handleWidgetClick = () => {
     if (onToggleWidget) {
       onToggleWidget();
@@ -170,7 +168,6 @@ export default function AreaChart({
   };
 
   /*   TOOLTIP   */
-
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
     const row = payload[0].payload;
@@ -197,30 +194,26 @@ export default function AreaChart({
         }`}
         onClick={handleChartClick}
       >
-        {/* HEADER */}
         <div className="flex justify-between mb-6">
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-
             <div className="flex gap-6 mt-3">
-              {legendValues.map(
-                (l) =>
-                  l.label && (
-                    <div key={l.field} className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: l.color }}
-                      />
-                      <span className="text-sm">{l.label}</span>
-                    </div>
-                  )
+              {legendValues.map((l) =>
+                l.label ? (
+                  <div key={l.field} className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: l.color }}
+                    />
+                    <span className="text-sm">{l.label}</span>
+                  </div>
+                ) : null
               )}
             </div>
           </div>
 
-          {/* ACTION MENU */}
           <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
-            <p className="text-sm text-gray-500">Total {totalValue}</p>
+            <p className="text-sm text-gray-500">Total {totalEmployees}</p>
 
             <div className="flex gap-2 border-l pl-4 relative">
               <button
@@ -300,26 +293,22 @@ export default function AreaChart({
           </div>
         </div>
 
-        {/* CHART */}
         <ResponsiveContainer width="100%" height={350}>
-          <ReAreaChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="name" />
             <YAxis domain={[startingRange, endingRange]} />
             <Tooltip content={<CustomTooltip />} />
-
             {legendValues.map((l) => (
-              <Area
+              <Bar
                 key={l.field}
                 dataKey={l.field}
-                type="monotone"
-                stackId="1"
-                stroke={l.color}
                 fill={l.color}
-                fillOpacity={0.3}
+                radius={[4, 4, 0, 0]}
+                activeBar={{ fill: l.color, opacity: 0.8 }}
               />
             ))}
-          </ReAreaChart>
+          </BarChart>
         </ResponsiveContainer>
 
         {/* Indicator if chart has children */}
@@ -350,7 +339,7 @@ export default function AreaChart({
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers.map((tier) => (
-              <AreaChart
+              <ColumnBarChart
                 key={tier.id}
                 widgetTitle={tier.name}
                 xAxisValues={tier.xAxisValues}

@@ -32,7 +32,8 @@ const WidgetForChartModuleTwo = ({
     startingRange?: number,
     setStartingRange?: React.Dispatch<React.SetStateAction<number>>,
     endingRange?: number,
-    setEndingRange?: React.Dispatch<React.SetStateAction<number>>
+    setEndingRange?: React.Dispatch<React.SetStateAction<number>>,
+    onClose?: ()=> void
 }) => {
 
     const [filter, setFilter] = useState<string>("");
