@@ -15,9 +15,15 @@ import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/Char
 import PieChartModule from "./../../components/client/ProjectBuilder/chartModules/PieChartModule";
 import HorizontalBarChartModule from "./../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule";
 import ProgressRingModule from "./../../components/client/ProjectBuilder/chartModules/ProgressRingModule";
+<<<<<<< HEAD
 import GaugeChartModule from "./../../components/client/ProjectBuilder/chartModules/GaugeChartModule";
 import HistogramChartModule from "./../../components/client/ProjectBuilder/chartModules/HistogramChartModule";
 import BubbleChartModule from "./../../components/client/ProjectBuilder/chartModules/BubbleChartModule";
+=======
+import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModules/ColumnBarChartModule";
+import FunnelChartModule from "@/components/client/ProjectBuilder/chartModules/FunnelChartModule";
+import ScatterChartModule from "@/components/client/ProjectBuilder/chartModules/ScatterChartModule";
+>>>>>>> b8eb5d55f3d111a3ee555d9b3697ce47599aaed0
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -110,6 +116,7 @@ const StaffManagerProjectBuilder = () => {
           <ChartModuleOne chartName="area-chart" />
         )}
 
+<<<<<<< HEAD
         {selectedWidget === "gauge-chart" && <GaugeChartModule />}
 
         {selectedWidget === "histogram-chart" && (
@@ -117,9 +124,16 @@ const StaffManagerProjectBuilder = () => {
         )}
 
         {selectedWidget === "bubble-chart" && <BubbleChartModule />}
+=======
+        {selectedWidget === "column-chart" && <ColumnBarChartModule />}
+        {selectedWidget === "funnel-chart" && <FunnelChartModule />}
+        {selectedWidget === "scatter-chart" && <ScatterChartModule />}
+>>>>>>> b8eb5d55f3d111a3ee555d9b3697ce47599aaed0
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
   );
 };
 export default StaffManagerProjectBuilder;
+
+

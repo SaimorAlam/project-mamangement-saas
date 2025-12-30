@@ -1,19 +1,39 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import BoxContainer from "@/common/BoxContainer";
 import PrimaryButton from "@/common/PrimaryButton";
 import DropdownSelect from "@/common/DropdownSelect";
 import DescriptionTextArea from "@/common/DescriptionTextArea";
 import { Send } from "lucide-react";
+import { useCreateSupportMutation } from "@/store/Api/AdminApi/ClientSupportApi";
+import { toast } from "sonner";
 
 const ClientCreateTicket = () => {
+  const [createSupport] = useCreateSupportMutation();
   const selectItem = [
     { value: "light", title: "Light" },
     { value: "dark", title: "Dark" },
     { value: "system", title: "System" },
   ];
 
-  const handleAttachment = () => {};
-  const handleEmoji = () => {};
-  const handleMessage = () => {};
+  const handleAttachment = (data: any) => {
+    console.log(data);
+  };
+  const handleEmoji = (data: any) => {
+    console.log(data);
+  };
+  const handleMessage = (data: any) => {
+    console.log(data);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await createSupport({}).unwrap();
+      console.log(response);
+      toast.success("Support ticket created successfully");
+    } catch {
+      toast.error("Something went wrong");
+    }
+  };
 
   return (
     <div className="w-1/3 mx-auto">
@@ -37,6 +57,7 @@ const ClientCreateTicket = () => {
                   type={"Primary"}
                   title={"Send"}
                   rightIcon={<Send />}
+                  onClick={() => handleSubmit()}
                 />
               </div>
             </div>

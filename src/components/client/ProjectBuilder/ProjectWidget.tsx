@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  BarChart3,
   LineChart as LineChartIcon,
   PieChart as PieChartIcon,
   Table,
@@ -11,9 +10,16 @@ import {
   ChartBarIncreasing,
   Flame,
   ChartArea,
+<<<<<<< HEAD
   Gauge,
   Tally4,
   Bubbles,
+=======
+  ChartScatter,
+  Cone,
+  ChartColumnBig,
+  ChartColumnStacked,
+>>>>>>> b8eb5d55f3d111a3ee555d9b3697ce47599aaed0
 } from "lucide-react";
 
 interface Widget {
@@ -31,7 +37,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   onWidgetSelect,
 }) => {
   const [selectedProgram, setSelectedProgram] = useState<string>("");
-  const [selectedWidget, setSelectedWidget] = useState<string>("kpi"); // ✅ default KPI widget active
+  const [selectedWidget, setSelectedWidget] = useState<string>("kpi"); // default KPI widget active
 
   const widgets: Widget[] = [
     {
@@ -44,7 +50,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       id: "bar-chart",
       name: "Stacked Bar Chart",
       description: "Compare data across categories",
-      icon: <BarChart3 className="w-5 h-5" />,
+      icon: <ChartColumnStacked className="w-5 h-5" />,
     },
     {
       id: "line-chart",
@@ -101,6 +107,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       icon: <Image className="w-5 h-5" />,
     },
     {
+<<<<<<< HEAD
       id: "gauge-chart",
       name: "Gauge Chart",
       description: "Show gauge chart",
@@ -118,6 +125,31 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Show bubble chart",
       icon: <Bubbles className="w-5 h-5" />,
     },
+=======
+      id: "column-chart",
+      name: "Column Chart",
+      description: "Compare data across categories",
+      icon: <ChartColumnBig className="w-5 h-5" />,
+    },
+    {
+      id: "funnel-chart",
+      name: "Funnel Chart",
+      description: "See clearly the process",
+      icon: <Cone className="w-5 h-5" />,
+    },
+    {
+      id: "scatter-chart",
+      name: "Scatter Chart",
+      description: "Division of same category",
+      icon: <ChartScatter className="w-5 h-5" />,
+    },
+    // {
+    //   id: "rader-chart",
+    //   name: "Rader Chart",
+    //   description: "Division of same category",
+    //   icon: <ChartScatter className="w-5 h-5" />,
+    // },
+>>>>>>> b8eb5d55f3d111a3ee555d9b3697ce47599aaed0
   ];
 
   return (
@@ -213,15 +245,19 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
         </div>
       </div>
 
-      {/* Widget Library */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4">
-          <h2 className="text-xl font-semibold text-gray-900 mb-1">
+      <div className="px-4 pt-4">
+        <h2 className="text-xl font-semibold text-gray-900 mb-1">
             Widget Library
           </h2>
           <p className="text-xs text-gray-500 mb-4">
             Drag widgets to the canvas
           </p>
+      </div>
+
+      {/* Widget Library */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4">
+          
 
           {/* Widget List */}
           <div className="flex flex-col gap-3">

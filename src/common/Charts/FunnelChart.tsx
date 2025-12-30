@@ -1,51 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import {
-  AreaChart as ReAreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import ReactApexChart from "react-apexcharts";
 import { Copy, Trash2, Download } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
-
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
-import { generateAreaChartData } from "@/utils";
+import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 
-/*     TYPES     */
-
-type ChartData = {
-  name: string;
-  [key: string]: number | string;
-};
-
-type LegendValue = {
-  label: string;
-  field: string;
-  color: string;
-};
+/*       TYPES       */
 
 export type TierChart = {
   id: string;
   name: string;
   xAxisValues: string[];
-  legendValues: LegendValue[];
   children: TierChart[];
 };
 
 type Props = {
   widgetTitle?: string;
   xAxisValues?: string[];
-  legendValues?: LegendValue[];
-  numOfLegendDataSet?: number;
   startingRange: number;
   endingRange: number;
   onToggleWidget?: () => void;
@@ -53,13 +29,11 @@ type Props = {
   chartId?: string;
 };
 
-/*     COMPONENT     */
+/*       COMPONENT       */
 
-export default function AreaChart({
-  widgetTitle = "My CSV",
+export default function FunnelChart({
+  widgetTitle = "Recruitment Funnel",
   xAxisValues = [],
-  legendValues = [],
-  numOfLegendDataSet = 1,
   startingRange,
   endingRange,
   onToggleWidget,
@@ -69,6 +43,7 @@ export default function AreaChart({
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
 
+  // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
@@ -76,51 +51,87 @@ export default function AreaChart({
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
   /*   DATA   */
-
-  const chartData: ChartData[] = useMemo(() => {
-    if (!xAxisValues.length || !legendValues.length) return [];
-    return generateAreaChartData(
-      xAxisValues,
-      legendValues,
-      startingRange,
-      endingRange
+  const chartData = useMemo(() => {
+    if (!xAxisValues.length) return [];
+    
+    // Generate descending values for funnel effect
+    const step = (endingRange - startingRange) / (xAxisValues.length - 1 || 1);
+    return xAxisValues.map((_, index) => 
+      Math.round(endingRange - (step * index))
     );
-  }, [xAxisValues, legendValues, startingRange, endingRange]);
+  }, [xAxisValues, startingRange, endingRange]);
 
-  /*   TOTAL   */
+  const chartOptions: any = useMemo(() => ({
+    chart: {
+      type: 'bar',
+      height: 350,
+      toolbar: {
+        show: false,
+      },
+      dropShadow: {
+        enabled: true,
+        top: 2,
+        left: 2,
+        blur: 4,
+        opacity: 0.2,
+      },
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 0,
+        horizontal: true,
+        barHeight: '80%',
+        isFunnel: true,
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: function (val: any, opt: any) {
+        return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
+      },
+      dropShadow: {
+        enabled: true,
+      },
+    },
+    colors: ['#00E396'],
+    xaxis: {
+      categories: xAxisValues.filter(Boolean),
+    },
+    legend: {
+      show: false,
+    },
+  }), [xAxisValues]);
+
+  const series = useMemo(() => [{
+    name: "Funnel Series",
+    data: chartData,
+  }], [chartData]);
 
   const totalValue = useMemo(() => {
-    return chartData.reduce((sum, row) => {
-      return (
-        sum +
-        legendValues.reduce(
-          (inner, l) => inner + Number(row[l.field] || 0),
-          0
-        )
-      );
-    }, 0);
-  }, [chartData, legendValues]);
-
-  /*   ACTIONS   */
+    return chartData.reduce((sum, val) => sum + val, 0);
+  }, [chartData]);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
+    const copyData = xAxisValues.map((label, index) => ({
+      label,
+      value: chartData[index],
+    }));
+    navigator.clipboard.writeText(JSON.stringify(copyData, null, 2));
   };
 
-  const handleDownload = () => {
+const handleDownload = () => {
     const payload = {
-      numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
-      showWidgets: legendValues.map((l) => ({
-        legend_name: l.label,
-        color: l.color,
+      numberOfDataset: xAxisValues.length,
+      firstFiledDataset: 0,
+      lastFiledDAtaset: 100,
+      showWidgets: xAxisValues.map((l) => ({
+        legend_name: l,
       })),
       title: widgetTitle,
       status: "ACTIVE",
       category: "BAR",
       xAxis: JSON.stringify({
-        labels: xAxisValues,
+        labels: [],
         values: [],
       }),
       yAxis: JSON.stringify({}),
@@ -128,12 +139,12 @@ export default function AreaChart({
     };
     setIsDownloading(true);
 
-    DownloadAndSaveCSVforModuleOneWidget(
+    // Also save to backend
+    DownloadAndSaveCSVforModuleTwoWidget(
       payload,
       getChartTitleId,
       widgetTitle,
-      xAxisValues,
-      legendValues
+      xAxisValues
     );
 
     setIsDownloading(false);
@@ -156,7 +167,6 @@ export default function AreaChart({
       id: `${chartId}-tier-${Date.now()}`,
       name: tierName,
       xAxisValues: xAxisValues,
-      legendValues: legendValues,
       children: [],
     };
     setChildTiers([...childTiers, newTier]);
@@ -169,24 +179,6 @@ export default function AreaChart({
     }
   };
 
-  /*   TOOLTIP   */
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (!active || !payload?.length) return null;
-    const row = payload[0].payload;
-
-    return (
-      <div className="bg-white p-3 border rounded shadow-lg">
-        <p className="font-semibold mb-2">{row.name}</p>
-        {legendValues.map((l) => (
-          <p key={l.field} style={{ color: l.color }} className="text-sm">
-            {l.label}: {row[l.field]}
-          </p>
-        ))}
-      </div>
-    );
-  };
-
   /*   RENDER   */
 
   return (
@@ -197,28 +189,14 @@ export default function AreaChart({
         }`}
         onClick={handleChartClick}
       >
-        {/* HEADER */}
         <div className="flex justify-between mb-6">
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-
-            <div className="flex gap-6 mt-3">
-              {legendValues.map(
-                (l) =>
-                  l.label && (
-                    <div key={l.field} className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: l.color }}
-                      />
-                      <span className="text-sm">{l.label}</span>
-                    </div>
-                  )
-              )}
-            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              {xAxisValues.filter(Boolean).length} stages
+            </p>
           </div>
 
-          {/* ACTION MENU */}
           <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
             <p className="text-sm text-gray-500">Total {totalValue}</p>
 
@@ -300,27 +278,18 @@ export default function AreaChart({
           </div>
         </div>
 
-        {/* CHART */}
-        <ResponsiveContainer width="100%" height={350}>
-          <ReAreaChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis domain={[startingRange, endingRange]} />
-            <Tooltip content={<CustomTooltip />} />
-
-            {legendValues.map((l) => (
-              <Area
-                key={l.field}
-                dataKey={l.field}
-                type="monotone"
-                stackId="1"
-                stroke={l.color}
-                fill={l.color}
-                fillOpacity={0.3}
-              />
-            ))}
-          </ReAreaChart>
-        </ResponsiveContainer>
+        {xAxisValues.filter(Boolean).length > 0 ? (
+          <ReactApexChart
+            options={chartOptions}
+            series={series}
+            type="bar"
+            height={350}
+          />
+        ) : (
+          <div className="h-[350px] flex items-center justify-center text-gray-400">
+            No data available. Please add funnel stages in the widget configuration.
+          </div>
+        )}
 
         {/* Indicator if chart has children */}
         {childTiers.length > 0 && (
@@ -350,12 +319,10 @@ export default function AreaChart({
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers.map((tier) => (
-              <AreaChart
+              <FunnelChart
                 key={tier.id}
                 widgetTitle={tier.name}
                 xAxisValues={tier.xAxisValues}
-                legendValues={tier.legendValues}
-                numOfLegendDataSet={tier.legendValues.length}
                 startingRange={startingRange}
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
