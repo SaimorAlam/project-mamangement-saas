@@ -15,6 +15,7 @@ import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/Char
 import PieChartModule from "./../../components/client/ProjectBuilder/chartModules/PieChartModule";
 import HorizontalBarChartModule from "./../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule";
 import ProgressRingModule from "./../../components/client/ProjectBuilder/chartModules/ProgressRingModule";
+import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModules/ColumnBarChartModule";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -104,6 +105,10 @@ const StaffManagerProjectBuilder = () => {
         {selectedWidget === "area-chart" && (
           <ChartModuleOne chartName="area-chart" />
         )}
+
+        {selectedWidget === "column-chart" && <ColumnBarChartModule />}
+        {selectedWidget === "funnel-chart" && <ColumnBarChartModule />}
+        {selectedWidget === "scatter-chart" && <ColumnBarChartModule />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>

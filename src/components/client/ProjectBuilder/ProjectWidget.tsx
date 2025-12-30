@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  BarChart3,
   LineChart as LineChartIcon,
   PieChart as PieChartIcon,
   Table,
@@ -11,6 +10,10 @@ import {
   ChartBarIncreasing,
   Flame,
   ChartArea,
+  ChartScatter,
+  Cone,
+  ChartColumnBig,
+  ChartColumnStacked,
 } from "lucide-react";
 
 interface Widget {
@@ -28,7 +31,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   onWidgetSelect,
 }) => {
   const [selectedProgram, setSelectedProgram] = useState<string>("");
-  const [selectedWidget, setSelectedWidget] = useState<string>("kpi"); // ✅ default KPI widget active
+  const [selectedWidget, setSelectedWidget] = useState<string>("kpi"); // default KPI widget active
 
   const widgets: Widget[] = [
     {
@@ -41,7 +44,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       id: "bar-chart",
       name: "Stacked Bar Chart",
       description: "Compare data across categories",
-      icon: <BarChart3 className="w-5 h-5" />,
+      icon: <ChartColumnStacked className="w-5 h-5" />,
     },
     {
       id: "line-chart",
@@ -97,6 +100,30 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Add image or video",
       icon: <Image className="w-5 h-5" />,
     },
+    {
+      id: "column-chart",
+      name: "Column Chart",
+      description: "Compare data across categories",
+      icon: <ChartColumnBig className="w-5 h-5" />,
+    },
+    {
+      id: "funnel-chart",
+      name: "Funnel Chart",
+      description: "See clearly the process",
+      icon: <Cone className="w-5 h-5" />,
+    },
+    {
+      id: "scatter-chart",
+      name: "Scatter Chart",
+      description: "Division of same category",
+      icon: <ChartScatter className="w-5 h-5" />,
+    },
+    // {
+    //   id: "rader-chart",
+    //   name: "Rader Chart",
+    //   description: "Division of same category",
+    //   icon: <ChartScatter className="w-5 h-5" />,
+    // },
   ];
 
   return (
