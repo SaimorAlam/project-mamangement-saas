@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { LegendValue } from "../WidgetForChartModuleOne";
 import ScatterChart from "@/common/Charts/ScatterChart";
 import WidgetForChartModuleTwo from "../WidgetForChartModuleTwo";

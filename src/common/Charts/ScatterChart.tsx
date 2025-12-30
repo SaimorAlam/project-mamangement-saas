@@ -52,6 +52,9 @@ type Props = {
   chartId?: string;
 };
 
+const generateId = () =>
+  crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
+
 /*       COMPONENT       */
 
 export default function ScatterChart({
@@ -100,7 +103,7 @@ export default function ScatterChart({
         data: generateScatterData(index * 37, 6),
         color: legend.color,
       }));
-  }, [legendValues, startingRange, endingRange]);
+  }, [legendValues, startingRange, endingRange, generateScatterData]);
 
   /*   TOTAL POINTS   */
   const totalPoints = useMemo(() => {
@@ -118,10 +121,12 @@ export default function ScatterChart({
   };
 
   const handleDownload = () => {
+    const csvId = generateId();
+
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFiledDataset: 0,
+      lastFiledDAtaset: 100,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -129,12 +134,34 @@ export default function ScatterChart({
       title: widgetTitle,
       status: "ACTIVE",
       category: "SCATTER",
-      xAxis: JSON.stringify({}),
+      xAxis: JSON.stringify({
+        labels: [],
+        values: [],
+      }),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
     };
     setIsDownloading(true);
 
+    // For CSV export with just labels
+    const header = "Label,Value";
+    const rows = legendValues
+      .filter((l) => l.label)
+      .map((l) => `${l.label},`);
+
+    const csvContent = [header, ...rows].join("\n");
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${widgetTitle}-${csvId}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    // Also save to backend
     DownloadAndSaveCSVforModuleOneWidget(
       payload,
       getChartTitleId,
