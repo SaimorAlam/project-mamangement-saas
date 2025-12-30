@@ -96,9 +96,9 @@ const routes = createBrowserRouter([
       {
         path: "/client-panel",
         element: (
-          <ProtectedRoute allowedRoles={["CLIENT"]}>
-            <ClientDashboardLayout />
-          </ProtectedRoute>
+          // <ProtectedRoute allowedRoles={["CLIENT"]}>
+          <ClientDashboardLayout />
+          // </ProtectedRoute>
         ),
         children: getClientRoutes(),
       },

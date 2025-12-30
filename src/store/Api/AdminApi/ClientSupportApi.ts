@@ -10,7 +10,7 @@ const ClientSupportApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    getMyTickets: builder.mutation({
+    getMyTickets: builder.query({
       query: () => ({
         url: "client-support/my-tickets",
         method: "GET",
@@ -19,6 +19,6 @@ const ClientSupportApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useCreateSupportMutation, useGetMyTicketsMutation } =
+export const { useCreateSupportMutation, useGetMyTicketsQuery } =
   ClientSupportApi;
 export default ClientSupportApi;
