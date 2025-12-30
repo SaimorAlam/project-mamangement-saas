@@ -3,13 +3,13 @@ import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
 import WaterfallChart from "@/common/Charts/WaterfallChart";
 
 const WaterfallChartModule = () => {
-  const [widgetTitle, setWidgetTitle] = useState("Range Column Chart");
+  const [widgetTitle, setWidgetTitle] = useState("Waterfall Chart");
   const [showWidget, setShowWidget] = useState(false);
 
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
+  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(3);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(2);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#008FFB" },
@@ -74,9 +74,9 @@ const WaterfallChartModule = () => {
       />
       {showWidget && (
         <ProjectConfiguration
-          widgedName="Range Column Chart"
+          widgedName="Waterfall Chart"
           widgetTitle={widgetTitle}
-          widgetCategory="RANGE"
+          widgetCategory="BAR"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
