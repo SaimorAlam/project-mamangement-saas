@@ -103,6 +103,7 @@ export default function ColumnBarChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
+  // download csv 
 const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
@@ -114,7 +115,7 @@ const handleDownload = () => {
       })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "COLUMN",
+      category: "BAR",
       xAxis: JSON.stringify({
         labels: xAxisValues,
         values: [],
@@ -135,6 +136,7 @@ const handleDownload = () => {
     setIsDownloading(false);
   };
 
+  // handle widget click 
   const handleWidgetClick = () => {
     if (onToggleWidget) {
       onToggleWidget();

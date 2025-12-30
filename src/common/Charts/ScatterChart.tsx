@@ -16,7 +16,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
+import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 
@@ -51,9 +51,6 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
 };
-
-const generateId = () =>
-  crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
 
 /*       COMPONENT       */
 
@@ -121,8 +118,6 @@ export default function ScatterChart({
   };
 
   const handleDownload = () => {
-    const csvId = generateId();
-
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: 0,
@@ -133,7 +128,7 @@ export default function ScatterChart({
       })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "SCATTER",
+      category: "BAR",
       xAxis: JSON.stringify({
         labels: [],
         values: [],
@@ -143,30 +138,11 @@ export default function ScatterChart({
     };
     setIsDownloading(true);
 
-    // For CSV export with just labels
-    const header = "Label,Value";
-    const rows = legendValues
-      .filter((l) => l.label)
-      .map((l) => `${l.label},`);
-
-    const csvContent = [header, ...rows].join("\n");
-    const blob = new Blob([csvContent], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${widgetTitle}-${csvId}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-
     // Also save to backend
-    DownloadAndSaveCSVforModuleOneWidget(
+    DownloadAndSaveCSVforModuleTwoWidget(
       payload,
       getChartTitleId,
       widgetTitle,
-      [],
       legendValues
     );
 

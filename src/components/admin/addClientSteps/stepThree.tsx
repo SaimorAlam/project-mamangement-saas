@@ -10,7 +10,7 @@ import { CustomCheckBox } from "@/components/ui/CustomCheckBox"
 export function StepThree() {
   const { control, watch } = useFormContext<FormData>()
   const subdomain = watch("subdomain")
-  const regionServerLocation = watch("regionServerLocation")
+  const region = watch("region")
 
   return (
     <div className="space-y-8">
@@ -42,7 +42,7 @@ export function StepThree() {
 
           <FormField
             control={control}
-            name="regionServerLocation"
+            name="region"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-md">Region/Server Location *</FormLabel>
@@ -89,7 +89,7 @@ export function StepThree() {
 
           <FormField
             control={control}
-            name="defaultLanguage"
+            name="language"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-md">Default Language</FormLabel>
@@ -118,7 +118,7 @@ export function StepThree() {
           <div className="space-y-4">
             <FormField
               control={control}
-              name="enableOnboardingGuide"
+              name="enableOnboarding"
               render={({ field }) => (
                 <FormItem className="flex items-center space-x-2">
                   <CustomCheckBox checked={field.value} onChange={field.onChange} />
@@ -131,7 +131,7 @@ export function StepThree() {
           <div className="space-y-4">
             <FormField
               control={control}
-              name="autoGenerateWelcomeDashboard"
+              name="autoGenDashboard"
               render={({ field }) => (
                 <FormItem className="flex items-center space-x-2">
                   <CustomCheckBox checked={field.value} onChange={field.onChange} />
@@ -187,7 +187,7 @@ export function StepThree() {
               <Server className="w-8 h-8 text-blue-600" />
               <div>
                 <p className="font-medium">Server Location</p>
-                <p className="text-sm text-gray-600">{regionServerLocation} (Virginia)</p>
+                <p className="text-sm text-gray-600">{region} (Virginia)</p>
               </div>
             </CardContent>
           </Card>

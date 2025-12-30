@@ -75,7 +75,7 @@ export default function AreaChart({
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
-  /* ========= DATA ========= */
+  /*   DATA   */
 
   const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
@@ -87,7 +87,7 @@ export default function AreaChart({
     );
   }, [xAxisValues, legendValues, startingRange, endingRange]);
 
-  /* ========= TOTAL ========= */
+  /*   TOTAL   */
 
   const totalValue = useMemo(() => {
     return chartData.reduce((sum, row) => {
@@ -101,7 +101,7 @@ export default function AreaChart({
     }, 0);
   }, [chartData, legendValues]);
 
-  /* ========= ACTIONS ========= */
+  /*   ACTIONS   */
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
@@ -169,7 +169,7 @@ export default function AreaChart({
     }
   };
 
-  /* ========= TOOLTIP ========= */
+  /*   TOOLTIP   */
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
@@ -187,7 +187,7 @@ export default function AreaChart({
     );
   };
 
-  /* ========= RENDER ========= */
+  /*   RENDER   */
 
   return (
     <>
