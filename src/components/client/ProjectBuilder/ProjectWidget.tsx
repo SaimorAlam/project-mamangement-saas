@@ -10,16 +10,13 @@ import {
   ChartBarIncreasing,
   Flame,
   ChartArea,
-<<<<<<< HEAD
   Gauge,
   Tally4,
   Bubbles,
-=======
   ChartScatter,
   Cone,
   ChartColumnBig,
   ChartColumnStacked,
->>>>>>> b8eb5d55f3d111a3ee555d9b3697ce47599aaed0
 } from "lucide-react";
 
 interface Widget {
@@ -107,7 +104,6 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       icon: <Image className="w-5 h-5" />,
     },
     {
-<<<<<<< HEAD
       id: "gauge-chart",
       name: "Gauge Chart",
       description: "Show gauge chart",
@@ -124,8 +120,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       name: "Bubble Chart",
       description: "Show bubble chart",
       icon: <Bubbles className="w-5 h-5" />,
-    },
-=======
+    },{
       id: "column-chart",
       name: "Column Chart",
       description: "Compare data across categories",
@@ -149,7 +144,6 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     //   description: "Division of same category",
     //   icon: <ChartScatter className="w-5 h-5" />,
     // },
->>>>>>> b8eb5d55f3d111a3ee555d9b3697ce47599aaed0
   ];
 
   return (
