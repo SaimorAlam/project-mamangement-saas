@@ -1,5 +1,5 @@
-import CounterCard from "@/components/admin/counterCard/counterCard"
-import { useState } from "react";
+import CounterCard from "@/components/admin/counterCard/counterCard";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid, Table, Filter } from "lucide-react";
 import BoardCustomerInsight from "@/components/admin/boardCustomerInsight/boardCustomerInsight";
@@ -7,16 +7,18 @@ import TableCustomerInsight from "@/components/admin/tableCustomerInsight/tableC
 import { ClientData } from "@/types/client";
 
 interface Clientdata {
-  customer?: ClientData
+  customer?: ClientData;
 }
 
-const Clients:React.FC<Clientdata> = () => {
+const Clients: React.FC<Clientdata> = () => {
   const [customers, setCustomers] = useState<ClientData[]>([]);
-  fetch("/customerData.json")
-    .then(res => res.json())
-    .then(data => {
-      setCustomers(data)
-    })
+  useEffect(() => {
+    fetch("/customerData.json")
+      .then((res) => res.json())
+      .then((data) => {
+        setCustomers(data);
+      });
+  }, []);
   const [viewMode, setViewMode] = useState("Boards");
 
   // Pagination states
@@ -41,7 +43,9 @@ const Clients:React.FC<Clientdata> = () => {
       <div className="space-y-6 mt-11">
         {/* Section Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">Customer Insight</h2>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Customer Insight
+          </h2>
 
           <div className="flex items-center gap-3">
             <Button
@@ -69,7 +73,11 @@ const Clients:React.FC<Clientdata> = () => {
               <Table className="h-4 w-4" />
               Tables
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 bg-transparent"
+            >
               <Filter className="h-4 w-4" />
               Filter By
             </Button>
@@ -122,7 +130,9 @@ const Clients:React.FC<Clientdata> = () => {
           <Button
             className="border border-blue-500 text-blue-500 cursor-pointer"
             size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
           >
             Next
@@ -130,7 +140,7 @@ const Clients:React.FC<Clientdata> = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Clients
+export default Clients;

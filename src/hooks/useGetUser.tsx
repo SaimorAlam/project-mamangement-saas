@@ -16,7 +16,9 @@ export const useGetUser = () => {
   const user = data?.data as User | undefined;
   const currentRoute =
     user?.role && Role[user.role as keyof typeof Role]
-      ? `/${Role[user.role as keyof typeof Role]}`
+      ? user.role === "SUPERADMIN"
+        ? "/admin"
+        : `/${Role[user.role as keyof typeof Role]}`
       : "/login";
   return {
     loading: isLoading,
