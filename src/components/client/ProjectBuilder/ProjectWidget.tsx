@@ -11,6 +11,7 @@ import {
   ChartBarIncreasing,
   Flame,
   ChartArea,
+  Gauge,
 } from "lucide-react";
 
 interface Widget {
@@ -96,6 +97,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       name: "Picture/Video",
       description: "Add image or video",
       icon: <Image className="w-5 h-5" />,
+    },
+    {
+      id: "gauge-chart",
+      name: "Gauge Chart",
+      description: "Show gauge chart",
+      icon: <Gauge className="w-5 h-5" />,
     },
   ];
 

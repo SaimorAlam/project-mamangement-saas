@@ -15,6 +15,7 @@ import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/Char
 import PieChartModule from "./../../components/client/ProjectBuilder/chartModules/PieChartModule";
 import HorizontalBarChartModule from "./../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule";
 import ProgressRingModule from "./../../components/client/ProjectBuilder/chartModules/ProgressRingModule";
+import GaugeChartModule from "./../../components/client/ProjectBuilder/chartModules/GaugeChartModule";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");
@@ -99,11 +100,15 @@ const StaffManagerProjectBuilder = () => {
           <HorizontalBarChartModule />
         )}
 
-        {selectedWidget === "heat-map-chart" && <ChartModuleOne chartName="heat-map-chart" />}
+        {selectedWidget === "heat-map-chart" && (
+          <ChartModuleOne chartName="heat-map-chart" />
+        )}
 
         {selectedWidget === "area-chart" && (
           <ChartModuleOne chartName="area-chart" />
         )}
+
+        {selectedWidget === "gauge-chart" && <GaugeChartModule />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
