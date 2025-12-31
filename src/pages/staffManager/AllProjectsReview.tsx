@@ -4,6 +4,9 @@ import { FaSpinner } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import Pagination from "@/common/Pagination";
 import { DateRange } from "react-day-picker";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { Download } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -60,7 +63,7 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
 
-  /* ---------------- RTK QUERY ---------------- */
+  /*   RTK QUERY   */
   const { data, isLoading } = useGetAllReviewProjectsQuery({
     status: priorityFilter || undefined,
     fromDate: dateRange?.from?.toISOString(),
@@ -78,7 +81,7 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
   const itemsPerPage = meta?.limit ?? limit;
   const totalPages = meta?.totalPages ?? Math.ceil(totalProjects / itemsPerPage);
 
-  /* ---------------- SORTING ---------------- */
+  /*   SORTING   */
   const handleSort = (column: any) => {
     if (sortColumn === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -130,6 +133,65 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
         day: "numeric",
       })
       : "-";
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF("p", "mm", "a4");
+
+    // Title
+    doc.setFontSize(16);
+    doc.text(title, 14, 15);
+
+    // Sub info (filters)
+    doc.setFontSize(10);
+    const filterText = [
+      priorityFilter ? `Status: ${priorityFilter}` : "Status: All",
+      dateRange?.from && dateRange?.to
+        ? `Date: ${format(dateRange.from, "dd MMM yyyy")} - ${format(
+          dateRange.to,
+          "dd MMM yyyy"
+        )}`
+        : "Date: All",
+    ];
+
+    doc.text(filterText.join(" | "), 14, 22);
+
+    // Table data
+    const tableColumn = [
+      "Project Name",
+      "Assigned Staff",
+      "Status",
+      "Priority",
+      "Submit Date",
+    ];
+
+    const tableRows = sortedProjects.map((project) => [
+      project.project.name,
+      project.assignStuff?.avatars?.length
+        ? `${project.assignStuff.avatars.length} Staff`
+        : "No Staff",
+      project.status,
+      project.project.priority,
+      formatDate(project.createdAt),
+    ]);
+
+    autoTable(doc, {
+      startY: 28,
+      head: [tableColumn],
+      body: tableRows,
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [240, 240, 240],
+        textColor: 0,
+        fontStyle: "bold",
+      },
+    });
+
+    doc.save(`projects-submissions-review-${Date.now()}.pdf`);
+  };
+
 
   if (isLoading) {
     return (
@@ -237,6 +299,16 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              <Button
+                variant="outline"
+                onClick={handleExportPDF}
+                className="flex gap-2 text-sm font-normal border border-gray-200 rounded h-full"
+              >
+                <Download size={16} />
+                Export PDF
+              </Button>
+
             </div>
           </div>
 
