@@ -113,9 +113,6 @@ const AllProjectsReview = ({
     });
   }, [projects, sortColumn, sortOrder]);
 
-  console.log("r p :", sortedProjects);
-
-
   const formatDate = (date?: string) =>
     date
       ? new Date(date).toLocaleDateString(undefined, {
@@ -135,7 +132,7 @@ const AllProjectsReview = ({
   const statusClasses: Record<string, string> = {
     APPROVED: "text-[#0B5A4A] bg-[#EBFFF2] border border-[#ABEFD5]",
     PENDING: "text-[#665CFF] bg-[#F2F2FF] border border-[#C7C2FF]",
-    RETURNED: "text-[#B00020] bg-[#FFEAEA] border border-[#FFB3B3]",
+    REJECTED: "text-[#B00020] bg-[#FFEAEA] border border-[#FFB3B3]",
     DRAFT: "text-[#6B7280] bg-[#F3F4F6] border border-[#D1D5DB]",
     OVERDUE: "text-[#6B7280] bg-[#F3F4F6] border border-[#D1D5DB]",
   };
@@ -143,7 +140,7 @@ const AllProjectsReview = ({
   const statusLabels: any = {
     APPROVED: "APPROVED",
     PENDING: "PENDING",
-    RETURNED: "RETURNED",
+    REJECTED: "RETURNED",
     DRAFT: "DRAFT",
     OVERDUE: "OVERDUE",
   };
@@ -277,7 +274,7 @@ const AllProjectsReview = ({
                             className={`py-1.5 px-3 min-w-20 ${statusClasses[project.status]
                               }`}
                           >
-                            {statusLabels[project.project.status]}
+                            {statusLabels[project.status]}
                           </Badge>
                         </td>
 
@@ -353,22 +350,13 @@ const AllProjectsReview = ({
         open={reviewOpen}
         onClose={() => setReviewOpen(false)}
         submission={selectedSubmission}
-        onSubmit={(status) => {
-          console.log("Update status:", status, selectedSubmission.id);
-          setReviewOpen(false);
-        }}
       />
 
       <DeleteSubmissionModal
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
-        onDelete={() => {
-          console.log("Delete:", selectedSubmission.id);
-          setDeleteOpen(false);
-        }}
+        submissionId={selectedSubmission}
       />
-
-
     </div>
   );
 };

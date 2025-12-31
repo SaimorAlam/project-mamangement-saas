@@ -69,6 +69,21 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/activity`,
       providesTags: ["Manager"],
     }),
+    editSubmission: builder.mutation<any, {submissionId: string; action: string}>({
+      query: ({ submissionId, action }) => ({
+        url: `/manager/${submissionId}/status`,
+        method: "PATCH",
+        body: { status : action },
+      }),
+      invalidatesTags: ["Manager"],
+    }),
+    deleteSubmission: builder.mutation<any, {submissionId: string}>({
+      query: ({ submissionId }) => ({
+        url: `/manager/${submissionId}/delete-submission`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Manager"],
+    }),
     // for favorite projects
     getFavoriteProjects: builder.query<any, void>({
       query: ()=> `/favorites-project/me`,
@@ -110,6 +125,8 @@ export const {
   useGetProjectReviewPageCardsQuery,
   useGetAllReviewProjectsQuery,
   useGetAllReviewProjectsReviewerActivityQuery,
+  useEditSubmissionMutation,
+  useDeleteSubmissionMutation,
   useGetFavoriteProjectsQuery,
   useAddProjectToFavoriteMutation,
   useRemoveProjectFromFavoriteMutation,
