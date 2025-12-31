@@ -61,23 +61,51 @@ type Props = {
 
 /*       HELPER FUNCTIONS       */
 
-const generateHistogramData = (
+const generateHistogramDataForLegend = (
   startingRange: number,
-  endingRange: number
+  endingRange: number,
+  legendIndex: number = 0
 ) => {
-  // Generate random data points for histogram
-  const dataPoints: { value: number }[] = [];
-  const numPoints = 50; // Generate 50 data points
+  // Generate random data points for histogram with slight variation per legend
+  const dataPoints: { value: number; series: string }[] = [];
+  const numPoints = 50; // Generate 50 data points per series
+
+  // Add some variation based on legend index to make series distinct
+  const variation = legendIndex * 10;
 
   for (let i = 0; i < numPoints; i++) {
-    const value = Math.floor(
+    const baseValue = Math.floor(
       Math.random() * (endingRange - startingRange + 1) +
         startingRange
     );
-    dataPoints.push({ value });
+    const value = Math.max(
+      startingRange,
+      Math.min(endingRange, baseValue + variation)
+    );
+    dataPoints.push({ value, series: `series_${legendIndex}` });
   }
 
   return dataPoints;
+};
+
+const generateCombinedHistogramData = (
+  startingRange: number,
+  endingRange: number,
+  legendCount: number
+) => {
+  // Generate combined data for all legends
+  const allData: { value: number; series: string }[] = [];
+
+  for (let i = 0; i < legendCount; i++) {
+    const seriesData = generateHistogramDataForLegend(
+      startingRange,
+      endingRange,
+      i
+    );
+    allData.push(...seriesData);
+  }
+
+  return allData;
 };
 
 const generateId = () =>
@@ -109,39 +137,67 @@ export default function HistogramChart({
 
   /*   DATA   */
   const histogramData = useMemo(() => {
-    return generateHistogramData(startingRange, endingRange);
-  }, [startingRange, endingRange]);
+    return generateCombinedHistogramData(
+      startingRange,
+      endingRange,
+      legendValues.length || 1
+    );
+  }, [startingRange, endingRange, legendValues.length]);
 
   /*   AG CHARTS OPTIONS   */
   const chartOptions = useMemo((): AgChartOptions | null => {
     if (!histogramData.length) return null;
 
-    const color =
-      legendValues.length > 0 && legendValues[0].color
-        ? legendValues[0].color
-        : "#8D79F6";
+    // Create multiple series if we have multiple legends
+    const series = legendValues.map((legend, index) => ({
+      type: "histogram" as const,
+      xKey: "value",
+      yKey: "value",
+      xName: legend.label || `Series ${index + 1}`,
+      fill: legend.color || "#8D79F6",
+      stroke: legend.color || "#8D79F6",
+      fillOpacity: 0.7 - index * 0.1, // Slight opacity variation for overlapping histograms
+      strokeWidth: 2,
+      title: legend.label || `Series ${index + 1}`,
+      data: histogramData.filter(
+        (item) => item.series === `series_${index}`
+      ),
+    }));
+
+    // If no legends configured, use default
+    if (series.length === 0) {
+      series.push({
+        type: "histogram",
+        xKey: "value",
+        yKey: "value",
+        xName: "Value",
+        fill: "#8D79F6",
+        stroke: "#8D79F6",
+        fillOpacity: 0.7,
+        strokeWidth: 2,
+        title: "Histogram",
+        data: histogramData,
+      });
+    }
 
     return {
-      data: histogramData,
-      series: [
-        {
-          type: "histogram",
-          xKey: "value",
-          yKey: "value",
-          xName: legendValues[0]?.label || "Value",
-          fill: color,
-          stroke: color,
-        } as any,
-      ],
+      data: legendValues.length > 1 ? [] : histogramData, 
+      series,
       axes: [
         {
           type: "number",
           position: "bottom",
           title: {
             text: xAxisValues[0] || "Value Range",
+            enabled: xAxisValues[0]?.trim().length > 0,
           },
           interval: {
             step: Math.ceil((endingRange - startingRange) / 10),
+          },
+          label: {
+            formatter: (params: any) => {
+              return params.value;
+            },
           },
         },
         {
@@ -149,13 +205,26 @@ export default function HistogramChart({
           position: "left",
           title: {
             text: "Frequency",
+            enabled: true,
           },
         },
       ],
       legend: {
+        enabled:
+          legendValues.length > 1 ||
+          legendValues[0]?.label?.trim().length > 0,
+        position: "right",
+        item: {
+          marker: {
+            shape: "square",
+            size: 12,
+          },
+        },
+      },
+      tooltip: {
         enabled: true,
       },
-    } as AgChartOptions;
+    } as unknown as AgChartOptions;
   }, [
     histogramData,
     legendValues,
@@ -164,9 +233,10 @@ export default function HistogramChart({
     endingRange,
   ]);
 
-  const isAllLegendFieldEmpty = legendValues.filter(
-    (l) => l.field !== ""
-  );
+  const hasValidLegendData =
+    legendValues.some((l) => l.field.trim() !== "") ||
+    legendValues.length === 0;
+  const hasValidData = histogramData.length > 0 && hasValidLegendData;
 
   /*   ACTIONS   */
 
@@ -199,9 +269,13 @@ export default function HistogramChart({
     };
     setIsDownloading(true);
 
-    // For CSV export
-    const header = "Value";
-    const rows = histogramData.map((item) => `${item.value}`);
+    // For CSV export - include series if multiple legends
+    const header = legendValues.length > 1 ? "Series,Value" : "Value";
+    const rows = histogramData.map((item) =>
+      legendValues.length > 1
+        ? `${item.series || "default"},${item.value}`
+        : `${item.value}`
+    );
     const csv = [header, ...rows].join("\n");
 
     const blob = new Blob([csv], {
@@ -273,17 +347,25 @@ export default function HistogramChart({
         <div className="flex justify-between mb-4">
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            {legendValues.length > 0 && legendValues[0].label && (
-              <div className="flex gap-6 mt-3">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: legendValues[0].color }}
-                  />
-                  <span className="text-sm">
-                    {legendValues[0].label}
-                  </span>
-                </div>
+            {legendValues.length > 0 && (
+              <div className="flex flex-wrap gap-3 mt-3">
+                {legendValues.map(
+                  (legend, index) =>
+                    legend.label && (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2"
+                      >
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: legend.color }}
+                        />
+                        <span className="text-sm">
+                          {legend.label}
+                        </span>
+                      </div>
+                    )
+                )}
               </div>
             )}
           </div>
@@ -371,16 +453,25 @@ export default function HistogramChart({
         </div>
 
         {/* Histogram Chart */}
-        {chartOptions && isAllLegendFieldEmpty.length > 0 ? (
+        {chartOptions && hasValidData ? (
           <div style={{ height: "400px" }}>
             <AgCharts options={chartOptions} />
           </div>
         ) : (
           <div className="h-[400px] flex items-center justify-center text-gray-400">
-            No data available, Please fill the input field to generate
-            the chart and then download the csv.
+            No data available. Please configure legends and ensure
+            field names are provided.
           </div>
         )}
+
+        {/* Configuration Info */}
+        <div className="mt-4 text-sm text-gray-500">
+          <p>
+            Data Range: {startingRange} - {endingRange} | Legends:{" "}
+            {legendValues.length} | X-Axis:{" "}
+            {xAxisValues[0] || "Not set"}
+          </p>
+        </div>
 
         {/* Indicator if chart has children */}
         {childTiers.length > 0 && (

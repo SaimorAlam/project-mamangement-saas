@@ -20,6 +20,7 @@ import {
   ChartLine,
   FileChartPie,
   SquareKanban,
+  ChartCandlestick,
 } from "lucide-react";
 
 interface Widget {
@@ -123,7 +124,8 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       name: "Bubble Chart",
       description: "Show bubble chart",
       icon: <Bubbles className="w-5 h-5" />,
-    },{
+    },
+    {
       id: "column-chart",
       name: "Column Chart",
       description: "Compare data across categories",
@@ -159,6 +161,18 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Division of same category",
       icon: <FileChartPie className="w-5 h-5" />,
     },
+    {
+      id: "candle-chart",
+      name: "Candle Chart",
+      description: "Show candle chart",
+      icon: <ChartCandlestick className="w-5 h-5" />,
+    },
+    // {
+    //   id: "rader-chart",
+    //   name: "Rader Chart",
+    //   description: "Division of same category",
+    //   icon: <ChartScatter className="w-5 h-5" />,
+    // },
   ];
 
   return (
@@ -256,18 +270,16 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
 
       <div className="px-4 pt-4">
         <h2 className="text-xl font-semibold text-gray-900 mb-1">
-            Widget Library
-          </h2>
-          <p className="text-xs text-gray-500 mb-4">
-            Drag widgets to the canvas
-          </p>
+          Widget Library
+        </h2>
+        <p className="text-xs text-gray-500 mb-4">
+          Drag widgets to the canvas
+        </p>
       </div>
 
       {/* Widget Library */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-4">
-          
-
           {/* Widget List */}
           <div className="flex flex-col gap-3">
             {widgets.map((widget) => (
