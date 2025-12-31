@@ -62,7 +62,11 @@ const userApi = baseApi.injectEndpoints({
       providesTags: ["Manager"],
     }),
     getAllReviewProjects: builder.query({ 
-      query: () => `/manager/submissions`,
+      query: (params) => ({
+        url: "/manager/submissions",
+        method: "GET",
+        params,
+      }),
       providesTags: ["Manager"],
     }),
     getAllReviewProjectsReviewerActivity: builder.query({ 
