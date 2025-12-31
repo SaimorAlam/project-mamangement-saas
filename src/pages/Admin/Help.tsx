@@ -190,7 +190,6 @@
 //   }
 // };
 
-
 //   const handleSelectAll = () => {
 //     if (selectAll) {
 //       setSelectedTickets(new Set());
@@ -444,8 +443,6 @@
 // };
 
 // export default SupportTickets;
-
-
 
 // import React, { useEffect, useMemo, useState } from "react";
 // import { Search, ChevronDown, UserPlus, X, Calendar } from "lucide-react";
@@ -983,7 +980,6 @@
 //               </label>
 //             </div>
 
-
 //             {/* Staff Cards */}
 //             <div className="px-6 pb-6 space-y-5">
 //               {sampleStaff
@@ -1061,7 +1057,7 @@
 //       {showAssignmentForm && selectedStaff && (
 //   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
 //     <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
-      
+
 //       {/* Header */}
 //       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
 //         <h3 className="text-lg font-semibold text-gray-900">
@@ -1077,7 +1073,7 @@
 
 //       {/* Body */}
 //       <div className="px-6 py-6 space-y-6">
-        
+
 //         {/* Ticket Info Row */}
 //         <div className="flex flex-wrap gap-4 items-center text-sm">
 //           <span className="text-gray-700 font-medium">
@@ -1158,9 +1154,18 @@
 
 // export default SupportTickets;
 
-
 import React, { useState } from "react";
-import { Search, ChevronDown, MoreHorizontal, Eye, Edit, Trash2, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search,
+  ChevronDown,
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 interface Employee {
   id: string;
@@ -1179,7 +1184,9 @@ const SupportEmployeesList: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState("All");
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
-  const [selectedEmployees, setSelectedEmployees] = useState<Set<string>>(new Set());
+  const [selectedEmployees, setSelectedEmployees] = useState<Set<string>>(
+    new Set()
+  );
   const [showActionMenu, setShowActionMenu] = useState<string | null>(null);
 
   const employees: Employee[] = [
@@ -1342,20 +1349,28 @@ const SupportEmployeesList: React.FC = () => {
       lastActive: "Senior Don Qas",
       level: "1/15/12",
       status: "In Active",
-    }
+    },
   ];
 
-  const roles = ["All", "Support Manager", "Sales Officer", "Call attendance", "System Fops", "Viewer"];
+  const roles = [
+    "All",
+    "Support Manager",
+    "Sales Officer",
+    "Call attendance",
+    "System Fops",
+    "Viewer",
+  ];
 
-  const filteredEmployees = employees.filter(employee => {
-    const matchesSearch = 
+  const filteredEmployees = employees.filter((employee) => {
+    const matchesSearch =
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.role.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === "All" || employee.status === statusFilter;
+
+    const matchesStatus =
+      statusFilter === "All" || employee.status === statusFilter;
     const matchesRole = roleFilter === "All" || employee.role === roleFilter;
-    
+
     return matchesSearch && matchesStatus && matchesRole;
   });
 
@@ -1373,7 +1388,7 @@ const SupportEmployeesList: React.FC = () => {
     if (selectedEmployees.size === filteredEmployees.length) {
       setSelectedEmployees(new Set());
     } else {
-      setSelectedEmployees(new Set(filteredEmployees.map(e => e.id)));
+      setSelectedEmployees(new Set(filteredEmployees.map((e) => e.id)));
     }
   };
 
@@ -1387,8 +1402,10 @@ const SupportEmployeesList: React.FC = () => {
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Support Employees List</h1>
-        
+        <h1 className="text-xl font-semibold text-gray-900">
+          Support Employees List
+        </h1>
+
         <div className="flex items-center space-x-4">
           {/* Search */}
           <div className="relative">
@@ -1400,7 +1417,7 @@ const SupportEmployeesList: React.FC = () => {
               className="pl-9 pr-3 py-2 w-64 rounded border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
-          
+
           {/* Status Filter */}
           <div className="relative">
             <button
@@ -1414,7 +1431,7 @@ const SupportEmployeesList: React.FC = () => {
               <span className="text-gray-700">Status: {statusFilter}</span>
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>
-            
+
             {showStatusDropdown && (
               <div className="absolute right-0 z-10 mt-1 w-40 bg-white border border-gray-200 rounded shadow">
                 <div className="py-1">
@@ -1448,7 +1465,7 @@ const SupportEmployeesList: React.FC = () => {
               <span className="text-gray-700">Role: {roleFilter}</span>
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>
-            
+
             {showRoleDropdown && (
               <div className="absolute right-0 z-10 mt-1 w-48 bg-white border border-gray-200 rounded shadow">
                 <div className="py-1 max-h-60 overflow-y-auto">
@@ -1479,7 +1496,10 @@ const SupportEmployeesList: React.FC = () => {
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input
                   type="checkbox"
-                  checked={selectedEmployees.size === filteredEmployees.length && filteredEmployees.length > 0}
+                  checked={
+                    selectedEmployees.size === filteredEmployees.length &&
+                    filteredEmployees.length > 0
+                  }
                   onChange={toggleSelectAll}
                   className="h-4 w-4 text-blue-600 rounded"
                 />
@@ -1522,7 +1542,9 @@ const SupportEmployeesList: React.FC = () => {
                   />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {employee.name}
+                  </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">{employee.email}</div>
@@ -1534,7 +1556,9 @@ const SupportEmployeesList: React.FC = () => {
                   <div className="text-sm text-gray-900">{employee.skills}</div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{employee.lastActive}</div>
+                  <div className="text-sm text-gray-900">
+                    {employee.lastActive}
+                  </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">{employee.level}</div>
@@ -1551,13 +1575,17 @@ const SupportEmployeesList: React.FC = () => {
                   </span>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm relative">
-                  <button 
+                  <button
                     className="text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowActionMenu(showActionMenu === employee.id ? null : employee.id)}
+                    onClick={() =>
+                      setShowActionMenu(
+                        showActionMenu === employee.id ? null : employee.id
+                      )
+                    }
                   >
                     <MoreHorizontal className="w-5 h-5" />
                   </button>
-                  
+
                   {showActionMenu === employee.id && (
                     <div className="absolute right-0 z-10 mt-1 w-48 bg-white border border-gray-200 rounded shadow-lg">
                       <div className="py-1">
@@ -1576,7 +1604,9 @@ const SupportEmployeesList: React.FC = () => {
                           Edit
                         </button>
                         <button
-                          onClick={() => handleActionClick(employee.id, "delete")}
+                          onClick={() =>
+                            handleActionClick(employee.id, "delete")
+                          }
                           className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -1597,12 +1627,16 @@ const SupportEmployeesList: React.FC = () => {
         <div className="flex-1 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-700">
-              Showing <span className="font-medium">1</span> to <span className="font-medium">11</span> of{" "}
+              Showing <span className="font-medium">1</span> to{" "}
+              <span className="font-medium">11</span> of{" "}
               <span className="font-medium">500</span> employees
             </p>
           </div>
           <div>
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <nav
+              className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+              aria-label="Pagination"
+            >
               <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                 <span className="sr-only">Previous</span>
                 <ChevronLeft className="h-5 w-5" />

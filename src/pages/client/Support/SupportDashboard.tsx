@@ -78,7 +78,7 @@ const SupportDashboard = () => {
     if (selectedTicket && socket) {
       // Clear previous chat messages and join room
       setMessages([]);
-      socket.emit("join_ticket_room", { ticketId: selectedTicket.id });
+      socket.emit("joinTicket", { ticketId: selectedTicket.id });
 
       // Fetch message history for this ticket via REST API
       fetch(`${TICKETS_API_URL}/${selectedTicket.id}/messages`)
@@ -106,7 +106,7 @@ const SupportDashboard = () => {
     };
 
     // Emit to server
-    socket.emit("send_message", messageData);
+    socket.emit("user_joined_room", messageData);
 
     // Optimistic UI update (optional)
     setMessages((prev: Message[]) => [...prev, { ...messageData }]);
@@ -132,28 +132,28 @@ const SupportDashboard = () => {
     );
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="flex h-screen  overflow-hidden border border-gray-200 rounded-xl ">
       {/* Table Section */}
       <div
         className={`flex-1 flex flex-col transition-all ${
           selectedTicket ? "hidden lg:flex" : "flex"
         }`}
       >
-        <header className="h-16 border-b bg-white px-6 flex items-center justify-between">
-          <h1 className="text-xl font-bold">Support Center</h1>
+        <header className="h-16 border-b border-gray-200 bg-white px-6 flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">Support Center</h1>
         </header>
         <main className="flex-1 overflow-auto p-6">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+          <div className="bg-white rounded-t-xl shadow-sm border border-slate-200 overflow-hidden">
             <table className="w-full text-left">
-              <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold">
-                <tr>
+              <thead className="bg-slate-50 text-xs uppercase text-slate-500 font-semibold">
+                <tr className="">
                   <th className="px-6 py-4">ID</th>
                   <th className="px-6 py-4">Subject</th>
                   <th className="px-6 py-4">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {tickets.map((ticket: any) => (
+                {tickets?.map((ticket: any) => (
                   <tr
                     key={ticket.id}
                     onClick={() => setSelectedTicket(ticket)}
@@ -211,7 +211,7 @@ const SupportDashboard = () => {
             </header>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
-              {messages.map((msg, idx) => (
+              {messages?.map((msg, idx) => (
                 <div
                   key={idx}
                   className={`flex ${

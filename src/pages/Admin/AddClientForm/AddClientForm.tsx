@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StepOne } from "@/components/admin/addClientSteps/stepOne";
 import { StepTwo } from "@/components/admin/addClientSteps/stepTwo";
 import { StepThree } from "@/components/admin/addClientSteps/stepThree";
@@ -102,6 +103,7 @@ export default function MultiLevelForm() {
     },
     mode: "onChange",
   });
+  type AnyObject = Record<string, any>;
 
   const { handleSubmit, trigger, reset } = methods;
 
@@ -132,13 +134,54 @@ export default function MultiLevelForm() {
     }
   };
 
+  const isEmptyValue = (value: any) => {
+    if (value === undefined || value === null) return true;
+    if (typeof value === "string" && value.trim() === "") return true;
+    if (Array.isArray(value) && value.length === 0) return true;
+    if (
+      typeof value === "object" &&
+      !(value instanceof File) &&
+      Object.keys(value).length === 0
+    )
+      return true;
+
+    return false;
+  };
+
+  const buildClientFormData = (payload: AnyObject) => {
+    const formData = new FormData();
+
+    Object.entries(payload).forEach(([key, value]) => {
+      if (isEmptyValue(value)) return;
+
+      // File fields
+      if (value instanceof File) {
+        formData.append(key, value);
+        return;
+      }
+
+      // Arrays
+      if (Array.isArray(value)) {
+        formData.append(key, JSON.stringify(value));
+        return;
+      }
+
+      // Scalars
+      formData.append(key, String(value));
+    });
+
+    return formData;
+  };
+
   const onSubmit = async (data: FormData) => {
     console.log("[v0] Form submitted successfully:", data);
 
     try {
-      const result = await createClient(data).unwrap();
+      const formData = buildClientFormData(data);
+      console.log("[v0] Form data:", JSON.stringify(  formData));
+      const result = await createClient(formData).unwrap();
       console.log("[v0] Client creation result:", result);
-      
+
       setSubmittedData(data);
       setIsSubmitted(true);
     } catch (error) {
