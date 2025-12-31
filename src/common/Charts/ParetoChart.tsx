@@ -1,16 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import { useMemo, useState, useEffect, useRef } from "react";
+import CanvasJSReact from "@canvasjs/react-charts";
 import { Copy, Trash2, Download } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
+import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 
+const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+
 /*       TYPES       */
+
+type DataPoint = {
+  label: string;
+  y: number;
+};
 
 export type TierChart = {
   id: string;
@@ -31,8 +38,8 @@ type Props = {
 
 /*       COMPONENT       */
 
-export default function FunnelChart({
-  widgetTitle = "Recruitment Funnel",
+export default function ParetoChart({
+  widgetTitle = "Customer Complaints",
   xAxisValues = [],
   startingRange,
   endingRange,
@@ -42,6 +49,7 @@ export default function FunnelChart({
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
+  const chartRef = useRef<any>(null);
 
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
@@ -50,101 +58,137 @@ export default function FunnelChart({
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
-  /*   DATA   */
-  const chartData = useMemo(() => {
+  /*   DATA GENERATION   */
+  const dataPoints: DataPoint[] = useMemo(() => {
     if (!xAxisValues.length) return [];
-    
-    // Generate descending values for funnel effect
-    const step = (endingRange - startingRange) / (xAxisValues.length - 1 || 1);
-    return xAxisValues.map((_, index) => 
-      Math.round(endingRange - (step * index))
-    );
+
+    const range = endingRange - startingRange;
+    const step = range / xAxisValues.length;
+
+    // Generate descending values for Pareto effect
+    return xAxisValues
+      .filter(Boolean)
+      .map((label, index) => ({
+        label,
+        y: Math.round(endingRange - step * index),
+      }))
+      .sort((a, b) => b.y - a.y); // Sort descending
   }, [xAxisValues, startingRange, endingRange]);
 
-  const chartOptions: any = useMemo(() => ({
-    chart: {
-      type: 'bar',
-      height: 350,
-      toolbar: {
-        show: false,
-      },
-      dropShadow: {
-        enabled: true,
-        top: 2,
-        left: 2,
-        blur: 4,
-        opacity: 0.2,
-      },
-    },
-    plotOptions: {
-      bar: {
-        borderRadius: 0,
-        horizontal: true,
-        barHeight: '80%',
-        isFunnel: true,
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val: any, opt: any) {
-        return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
-      },
-      dropShadow: {
-        enabled: true,
-      },
-    },
-    colors: ['#00E396'],
-    xaxis: {
-      categories: xAxisValues.filter(Boolean),
-    },
-    legend: {
-      show: false,
-    },
-  }), [xAxisValues]);
-
-  const series = useMemo(() => [{
-    name: "Funnel Series",
-    data: chartData,
-  }], [chartData]);
-
+  /*   TOTAL VALUE   */
   const totalValue = useMemo(() => {
-    return chartData.reduce((sum, val) => sum + val, 0);
-  }, [chartData]);
+    return dataPoints.reduce((sum, dp) => sum + dp.y, 0);
+  }, [dataPoints]);
 
-  const handleCopy = () => {
-    const copyData = xAxisValues.map((label, index) => ({
-      label,
-      value: chartData[index],
-    }));
-    navigator.clipboard.writeText(JSON.stringify(copyData, null, 2));
+  /*   CREATE PARETO LINE   */
+  const createParetoLine = (chart: any) => {
+    if (!chart || !chart.data || !chart.data[0]) return;
+
+    const dps: any[] = [];
+    let yTotal = 0;
+    let yPercent = 0;
+
+    // Calculate total
+    for (let i = 0; i < chart.data[0].dataPoints.length; i++) {
+      yTotal += chart.data[0].dataPoints[i].y;
+    }
+
+    // Calculate cumulative percentage
+    for (let i = 0; i < chart.data[0].dataPoints.length; i++) {
+      const yValue = chart.data[0].dataPoints[i].y;
+      yPercent += (yValue / yTotal) * 100;
+      dps.push({
+        label: chart.data[0].dataPoints[i].label,
+        y: yPercent,
+      });
+    }
+
+    // Add line series
+    chart.addTo("data", {
+      type: "line",
+      yValueFormatString: "0.##'%'",
+      dataPoints: dps,
+    });
+
+    // Configure secondary axis
+    chart.data[1].set("axisYType", "secondary", false);
+    chart.axisY[0].set("maximum", Math.round(yTotal / 20) * 20);
+    chart.axisY2[0].set("maximum", 100);
   };
 
-const handleDownload = () => {
+  /*   CHART OPTIONS   */
+  const chartOptions = useMemo(
+    () => ({
+      title: {
+        text: widgetTitle,
+        fontSize: 20,
+        fontWeight: "normal",
+      },
+      axisX: {
+        title: "Categories",
+        labelAngle: -45,
+      },
+      axisY: {
+        title: "Count",
+        lineColor: "#4F81BC",
+        tickColor: "#4F81BC",
+        labelFontColor: "#4F81BC",
+      },
+      axisY2: {
+        title: "Cumulative %",
+        suffix: "%",
+        lineColor: "#C0504E",
+        tickColor: "#C0504E",
+        labelFontColor: "#C0504E",
+      },
+      data: [
+        {
+          type: "column",
+          color: "#4F81BC",
+          dataPoints: dataPoints,
+        },
+      ],
+    }),
+    [widgetTitle, dataPoints]
+  );
+
+  /*   EFFECT TO CREATE PARETO   */
+  useEffect(() => {
+    if (chartRef.current && dataPoints.length > 0) {
+      createParetoLine(chartRef.current);
+    }
+  }, [dataPoints]);
+
+  /*   ACTIONS   */
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(dataPoints, null, 2));
+  };
+
+  const handleDownload = () => {
     const payload = {
-      numberOfDataset: xAxisValues.length,
-      firstFiledDataset: 0,
-      lastFiledDAtaset: 100,
-      showWidgets: xAxisValues.map((l) => ({
-        legend_name: l,
-      })),
+      numberOfDataset: 1,
+      firstFiledDataset: startingRange,
+      lastFiledDAtaset: endingRange,
+      showWidgets: [{ legend_name: "Pareto", color: "#4F81BC" }],
       title: widgetTitle,
       status: "ACTIVE",
-      category: "BAR",
+      category: "PARETO",
       xAxis: JSON.stringify({
-        labels: [],
-        values: [],
+        labels: xAxisValues,
+        values: dataPoints.map((dp) => dp.y),
       }),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
     };
     setIsDownloading(true);
 
-    // Also save to backend
-    DownloadAndSaveCSVforModuleTwoWidget(
+    DownloadAndSaveCSVforModuleOneWidget(
       payload,
       getChartTitleId,
       widgetTitle,
-      xAxisValues
+      xAxisValues,
+      [{ label: "Pareto", field: "pareto", color: "#4F81BC" }]
     );
 
     setIsDownloading(false);
@@ -185,7 +229,9 @@ const handleDownload = () => {
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+          childTiers.length > 0
+            ? "cursor-pointer hover:shadow-lg transition-shadow"
+            : ""
         }`}
         onClick={handleChartClick}
       >
@@ -193,12 +239,15 @@ const handleDownload = () => {
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
             <p className="text-sm text-gray-500 mt-1">
-              {xAxisValues.length} stages
+              {dataPoints.length} categories
             </p>
           </div>
 
-          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
-            <p className="text-sm text-gray-500">Total {totalValue}</p>
+          <div
+            className="flex items-center gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-sm text-gray-500">Total: {totalValue}</p>
 
             <div className="flex gap-2 border-l pl-4 relative">
               <button
@@ -278,16 +327,17 @@ const handleDownload = () => {
           </div>
         </div>
 
-        {xAxisValues.filter(Boolean).length > 0 ? (
-          <ReactApexChart
-            options={chartOptions}
-            series={series}
-            type="bar"
-            height={350}
-          />
+        {dataPoints.length > 0 ? (
+          <div style={{ height: "400px", width: "100%" }}>
+            <CanvasJSChart
+              options={chartOptions}
+              onRef={(ref: any) => (chartRef.current = ref)}
+            />
+          </div>
         ) : (
-          <div className="h-[350px] flex items-center justify-center text-gray-400">
-            No data available. Please add funnel stages in the widget configuration.
+          <div className="h-[400px] flex items-center justify-center text-gray-400">
+            No data available. Please add categories in the widget
+            configuration.
           </div>
         )}
 
@@ -295,7 +345,8 @@ const handleDownload = () => {
         {childTiers.length > 0 && (
           <div className="mt-4 text-center">
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           </div>
         )}
@@ -319,7 +370,7 @@ const handleDownload = () => {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers.map((tier) => (
-              <FunnelChart
+              <ParetoChart
                 key={tier.id}
                 widgetTitle={tier.name}
                 xAxisValues={tier.xAxisValues}

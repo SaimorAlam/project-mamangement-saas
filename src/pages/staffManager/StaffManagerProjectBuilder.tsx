@@ -21,6 +21,9 @@ import BubbleChartModule from "./../../components/client/ProjectBuilder/chartMod
 import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModules/ColumnBarChartModule";
 import FunnelChartModule from "@/components/client/ProjectBuilder/chartModules/FunnelChartModule";
 import ScatterChartModule from "@/components/client/ProjectBuilder/chartModules/ScatterChartModule";
+import ParetoChartModule from "@/components/client/ProjectBuilder/chartModules/ParetoChartModule";
+import RadarChartModule from "@/components/client/ProjectBuilder/chartModules/RadarChartModule";
+import WaterfallChartModule from "@/components/client/ProjectBuilder/chartModules/WaterfallChartModule";
 import CandleChartModule from "./../../components/client/ProjectBuilder/chartModules/CandleChartModule";
 
 const StaffManagerProjectBuilder = () => {
@@ -126,6 +129,9 @@ const StaffManagerProjectBuilder = () => {
         )}
         {selectedWidget === "funnel-chart" && <FunnelChartModule />}
         {selectedWidget === "scatter-chart" && <ScatterChartModule />}
+        {selectedWidget === "pareto-chart" && <ParetoChartModule />}
+        {selectedWidget === "waterfall-chart" && <WaterfallChartModule />}
+        {selectedWidget === "radar-chart" && <RadarChartModule />}
         {selectedWidget === "candle-chart" && <CandleChartModule />}
       </div>
       {/* <ProjectConfiguration /> */}

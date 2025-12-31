@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@canvasjs/react-charts": "^1.0.2",
     "@dlhsoft/ganttcharthyperlibrary": "^5.3.38",
     "@handsontable/react": "^16.2.0",
     "@hookform/resolvers": "^4.1.3",
