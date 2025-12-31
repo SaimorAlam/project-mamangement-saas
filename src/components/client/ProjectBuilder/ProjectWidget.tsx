@@ -17,6 +17,9 @@ import {
   Cone,
   ChartColumnBig,
   ChartColumnStacked,
+  ChartLine,
+  FileChartPie,
+  SquareKanban,
   ChartCandlestick,
 } from "lucide-react";
 
@@ -139,6 +142,24 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       name: "Scatter Chart",
       description: "Division of same category",
       icon: <ChartScatter className="w-5 h-5" />,
+    },
+    {
+      id: "pareto-chart",
+      name: "Pareto Chart",
+      description: "Show pareto chart",
+      icon: <ChartLine className="w-5 h-5" />,
+    },
+    {
+      id: "waterfall-chart",
+      name: "Water Chart",
+      description: "Show waterfall chart",
+      icon: <SquareKanban className="w-5 h-5" />,
+    },
+    {
+      id: "radar-chart",
+      name: "Radar Chart",
+      description: "Division of same category",
+      icon: <FileChartPie className="w-5 h-5" />,
     },
     {
       id: "candle-chart",
