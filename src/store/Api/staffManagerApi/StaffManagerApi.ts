@@ -7,14 +7,6 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/dashboard`,
       providesTags: ["Manager"],
     }),
-    // getAllProjects: builder.query<any, GetProjectsParams>({
-    //   query: (params) => ({
-    //     url: "/program",
-    //     method: "GET",
-    //     params,
-    //   }),
-    //   providesTags: ["Manager"],
-    // }),
     getTopOverdueProjects: builder.query({
       query: () => `/manager/charts/top-overdue-projects`,
       providesTags: ["Manager"],
@@ -46,6 +38,13 @@ const userApi = baseApi.injectEndpoints({
         params,
       }),
       providesTags: ["Manager"],
+    }),
+    deleteManagerProject: builder.mutation<any, {id: string}>({
+      query: ({id})=> ({
+        url: `/project/manager-project-softdelete/${id}`,
+        method: "DELETE"
+      }),
+      invalidatesTags: ["Manager"],
     }),
     // for project page
     getProjectPageStateCarts: builder.query({
@@ -124,6 +123,7 @@ export const {
   useGetUpcomingDeadlinesQuery,
   useGetAllActivityLogsQuery,
   useGetAllLatestSubmissionsQuery,
+  useDeleteManagerProjectMutation,
   useGetProjectPageStateCartsQuery,
   useGetProgramAllProjectsQuery,
   useGetProjectReviewPageCardsQuery,
