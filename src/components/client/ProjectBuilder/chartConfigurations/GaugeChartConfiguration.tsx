@@ -13,7 +13,6 @@ const GaugeChartConfiguration = ({
   widgetTitle,
   setWidgetTitle,
   numOfLegendDataSet,
-  setNumOfLegendDataSet,
   legendValues,
   setLegendValues,
   startingRange,

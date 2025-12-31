@@ -32,7 +32,6 @@ const HistogramChartModule = () => {
 
   const minXaxisField = 1;
   const maxXaxisField = 10;
-  const maxLegendCount = 5;
 
   // Initialize xAxisValues based on numOfXAxisDataSet
   useEffect(() => {
@@ -101,13 +100,6 @@ const HistogramChartModule = () => {
       updated[index] = value;
       return updated;
     });
-  };
-
-  // Handle legend count change from configuration component
-  const handleLegendCountChange = (count: number) => {
-    if (count >= 1 && count <= maxLegendCount) {
-      setNumOfLegendDataSet(count);
-    }
   };
 
   // Toggle widget visibility
