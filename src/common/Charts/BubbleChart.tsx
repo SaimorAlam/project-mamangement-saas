@@ -33,6 +33,10 @@ type Props = {
   numOfLegendDataSet?: number;
   startingRange: number;
   endingRange: number;
+  minBubbleSize?: number;
+  maxBubbleSize?: number;
+  opacity?: number;
+  chartHeight?: number;
   onToggleWidget?: () => void;
   tierLevel?: number;
   chartId?: string;
@@ -40,9 +44,35 @@ type Props = {
 
 /*       HELPER FUNCTIONS       */
 
+// Deterministic hash function for consistent values
+const simpleHash = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
+
+// Deterministic pseudo-random number generator
+const deterministicRandom = (
+  seed: number,
+  min: number,
+  max: number
+): number => {
+  // Simple deterministic pseudo-random based on seed
+  const x = Math.sin(seed) * 10000;
+  const random = x - Math.floor(x);
+  return Math.floor(random * (max - min + 1)) + min;
+};
+
 const generateBubbleData = (
   xAxisValues: string[],
-  yrange: { min: number; max: number }
+  yrange: { min: number; max: number },
+  minBubbleSize: number,
+  maxBubbleSize: number,
+  legendIndex: number // Added to differentiate between legends
 ) => {
   const series = [];
   for (let i = 0; i < xAxisValues.length; i++) {
@@ -50,10 +80,17 @@ const generateBubbleData = (
     const xValue = xAxisValues[i];
     const x = !isNaN(Number(xValue)) ? Number(xValue) : i + 1;
 
-    const y =
-      Math.floor(Math.random() * (yrange.max - yrange.min + 1)) +
-      yrange.min;
-    const z = Math.floor(Math.random() * 60) + 15; // Bubble size
+    // Create a unique seed for each data point
+    const seed = simpleHash(`${xValue}-${i}-${legendIndex}`);
+
+    // Use deterministic random based on seed
+    const y = deterministicRandom(seed + 1, yrange.min, yrange.max);
+    const z = deterministicRandom(
+      seed + 2,
+      minBubbleSize,
+      maxBubbleSize
+    );
+
     series.push([x, y, z]);
   }
   return series;
@@ -72,6 +109,10 @@ export default function BubbleChart({
   numOfLegendDataSet = 1,
   startingRange,
   endingRange,
+  minBubbleSize = 15,
+  maxBubbleSize = 75,
+  opacity = 0.8,
+  chartHeight = 350,
   onToggleWidget,
   tierLevel = 0,
   chartId = "root",
@@ -97,9 +138,15 @@ export default function BubbleChart({
     // Generate series for each legend
     const series = legendValues
       .filter((l) => l.label)
-      .map((l) => ({
+      .map((l, legendIndex) => ({
         name: l.label,
-        data: generateBubbleData(xAxisValues, yrange),
+        data: generateBubbleData(
+          xAxisValues,
+          yrange,
+          minBubbleSize,
+          maxBubbleSize,
+          legendIndex
+        ),
       }));
 
     const colors = legendValues
@@ -111,14 +158,14 @@ export default function BubbleChart({
       options: {
         chart: {
           type: "bubble" as const,
-          height: 350,
+          height: chartHeight,
           toolbar: { show: false },
         },
         dataLabels: {
           enabled: false,
         },
         fill: {
-          opacity: 0.8,
+          opacity: opacity,
         },
         xaxis: {
           type: "numeric",
@@ -144,7 +191,16 @@ export default function BubbleChart({
         colors: colors,
       },
     };
-  }, [xAxisValues, legendValues, startingRange, endingRange]);
+  }, [
+    xAxisValues,
+    legendValues,
+    startingRange,
+    endingRange,
+    minBubbleSize,
+    maxBubbleSize,
+    opacity,
+    chartHeight,
+  ]);
 
   /*   ACTIONS   */
 
@@ -173,7 +229,12 @@ export default function BubbleChart({
         values: [],
       }),
       yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({
+        min: minBubbleSize,
+        max: maxBubbleSize,
+        opacity: opacity,
+        chartHeight: chartHeight,
+      }),
     };
     setIsDownloading(true);
 
@@ -256,22 +317,6 @@ export default function BubbleChart({
         <div className="flex justify-between mb-4">
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <div className="flex gap-6 mt-3">
-              {legendValues.map((l) =>
-                l.label ? (
-                  <div
-                    key={l.field}
-                    className="flex items-center gap-2"
-                  >
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: l.color }}
-                    />
-                    <span className="text-sm">{l.label}</span>
-                  </div>
-                ) : null
-              )}
-            </div>
           </div>
 
           <div
@@ -362,7 +407,7 @@ export default function BubbleChart({
             options={chartData.options}
             series={chartData.series}
             type="bubble"
-            height={350}
+            height={chartHeight}
           />
         ) : (
           <div className="h-96 flex items-center justify-center text-gray-400">
@@ -408,6 +453,10 @@ export default function BubbleChart({
                 numOfLegendDataSet={tier.legendValues.length}
                 startingRange={startingRange}
                 endingRange={endingRange}
+                minBubbleSize={minBubbleSize}
+                maxBubbleSize={maxBubbleSize}
+                opacity={opacity}
+                chartHeight={chartHeight}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
               />
