@@ -31,6 +31,14 @@ type Props = {
   numOfLegendDataSet?: number;
   startingRange?: number;
   endingRange?: number;
+  gaugeValue?: number; // NEW
+  chartHeight?: number; // NEW
+  startAngle?: number; // NEW
+  endAngle?: number; // NEW
+  trackColor?: string; // NEW
+  strokeWidth?: string; // NEW
+  fontSize?: number; // NEW
+  shadeIntensity?: number; // NEW
   onToggleWidget?: () => void;
   tierLevel?: number;
   chartId?: string;
@@ -38,11 +46,32 @@ type Props = {
 
 /*       HELPER FUNCTIONS       */
 
-const getRandomValue = (min = 0, max = 100) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+// Deterministic hash function for consistent values
+const simpleHash = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
+
+// Deterministic pseudo-random number generator
+const deterministicRandom = (
+  seed: number,
+  min: number,
+  max: number
+): number => {
+  // Simple deterministic pseudo-random based on seed
+  const x = Math.sin(seed) * 10000;
+  const random = x - Math.floor(x);
+  return Math.floor(random * (max - min + 1)) + min;
+};
 
 const generateId = () =>
-  crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
+  crypto.randomUUID?.() ??
+  Math.random().toString(36).substring(2, 10);
 
 /*       COMPONENT       */
 
@@ -52,6 +81,14 @@ export default function GaugeChart({
   numOfLegendDataSet = 1,
   startingRange = 0,
   endingRange = 100,
+  gaugeValue, // NEW
+  chartHeight = 300, // NEW
+  startAngle = -90, // NEW
+  endAngle = 90, // NEW
+  trackColor = "#e7e7e7", // NEW
+  strokeWidth = "97%", // NEW
+  fontSize = 22, // NEW
+  shadeIntensity = 0.4, // NEW
   onToggleWidget,
   tierLevel = 0,
   chartId = "root",
@@ -67,22 +104,33 @@ export default function GaugeChart({
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
   /*   GAUGE VALUE   */
-  const gaugeValue = useMemo(() => {
-    // Generate a random value within the range
-    return getRandomValue(startingRange, endingRange);
-  }, [startingRange, endingRange]);
+  const calculatedGaugeValue = useMemo(() => {
+    // If gaugeValue is provided, use it
+    if (gaugeValue !== undefined) {
+      return gaugeValue;
+    }
 
-  const isAllLegendFieldEmpty = legendValues.filter((l) => l.field !== "");
+    // Otherwise generate deterministic value based on widget title and ranges
+    const seed = simpleHash(
+      `${widgetTitle}-${startingRange}-${endingRange}`
+    );
+    return deterministicRandom(seed, startingRange, endingRange);
+  }, [gaugeValue, widgetTitle, startingRange, endingRange]);
+
+  const isAllLegendFieldEmpty = legendValues.filter(
+    (l) => l.field !== ""
+  );
 
   /*   APEX CHART STATE   */
   const chartData: any = useMemo(() => {
     // Use first legend color if available, otherwise default gradient
-    const colors = legendValues.length > 0 && legendValues[0].color
-      ? [legendValues[0].color]
-      : ["#8D79F6"];
+    const colors =
+      legendValues.length > 0 && legendValues[0].color
+        ? [legendValues[0].color]
+        : ["#8D79F6"];
 
     return {
-      series: [gaugeValue],
+      series: [calculatedGaugeValue],
       options: {
         chart: {
           type: "radialBar" as const,
@@ -93,14 +141,15 @@ export default function GaugeChart({
           toolbar: {
             show: false,
           },
+          height: chartHeight, // USING chartHeight prop
         },
         plotOptions: {
           radialBar: {
-            startAngle: -90,
-            endAngle: 90,
+            startAngle: startAngle, // USING startAngle prop
+            endAngle: endAngle, // USING endAngle prop
             track: {
-              background: "#e7e7e7",
-              strokeWidth: "97%",
+              background: trackColor, // USING trackColor prop
+              strokeWidth: strokeWidth, // USING strokeWidth prop
               margin: 5,
               dropShadow: {
                 enabled: true,
@@ -117,7 +166,7 @@ export default function GaugeChart({
               },
               value: {
                 offsetY: -2,
-                fontSize: "22px",
+                fontSize: fontSize, // USING fontSize prop
                 fontWeight: 600,
               },
             },
@@ -132,7 +181,7 @@ export default function GaugeChart({
           type: "gradient",
           gradient: {
             shade: "light",
-            shadeIntensity: 0.4,
+            shadeIntensity: shadeIntensity, // USING shadeIntensity prop
             inverseColors: false,
             opacityFrom: 1,
             opacityTo: 1,
@@ -143,15 +192,34 @@ export default function GaugeChart({
         labels: [legendValues[0]?.label || "Average Results"],
       },
     };
-  }, [gaugeValue, legendValues]);
+  }, [
+    calculatedGaugeValue,
+    legendValues,
+    chartHeight, // IN DEPENDENCY ARRAY
+    startAngle, // IN DEPENDENCY ARRAY
+    endAngle, // IN DEPENDENCY ARRAY
+    trackColor, // IN DEPENDENCY ARRAY
+    strokeWidth, // IN DEPENDENCY ARRAY
+    fontSize, // IN DEPENDENCY ARRAY
+    shadeIntensity, // IN DEPENDENCY ARRAY
+  ]);
 
   /*   ACTIONS   */
 
   const handleCopy = () => {
     const data = {
-      value: gaugeValue,
+      value: calculatedGaugeValue,
       label: legendValues[0]?.label || "Average Results",
       range: { min: startingRange, max: endingRange },
+      settings: {
+        chartHeight,
+        startAngle,
+        endAngle,
+        trackColor,
+        strokeWidth,
+        fontSize,
+        shadeIntensity,
+      },
     };
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
   };
@@ -175,13 +243,26 @@ export default function GaugeChart({
         values: [],
       }),
       yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({
+        gaugeValue: calculatedGaugeValue,
+        chartHeight: chartHeight,
+        startAngle: startAngle,
+        endAngle: endAngle,
+        trackColor: trackColor,
+        strokeWidth: strokeWidth,
+        fontSize: fontSize,
+        shadeIntensity: shadeIntensity,
+      }),
     };
     setIsDownloading(true);
 
     // For CSV export
     const header = "Label,Value,Min,Max";
-    const rows = [`${legendValues[0]?.label || "Average Results"},${gaugeValue},${startingRange},${endingRange}`];
+    const rows = [
+      `${
+        legendValues[0]?.label || "Average Results"
+      },${calculatedGaugeValue},${startingRange},${endingRange}`,
+    ];
     const csv = [header, ...rows].join("\n");
 
     const blob = new Blob([csv], {
@@ -242,7 +323,9 @@ export default function GaugeChart({
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 relative ${
-          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+          childTiers.length > 0
+            ? "cursor-pointer hover:shadow-lg transition-shadow"
+            : ""
         }`}
         onClick={handleChartClick}
       >
@@ -250,7 +333,10 @@ export default function GaugeChart({
         <div className="flex justify-between mb-4">
           <h2 className="text-xl font-semibold">{widgetTitle}</h2>
 
-          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex gap-2 border-l pl-4 relative">
               <button
                 onClick={(e) => {
@@ -348,12 +434,12 @@ export default function GaugeChart({
             options={chartData.options}
             series={chartData.series}
             type="radialBar"
-            height={300}
+            height={chartHeight} // UPDATED
           />
         ) : (
           <div className="h-[300px] flex items-center justify-center text-gray-400">
-            No data available, Please fill the input field to generate the chart
-            and then download the csv.
+            No data available, Please fill the input field to generate
+            the chart and then download the csv.
           </div>
         )}
 
@@ -393,6 +479,14 @@ export default function GaugeChart({
                 numOfLegendDataSet={tier.legendValues.length}
                 startingRange={startingRange}
                 endingRange={endingRange}
+                gaugeValue={calculatedGaugeValue}
+                chartHeight={chartHeight}
+                startAngle={startAngle}
+                endAngle={endAngle}
+                trackColor={trackColor}
+                strokeWidth={strokeWidth}
+                fontSize={fontSize}
+                shadeIntensity={shadeIntensity}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
               />
