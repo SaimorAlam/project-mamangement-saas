@@ -74,13 +74,13 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     {
       id: "heat-map-chart",
       name: "Heat Map Chart",
-      description: "Show heat map",
+      description: "Visualize data density with color intensity",
       icon: <Flame className="w-5 h-5" />,
     },
     {
       id: "area-chart",
       name: "Area Chart",
-      description: "Show area chart",
+      description: "Show trends over time with filled areas",
       icon: <ChartArea className="w-5 h-5" />,
     },
     {
@@ -92,7 +92,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     {
       id: "progress-ring",
       name: "Progress Ring",
-      description: "Show completion percentage",
+      description: "Display progress or completion percentage",
       icon: <Circle className="w-5 h-5" />,
     },
     {
@@ -134,31 +134,31 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     {
       id: "funnel-chart",
       name: "Funnel Chart",
-      description: "See clearly the process",
+      description: "Illustrate stages in a process or pipeline",
       icon: <Cone className="w-5 h-5" />,
     },
     {
       id: "scatter-chart",
       name: "Scatter Chart",
-      description: "Division of same category",
+      description: "Show relationships between two variables",
       icon: <ChartScatter className="w-5 h-5" />,
     },
     {
       id: "pareto-chart",
       name: "Pareto Chart",
-      description: "Show pareto chart",
+      description: "Highlight key factors (80/20 rule)",
       icon: <ChartLine className="w-5 h-5" />,
     },
     {
       id: "waterfall-chart",
-      name: "Water Chart",
-      description: "Show waterfall chart",
+      name: "Waterfall Chart",
+      description: "Show cumulative effect of sequential values",
       icon: <SquareKanban className="w-5 h-5" />,
     },
     {
       id: "radar-chart",
       name: "Radar Chart",
-      description: "Division of same category",
+      description: "Compare multiple variables across categories",
       icon: <FileChartPie className="w-5 h-5" />,
     },
     {
