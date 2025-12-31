@@ -146,19 +146,32 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     {
       id: "pareto-chart",
       name: "Pareto Chart",
+<<<<<<< HEAD
       description: "Highlight key factors (80/20 rule)",
+=======
+      description: "Show pareto chart",
+>>>>>>> 4723e30b4a22b42d6556600e6453f2a7333dbf66
       icon: <ChartLine className="w-5 h-5" />,
     },
     {
       id: "waterfall-chart",
+<<<<<<< HEAD
       name: "Waterfall Chart",
       description: "Show cumulative effect of sequential values",
+=======
+      name: "Water Chart",
+      description: "Show waterfall chart",
+>>>>>>> 4723e30b4a22b42d6556600e6453f2a7333dbf66
       icon: <SquareKanban className="w-5 h-5" />,
     },
     {
       id: "radar-chart",
       name: "Radar Chart",
+<<<<<<< HEAD
       description: "Compare multiple variables across categories",
+=======
+      description: "Division of same category",
+>>>>>>> 4723e30b4a22b42d6556600e6453f2a7333dbf66
       icon: <FileChartPie className="w-5 h-5" />,
     },
     {
