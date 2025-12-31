@@ -8,10 +8,12 @@ const HistogramChartModule = () => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
+  const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
+    useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(1);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] =
+    useState<number>(1);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#8D79F6" },
@@ -20,9 +22,16 @@ const HistogramChartModule = () => {
   const [startingRange, setStartingRange] = useState<number>(0);
   const [endingRange, setEndingRange] = useState<number>(100);
 
+  // NEW STATE FOR HISTOGRAM CHART CONFIGURATION
+  const [chartHeight, setChartHeight] = useState<number>(400);
+  const [strokeWidth, setStrokeWidth] = useState<number>(2);
+  const [dataPointsPerSeries, setDataPointsPerSeries] =
+    useState<number>(50);
+  const [fillOpacity, setFillOpacity] = useState<number>(0.7);
+  const [binCount, setBinCount] = useState<number>(10);
+
   const minXaxisField = 1;
   const maxXaxisField = 10;
-  const maxLegendCount = 5;
 
   // Initialize xAxisValues based on numOfXAxisDataSet
   useEffect(() => {
@@ -47,15 +56,19 @@ const HistogramChartModule = () => {
       // Add default legends if needed
       const updated = [...legendValues];
       const colors = [
-        "#8D79F6", "#4F46E5", "#0EA5E9", "#10B981", "#F59E0B"
+        "#8D79F6",
+        "#4F46E5",
+        "#0EA5E9",
+        "#10B981",
+        "#F59E0B",
       ];
-      
+
       while (updated.length < numOfLegendDataSet) {
         const index = updated.length;
         updated.push({
           label: `Legend ${index + 1}`,
           field: `field_${index + 1}`,
-          color: colors[index % colors.length]
+          color: colors[index % colors.length],
         });
       }
       setLegendValues(updated);
@@ -89,13 +102,6 @@ const HistogramChartModule = () => {
     });
   };
 
-  // Handle legend count change from configuration component
-  const handleLegendCountChange = (count: number) => {
-    if (count >= 1 && count <= maxLegendCount) {
-      setNumOfLegendDataSet(count);
-    }
-  };
-
   // Toggle widget visibility
   const handleToggleWidget = () => {
     setShowWidget(!showWidget);
@@ -115,6 +121,11 @@ const HistogramChartModule = () => {
         numOfLegendDataSet={numOfLegendDataSet}
         startingRange={startingRange}
         endingRange={endingRange}
+        chartHeight={chartHeight}
+        strokeWidth={strokeWidth}
+        dataPointsPerSeries={dataPointsPerSeries}
+        fillOpacity={fillOpacity}
+        binCount={binCount}
         onToggleWidget={handleToggleWidget}
       />
       {showWidget && (
@@ -126,13 +137,23 @@ const HistogramChartModule = () => {
           xAxisValues={xAxisValues}
           handleXAxisValueChange={handleXAxisValueChange}
           numOfLegendDataSet={numOfLegendDataSet}
-          setNumOfLegendDataSet={handleLegendCountChange}
+          setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
           setLegendValues={setLegendValues}
           startingRange={startingRange}
           setStartingRange={setStartingRange}
           endingRange={endingRange}
           setEndingRange={setEndingRange}
+          chartHeight={chartHeight}
+          setChartHeight={setChartHeight}
+          strokeWidth={strokeWidth}
+          setStrokeWidth={setStrokeWidth}
+          dataPointsPerSeries={dataPointsPerSeries}
+          setDataPointsPerSeries={setDataPointsPerSeries}
+          fillOpacity={fillOpacity}
+          setFillOpacity={setFillOpacity}
+          binCount={binCount}
+          setBinCount={setBinCount}
           onClose={handleCloseWidget}
         />
       )}

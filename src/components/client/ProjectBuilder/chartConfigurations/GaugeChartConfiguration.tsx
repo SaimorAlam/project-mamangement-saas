@@ -19,6 +19,22 @@ const GaugeChartConfiguration = ({
   setStartingRange,
   endingRange,
   setEndingRange,
+  gaugeValue,
+  setGaugeValue,
+  chartHeight,
+  setChartHeight,
+  startAngle,
+  setStartAngle,
+  endAngle,
+  setEndAngle,
+  trackColor,
+  setTrackColor,
+  strokeWidth,
+  setStrokeWidth,
+  fontSize,
+  setFontSize,
+  shadeIntensity,
+  setShadeIntensity,
   onClose,
 }: {
   widgetTitle: string;
@@ -33,6 +49,23 @@ const GaugeChartConfiguration = ({
   setStartingRange: React.Dispatch<React.SetStateAction<number>>;
   endingRange: number;
   setEndingRange: React.Dispatch<React.SetStateAction<number>>;
+  // NEW PROPS
+  gaugeValue: number;
+  setGaugeValue: React.Dispatch<React.SetStateAction<number>>;
+  chartHeight: number;
+  setChartHeight: React.Dispatch<React.SetStateAction<number>>;
+  startAngle: number;
+  setStartAngle: React.Dispatch<React.SetStateAction<number>>;
+  endAngle: number;
+  setEndAngle: React.Dispatch<React.SetStateAction<number>>;
+  trackColor: string;
+  setTrackColor: React.Dispatch<React.SetStateAction<string>>;
+  strokeWidth: string;
+  setStrokeWidth: React.Dispatch<React.SetStateAction<string>>;
+  fontSize: number;
+  setFontSize: React.Dispatch<React.SetStateAction<number>>;
+  shadeIntensity: number;
+  setShadeIntensity: React.Dispatch<React.SetStateAction<number>>;
   onClose?: () => void;
 }) => {
   const [showLegend, setShowLegend] = useState(true);
@@ -81,6 +114,14 @@ const GaugeChartConfiguration = ({
       return;
     }
 
+    // Validate gauge value is within range
+    if (gaugeValue < startingRange || gaugeValue > endingRange) {
+      alert(
+        `Gauge value must be between ${startingRange} and ${endingRange}`
+      );
+      return;
+    }
+
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -97,7 +138,16 @@ const GaugeChartConfiguration = ({
         values: [],
       }),
       yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({
+        gaugeValue: gaugeValue,
+        chartHeight: chartHeight,
+        startAngle: startAngle,
+        endAngle: endAngle,
+        trackColor: trackColor,
+        strokeWidth: strokeWidth,
+        fontSize: fontSize,
+        shadeIntensity: shadeIntensity,
+      }),
     };
 
     DownloadAndSaveCSVforModuleOneWidget(
@@ -178,10 +228,144 @@ const GaugeChartConfiguration = ({
             />
           </div>
 
+          {/* NEW: Gauge Value */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              Gauge Value:
+            </label>
+            <input
+              type="number"
+              min={startingRange}
+              max={endingRange}
+              value={gaugeValue}
+              onChange={(e) => setGaugeValue(Number(e.target.value))}
+              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
           <p className="text-xs text-gray-500 mt-2">
-            The gauge will display a random value between{" "}
-            {startingRange} and {endingRange}
+            The gauge will display value: {gaugeValue} (between{" "}
+            {startingRange} and {endingRange})
           </p>
+        </div>
+
+        {/* NEW: Gauge Chart Settings Section */}
+        <div>
+          <h3 className="text-xs font-semibold text-blue-600 mb-3">
+            Gauge Chart Settings
+          </h3>
+
+          {/* Chart Height */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              Chart Height (px):
+            </label>
+            <input
+              type="number"
+              min={200}
+              max={500}
+              value={chartHeight}
+              onChange={(e) => setChartHeight(Number(e.target.value))}
+              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* Start Angle */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              Start Angle (deg):
+            </label>
+            <input
+              type="number"
+              min={-360}
+              max={360}
+              value={startAngle}
+              onChange={(e) => setStartAngle(Number(e.target.value))}
+              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* End Angle */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              End Angle (deg):
+            </label>
+            <input
+              type="number"
+              min={-360}
+              max={360}
+              value={endAngle}
+              onChange={(e) => setEndAngle(Number(e.target.value))}
+              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* Track Color */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              Track Color:
+            </label>
+            <div className="flex items-center justify-end gap-2 flex-1">
+              <input
+                type="text"
+                value={trackColor}
+                onChange={(e) => setTrackColor(e.target.value)}
+                className="text-xs px-2 py-1 border border-gray-200 rounded w-22"
+              />
+              <input
+                type="color"
+                value={trackColor}
+                onChange={(e) => setTrackColor(e.target.value)}
+                className="w-14 h-6 rounded border border-gray-200 cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* Stroke Width */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              Stroke Width (%):
+            </label>
+            <input
+              type="text"
+              value={strokeWidth}
+              onChange={(e) => setStrokeWidth(e.target.value)}
+              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* Font Size */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              Value Font Size:
+            </label>
+            <input
+              type="number"
+              min={10}
+              max={36}
+              value={fontSize}
+              onChange={(e) => setFontSize(Number(e.target.value))}
+              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* Shade Intensity */}
+          <div className="flex items-center mb-2">
+            <label className="text-xs text-gray-700 flex-1">
+              Shade Intensity:
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              min={0}
+              max={1}
+              value={shadeIntensity}
+              onChange={(e) =>
+                setShadeIntensity(Number(e.target.value))
+              }
+              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
         </div>
 
         {/* Display Settings Section */}

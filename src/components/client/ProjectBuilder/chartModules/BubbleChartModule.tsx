@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import ProjectConfiguration, {
+import BubbleChartConfigurationWidget, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
+} from "../chartConfigurations/BubbleChartConfigurationWidget";
 import BubbleChart from "@/common/Charts/BubbleChart";
 
 const BubbleChartModule = () => {
@@ -22,6 +22,12 @@ const BubbleChartModule = () => {
   ]);
   const [startingRange, setStartingRange] = useState<number>(10); //for y axis
   const [endingRange, setEndingRange] = useState<number>(70); // for y axis
+
+  // NEW STATE FOR BUBBLE CHART CONFIGURATION
+  const [minBubbleSize, setMinBubbleSize] = useState<number>(15);
+  const [maxBubbleSize, setMaxBubbleSize] = useState<number>(75);
+  const [opacity, setOpacity] = useState<number>(0.8);
+  const [chartHeight, setChartHeight] = useState<number>(350);
 
   const minXaxisField = 1;
   const maxXaxisField = 20;
@@ -57,7 +63,7 @@ const BubbleChartModule = () => {
       updated[index] = value;
       return updated;
     });
-    console.log("parant x values: ", xAxisValues);
+    console.log("parent x values: ", xAxisValues);
   };
 
   // Toggle widget visibility
@@ -79,10 +85,14 @@ const BubbleChartModule = () => {
         numOfLegendDataSet={numOfLegendDataSet}
         startingRange={startingRange}
         endingRange={endingRange}
+        minBubbleSize={minBubbleSize}
+        maxBubbleSize={maxBubbleSize}
+        opacity={opacity}
+        chartHeight={chartHeight}
         onToggleWidget={handleToggleWidget}
       />
       {showWidget && (
-        <ProjectConfiguration
+        <BubbleChartConfigurationWidget
           widgedName="Bubble Chart"
           widgetTitle={widgetTitle}
           widgetCategory="BUBBLE"
@@ -99,6 +109,14 @@ const BubbleChartModule = () => {
           setStartingRange={setStartingRange}
           endingRange={endingRange}
           setEndingRange={setEndingRange}
+          minBubbleSize={minBubbleSize}
+          setMinBubbleSize={setMinBubbleSize}
+          maxBubbleSize={maxBubbleSize}
+          setMaxBubbleSize={setMaxBubbleSize}
+          opacity={opacity}
+          setOpacity={setOpacity}
+          chartHeight={chartHeight}
+          setChartHeight={setChartHeight}
           onClose={handleCloseWidget}
         />
       )}

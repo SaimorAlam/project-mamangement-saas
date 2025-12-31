@@ -9,34 +9,10 @@ export type LegendValue = {
   color: string;
 };
 
-const HistogramChartConfiguration = ({
-  widgetTitle,
-  setWidgetTitle,
-  numOfXAxisDataSet,
-  handleSetNumOfXAxisDataSet,
-  xAxisValues,
-  handleXAxisValueChange,
-  numOfLegendDataSet,
-  setNumOfLegendDataSet,
-  legendValues,
-  setLegendValues,
-  startingRange,
-  setStartingRange,
-  endingRange,
-  setEndingRange,
-  chartHeight,
-  setChartHeight,
-  strokeWidth,
-  setStrokeWidth,
-  dataPointsPerSeries,
-  setDataPointsPerSeries,
-  fillOpacity,
-  setFillOpacity,
-  binCount,
-  setBinCount,
-  onClose,
-}: {
+interface IWidgetPropsType {
+  widgedName: string;
   widgetTitle: string;
+  widgetCategory: string;
   setWidgetTitle: React.Dispatch<React.SetStateAction<string>>;
   numOfXAxisDataSet: number;
   handleSetNumOfXAxisDataSet: (
@@ -54,26 +30,47 @@ const HistogramChartConfiguration = ({
   setStartingRange: React.Dispatch<React.SetStateAction<number>>;
   endingRange: number;
   setEndingRange: React.Dispatch<React.SetStateAction<number>>;
-  // NEW PROPS
+  onClose?: () => void;
+  minBubbleSize: number;
+  setMinBubbleSize: React.Dispatch<React.SetStateAction<number>>;
+  maxBubbleSize: number;
+  setMaxBubbleSize: React.Dispatch<React.SetStateAction<number>>;
+  opacity: number;
+  setOpacity: React.Dispatch<React.SetStateAction<number>>;
   chartHeight: number;
   setChartHeight: React.Dispatch<React.SetStateAction<number>>;
-  strokeWidth: number;
-  setStrokeWidth: React.Dispatch<React.SetStateAction<number>>;
-  dataPointsPerSeries: number;
-  setDataPointsPerSeries: React.Dispatch<
-    React.SetStateAction<number>
-  >;
-  fillOpacity: number;
-  setFillOpacity: React.Dispatch<React.SetStateAction<number>>;
-  binCount: number;
-  setBinCount: React.Dispatch<React.SetStateAction<number>>;
-  onClose?: () => void;
-}) => {
-  const [showLegend, setShowLegend] = useState(true);
-  const [showFilter, setShowFilter] = useState(false);
-  const [filter, setFilter] = useState<string>("");
+}
 
-  // Assigned By user info
+const BubbleChartConfigurationWidget = ({
+  widgedName,
+  widgetTitle,
+  widgetCategory,
+  setWidgetTitle,
+  numOfXAxisDataSet,
+  handleSetNumOfXAxisDataSet,
+  xAxisValues,
+  handleXAxisValueChange,
+  numOfLegendDataSet,
+  setNumOfLegendDataSet,
+  legendValues,
+  setLegendValues,
+  startingRange,
+  setStartingRange,
+  endingRange,
+  setEndingRange,
+  onClose,
+}: IWidgetPropsType) => {
+  const [filter, setFilter] = useState<string>("");
+  const [showFilter, setShowFilter] = useState(false);
+  const [showLegend, setShowLegend] = useState(true);
+
+  // NEW STATE FOR BUBBLE CHART CONFIGURATION
+  const [minBubbleSize, setMinBubbleSize] = useState<number>(15);
+  const [maxBubbleSize, setMaxBubbleSize] = useState<number>(75);
+  const [opacity, setOpacity] = useState<number>(0.8);
+  const [chartHeight, setChartHeight] = useState<number>(350);
+
+  // for showing user info below
   const assignedBy = {
     name: "Alexis Burg",
     role: "Admin",
@@ -81,8 +78,8 @@ const HistogramChartConfiguration = ({
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
   };
 
-  // Handler for Legend inputs
-  const minLegend = 1;
+  // handler for Legend inputs
+  const minLegend = 3;
   const maxLegend = 5;
   const handleSetNumOfLegendDataSet = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -105,7 +102,7 @@ const HistogramChartConfiguration = ({
         updated.push({
           label: "",
           field: "",
-          color: "#8D79F6",
+          color: "#000000",
         });
       }
 
@@ -137,7 +134,7 @@ const HistogramChartConfiguration = ({
     useGetChartTitleIdMutation();
 
   const downloadCSV = () => {
-    // Validate that if any of the legend labels or xAxisValues are empty, alert the user
+    // validating that if any of the legend labels or xAxisValues are empty, alert the user
     for (let i = 0; i < legendValues.length; i++) {
       if (!legendValues[i].label) {
         alert(`Please fill in the label for legend ${i + 1}`);
@@ -152,15 +149,19 @@ const HistogramChartConfiguration = ({
       }
     }
 
-    if (legendValues.length < 1) {
-      alert(`Please add at least ${minLegend} legend value`);
+    if (legendValues.length < 3) {
+      alert(`Please add at least ${minLegend} legend values`);
       return;
     }
     if (xAxisValues.length < 1) {
       alert(`Please add at least ${1} X-Axis value`);
       return;
     }
-
+    if (!widgetCategory) {
+      alert(`Please input category : ${widgetCategory}`);
+      console.log("category: ", widgetCategory);
+      return;
+    }
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -171,21 +172,19 @@ const HistogramChartConfiguration = ({
       })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "HISTOGRAM",
+      category: widgetCategory,
       xAxis: JSON.stringify({
         labels: xAxisValues,
         values: [],
       }),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({
+        min: minBubbleSize,
+        max: maxBubbleSize,
+        opacity: opacity,
         chartHeight: chartHeight,
-        strokeWidth: strokeWidth,
-        dataPointsPerSeries: dataPointsPerSeries,
-        fillOpacity: fillOpacity,
-        binCount: binCount,
       }),
     };
-
     DownloadAndSaveCSVforModuleOneWidget(
       payload,
       getChartTitleId,
@@ -212,9 +211,9 @@ const HistogramChartConfiguration = ({
 
       {/* Content */}
       <div className="px-4 py-4 space-y-4">
-        {/* Histogram Chart Widget Details Link */}
+        {/* Stacked BarChart Widget Details Link */}
         <a href="#" className="text-xs text-blue-600 hover:underline">
-          Histogram Chart Widget Details
+          {widgedName} Widget Details
         </a>
 
         {/* Widget Title */}
@@ -244,8 +243,8 @@ const HistogramChartConfiguration = ({
             <input
               type="number"
               min={1}
-              max={10}
-              value={numOfXAxisDataSet}
+              max={20}
+              defaultValue={numOfXAxisDataSet}
               onChange={handleSetNumOfXAxisDataSet}
               className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
@@ -347,16 +346,31 @@ const HistogramChartConfiguration = ({
           </div>
         )}
 
-        {/* Data Range Section */}
+        {/* Data Mapping for Y-Axis Section */}
         <div>
           <h3 className="text-xs font-semibold text-blue-600 mb-3">
-            Data Range Configuration
+            Data Mapping for Y-Axis
           </h3>
 
-          {/* Starting Range */}
+          {/* Number of Data sets */}
+          <div className="flex items-center mb-3">
+            <label className="text-xs text-gray-700 flex-1">
+              Number of Data sets:
+            </label>
+            <input
+              type="number"
+              min={3}
+              max={5}
+              defaultValue={numOfLegendDataSet}
+              onChange={handleSetNumOfLegendDataSet}
+              className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
+          {/* 1st field Data */}
           <div className="flex items-center mb-2">
             <label className="text-xs text-gray-700 flex-1">
-              Starting Range:
+              1st field Data:
             </label>
             <input
               type="number"
@@ -364,105 +378,92 @@ const HistogramChartConfiguration = ({
               onChange={(e) =>
                 setStartingRange(Number(e.target.value))
               }
-              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
 
-          {/* Ending Range */}
+          {/* Last field Data */}
           <div className="flex items-center mb-2">
             <label className="text-xs text-gray-700 flex-1">
-              Ending Range:
+              Last field Data:
             </label>
             <input
               type="number"
               value={endingRange}
               onChange={(e) => setEndingRange(Number(e.target.value))}
-              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
         </div>
 
-        {/* NEW: Histogram Chart Settings Section */}
+        {/* NEW: Bubble Chart Settings Section */}
         <div>
           <h3 className="text-xs font-semibold text-blue-600 mb-3">
-            Histogram Chart Settings
+            Bubble Chart Settings
           </h3>
 
-          {/* Chart Height */}
+          {/* Min Bubble Size */}
           <div className="flex items-center mb-2">
             <label className="text-xs text-gray-700 flex-1">
-              Chart Height (px):
-            </label>
-            <input
-              type="number"
-              min={200}
-              max={600}
-              value={chartHeight}
-              onChange={(e) => setChartHeight(Number(e.target.value))}
-              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
-            />
-          </div>
-
-          {/* Stroke Width */}
-          <div className="flex items-center mb-2">
-            <label className="text-xs text-gray-700 flex-1">
-              Stroke Width:
+              Min Bubble Size:
             </label>
             <input
               type="number"
               min={1}
-              max={10}
-              value={strokeWidth}
-              onChange={(e) => setStrokeWidth(Number(e.target.value))}
-              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+              max={100}
+              value={minBubbleSize}
+              onChange={(e) =>
+                setMinBubbleSize(Number(e.target.value))
+              }
+              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
 
-          {/* Data Points per Series */}
+          {/* Max Bubble Size */}
           <div className="flex items-center mb-2">
             <label className="text-xs text-gray-700 flex-1">
-              Data Points per Series:
+              Max Bubble Size:
             </label>
             <input
               type="number"
-              min={10}
-              max={200}
-              value={dataPointsPerSeries}
+              min={1}
+              max={100}
+              value={maxBubbleSize}
               onChange={(e) =>
-                setDataPointsPerSeries(Number(e.target.value))
+                setMaxBubbleSize(Number(e.target.value))
               }
-              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
 
-          {/* Fill Opacity */}
+          {/* Opacity */}
           <div className="flex items-center mb-2">
             <label className="text-xs text-gray-700 flex-1">
-              Fill Opacity (0-1):
+              Opacity (0-1):
             </label>
             <input
               type="number"
               step="0.1"
               min={0}
               max={1}
-              value={fillOpacity}
-              onChange={(e) => setFillOpacity(Number(e.target.value))}
-              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+              value={opacity}
+              onChange={(e) => setOpacity(Number(e.target.value))}
+              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
 
-          {/* Bin Count */}
-          <div className="flex items-center mb-2">
+          {/* Chart Height */}
+          <div className="flex items-center mb-3">
             <label className="text-xs text-gray-700 flex-1">
-              Number of Bins:
+              Chart Height (px):
             </label>
             <input
               type="number"
-              min={5}
-              max={50}
-              value={binCount}
-              onChange={(e) => setBinCount(Number(e.target.value))}
-              className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+              min={200}
+              max={500}
+              value={chartHeight}
+              onChange={(e) => setChartHeight(Number(e.target.value))}
+              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
         </div>
@@ -502,21 +503,6 @@ const HistogramChartConfiguration = ({
             </div>
           </div>
 
-          {/* Number of Legends */}
-          <div className="flex items-center mb-3">
-            <label className="text-xs text-gray-700 flex-1">
-              Number of Legends:
-            </label>
-            <input
-              type="number"
-              min={minLegend}
-              max={maxLegend}
-              value={numOfLegendDataSet}
-              onChange={handleSetNumOfLegendDataSet}
-              className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
-            />
-          </div>
-
           {showLegend &&
             Array.from({ length: numOfLegendDataSet }).map(
               (_, index) => (
@@ -550,52 +536,54 @@ const HistogramChartConfiguration = ({
                   </div>
 
                   {/* Legend Color */}
-                  <div className="flex items-center mb-3">
-                    <label
-                      className="text-xs text-gray-700"
-                      style={{ width: "110px" }}
-                    >
-                      {index + 1}
-                      {index === 0
-                        ? "st"
-                        : index === 1
-                        ? "nd"
-                        : index === 2
-                        ? "rd"
-                        : "th"}{" "}
-                      Legend Color:
-                    </label>
+                  {widgedName === "Heatmap Chart" ? null : (
+                    <div className="flex items-center mb-3">
+                      <label
+                        className="text-xs text-gray-700"
+                        style={{ width: "110px" }}
+                      >
+                        {index + 1}
+                        {index === 0
+                          ? "st"
+                          : index === 1
+                          ? "nd"
+                          : index === 2
+                          ? "rd"
+                          : "th"}{" "}
+                        Legend Color:
+                      </label>
 
-                    <div className="flex items-center justify-end gap-2 flex-1">
-                      <input
-                        type="text"
-                        value={
-                          legendValues[index]?.color || "#8D79F6"
-                        }
-                        onChange={(e) =>
-                          handleLegendColorChange(
-                            index,
-                            e.target.value
-                          )
-                        }
-                        className="text-xs px-2 py-1 border border-gray-200 rounded w-22"
-                      />
+                      <div className="flex items-center justify-end gap-2 flex-1">
+                        <input
+                          type="text"
+                          value={
+                            legendValues[index]?.color || "#000000"
+                          }
+                          onChange={(e) =>
+                            handleLegendColorChange(
+                              index,
+                              e.target.value
+                            )
+                          }
+                          className="text-xs px-2 py-1 border border-gray-200 rounded w-22"
+                        />
 
-                      <input
-                        type="color"
-                        value={
-                          legendValues[index]?.color || "#8D79F6"
-                        }
-                        onChange={(e) =>
-                          handleLegendColorChange(
-                            index,
-                            e.target.value
-                          )
-                        }
-                        className="w-14 h-6 rounded border border-gray-200 cursor-pointer"
-                      />
+                        <input
+                          type="color"
+                          value={
+                            legendValues[index]?.color || "#000000"
+                          }
+                          onChange={(e) =>
+                            handleLegendColorChange(
+                              index,
+                              e.target.value
+                            )
+                          }
+                          className="w-14 h-6 rounded border border-gray-200 cursor-pointer"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )
             )}
@@ -644,4 +632,4 @@ const HistogramChartConfiguration = ({
   );
 };
 
-export default HistogramChartConfiguration;
+export default BubbleChartConfigurationWidget;
