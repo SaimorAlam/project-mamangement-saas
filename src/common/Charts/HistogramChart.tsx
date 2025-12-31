@@ -54,6 +54,11 @@ type Props = {
   numOfLegendDataSet?: number;
   startingRange: number;
   endingRange: number;
+  chartHeight?: number; // NEW
+  strokeWidth?: number; // NEW
+  dataPointsPerSeries?: number; // NEW
+  fillOpacity?: number; // NEW
+  binCount?: number; // NEW
   onToggleWidget?: () => void;
   tierLevel?: number;
   chartId?: string;
@@ -61,22 +66,50 @@ type Props = {
 
 /*       HELPER FUNCTIONS       */
 
+// Deterministic hash function for consistent values
+const simpleHash = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
+
+// Deterministic pseudo-random number generator
+const deterministicRandom = (
+  seed: number,
+  min: number,
+  max: number
+): number => {
+  // Simple deterministic pseudo-random based on seed
+  const x = Math.sin(seed) * 10000;
+  const random = x - Math.floor(x);
+  return Math.floor(random * (max - min + 1)) + min;
+};
+
 const generateHistogramDataForLegend = (
   startingRange: number,
   endingRange: number,
+  dataPointsPerSeries: number,
   legendIndex: number = 0
 ) => {
-  // Generate random data points for histogram with slight variation per legend
+  // Generate deterministic data points for histogram
   const dataPoints: { value: number; series: string }[] = [];
-  const numPoints = 50; // Generate 50 data points per series
 
-  // Add some variation based on legend index to make series distinct
-  const variation = legendIndex * 10;
+  for (let i = 0; i < dataPointsPerSeries; i++) {
+    // Create a unique seed for each data point
+    const seed = simpleHash(
+      `${legendIndex}-${i}-${startingRange}-${endingRange}`
+    );
 
-  for (let i = 0; i < numPoints; i++) {
-    const baseValue = Math.floor(
-      Math.random() * (endingRange - startingRange + 1) +
-        startingRange
+    // Use deterministic random based on seed with slight variation per legend
+    const variation = legendIndex * 10;
+    const baseValue = deterministicRandom(
+      seed,
+      startingRange,
+      endingRange
     );
     const value = Math.max(
       startingRange,
@@ -91,7 +124,8 @@ const generateHistogramDataForLegend = (
 const generateCombinedHistogramData = (
   startingRange: number,
   endingRange: number,
-  legendCount: number
+  legendCount: number,
+  dataPointsPerSeries: number
 ) => {
   // Generate combined data for all legends
   const allData: { value: number; series: string }[] = [];
@@ -100,6 +134,7 @@ const generateCombinedHistogramData = (
     const seriesData = generateHistogramDataForLegend(
       startingRange,
       endingRange,
+      dataPointsPerSeries,
       i
     );
     allData.push(...seriesData);
@@ -121,6 +156,11 @@ export default function HistogramChart({
   numOfLegendDataSet = 1,
   startingRange,
   endingRange,
+  chartHeight = 400, // NEW DEFAULT
+  strokeWidth = 2, // NEW DEFAULT
+  dataPointsPerSeries = 50, // NEW DEFAULT
+  fillOpacity = 0.7, // NEW DEFAULT
+  binCount = 10, // NEW DEFAULT
   onToggleWidget,
   tierLevel = 0,
   chartId = "root",
@@ -140,9 +180,15 @@ export default function HistogramChart({
     return generateCombinedHistogramData(
       startingRange,
       endingRange,
-      legendValues.length || 1
+      legendValues.length || 1,
+      dataPointsPerSeries
     );
-  }, [startingRange, endingRange, legendValues.length]);
+  }, [
+    startingRange,
+    endingRange,
+    legendValues.length,
+    dataPointsPerSeries,
+  ]);
 
   /*   AG CHARTS OPTIONS   */
   const chartOptions = useMemo((): AgChartOptions | null => {
@@ -156,8 +202,8 @@ export default function HistogramChart({
       xName: legend.label || `Series ${index + 1}`,
       fill: legend.color || "#8D79F6",
       stroke: legend.color || "#8D79F6",
-      fillOpacity: 0.7 - index * 0.1, // Slight opacity variation for overlapping histograms
-      strokeWidth: 2,
+      fillOpacity: fillOpacity - index * 0.1, // Slight opacity variation for overlapping histograms
+      strokeWidth: strokeWidth,
       title: legend.label || `Series ${index + 1}`,
       data: histogramData.filter(
         (item) => item.series === `series_${index}`
@@ -173,15 +219,19 @@ export default function HistogramChart({
         xName: "Value",
         fill: "#8D79F6",
         stroke: "#8D79F6",
-        fillOpacity: 0.7,
-        strokeWidth: 2,
+        fillOpacity: fillOpacity,
+        strokeWidth: strokeWidth,
         title: "Histogram",
         data: histogramData,
       });
     }
 
+    // Calculate bin interval based on bin count
+    const range = endingRange - startingRange;
+    const binInterval = range / binCount;
+
     return {
-      data: legendValues.length > 1 ? [] : histogramData, 
+      data: legendValues.length > 1 ? [] : histogramData,
       series,
       axes: [
         {
@@ -192,7 +242,7 @@ export default function HistogramChart({
             enabled: xAxisValues[0]?.trim().length > 0,
           },
           interval: {
-            step: Math.ceil((endingRange - startingRange) / 10),
+            step: binInterval,
           },
           label: {
             formatter: (params: any) => {
@@ -231,6 +281,9 @@ export default function HistogramChart({
     xAxisValues,
     startingRange,
     endingRange,
+    fillOpacity,
+    strokeWidth,
+    binCount,
   ]);
 
   const hasValidLegendData =
@@ -265,7 +318,13 @@ export default function HistogramChart({
         values: [],
       }),
       yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({
+        chartHeight: chartHeight,
+        strokeWidth: strokeWidth,
+        dataPointsPerSeries: dataPointsPerSeries,
+        fillOpacity: fillOpacity,
+        binCount: binCount,
+      }),
     };
     setIsDownloading(true);
 
@@ -454,7 +513,7 @@ export default function HistogramChart({
 
         {/* Histogram Chart */}
         {chartOptions && hasValidData ? (
-          <div style={{ height: "400px" }}>
+          <div style={{ height: `${chartHeight}px` }}>
             <AgCharts options={chartOptions} />
           </div>
         ) : (
@@ -469,7 +528,7 @@ export default function HistogramChart({
           <p>
             Data Range: {startingRange} - {endingRange} | Legends:{" "}
             {legendValues.length} | X-Axis:{" "}
-            {xAxisValues[0] || "Not set"}
+            {xAxisValues[0] || "Not set"} | Bins: {binCount}
           </p>
         </div>
 
@@ -510,6 +569,11 @@ export default function HistogramChart({
                 numOfLegendDataSet={tier.legendValues.length}
                 startingRange={startingRange}
                 endingRange={endingRange}
+                chartHeight={chartHeight}
+                strokeWidth={strokeWidth}
+                dataPointsPerSeries={dataPointsPerSeries}
+                fillOpacity={fillOpacity}
+                binCount={binCount}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
               />
