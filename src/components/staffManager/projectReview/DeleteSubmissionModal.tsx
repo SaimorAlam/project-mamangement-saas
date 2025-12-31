@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Dialog,
   DialogContent,
@@ -5,14 +6,16 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useDeleteSubmissionMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onDelete: () => void;
+  submissionId: any;
 }
 
-const DeleteSubmissionModal = ({ open, onClose, onDelete }: Props) => {
+const DeleteSubmissionModal = ({ open, onClose, submissionId }: Props) => {
+  const [deleteSubmission,{isLoading}] = useDeleteSubmissionMutation();
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm">
@@ -30,9 +33,9 @@ const DeleteSubmissionModal = ({ open, onClose, onDelete }: Props) => {
           </button>
           <button
             className="bg-red-600 text-white px-4 py-2 rounded"
-            onClick={onDelete}
+            onClick={()=> {deleteSubmission({submissionId: submissionId.id}); onClose()}}
           >
-            Delete
+            {isLoading ? "Deleting...":"Delete"}
           </button>
         </DialogFooter>
       </DialogContent>

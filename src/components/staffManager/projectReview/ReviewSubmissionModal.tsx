@@ -6,21 +6,27 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useEditSubmissionMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   submission: any;
-  onSubmit: (status: "APPROVED" | "RETURNED") => void;
 }
 
 const ReviewSubmissionModal = ({
   open,
   onClose,
-  submission,
-  onSubmit,
+  submission
 }: Props) => {
+  const [editSubmission,{data, isLoading}] = useEditSubmissionMutation();
   if (!submission) return null;
+  const handleEdit = (status: string)=>{
+    editSubmission({submissionId: submission.id, action: status});
+    if(data){ alert(data.message);}
+    onClose();
+  }
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -44,16 +50,16 @@ const ReviewSubmissionModal = ({
 
           <button
             className="px-4 py-2 rounded bg-red-600 text-white"
-            onClick={() => onSubmit("RETURNED")}
+            onClick={() => handleEdit("REJECTED")}
           >
             Return
           </button>
 
           <button
             className="px-4 py-2 rounded bg-green-600 text-white"
-            onClick={() => onSubmit("APPROVED")}
+            onClick={() => handleEdit("APPROVED")}
           >
-            Approve
+            {isLoading ? "Approving...":"Approve"}
           </button>
         </DialogFooter>
       </DialogContent>

@@ -18,11 +18,11 @@ import {
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "../../../common/PrimaryButton";
 import DropdownSelect from "../../../common/DropdownSelect";
-import StaffEmployeeProjectTable from "@/components/staffEmployee/StaffEmployeeProjectTable";
 import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import StaffManagerProjectCard from "@/components/staffManager/StaffManagerProjectCard";
 import Pagination from "@/components/client/Pagination";
+import StaffManagerProjectTable from "./StaffManagerProjectTable";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -243,7 +243,7 @@ const AllProgramProject = () => {
       {/* Content */}
       {viewMode === "table" ? (
         <>
-          <StaffEmployeeProjectTable
+          <StaffManagerProjectTable
             projects={projects as StaffEmployeeProject[]}
           />
 

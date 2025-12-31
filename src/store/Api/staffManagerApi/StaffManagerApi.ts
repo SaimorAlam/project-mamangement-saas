@@ -7,14 +7,6 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/dashboard`,
       providesTags: ["Manager"],
     }),
-    // getAllProjects: builder.query<any, GetProjectsParams>({
-    //   query: (params) => ({
-    //     url: "/program",
-    //     method: "GET",
-    //     params,
-    //   }),
-    //   providesTags: ["Manager"],
-    // }),
     getTopOverdueProjects: builder.query({
       query: () => `/manager/charts/top-overdue-projects`,
       providesTags: ["Manager"],
@@ -47,6 +39,13 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Manager"],
     }),
+    deleteManagerProject: builder.mutation<any, {id: string}>({
+      query: ({id})=> ({
+        url: `/project/manager-project-softdelete/${id}`,
+        method: "DELETE"
+      }),
+      invalidatesTags: ["Manager"],
+    }),
     // for project page
     getProjectPageStateCarts: builder.query({
       query: () => `/manager/project-dashboard`,
@@ -62,12 +61,31 @@ const userApi = baseApi.injectEndpoints({
       providesTags: ["Manager"],
     }),
     getAllReviewProjects: builder.query({ 
-      query: () => `/manager/submissions`,
+      query: (params) => ({
+        url: "/manager/submissions",
+        method: "GET",
+        params,
+      }),
       providesTags: ["Manager"],
     }),
     getAllReviewProjectsReviewerActivity: builder.query({ 
       query: () => `/manager/activity`,
       providesTags: ["Manager"],
+    }),
+    editSubmission: builder.mutation<any, {submissionId: string; action: string}>({
+      query: ({ submissionId, action }) => ({
+        url: `/manager/${submissionId}/status`,
+        method: "PATCH",
+        body: { status : action },
+      }),
+      invalidatesTags: ["Manager"],
+    }),
+    deleteSubmission: builder.mutation<any, {submissionId: string}>({
+      query: ({ submissionId }) => ({
+        url: `/manager/${submissionId}/delete-submission`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Manager"],
     }),
     // for favorite projects
     getFavoriteProjects: builder.query<any, void>({
@@ -105,11 +123,14 @@ export const {
   useGetUpcomingDeadlinesQuery,
   useGetAllActivityLogsQuery,
   useGetAllLatestSubmissionsQuery,
+  useDeleteManagerProjectMutation,
   useGetProjectPageStateCartsQuery,
   useGetProgramAllProjectsQuery,
   useGetProjectReviewPageCardsQuery,
   useGetAllReviewProjectsQuery,
   useGetAllReviewProjectsReviewerActivityQuery,
+  useEditSubmissionMutation,
+  useDeleteSubmissionMutation,
   useGetFavoriteProjectsQuery,
   useAddProjectToFavoriteMutation,
   useRemoveProjectFromFavoriteMutation,
