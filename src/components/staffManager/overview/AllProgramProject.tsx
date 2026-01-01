@@ -74,17 +74,18 @@ const AllProgramProject = () => {
   const [priorityFilter, setPriorityFilter] = useState<string>("");
 
   const [sortOrder, setSortOrder] = useState<string>("asc");
-  const [sortBy, setSortBy] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const itemsPerPage = 10;
 
-  // const { data, isLoading } = useGetAllProjectsQuery({});
   const { data, isLoading } = useGetAllProjectsQuery({
     page: currentPage,
     limit: itemsPerPage,
     status: statusFilter==="ALL"?"":statusFilter,
     priority: priorityFilter==="ALL"?"":priorityFilter,
+    sortBy: sortBy,
+    sortOrder: sortOrder
   });
 
   const projects = data?.data?.projects?.data || [];
