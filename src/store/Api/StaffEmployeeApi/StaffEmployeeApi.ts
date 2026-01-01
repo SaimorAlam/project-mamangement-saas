@@ -53,7 +53,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: { projectId },
       }),
-      invalidatesTags: ["menuItems", "Manager"],
+      invalidatesTags: ["menuItems"],
     }),
     removeFavouriteProject: builder.mutation({
       query: (projectId) => ({

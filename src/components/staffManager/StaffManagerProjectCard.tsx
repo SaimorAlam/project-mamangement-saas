@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -5,8 +6,8 @@ import { Flag, Layers } from "lucide-react";
 import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
 import ProjectDetailsModal from "./overview/ProjectDetailsModal";
-import { useAddToFavouriteProjectMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 import { toast } from "sonner";
+import { useAddProjectToFavoriteMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
 export type ProjectStatus =
   | "LIVE"
@@ -97,7 +98,7 @@ const StaffManagerProjectCard = ({
     status,
   } = project;
 
-  const [addToFavouriteProject] = useAddToFavouriteProjectMutation();
+  const [addProjectToFavorite] = useAddProjectToFavoriteMutation();
 
   const priorityColor =
     priority === "HIGH"
@@ -108,7 +109,7 @@ const StaffManagerProjectCard = ({
 
   const handleAddToFavourite = async (projectId: string) => {
     try {
-      const res = await addToFavouriteProject(projectId);
+      const res = await addProjectToFavorite({projectId});
 
       // Handle error response
       if ("error" in res) {

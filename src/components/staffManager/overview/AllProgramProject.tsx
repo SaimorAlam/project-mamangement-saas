@@ -246,7 +246,7 @@ const AllProgramProject = () => {
       </div>
       {/* Content */}
       {
-        isLoading && (<div>Loading...</div>)
+        isLoading && (<div className="text-5xl ">Loading...</div>)
       }
       {viewMode === "table" ? (
         <>
