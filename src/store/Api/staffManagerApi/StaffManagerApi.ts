@@ -90,7 +90,7 @@ const userApi = baseApi.injectEndpoints({
     // for favorite projects
     getFavoriteProjects: builder.query<any, void>({
       query: ()=> `/favorites-project/me`,
-      providesTags: ["Manager"],
+      providesTags: ["Manager", "Favorite"],
     }),
     addProjectToFavorite: builder.mutation<any, {projectId: string}>({
       query: (body)=> ({
@@ -98,7 +98,7 @@ const userApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Manager"],
+      invalidatesTags: ["Manager", "Favorite"],
     }),
     removeProjectFromFavorite: builder.mutation({
       query: (projectId) => ({
@@ -106,7 +106,7 @@ const userApi = baseApi.injectEndpoints({
         method: "DELETE",
         body: { projectId: projectId },
       }),
-      invalidatesTags: ["Manager"],
+      invalidatesTags: ["Manager", "Favorite"],
     }),
     // for notification
     getNotification: builder.query<any, void>({

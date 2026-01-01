@@ -51,7 +51,7 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
     "" | "APPROVED" | "PENDING" | "REJECTED"
   >("");
 
-  const [sortColumn, setSortColumn] = useState<any | null>(null);
+  const [sortColumn, setSortColumn] = useState<"" | "startDate" | "endDate">("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
