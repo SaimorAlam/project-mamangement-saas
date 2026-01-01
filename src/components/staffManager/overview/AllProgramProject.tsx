@@ -70,37 +70,41 @@ export interface StaffEmployeeProject {
 
 const AllProgramProject = () => {
   const [viewMode, setViewMode] = useState<"table" | "board">("board");
-  const [, setStatusFilter] = useState<string>("all");
-  const [, setPriorityFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [priorityFilter, setPriorityFilter] = useState<string>("");
 
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
 
-  const { data, isLoading } = useGetAllProjectsQuery({});
+  // const { data, isLoading } = useGetAllProjectsQuery({});
+  const { data, isLoading } = useGetAllProjectsQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    status: statusFilter==="ALL"?"":statusFilter,
+    priority: priorityFilter==="ALL"?"":priorityFilter,
+  });
 
   const projects = data?.data?.projects?.data || [];
 
   const totalPages = Math.ceil(projects.length / itemsPerPage);
-
   const statusOptions = [
-    { value: "all", title: "All Status" },
-    { value: "Live", title: "Live" },
-    { value: "Returned", title: "Returned" },
-    { value: "Overdue", title: "Overdue" },
-    { value: "Draft", title: "Draft" },
-    { value: "In Review", title: "In Review" },
-    { value: "Submitted", title: "Submitted" },
+    { value: "ALL", title: "All Status" },
+    { value: "PENDING", title: "PENDING" },
+    { value: "COMPLETED", title: "COMPLETED" },
+    { value: "PROBLEM", title: "PROBLEM" },
+    { value: "OVERDUE", title: "OVERDUE" },
+    { value: "DRAFT", title: "DRAFT" },
+    { value: "LIVE", title: "LIVE" },
   ];
-
   const priorityOptions = [
-    { value: "all", title: "All Priority" },
-    { value: "High", title: "High" },
-    { value: "Medium", title: "Medium" },
-    { value: "Low", title: "Low" },
-    { value: "Default", title: "Default" },
+    { value: "ALL", title: "All Priority" },
+    { value: "HIGH", title: "High" },
+    { value: "MEDIUM", title: "Medium" },
+    { value: "LOW", title: "Low" },
+    { value: "NORMAL", title: "Default" },
   ];
 
   if (isLoading) {
@@ -241,6 +245,9 @@ const AllProgramProject = () => {
         </div>
       </div>
       {/* Content */}
+      {
+        isLoading && (<div>Loading...</div>)
+      }
       {viewMode === "table" ? (
         <>
           <StaffManagerProjectTable
