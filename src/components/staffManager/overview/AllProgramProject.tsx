@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AlignStartHorizontal,
   ArrowDownUp,
@@ -23,6 +24,7 @@ import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import StaffManagerProjectCard from "@/components/staffManager/StaffManagerProjectCard";
 import Pagination from "@/components/client/Pagination";
 import StaffManagerProjectTable from "./StaffManagerProjectTable";
+import { useSelector } from "react-redux";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -79,7 +81,10 @@ const AllProgramProject = () => {
 
   const itemsPerPage = 10;
 
+  const managerId = useSelector((state: any) => state.auth.user.userId);  
+
   const { data, isLoading } = useGetAllProjectsQuery({
+    managerId,
     page: currentPage,
     limit: itemsPerPage,
     status: statusFilter==="ALL"?"":statusFilter,
