@@ -52,7 +52,11 @@ const userApi = baseApi.injectEndpoints({
       providesTags: ["Manager"],
     }),
     getProgramAllProjects: builder.query({ 
-      query: () => `/manager/program-dashboard`,
+      query: (params) => ({
+        url: "/manager/program-dashboard",
+        method: "GET",
+        params
+      }),
       providesTags: ["Manager"],
     }),
     // for program review
