@@ -107,9 +107,9 @@ const routes = createBrowserRouter([
       {
         path: "/staff-manager-panel",
         element: (
-          // <ProtectedRoute allowedRoles={["MANAGER"]}>
+          <ProtectedRoute allowedRoles={["MANAGER"]}>
           <StaffManagerDashboardLayout />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         ),
         children: getStaffManagerRoutes(),
       },

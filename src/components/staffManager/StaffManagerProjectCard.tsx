@@ -2,12 +2,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Flag, Layers } from "lucide-react";
+import { Flag, Layers, Star } from "lucide-react";
 import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
 import ProjectDetailsModal from "./overview/ProjectDetailsModal";
 import { toast } from "sonner";
-import { useAddProjectToFavoriteMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import { useAddProjectToFavoriteMutation, useGetFavoriteProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
 export type ProjectStatus =
   | "LIVE"
@@ -98,18 +98,19 @@ const StaffManagerProjectCard = ({
     status,
   } = project;
 
+  const { data } = useGetFavoriteProjectsQuery();
   const [addProjectToFavorite] = useAddProjectToFavoriteMutation();
 
   const priorityColor =
     priority === "HIGH"
       ? "text-[#DA4352]"
       : priority === "MEDIUM"
-      ? "text-[#F59E0B]"
-      : "text-[#16A34A]";
+        ? "text-[#F59E0B]"
+        : "text-[#16A34A]";
 
   const handleAddToFavourite = async (projectId: string) => {
     try {
-      const res = await addProjectToFavorite({projectId});
+      const res = await addProjectToFavorite({ projectId });
 
       // Handle error response
       if ("error" in res) {
@@ -162,9 +163,15 @@ const StaffManagerProjectCard = ({
               </h4>
               <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2">
                 <span>{name || "Project Name"}</span>{" "}
-                <button onClick={() => handleAddToFavourite(id)}>
-                  <FaStar className="text-yellow-500" size={18} />
-                </button>
+                {data.data.some((element: any) => element.projectId === id) ? (
+                  <button title="You added this project in your favorite list." className="hover:cursor-not-allowed">
+                    <FaStar className="text-yellow-500" size={18} />
+                  </button>
+                ) : (
+                  <button onClick={() => handleAddToFavourite(id)} title="Add to favorite" className="hover:scale-105 hover:cursor-pointer duration-300">
+                    <Star className="text-gray-500" size={18} />
+                  </button>
+                )}
               </p>
             </div>
           </div>

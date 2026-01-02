@@ -105,7 +105,7 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
       const aVal = a[sortColumn];
       const bVal = b[sortColumn];
 
-      if (sortColumn === "priority") {
+      if (sortColumn === "startDate") {
         return sortOrder === "asc"
           ? priorityOrder[aVal] - priorityOrder[bVal]
           : priorityOrder[bVal] - priorityOrder[aVal];
