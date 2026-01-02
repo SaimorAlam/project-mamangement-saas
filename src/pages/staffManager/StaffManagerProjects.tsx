@@ -44,25 +44,25 @@ const StaffManagerProjects = ({
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<
-    "ALL" | "HIGH" | "MEDIUM" | "LOW"
+    "ALL" | "HIGH" | "MEDIUM" | "LOW" | ""
   >("ALL");
 
   const [sortColumn, setSortColumn] = useState<any | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-
-  // const debouncedSearch = useDebounce(search, 500);
 
   const [editProject] = useState<UpdateProjectPayload | null>(
     null
   );
   const [editModalOpen, setEditModalOpen] = useState(false);
 
-  // const { data, isLoading } = useGetAllProjectsQuery({});
-  const { data, isLoading } = useGetProgramAllProjectsQuery({});
+  const { data, isLoading, error } = useGetProgramAllProjectsQuery({});
+  // this router is working for only high priority, need to fix in backend 
+  // const { data, isLoading, error } = useGetProgramAllProjectsQuery({
+  //   priority: "MEDIUM",
+  //   search: search
+  // });
 
-  const [updateProject] = useUpdateProjectMutation();
-  console.log("p p: ", data?.data);
-  
+  const [updateProject] = useUpdateProjectMutation();  
 
   const projects = useMemo(() => data?.data?.projects ?? [], [data]);
   const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]); // Sidebar data
@@ -155,6 +155,13 @@ const StaffManagerProjects = ({
       </div>
     );
   }
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <h1 className="text-gray-400 text-center">Not yet any projects found to this manager.</h1>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-6">
@@ -181,13 +188,13 @@ const StaffManagerProjects = ({
                   {priorityFilter} <ChevronDown className="text-gray-600" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
+                  {["HIGH", "MEDIUM", "LOW"].map((p) => (
                     <>
                       <DropdownMenuItem
                         key={p}
                         onClick={() => {
                           setCurrentPage(1);
-                          setPriorityFilter(p as any);
+                          setPriorityFilter(p === "ALL" ? "" : (p as "HIGH" | "MEDIUM" | "LOW"));
                         }}
                       >
                         {p}

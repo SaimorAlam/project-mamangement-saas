@@ -56,13 +56,13 @@ const SideManagerMain: React.FC<SidebarProps> = ({ sidebar }) => {
   const [tags, setTags] = useState<Tag[]>(sidebar.tags || []);
 
   const remainingDaysNumber = useMemo(() => {
-    return parseInt(sidebar.duration.daysRemaining);
-  }, [sidebar.duration.daysRemaining]);
+    return parseInt(sidebar?.duration?.daysRemaining);
+  }, [sidebar?.duration?.daysRemaining]);
 
   const progress = useMemo(() => {
     const totalDays =
-      (new Date(sidebar.duration.end).getTime() -
-        new Date(sidebar.duration.start).getTime()) /
+      (new Date(sidebar?.duration?.end).getTime() -
+        new Date(sidebar?.duration?.start).getTime()) /
       (1000 * 60 * 60 * 24);
 
     return Math.min(
@@ -136,7 +136,7 @@ const SideManagerMain: React.FC<SidebarProps> = ({ sidebar }) => {
               <div className="flex justify-between mb-2">
                 <p className="text-xs text-gray-500">Time Remaining</p>
                 <p className="text-sm font-semibold">
-                  {sidebar.duration.daysRemaining}
+                  {sidebar?.duration?.daysRemaining}
                 </p>
               </div>
 
