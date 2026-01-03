@@ -93,7 +93,7 @@ const ClientSidebar = () => {
 
     if (item.children && item.children.length > 0) {
       return (
-        <SidebarMenuItem key={fullPath}>
+        <SidebarMenuItem key={fullPath} className="w-full!">
           <DropdownMenu onOpenChange={(v) => setOpen(v)}>
             <DropdownMenuTrigger asChild className="border-none py-3!">
               <button
@@ -105,7 +105,7 @@ const ClientSidebar = () => {
                   }
                   ${
                     active
-                      ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                      ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                       : "text-gray-900 hover:bg-slate-100"
                   }`}
               >
@@ -121,7 +121,7 @@ const ClientSidebar = () => {
                       state === "expanded" ? "gap-2" : ""
                     }`}
                   >
-                    <span className="size-6 flex-shrink-0">{item.icon}</span>
+                    <span className="size-6 shrink-0">{item.icon}</span>
                     {state === "expanded" && (
                       <span className="text-base font-normal">{item.name}</span>
                     )}
@@ -130,7 +130,7 @@ const ClientSidebar = () => {
                   {state === "expanded" && (
                     <ChevronRight
                       size={20}
-                      className={`flex-shrink-0 ${
+                      className={`shrink-0 ${
                         open ? "rotate-90 duration-200" : ""
                       }`}
                     />
@@ -174,7 +174,7 @@ const ClientSidebar = () => {
               }
               ${
                 active
-                  ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                  ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                   : "text-gray-900"
               }`}
           >
@@ -183,9 +183,11 @@ const ClientSidebar = () => {
                 state === "expanded" ? "gap-2" : ""
               }`}
             >
-              <span className="size-6 flex-shrink-0">{item.icon}</span>
+              <span className="size-6 shrink-0">{item.icon}</span>
               {state === "expanded" && (
-                <span className="text-base font-normal">{item.name}</span>
+                <span className="text-base font-normal w-full">
+                  {item.name}
+                </span>
               )}
             </div>
           </SidebarMenuButton>
@@ -250,7 +252,7 @@ const ClientSidebar = () => {
                     </SidebarGroupLabel>
                   )}
 
-                  <SidebarMenu className="space-y-[10px]">
+                  <SidebarMenu className="space-y-2.5">
                     {group.label === "Favorites" && isLoading
                       ? renderFavoritesSkeleton()
                       : group.items.map((item: any) => renderSidebarItem(item))}
@@ -266,7 +268,7 @@ const ClientSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="!bg-white">
+      <SidebarFooter className="bg-white!">
         <UserProfile />
       </SidebarFooter>
     </Sidebar>

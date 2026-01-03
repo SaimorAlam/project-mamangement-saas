@@ -2,14 +2,7 @@ import { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "@/hooks/useRedux";
 
-type role =
-  | "VIEWER"
-  | "EMPLOYEE"
-  | "SUPPORTER"
-  | "MANAGER"
-  | "ADMIN"
-  | "CLIENT"
-  | "SUPERADMIN";
+type role = "VIEWER" | "EMPLOYEE" | "SUPPORTER" | "MANAGER" | "CLIENT";
 
 interface ProtectedRouteProps {
   children: ReactNode;

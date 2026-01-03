@@ -50,11 +50,11 @@ const ClientActivityLog = lazy(
 );
 const ClientHelp = lazy(() => import("@/pages/client/ClientHelp"));
 // const ClientSupport = lazy(() => import("@/pages/client/ClientSupport"));
-const ClientSupportTickets = lazy(
-  () => import("@/pages/client/ClientSupportTickets")
-);
+// const ClientSupportTickets = lazy(
+//   () => import("@/pages/client/ClientSupportTickets")
+// );
 const ClientCreateTicket = lazy(
-  () => import("@/pages/client/ClientCreateTicket")
+  () => import("@/pages/client/Support/ClientCreateTicket")
 );
 const ClientFeedback = lazy(() => import("@/pages/client/ClientFeedBack"));
 const ClientProductTour = lazy(
@@ -128,12 +128,18 @@ export function getClientRoutes() {
           path: "support",
           element: <SupportDashboard />,
           children: [
-            { index: true, element: <ClientSupportTickets /> },
             {
               path: "create-tickets",
               element: <ClientCreateTicket />,
             },
           ],
+          // children: [
+          //   { index: true, element: <ClientSupportTickets /> },
+          //   {
+          //     path: "create-tickets",
+          //     element: <ClientCreateTicket />,
+          //   },
+          // ],
         },
         // {
         //   path: "support",

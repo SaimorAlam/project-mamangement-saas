@@ -14,12 +14,12 @@ import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
 // Layout imports
-import AdminDashboardLayout from "@/Layout/adminPanel/AdminDashboardLayout";
+// import AdminDashboardLayout from "@/Layout/adminPanel/AdminDashboardLayout";
 import ClientDashboardLayout from "@/Layout/clientPanel/ClientDashboardLayout";
 import StaffManagerDashboardLayout from "@/Layout/staffManagerPanel/StaffManagerDashboardLayout";
 // import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
 // Route list imports
-import { getAdminRoutes } from "./AdminRoutes";
+// import { getAdminRoutes } from "./AdminRoutes";
 import { getClientRoutes } from "./ClientRoute";
 import { getStaffManagerRoutes } from "./StaffManagerRoute";
 import ViewerPanelDashboardLayout from "./../Layout/ViewerPanel/ViewerPanelDashboardLayout";
@@ -81,16 +81,16 @@ const routes = createBrowserRouter([
         element: <EmailCode />,
       },
       // Super Admin routes
-      {
-        path: "/admin",
-        element: (
-          // <ProtectedRoute allowedRoles={["ADMIN"]}>
-          <AdminDashboardLayout />
-          // </ProtectedRoute>
-        ),
+      // {
+      //   path: "/admin",
+      //   element: (
+      //     // <ProtectedRoute allowedRoles={["ADMIN"]}>
+      //     <AdminDashboardLayout />
+      //     // </ProtectedRoute>
+      //   ),
 
-        children: getAdminRoutes(),
-      },
+      //   children: getAdminRoutes(),
+      // },
 
       // Client Route
       {

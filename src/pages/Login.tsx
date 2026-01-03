@@ -15,9 +15,7 @@ const Role = {
   EMPLOYEE: "staff-employee-panel", // todo: change to employee-panel when ready
   SUPPORTER: "supporter",
   MANAGER: "staff-manager-panel",
-  ADMIN: "admin",
   CLIENT: "client-panel",
-  SUPERADMIN: "admin",
 };
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -36,7 +34,7 @@ const Login = () => {
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "mdkazinaim0018@gmail.com",
+      email: "sakibsoftvence@gmail.com",
       password: "123456789",
     },
   });

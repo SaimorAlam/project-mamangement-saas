@@ -16,8 +16,8 @@ import {
   Store,
   Users,
   UserStar,
-  Ticket,
-  TicketPlus,
+  // Ticket,
+  // TicketPlus,
 } from "lucide-react";
 import { IoExtensionPuzzleOutline, IoSettingsOutline } from "react-icons/io5";
 import { ISidebarItem } from "@/types";
@@ -139,18 +139,18 @@ export const getClientSidebarItems = (): SidebarGroup[] => {
               icon: <Headphones />,
               path: "support",
               name: "Support",
-              children: [
-                {
-                  index: true,
-                  icon: <Ticket />,
-                  name: "Support Ticket",
-                },
-                {
-                  icon: <TicketPlus />,
-                  path: "create-tickets",
-                  name: "Create Ticket",
-                },
-              ],
+              // children: [
+              //   {
+              //     index: true,
+              //     icon: <Ticket />,
+              //     name: "Support Ticket",
+              //   },
+              //   {
+              //     icon: <TicketPlus />,
+              //     path: "create-tickets",
+              //     name: "Create Ticket",
+              //   },
+              // ],
             },
             {
               icon: <UserStar />,
