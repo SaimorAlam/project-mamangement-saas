@@ -16,9 +16,19 @@ const ClientSupportApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getTicketMessages: builder.query({
+      query: (id: string) => ({
+        url: `client-support/${id}/my-ticket`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useCreateSupportMutation, useGetMyTicketsQuery } =
-  ClientSupportApi;
+export const {
+  useCreateSupportMutation,
+  useGetMyTicketsQuery,
+  useGetTicketMessagesQuery,
+  useLazyGetTicketMessagesQuery,
+} = ClientSupportApi;
 export default ClientSupportApi;
