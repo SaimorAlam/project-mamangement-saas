@@ -1,6 +1,7 @@
 // src/routes/clientRoutes.tsx
 import Employee from "@/pages/client/NewEmployee/Employee";
 import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
+import SupportDashboard from "@/pages/client/Support/SupportDashboard";
 import { lazy } from "react";
 
 const ClientOverview = lazy(
@@ -41,17 +42,19 @@ const ClientProjectReview = lazy(
 const ClientProjectBuilder = lazy(
   () => import("@/pages/client/ClientProjectBuilder")
 );
-const ClientSettings = lazy(() => import("@/pages/client/Settings/ClientSettings"));
+const ClientSettings = lazy(
+  () => import("@/pages/client/Settings/ClientSettings")
+);
 const ClientActivityLog = lazy(
   () => import("@/pages/client/ClientActivityLog")
 );
 const ClientHelp = lazy(() => import("@/pages/client/ClientHelp"));
-const ClientSupport = lazy(() => import("@/pages/client/ClientSupport"));
-const ClientSupportTickets = lazy(
-  () => import("@/pages/client/ClientSupportTickets")
-);
+// const ClientSupport = lazy(() => import("@/pages/client/ClientSupport"));
+// const ClientSupportTickets = lazy(
+//   () => import("@/pages/client/ClientSupportTickets")
+// );
 const ClientCreateTicket = lazy(
-  () => import("@/pages/client/ClientCreateTicket")
+  () => import("@/pages/client/Support/ClientCreateTicket")
 );
 const ClientFeedback = lazy(() => import("@/pages/client/ClientFeedBack"));
 const ClientProductTour = lazy(
@@ -123,15 +126,32 @@ export function getClientRoutes() {
       children: [
         {
           path: "support",
-          element: <ClientSupport />,
+          element: <SupportDashboard />,
           children: [
-            { index: true, element: <ClientSupportTickets /> },
             {
               path: "create-tickets",
               element: <ClientCreateTicket />,
             },
           ],
+          // children: [
+          //   { index: true, element: <ClientSupportTickets /> },
+          //   {
+          //     path: "create-tickets",
+          //     element: <ClientCreateTicket />,
+          //   },
+          // ],
         },
+        // {
+        //   path: "support",
+        //   element: <ClientSupport />,
+        //   children: [
+        //     { index: true, element: <ClientSupportTickets /> },
+        //     {
+        //       path: "create-tickets",
+        //       element: <ClientCreateTicket />,
+        //     },
+        //   ],
+        // },
         { path: "feedback", element: <ClientFeedback /> },
         { path: "product-tour", element: <ClientProductTour /> },
         { path: "contact-us", element: <ClientContactUs /> },

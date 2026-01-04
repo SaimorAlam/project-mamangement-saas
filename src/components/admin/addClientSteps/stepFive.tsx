@@ -110,21 +110,26 @@ export function StepFive() {
           <Label>Billing Cycle</Label>
           <div className="flex gap-2 mt-2">
             {[
-              { value: "Monthly", label: "Monthly" },
+              { value: "MONTHLY", label: "Monthly" },
               {
-                value: "Half-Yearly",
+                value: "HALFYEARLY",
                 label: "Half-Yearly",
                 discount: "Save up to 10% Annually",
               },
               {
-                value: "Yearly",
+                value: "YEARLY",
                 label: "Yearly",
                 discount: "Save 15% Annually",
               },
               {
-                value: "2-Yearly",
+                value: "TWOYEARLY",
                 label: "2-Yearly",
                 discount: "Save 20% Annually",
+              },
+              {
+                value: "ENTERPRISE",
+                label: "Enterprise",
+                discount: "Custom Billing",
               },
             ].map((option) => (
               <div key={option.value} className="flex flex-col">
@@ -192,9 +197,7 @@ export function StepFive() {
               id="discountCode"
               placeholder="Enter discount rate or promo code here"
               value={formData.discountCode || ""}
-              onChange={(e) =>
-                updateFormData({ discountCode: e.target.value })
-              }
+              onChange={(e) => updateFormData({ discountCode: e.target.value })}
               className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 mt-1"
             />
           </div>
@@ -258,9 +261,7 @@ export function StepFive() {
               id="discountCodeSecond"
               placeholder="Enter discount rate or promo code here"
               value={formData.discountCode || ""}
-              onChange={(e) =>
-                updateFormData({ discountCode: e.target.value })
-              }
+              onChange={(e) => updateFormData({ discountCode: e.target.value })}
               className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 mt-2"
             />
           </div>
@@ -273,33 +274,38 @@ export function StepFive() {
           <CustomCheckBox
             checked={!!formData.internalNotes || false}
             onChange={(checked) =>
-              updateFormData({ internalNotes: checked ? formData.internalNotes || " " : "" })
+              updateFormData({
+                internalNotes: checked ? formData.internalNotes || " " : "",
+              })
             }
           />
           <Label htmlFor="internalNotesToggle">Internal Notes</Label>
         </div>
 
-        {formData.internalNotes !== undefined && formData.internalNotes !== "" && (
-          <div>
-            <h4 className="text-blue-600 font-medium mb-2 text-md">
-              Internal Notes for Admin only
-            </h4>
+        {formData.internalNotes !== undefined &&
+          formData.internalNotes !== "" && (
             <div>
-              <Label htmlFor="internalNotes">Admin Note</Label>
-              <Textarea
-                id="internalNotes"
-                placeholder="e.g. Custom instance setup required for this client."
-                value={formData.internalNotes || ""}
-                onChange={(e) => updateFormData({ internalNotes: e.target.value })}
-                className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 mt-2"
-                rows={4}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Not visible to client
-              </p>
+              <h4 className="text-blue-600 font-medium mb-2 text-md">
+                Internal Notes for Admin only
+              </h4>
+              <div>
+                <Label htmlFor="internalNotes">Admin Note</Label>
+                <Textarea
+                  id="internalNotes"
+                  placeholder="e.g. Custom instance setup required for this client."
+                  value={formData.internalNotes || ""}
+                  onChange={(e) =>
+                    updateFormData({ internalNotes: e.target.value })
+                  }
+                  className="border border-gray-300 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-2 focus:border-gray-500 mt-2"
+                  rows={4}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Not visible to client
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     </div>
   );

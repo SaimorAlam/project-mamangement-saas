@@ -1,36 +1,50 @@
-import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import {
-  User, Building2, Mail, Phone,
-  MapPin, Pause, Ticket
-} from "lucide-react"
-import ClientInfoCards from "@/components/admin/clientInfoCards/clientInfoCards"
-import ClientSingleOverviewTab from "@/components/admin/clientSingleOverView/ClientSingleOverviewTab"
-import ClientPrograms from "@/components/admin/clientSingleProgramsTab/clientSingleProgramTab"
-import ClientSingleActiveAlerts from "@/components/admin/clientSingleAlerts/ClientSingleActiveAlerts"
-import ClientSingleSubscriptionTab from "@/components/admin/clientSingleSubscriptionDetails/ClientSingleSubscriptionTab"
-import ClientSingleActivityLog from "@/components/admin/clientSingleActivityLog/clientSingleActivityLog"
+  User,
+  Building2,
+  Mail,
+  Phone,
+  MapPin,
+  Pause,
+  Ticket,
+} from "lucide-react";
+import ClientInfoCards from "@/components/admin/clientInfoCards/clientInfoCards";
+import ClientSingleOverviewTab from "@/components/admin/clientSingleOverView/ClientSingleOverviewTab";
+import ClientPrograms from "@/components/admin/clientSingleProgramsTab/clientSingleProgramTab";
+import ClientSingleActiveAlerts from "@/components/admin/clientSingleAlerts/ClientSingleActiveAlerts";
+import ClientSingleSubscriptionTab from "@/components/admin/clientSingleSubscriptionDetails/ClientSingleSubscriptionTab";
+import ClientSingleActivityLog from "@/components/admin/clientSingleActivityLog/clientSingleActivityLog";
 
 export function SingleClient() {
-  const [customers, setCustomers] = useState<any[]>([])
-  const { id } = useParams<{ id: string }>()
+  const [customers, setCustomers] = useState<any[]>([]);
+  const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
     fetch("/customerData.json")
-      .then(res => res.json())
-      .then(data => setCustomers(data))
-  }, [])
+      .then((res) => res.json())
+      .then((data) => setCustomers(data));
+  }, []);
 
-  const userData = customers.find(c => c.id === Number(id))
-  if (!userData) return <p>Client not found</p>
+  const userData = customers.find((c) => c.id === Number(id));
+  if (!userData) return <p>Client not found</p>;
 
   // Fix: actual data is inside userData.user
-  console.log(userData)
-  const {client,metrics,planSummary,programs,alertsList,invoices,activityLog} = userData.user;
-  const {plan} = userData.user.client;
+  console.log(userData);
+  const {
+    client,
+    metrics,
+    planSummary,
+    programs,
+    alertsList,
+    invoices,
+    activityLog,
+  } = userData.user;
+  const { plan } = userData.user.client;
 
   return (
     <div className="flex h-full">
@@ -42,11 +56,21 @@ export function SingleClient() {
         {/* Tabs */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger className="cursor-pointer" value="overview">Overview</TabsTrigger>
-            <TabsTrigger className="cursor-pointer" value="program">Program</TabsTrigger>
-            <TabsTrigger className="cursor-pointer" value="alerts">Alerts</TabsTrigger>
-            <TabsTrigger className="cursor-pointer" value="subscription">Subscription</TabsTrigger>
-            <TabsTrigger className="cursor-pointer" value="activity">Activity Log</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="overview">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="program">
+              Program
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="alerts">
+              Alerts
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="subscription">
+              Subscription
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="activity">
+              Activity Log
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
@@ -54,18 +78,21 @@ export function SingleClient() {
           </TabsContent>
 
           <TabsContent value="program" className="mt-6">
-            <ClientPrograms programs={programs}/>
+            <ClientPrograms programs={programs} />
           </TabsContent>
 
           <TabsContent value="alerts" className="mt-6">
-            <ClientSingleActiveAlerts alerts={alertsList}/>
+            <ClientSingleActiveAlerts alerts={alertsList} />
           </TabsContent>
 
           <TabsContent value="subscription" className="mt-6">
-            <ClientSingleSubscriptionTab invoices={invoices} subscription={plan}/>
+            <ClientSingleSubscriptionTab
+              invoices={invoices}
+              subscription={plan}
+            />
           </TabsContent>
           <TabsContent value="activity" className="mt-6">
-            <ClientSingleActivityLog activityLogs={activityLog}/>
+            <ClientSingleActivityLog activityLogs={activityLog} />
           </TabsContent>
         </Tabs>
       </div>
@@ -121,7 +148,10 @@ export function SingleClient() {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600">Current Plan:</p>
-                <Badge variant="secondary" className="bg-purple-100 text-purple-800 mt-1">
+                <Badge
+                  variant="secondary"
+                  className="bg-purple-100 text-purple-800 mt-1"
+                >
                   {client.plan.current}
                 </Badge>
               </div>
@@ -135,7 +165,9 @@ export function SingleClient() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Status:</p>
-                <Badge className="bg-green-100 text-green-800 mt-1">{client.plan.status}</Badge>
+                <Badge className="bg-green-100 text-green-800 mt-1">
+                  {client.plan.status}
+                </Badge>
               </div>
             </div>
           </div>
@@ -144,19 +176,27 @@ export function SingleClient() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Action</h3>
             <div className="space-y-3">
-              <Button className="w-full justify-start gap-2 bg-transparent" variant="outline">
+              <Button
+                className="w-full justify-start gap-2 bg-transparent"
+                variant="outline"
+              >
                 <Pause className="w-4 h-4" />
                 Suspend Client
               </Button>
-              <Button className="w-full justify-start gap-2 bg-transparent" variant="outline">
+              <Button
+                className="w-full justify-start gap-2 bg-transparent"
+                variant="outline"
+              >
                 <Ticket className="w-4 h-4" />
                 View Support Tickets
-                <Badge variant="secondary" className="ml-auto">3</Badge>
+                <Badge variant="secondary" className="ml-auto">
+                  3
+                </Badge>
               </Button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

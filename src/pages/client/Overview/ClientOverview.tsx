@@ -1,6 +1,4 @@
 import ActivityLog from "@/components/client/Overview/ActivityLog";
-// import LatestSubmission from "@/components/client/Overview/LatestSubmission";
-import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import ProjectStatusDonutChart from "./Components/ProjectStatusDonutChart";
 import ProjectTimelineColumnChart from "./Components/ProjectTimelineColumnChart";
 import { useGetOverviewStackQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
@@ -9,23 +7,24 @@ import ProjectOverdueBarChart from "./Components/ProjectOverdueBarChart";
 import LatestSubmission from "./Components/LatestSubmission/LatestSubmission";
 import AllProgramProject from "./Components/AllProgramProjects/AllProgramProjects";
 import UpcomingDeadline from "./Components/UpcomingDeadline";
+import ClientPanelStatsCard from "./Components/ClientPanelStatsCard";
 
 const ClientOverview = () => {
   const { data: overview, isLoading } = useGetOverviewStackQuery({});
 
-  const totalProgram = overview?.data?.programs?.total;
-  const programThisMonth = overview?.data.programs.thisMonth;
-  const totalProject = overview?.data?.projects?.total;
-  const projectThisMonth = overview?.data?.projects?.thisMonth;
-  const liveProject = overview?.data?.liveProjects?.total;
-  const liveProjectThisMonth = overview?.data?.liveProjects?.thisMonth;
-  const draftProject = overview?.data?.draftProjects?.total;
-  const draftProjectThisMonth = overview?.data?.draftProjects?.thisMonth;
-  const pendingReview = overview?.data?.pendingReview?.total;
-  const growth = overview?.data?.pendingReview?.growth;
-  const submitOverdue = overview?.data?.submitOverdue?.total;
+  const totalProgram = overview?.data?.programs?.total || 0;
+  const programThisMonth = overview?.data.programs.thisMonth || 0;
+  const totalProject = overview?.data?.projects?.total || 0;
+  const projectThisMonth = overview?.data?.projects?.thisMonth || 0;
+  const liveProject = overview?.data?.liveProjects?.total || 0;
+  const liveProjectThisMonth = overview?.data?.liveProjects?.thisMonth || 0;
+  const draftProject = overview?.data?.draftProjects?.total || 0;
+  const draftProjectThisMonth = overview?.data?.draftProjects?.thisMonth || 0;
+  const pendingReview = overview?.data?.pendingReview?.total || 0;
+  const growth = overview?.data?.pendingReview?.growth || 0;
+  const submitOverdue = overview?.data?.submitOverdue?.total || 0;
   const projectOverduePercentage =
-    overview?.data?.submitOverdue?.projectOverduePercentage;
+    overview?.data?.submitOverdue?.projectOverduePercentage || 0;
   const clientData = [
     {
       title: "Total Program",
@@ -99,7 +98,7 @@ const ClientOverview = () => {
               <DashboardPanelStatsCardSkeleton key={index} />
             ))
           : clientData.map((item) => (
-              <DashboardPanelStatsCard key={item.title} item={item} />
+              <ClientPanelStatsCard key={item.title} item={item} />
             ))}
       </div>
 
