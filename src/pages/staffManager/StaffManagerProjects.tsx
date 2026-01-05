@@ -44,8 +44,12 @@ const StaffManagerProjects = ({
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<
-    "ALL" | "HIGH" | "MEDIUM" | "LOW" | ""
-  >("ALL");
+  "HIGH" | "MEDIUM" | "LOW" | ""
+>("");
+
+const priorityLabel =
+  priorityFilter === "" ? "ALL PRIORITY" : priorityFilter;
+
 
   const [sortColumn, setSortColumn] = useState<any | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -55,12 +59,12 @@ const StaffManagerProjects = ({
   );
   const [editModalOpen, setEditModalOpen] = useState(false);
 
-  const { data, isLoading, error } = useGetProgramAllProjectsQuery({});
-  // this router is working for only high priority, need to fix in backend 
-  // const { data, isLoading, error } = useGetProgramAllProjectsQuery({
-  //   priority: "MEDIUM",
-  //   search: search
-  // });
+  // const { data, isLoading, error } = useGetProgramAllProjectsQuery({});
+
+  const { data, isLoading, error } = useGetProgramAllProjectsQuery({
+    priority: priorityFilter || undefined,
+    search: search || undefined
+  });
 
   const [updateProject] = useUpdateProjectMutation();  
 
@@ -185,10 +189,10 @@ const StaffManagerProjects = ({
 
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex gap-3 items-center border border-gray-200 px-4 py-2 rounded">
-                  {priorityFilter} <ChevronDown className="text-gray-600" />
+                  {priorityLabel} <ChevronDown className="text-gray-600" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {["HIGH", "MEDIUM", "LOW"].map((p) => (
+                  {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
                     <>
                       <DropdownMenuItem
                         key={p}
@@ -238,6 +242,9 @@ const StaffManagerProjects = ({
             </thead>
 
             <tbody>
+              <tr>
+              {sortedProjects.length===0 && (<div className="text-gray-400 mt-5 ml-6">No projects found.</div>)}
+              </tr>
               {sortedProjects.map((project) => (
                 <tr key={project.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">{project.name}</td>
