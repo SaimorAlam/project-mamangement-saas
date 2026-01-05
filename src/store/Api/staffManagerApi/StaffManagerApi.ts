@@ -117,6 +117,15 @@ const userApi = baseApi.injectEndpoints({
       query: ()=> `/notification/received`,
       providesTags: ["Manager"],
     }),
+    // for global search 
+    getGlobalSearchItems: builder.query({
+      query: (body)=> ({
+        url: "/manager/global-search",
+        method: "GET",
+        body
+      }) ,
+      providesTags: ["Manager"],
+    })
   }),
 });
 
@@ -138,7 +147,8 @@ export const {
   useGetFavoriteProjectsQuery,
   useAddProjectToFavoriteMutation,
   useRemoveProjectFromFavoriteMutation,
-  useGetNotificationQuery
+  useGetNotificationQuery,
+  useGetGlobalSearchItemsQuery
 } = userApi;
 
 export default userApi;
