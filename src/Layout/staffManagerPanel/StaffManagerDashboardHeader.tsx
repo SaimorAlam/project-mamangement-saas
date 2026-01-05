@@ -1,5 +1,4 @@
 import React, { cloneElement, useState } from "react";
-import SearchBar from "@/components/client/SearchBar";
 import { Bell, Eye, FileText, Home, Megaphone, Upload } from "lucide-react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
@@ -14,9 +13,9 @@ import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffManagerHeaderContext";
 import NotificationModalNew from "@/components/staffManager/NotificationModalNew";
+import GlobalSearch from "@/components/staffManager/GlobalSearch";
 
 const StaffManagerDashboardHeader = () => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const StaffManagerSidebarItems = getStaffManagerSidebarItems();
@@ -83,10 +82,7 @@ const StaffManagerDashboardHeader = () => {
         </div>
 
         {/* Search */}
-        <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
+        <GlobalSearch/>
 
         {/* Right Controls */}
         <div className="flex items-center justify-between gap-2 relative">
