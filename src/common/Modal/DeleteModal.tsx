@@ -22,8 +22,8 @@ const DeleteModal = ({ deletingItemTitle, deletingItemId, onDelete }: Props) => 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="sm">
-                    <Trash2 className="w-4 h-4 text-[#B00020]" />
+                <Button variant="ghost"  title="Delete">
+                    <Trash2 size={25} className=" text-[#B00020] hover:cursor-pointer"/>
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-w-sm">

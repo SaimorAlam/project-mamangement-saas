@@ -125,7 +125,7 @@ const userApi = baseApi.injectEndpoints({
         params: {query: searchText}
       }) ,
       providesTags: ["Manager"],
-    })
+    }),
   }),
 });
 

@@ -110,8 +110,9 @@ export default function GlobalSearch() {
                       {data.data.projects.map((project: any) => (
                         <Link
                           key={project.id}
-                          to="#"
+                          to={`/staff-manager-panel/projects/${project.id}`}
                           className="group flex items-center justify-between p-3 rounded-xl border border-transparent hover:border-indigo-100 hover:bg-indigo-50/50  transition-all duration-200"
+                          onClick={()=> setSearchText("")}
                         >
                           <div>
                             <h4 className="text-sm font-semibold text-gray-800 group-hover:text-indigo-700 transition-colors">
@@ -138,8 +139,9 @@ export default function GlobalSearch() {
                       {data.data.programs.map((program: any) => (
                         <Link
                           key={program.id}
-                          to="#"
+                          to={`/staff-manager-panel/program/${program.id}`}
                           className="group p-3 rounded-xl border border-transparent hover:border-emerald-100 hover:bg-emerald-50/50 transition-all"
+                          onClick={()=> setSearchText("")}
                         >
                           <div className="flex justify-between items-start">
                             <h4 className="text-sm font-semibold text-gray-800">{program.name}</h4>
