@@ -25,6 +25,7 @@ import {
 import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
 import useGetLazyProject from "./utils/useGetLazyProject";
+import { useLocation } from "react-router-dom";
 
 interface Widget {
   id: string;
@@ -40,6 +41,8 @@ interface ProjectWidgetProps {
 const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   onWidgetSelect,
 }) => {
+  const {pathname} = useLocation();
+  const isProgramBuilder = pathname.split('/')[2] === "program-builder";
   const [selectedProgram, setSelectedProgram] = useState<string>("");
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [selectedWidget, setSelectedWidget] = useState<string>("kpi"); // default KPI widget active
@@ -178,9 +181,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     // },
   ];
   const { programs ,isLoading} = useGetAllProgram();
-  const {projects,isLoading:isProjectsLoading} = useGetLazyProject(selectedProgram);
-
-
+  const {projects,isLoading:isProjectsLoading ,isFetching:projectFetching} = useGetLazyProject(selectedProgram,isProgramBuilder);
   return (
     <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 flex flex-col">
       {/* Header */}
@@ -224,7 +225,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     }
 
       {
-        isProjectsLoading ? <SelectSkeleton /> : (
+        !isProgramBuilder && (isProjectsLoading || projectFetching ? <SelectSkeleton /> : (
           <div className="px-4 pt-4">
         <label className="block text-sm font-medium text-website-color-darkGray mb-2">
           Project Name*
@@ -259,7 +260,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
           </div>
         </div>
       </div>
-      )}
+      ))}
 
       <div className="px-4 pt-4">
         <label className="block text-sm font-medium text-website-color-darkGray mb-2">

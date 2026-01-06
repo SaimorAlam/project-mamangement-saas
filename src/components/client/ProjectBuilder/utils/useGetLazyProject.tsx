@@ -2,13 +2,13 @@ import { useLazyGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/Progr
 import { useEffect } from "react";
 
 
-const useGetLazyProject = (id:string) => {
-    const [getLazyProject,{data,isLoading,error}] = useLazyGetProjectsByProgramIdQuery();
+const useGetLazyProject = (id:string,isProgramBuilder?:boolean) => {
+    const [getLazyProject,{data,isLoading,error,isFetching}] = useLazyGetProjectsByProgramIdQuery();
     useEffect(() => {
-        if(id){
+        if(!isProgramBuilder && id){
             getLazyProject({programId:id});
         }
-    }, [id]);
+    }, [!isProgramBuilder && id]);
     const projects = data?.data?.data?.map((item: any) => ({
         id: item.id,
         name: item.name,
@@ -16,7 +16,8 @@ const useGetLazyProject = (id:string) => {
     return {
         projects,
         isLoading,
-        error
+        error,
+        isFetching
        }
 };
 
