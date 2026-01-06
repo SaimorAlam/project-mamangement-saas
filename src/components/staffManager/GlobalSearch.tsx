@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Input } from "@/components/ui/input";
 import { Command, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useGetGlobalSearchItemsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import { Skeleton } from "../ui/skeleton";
+import { Link } from "react-router-dom";
 
 export default function GlobalSearch() {
   const [searchText, setSearchText] = useState("");
@@ -14,13 +16,14 @@ export default function GlobalSearch() {
 
   const showDropdown = searchText.length > 0;
 
+  // if click outside then hiding the popover 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        setSearchText(""); // 🔥 clear input
+        setSearchText("");
       }
     };
 
@@ -73,7 +76,7 @@ export default function GlobalSearch() {
 
       {/* Result dropdown */}
       {showDropdown && (
-        <div className="absolute z-50 mt-2 w-full rounded-lg border border-[#E2E8F0] bg-white shadow-lg">
+        <div className="min-h-44 absolute z-50 mt-2 w-full rounded-lg border border-[#E2E8F0] bg-white shadow-lg">
           {isLoading && (
             <div className="p-4 space-y-2">
               <Skeleton className="h-5 w-full bg-gray-100" />
@@ -87,17 +90,104 @@ export default function GlobalSearch() {
             </div>
           )}
 
-          {!isLoading && data && (
-            <div className="p-6 text-sm text-gray-400">
-              Successful
-              {/* map search results here */}
+          {!isLoading && data.data.projects.length === 0 && data.data.programs.length === 0 && data.data.employees.length === 0 && (
+            <div className="h-44 p-6 text-sm flex justify-center items-center text-gray-400">
+              No project/program/employee information found.
             </div>
           )}
-          {!isLoading && !data && (
-            <div className="p-6 text-sm text-gray-400 text-center">
-              No result found.
-            </div>
-          )}
+
+          <div className="p-2 max-h-[450px] overflow-y-auto custom-scrollbar">
+            {!isLoading && data?.data && (
+              <div className="space-y-6 p-1">
+                {/* --- PROJECTS --- */}
+                {data.data.projects?.length > 0 && (
+                  <section>
+                    <div className="flex items-center gap-2 mb-2 px-2 border-b border-gray-100">
+                      <div className="h-1 w-1 bg-indigo-500 rounded-full" />
+                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-400 pb-1">Projects</h3>
+                    </div>
+                    <div className="grid gap-1.5">
+                      {data.data.projects.map((project: any) => (
+                        <Link
+                          key={project.id}
+                          to="#"
+                          className="group flex items-center justify-between p-3 rounded-xl border border-transparent hover:border-indigo-100 hover:bg-indigo-50/50  transition-all duration-200"
+                        >
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-800 group-hover:text-indigo-700 transition-colors">
+                              {project.name}
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              Program: <span className="text-indigo-400 font-medium">{project.programName}</span>
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* --- PROGRAMS --- */}
+                {data.data.programs?.length > 0 && (
+                  <section>
+                    <div className="flex items-center gap-2 mb-2 px-2 border-b border-gray-100">
+                      <div className="h-1 w-1 bg-emerald-500 rounded-full" />
+                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-400 pb-1">Programs</h3>
+                    </div>
+                    <div className="grid gap-1.5">
+                      {data.data.programs.map((program: any) => (
+                        <Link
+                          key={program.id}
+                          to="#"
+                          className="group p-3 rounded-xl border border-transparent hover:border-emerald-100 hover:bg-emerald-50/50 transition-all"
+                        >
+                          <div className="flex justify-between items-start">
+                            <h4 className="text-sm font-semibold text-gray-800">{program.name}</h4>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight 
+                    ${program.priority === 'high' ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-700'}`}>
+                              {program.priority}
+                            </span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* --- EMPLOYEES --- */}
+                {data.data.employees?.length > 0 && (
+                  <section>
+                    <div className="flex items-center gap-2 mb-2 px-2 border-b border-gray-100">
+                      <div className="h-1 w-1 bg-orange-500 rounded-full" />
+                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-400 pb-1">Team Members</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-1.5">
+                      {data.data.employees.map((employee: any) => (
+                        <Link
+                          key={employee.id}
+                          to="#"
+                          className="group flex items-center gap-3 p-2 rounded-xl border border-transparent hover:border-orange-100 hover:bg-orange-50/40 transition-all"
+                        >
+                          <div className="relative">
+                            <img
+                              src={employee.image || 'https://ui-avatars.com/api/?name=' + employee.name}
+                              className="h-10 w-10 rounded-lg object-cover shadow-sm group-hover:scale-105 transition-transform"
+                              alt=""
+                            />
+                            <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></div>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-gray-800 group-hover:text-orange-700 line-clamp-1">{employee.name}</span>
+                            <span className="text-[11px] text-gray-400 font-medium line-clamp-1">{employee.email}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
