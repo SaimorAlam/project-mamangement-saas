@@ -110,8 +110,9 @@ export default function GlobalSearch() {
                       {data.data.projects.map((project: any) => (
                         <Link
                           key={project.id}
-                          to="#"
+                          to={`/staff-manager-panel/projects/${project.id}`}
                           className="group flex items-center justify-between p-3 rounded-xl border border-transparent hover:border-indigo-100 hover:bg-indigo-50/50  transition-all duration-200"
+                          onClick={()=> setSearchText("")}
                         >
                           <div>
                             <h4 className="text-sm font-semibold text-gray-800 group-hover:text-indigo-700 transition-colors">

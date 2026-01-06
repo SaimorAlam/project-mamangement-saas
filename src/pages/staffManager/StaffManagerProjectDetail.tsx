@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
   Calendar,
@@ -13,7 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import { useRemoveProjectFromFavoriteMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import { useGetFavoriteProjectsQuery, useRemoveProjectFromFavoriteMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import ErrorPage from "@/common/ErrorPage";
 import { FaSpinner } from "react-icons/fa";
 
@@ -51,13 +52,14 @@ const getPriorityStyles = (priority: string) => {
 export default function StaffManagerProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data, isLoading, isError, error } = useGetProjectByIdQuery(
+  const { data : projectData, isLoading, isError, error } = useGetProjectByIdQuery(
     id!
   );
+  const { data : favoriteData } = useGetFavoriteProjectsQuery();
   const [deleteProject, { isLoading: isDeleting }] =
     useRemoveProjectFromFavoriteMutation();
 
-  const project = data?.data?.project || {};
+  const project = projectData?.data?.project || {};
 
   const handleDelete = async () => {
     if (!project) return;
@@ -97,6 +99,7 @@ export default function StaffManagerProjectDetail() {
           </Button>
         </div>
 
+        {favoriteData.data.some((element: any) => element.projectId === id) && (
         <div className="flex items-center gap-9">
           <div
             className="p-3 rounded-lg flex items-center gap-3 cursor-pointer bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
@@ -106,6 +109,7 @@ export default function StaffManagerProjectDetail() {
             {isDeleting ? "Removing..." : "Remove from Favourites"}
           </div>
         </div>
+        )}
       </div>
 
       {/* Title & Description */}
