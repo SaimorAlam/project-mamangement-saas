@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LineChart as LineChartIcon,
   PieChart as PieChartIcon,
@@ -26,6 +26,8 @@ import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
 import useGetLazyProject from "./utils/useGetLazyProject";
 import { useLocation } from "react-router-dom";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setProgramId, setProjectId } from "@/store/Slices/ChartSlice/ChartSlice";
 
 interface Widget {
   id: string;
@@ -182,6 +184,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   ];
   const { programs ,isLoading} = useGetAllProgram();
   const {projects,isLoading:isProjectsLoading ,isFetching:projectFetching} = useGetLazyProject(selectedProgram,isProgramBuilder);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(setProgramId(selectedProgram))
+    dispatch(setProjectId(selectedProject))
+  }, [selectedProgram,selectedProject]);
+  
   return (
     <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 flex flex-col">
       {/* Header */}
@@ -223,7 +231,6 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       </div> 
       )
     }
-
       {
         !isProgramBuilder && (isProjectsLoading || projectFetching ? <SelectSkeleton /> : (
           <div className="px-4 pt-4">

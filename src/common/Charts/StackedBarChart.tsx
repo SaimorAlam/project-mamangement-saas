@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -17,6 +17,8 @@ import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import { useGetProjectTreeQuery, useLazyGetProjectTreeQuery } from "@/store/Api/NodeApi/NodeApi";
+import { useAppSelector } from "@/hooks/useRedux";
 
 /*       TYPES       */
 
@@ -64,16 +66,31 @@ export default function StackedBarChart({
   tierLevel = 0,
   chartId = "root",
 }: Props) {
+  const {projectId} = useAppSelector((state) => state.chartSlice)
+  const [getProjectTree,{data:childNodes}] = useLazyGetProjectTreeQuery()
+  const childData = useMemo(()=>{
+    getProjectTree(projectId)
+  },[projectId])
+  console.log(childData)
+    const projectTreeData = childNodes?.data?.map((item: any) => ({
+    id: item.id,
+    name: item.taskName,
+    children: item.children,
+  }))
+  console.log(projectTreeData)
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
-
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
-  const [childTiers, setChildTiers] = useState<TierChart[]>([]);
+  const [childTiers, setChildTiers] = useState<any[]>(projectTreeData);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
-
   const [getChartTitleId] = useGetChartTitleIdMutation();
-
+  
+  useEffect(()=>{
+    setChildTiers(projectTreeData)
+  },[projectId])
+  
+  console.log(childTiers)
   /*   DATA   */
   const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
@@ -149,20 +166,20 @@ export default function StackedBarChart({
     setShowPopover(false);
   };
 
-  const handleSaveTier = (tierName: string) => {
-    const newTier: TierChart = {
-      id: `${chartId}-tier-${Date.now()}`,
-      name: tierName,
-      xAxisValues: xAxisValues,
-      legendValues: legendValues,
-      children: [],
-    };
-    setChildTiers([...childTiers, newTier]);
-    setShowAddTierModal(false);
-  };
+  // const handleSaveTier = (tierName: string) => {
+  //   const newTier: TierChart = {
+  //     id: `${chartId}-tier-${Date.now()}`,
+  //     name: tierName,
+  //     xAxisValues: xAxisValues,
+  //     legendValues: legendValues,
+  //     children: [],
+  //   };
+  //   setChildTiers([...childTiers, newTier]);
+  //   setShowAddTierModal(false);
+  // };
 
   const handleChartClick = () => {
-    if (childTiers.length > 0) {
+    if (childTiers?.length > 0) {
       setShowChildrenModal(true);
     }
   };
@@ -195,7 +212,7 @@ export default function StackedBarChart({
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+          childTiers?.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
         }`}
         onClick={handleChartClick}
       >
@@ -307,7 +324,7 @@ export default function StackedBarChart({
             <XAxis dataKey="name" />
             <YAxis domain={[startingRange, endingRange]} />
             <Tooltip content={<CustomTooltip />} />
-            {legendValues.map((l, i) => (
+            {legendValues?.map((l, i) => (
               <Bar
                 key={l.field}
                 dataKey={l.field}
@@ -322,10 +339,10 @@ export default function StackedBarChart({
         </ResponsiveContainer>
 
         {/* Indicator if chart has children */}
-        {childTiers.length > 0 && (
+        {childTiers?.length > 0 && (
           <div className="mt-4 text-center">
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
             </p>
           </div>
         )}
@@ -335,8 +352,8 @@ export default function StackedBarChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        onSave={handleSaveTier}
-        parentChartName={widgetTitle}
+        // onSave={handleSaveTier}
+        parentChartName={projectTreeData?.name}
       />
 
       {/* Children Grid Modal */}

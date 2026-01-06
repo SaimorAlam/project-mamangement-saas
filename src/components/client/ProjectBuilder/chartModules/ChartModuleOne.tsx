@@ -11,7 +11,6 @@ import HeatmapChartNew from '@/common/Charts/HeatmapChartNew';
 const ChartModuleOne = ({ chartName }: { chartName: string }) => {
     const [widgetTitle, setWidgetTitle] = useState("My-CSV");
     const [showWidget, setShowWidget] = useState(false);
-
     const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1)
     const [xAxisValues, setXAxisValues] = useState<string[]>([]);
     const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
