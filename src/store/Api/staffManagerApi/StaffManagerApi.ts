@@ -119,10 +119,10 @@ const userApi = baseApi.injectEndpoints({
     }),
     // for global search 
     getGlobalSearchItems: builder.query({
-      query: (body)=> ({
+      query: (searchText)=> ({
         url: "/manager/global-search",
         method: "GET",
-        body
+        params: {query: searchText}
       }) ,
       providesTags: ["Manager"],
     })
