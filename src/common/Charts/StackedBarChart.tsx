@@ -19,6 +19,7 @@ import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import { useGetProjectTreeQuery, useLazyGetProjectTreeQuery } from "@/store/Api/NodeApi/NodeApi";
 import { useAppSelector } from "@/hooks/useRedux";
+import useChartData from "./GetChartData";
 
 /*       TYPES       */
 
@@ -42,6 +43,7 @@ export type TierChart = {
 };
 
 type Props = {
+  newData?: any[];
   widgetTitle?: string;
   xAxisValues?: string[];
   legendValues?: LegendValue[];
@@ -53,9 +55,8 @@ type Props = {
   chartId?: string;
 };
 
-/*       COMPONENT       */
-
 export default function StackedBarChart({
+  newData,
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
@@ -64,31 +65,16 @@ export default function StackedBarChart({
   endingRange,
   onToggleWidget,
   tierLevel = 0,
-  chartId = "root",
+  chartId,
 }: Props) {
-  const {projectId} = useAppSelector((state) => state.chartSlice)
-  const [getProjectTree,{data:childNodes}] = useLazyGetProjectTreeQuery()
+  const {childTiers} = useChartData({newData})
 
-  useEffect(()=>{
-    getProjectTree(projectId)
-  },[projectId])
-  
-    const projectTreeData = childNodes?.data?.map((item: any) => ({
-    id: item.id,
-    name: item.taskName,
-    children: item.children,
-  }))
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
-  const [childTiers, setChildTiers] = useState<any[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
   const [getChartTitleId] = useGetChartTitleIdMutation();
   
-  useEffect(()=>{
-    setChildTiers(projectTreeData)
-  },[childNodes])
-
   const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateChartData(
@@ -159,21 +145,10 @@ export default function StackedBarChart({
   };
 
   const handleAddTierClick = () => {
+    console.log(chartId, "ChartId")
     setShowAddTierModal(true);
     setShowPopover(false);
   };
-
-  // const handleSaveTier = (tierName: string) => {
-  //   const newTier: TierChart = {
-  //     id: `${chartId}-tier-${Date.now()}`,
-  //     name: tierName,
-  //     xAxisValues: xAxisValues,
-  //     legendValues: legendValues,
-  //     children: [],
-  //   };
-  //   setChildTiers([...childTiers, newTier]);
-  //   setShowAddTierModal(false);
-  // };
 
   const handleChartClick = () => {
     if (childTiers?.length > 0) {
@@ -181,8 +156,6 @@ export default function StackedBarChart({
     }
   };
 
-  /*   TOOLTIP   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
     const row = payload[0].payload;
@@ -202,14 +175,11 @@ export default function StackedBarChart({
       </div>
     );
   };
-
-  /*   RENDER   */
-  console.log(childTiers)
   return (
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers?.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+         childTiers?.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
         }`}
         onClick={handleChartClick}
       >
@@ -351,6 +321,7 @@ export default function StackedBarChart({
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
         // onSave={handleSaveTier}
+        chartId={chartId}
         parentChartName={widgetTitle}
       />
 
@@ -363,20 +334,19 @@ export default function StackedBarChart({
           title={widgetTitle}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers && childTiers?.map((tier) => {
-              console.log(tier)
-              console.log(childTiers)
+            {childTiers && childTiers?.map((tier:any) => {
               return(
               <StackedBarChart
-                key={tier.id}
-                widgetTitle={tier.name}
-                xAxisValues={tier.xAxisValues}
-                legendValues={tier.legendValues}
+                newData = {tier?.children || []}
+                key={tier?.id}
+                widgetTitle={tier?.name || tier?.taskName}
+                xAxisValues={tier?.xAxisValues}
+                legendValues={tier?.legendValues}
                 numOfLegendDataSet={tier?.legendValues?.length}
                 startingRange={startingRange}
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
-                chartId={tier.id}
+                chartId={tier?.id}
               />
             )
             })}

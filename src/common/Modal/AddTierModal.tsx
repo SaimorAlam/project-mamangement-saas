@@ -8,7 +8,8 @@ interface AddTierModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave?: (tierName: string) => void;
-  parentChartName: string;
+  parentChartName?: string;
+  chartId?: string;
 }
 
 const AddTierModal: React.FC<AddTierModalProps> = ({
@@ -16,6 +17,7 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
   onClose,
   onSave,
   parentChartName,
+  chartId,
 }) => {
   const {programId,projectId} = useAppSelector((state) => state.chartSlice);
   const [createNode] = useCreateNodeMutation()
@@ -28,7 +30,7 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
         programId: programId,
         projectId: projectId,
       }
-      const response = await createNode(payload).unwrap()
+      const response = await createNode(chartId ? {...payload, parentId: chartId} : payload).unwrap()
       console.log(response)
       if(response.success){
         toast.success("Node Created Successfully")

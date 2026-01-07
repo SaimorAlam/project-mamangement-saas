@@ -1,50 +1,63 @@
 import baseApi from "../BaseApi/BaseApi";
 
-
 export const infrastructureNodesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-
-    getRootNodes: builder.query({
+    getRootNodes: builder.query<any, string>({
       query: (projectId) => ({
         url: `/infrastructure-nodes/project/${projectId}/roots`,
         method: "GET",
       }),
-      providesTags: ["Nodes"],
+      providesTags: [{ type: "Nodes", id: "LIST" }],
     }),
 
-    getProjectTree: builder.query({
+    getProjectTree: builder.query<any, string>({
       query: (projectId) => ({
         url: `/infrastructure-nodes/project/${projectId}/tree`,
         method: "GET",
       }),
-      providesTags: ["Nodes"],
+      providesTags: (result) =>
+        result?.data
+          ? [
+              { type: "Nodes", id: "LIST" },
+              ...result.data.map((node: any) => ({
+                type: "Nodes",
+                id: node.id,
+              })),
+            ]
+          : [{ type: "Nodes", id: "LIST" }],
     }),
 
-    getNodeTree: builder.query({
+    getNodeTree: builder.query<any, string>({
       query: (nodeId) => ({
         url: `/infrastructure-nodes/${nodeId}/tree`,
         method: "GET",
       }),
-      providesTags: ["Nodes"],
+      providesTags: (result, error, nodeId) => [
+        { type: "Nodes", id: nodeId },
+      ],
     }),
 
-    getFlatNodes: builder.query({
+    getFlatNodes: builder.query<any, string>({
       query: (projectId) => ({
         url: `/infrastructure-nodes/project/${projectId}/flat`,
         method: "GET",
       }),
-      providesTags: ["Nodes"],
+      providesTags: [{ type: "Nodes", id: "LIST" }],
     }),
 
-    getNodeChildren: builder.query({
+    getNodeChildren: builder.query<any, string>({
       query: (nodeId) => ({
         url: `/infrastructure-nodes/${nodeId}/children`,
         method: "GET",
       }),
-      providesTags: ["Nodes"],
+      providesTags: (result, error, nodeId) => [
+        { type: "Nodes", id: nodeId },
+      ],
     }),
 
-    exportNodes: builder.query({
+    /* ---------------- EXPORT ---------------- */
+
+    exportNodes: builder.query<Blob, string>({
       query: (projectId) => ({
         url: `/infrastructure-nodes/project/${projectId}/export`,
         method: "GET",
@@ -52,41 +65,45 @@ export const infrastructureNodesApi = baseApi.injectEndpoints({
       }),
     }),
 
-    createNode: builder.mutation({
+    /* ---------------- MUTATIONS ---------------- */
+
+    createNode: builder.mutation<any, any>({
       query: (payload) => ({
         url: `/infrastructure-nodes`,
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["Nodes"],
+      invalidatesTags: [{ type: "Nodes", id: "LIST" }],
     }),
 
-    updateNode: builder.mutation({
+    updateNode: builder.mutation<any, { nodeId: string; data: any }>({
       query: ({ nodeId, data }) => ({
         url: `/infrastructure-nodes/${nodeId}`,
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["Nodes"],
+      invalidatesTags: (result, error, { nodeId }) => [
+        { type: "Nodes", id: nodeId },
+        { type: "Nodes", id: "LIST" },
+      ],
     }),
 
-    deleteNode: builder.mutation({
+    deleteNode: builder.mutation<any, string>({
       query: (nodeId) => ({
         url: `/infrastructure-nodes/${nodeId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Nodes"],
+      invalidatesTags: [{ type: "Nodes", id: "LIST" }],
     }),
 
-    importNodes: builder.mutation({
+    importNodes: builder.mutation<any, { projectId: string; data: any }>({
       query: ({ projectId, data }) => ({
         url: `/infrastructure-nodes/project/${projectId}/import`,
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Nodes"],
+      invalidatesTags: [{ type: "Nodes", id: "LIST" }],
     }),
-
   }),
 });
 
