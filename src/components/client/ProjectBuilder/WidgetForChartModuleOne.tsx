@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { useAppSelector } from "@/hooks/useRedux";
 import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
@@ -112,7 +111,7 @@ const WidgetForChartModuleOne = ({
     });
   };
 
-  const [getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
+  const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const downloadCSV = async() => {
     // validating that if any of the legend labels or xAxisValues are empty, alert the user

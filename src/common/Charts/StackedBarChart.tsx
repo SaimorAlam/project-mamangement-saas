@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -17,8 +17,6 @@ import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-import { useGetProjectTreeQuery, useLazyGetProjectTreeQuery } from "@/store/Api/NodeApi/NodeApi";
-import { useAppSelector } from "@/hooks/useRedux";
 import useChartData from "./GetChartData";
 
 /*       TYPES       */
