@@ -32,7 +32,7 @@ export const infrastructureNodesApi = baseApi.injectEndpoints({
         url: `/infrastructure-nodes/${nodeId}/tree`,
         method: "GET",
       }),
-      providesTags: (result, error, nodeId) => [
+      providesTags: (_result, _error, nodeId) => [
         { type: "Nodes", id: nodeId },
       ],
     }),
@@ -50,7 +50,7 @@ export const infrastructureNodesApi = baseApi.injectEndpoints({
         url: `/infrastructure-nodes/${nodeId}/children`,
         method: "GET",
       }),
-      providesTags: (result, error, nodeId) => [
+      providesTags: (_result, _error, nodeId) => [
         { type: "Nodes", id: nodeId },
       ],
     }),
@@ -82,7 +82,7 @@ export const infrastructureNodesApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: (result, error, { nodeId }) => [
+      invalidatesTags: (_result, _error, { nodeId }) => [
         { type: "Nodes", id: nodeId },
         { type: "Nodes", id: "LIST" },
       ],
