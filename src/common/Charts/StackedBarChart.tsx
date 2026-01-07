@@ -68,30 +68,27 @@ export default function StackedBarChart({
 }: Props) {
   const {projectId} = useAppSelector((state) => state.chartSlice)
   const [getProjectTree,{data:childNodes}] = useLazyGetProjectTreeQuery()
-  const childData = useMemo(()=>{
+
+  useEffect(()=>{
     getProjectTree(projectId)
   },[projectId])
-  console.log(childData)
+  
     const projectTreeData = childNodes?.data?.map((item: any) => ({
     id: item.id,
     name: item.taskName,
     children: item.children,
   }))
-  console.log(projectTreeData)
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
-  // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
-  const [childTiers, setChildTiers] = useState<any[]>(projectTreeData);
+  const [childTiers, setChildTiers] = useState<any[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
   const [getChartTitleId] = useGetChartTitleIdMutation();
   
   useEffect(()=>{
     setChildTiers(projectTreeData)
-  },[projectId])
-  
-  console.log(childTiers)
-  /*   DATA   */
+  },[childNodes])
+
   const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateChartData(
@@ -122,7 +119,7 @@ export default function StackedBarChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = () => {
+  const handleDownload = async() => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -143,7 +140,7 @@ export default function StackedBarChart({
     };
     setIsDownloading(true);
 
-    DownloadAndSaveCSVforModuleOneWidget(
+    await DownloadAndSaveCSVforModuleOneWidget(
       payload,
       getChartTitleId,
       widgetTitle,
@@ -207,7 +204,7 @@ export default function StackedBarChart({
   };
 
   /*   RENDER   */
-
+  console.log(childTiers)
   return (
     <>
       <div
@@ -275,6 +272,7 @@ export default function StackedBarChart({
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
                   >
                     <Download size={18} />
+
                     <span>Download</span>
                   </button>
 
@@ -353,7 +351,7 @@ export default function StackedBarChart({
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
         // onSave={handleSaveTier}
-        parentChartName={projectTreeData?.name}
+        parentChartName={widgetTitle}
       />
 
       {/* Children Grid Modal */}
@@ -365,19 +363,23 @@ export default function StackedBarChart({
           title={widgetTitle}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers.map((tier) => (
+            {childTiers && childTiers?.map((tier) => {
+              console.log(tier)
+              console.log(childTiers)
+              return(
               <StackedBarChart
                 key={tier.id}
                 widgetTitle={tier.name}
                 xAxisValues={tier.xAxisValues}
                 legendValues={tier.legendValues}
-                numOfLegendDataSet={tier.legendValues.length}
+                numOfLegendDataSet={tier?.legendValues?.length}
                 startingRange={startingRange}
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
               />
-            ))}
+            )
+            })}
           </div>
         </TierChartModal>
       )}
