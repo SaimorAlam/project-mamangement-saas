@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
+import { useAppSelector } from "@/hooks/useRedux";
+import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
+import { toast } from "sonner";
 
 export type LegendValue = {
   label: string;
@@ -46,10 +48,11 @@ const WidgetForChartModuleOne = ({
   setEndingRange: React.Dispatch<React.SetStateAction<number>>;
   onClose?: () => void;
 }) => {
+  const programId = useAppSelector((state)=> state.chartSlice.programId)
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
-
+  const [createChart] = useCreateChartMutation();
   // for showing user info below
   const assignedBy = {
     name: "Alexis Burg",
@@ -108,9 +111,9 @@ const WidgetForChartModuleOne = ({
     });
   };
 
-  const [getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
+  const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
-  const downloadCSV = () => {
+  const downloadCSV = async() => {
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
     for (let i = 0; i < legendValues.length; i++) {
       if (!legendValues[i].label) {
@@ -156,14 +159,24 @@ const WidgetForChartModuleOne = ({
       }),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
+      programId,
     };
-    DownloadAndSaveCSVforModuleOneWidget(
-      payload,
-      getChartTitleId,
-      widgetTitle,
-      xAxisValues,
-      legendValues
-    );
+    try {
+      const res = await createChart(payload).unwrap()
+      if(res?.success){
+        toast.success("Chart created successfully")
+      }
+    } catch {
+      toast.error("Chart creation failed")
+    }
+
+    // DownloadAndSaveCSVforModuleOneWidget(
+    //   payload,
+    //   getChartTitleId,
+    //   widgetTitle,
+    //   xAxisValues,
+    //   legendValues
+    // );
   };
 
   return (

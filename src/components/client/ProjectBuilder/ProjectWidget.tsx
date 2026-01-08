@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LineChart as LineChartIcon,
   PieChart as PieChartIcon,
@@ -22,6 +22,12 @@ import {
   SquareKanban,
   ChartCandlestick,
 } from "lucide-react";
+import useGetAllProgram from "./utils/useGetAllProgram";
+import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
+import useGetLazyProject from "./utils/useGetLazyProject";
+import { useLocation } from "react-router-dom";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setProgramId, setProjectId } from "@/store/Slices/ChartSlice/ChartSlice";
 
 interface Widget {
   id: string;
@@ -37,9 +43,11 @@ interface ProjectWidgetProps {
 const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   onWidgetSelect,
 }) => {
+  const {pathname} = useLocation();
+  const isProgramBuilder = pathname.split('/')[2] === "program-builder";
   const [selectedProgram, setSelectedProgram] = useState<string>("");
+  const [selectedProject, setSelectedProject] = useState<string>("");
   const [selectedWidget, setSelectedWidget] = useState<string>("kpi"); // default KPI widget active
-
   const widgets: Widget[] = [
     {
       id: "kpi",
@@ -174,11 +182,20 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     //   icon: <ChartScatter className="w-5 h-5" />,
     // },
   ];
-
+  const { programs ,isLoading} = useGetAllProgram();
+  const {projects,isLoading:isProjectsLoading ,isFetching:projectFetching} = useGetLazyProject(selectedProgram,isProgramBuilder);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(setProgramId(selectedProgram))
+    dispatch(setProjectId(selectedProject))
+  }, [selectedProgram,selectedProject]);
+  
   return (
     <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 flex flex-col">
       {/* Header */}
-      <div className="px-4 pt-4">
+    {
+      isLoading ? <SelectSkeleton /> : (
+         <div className="px-4 pt-4">
         <label className="block text-sm font-medium text-website-color-darkGray mb-2">
           Program Name*
         </label>
@@ -189,6 +206,11 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Add program or select</option>
+            {programs?.map((program:{id:string,name:string}) => (
+              <option key={program.id} value={program.id}>
+                {program.name}
+              </option>
+            ))}
           </select>
           <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
             <svg
@@ -206,19 +228,27 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
             </svg>
           </div>
         </div>
-      </div>
-
-      <div className="px-4 pt-4">
+      </div> 
+      )
+    }
+      {
+        !isProgramBuilder && (isProjectsLoading || projectFetching ? <SelectSkeleton /> : (
+          <div className="px-4 pt-4">
         <label className="block text-sm font-medium text-website-color-darkGray mb-2">
           Project Name*
         </label>
         <div className="relative">
           <select
-            value={selectedProgram}
-            onChange={(e) => setSelectedProgram(e.target.value)}
+            value={selectedProject}
+            onChange={(e) => setSelectedProject(e.target.value)}
             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">Add program or select</option>
+            <option value="">{projects?.length > 0 ? "Select project" : "No projects available"}</option>
+            {projects?.length > 0 && projects?.map((project:{id:string,name:string}) => (
+              <option key={project.id} value={project.id}>
+                {project.name}
+              </option>
+            ))}
           </select>
           <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
             <svg
@@ -237,6 +267,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
           </div>
         </div>
       </div>
+      ))}
 
       <div className="px-4 pt-4">
         <label className="block text-sm font-medium text-website-color-darkGray mb-2">

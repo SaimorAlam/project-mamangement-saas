@@ -103,6 +103,7 @@ export const {
   useGetAllProgramQuery,
   useGetProgramByIdQuery,
   useGetProjectsByProgramIdQuery,
+  useLazyGetProjectsByProgramIdQuery,
   useUpdateProgramNameMutation,
   useGetChartTitleIdMutation,
   useGetStackBarChartCSVfilesTitleIdQuery,
