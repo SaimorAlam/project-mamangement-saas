@@ -51,6 +51,7 @@ type Props = {
   onToggleWidget?: () => void;
   tierLevel?: number;
   chartId?: string;
+  isCreationMode?: boolean;
 };
 
 export default function StackedBarChart({
@@ -64,15 +65,15 @@ export default function StackedBarChart({
   onToggleWidget,
   tierLevel = 0,
   chartId,
+  isCreationMode = false,
 }: Props) {
-  const {childTiers} = useChartData({newData})
-
+  const { childTiers } = useChartData({ newData, isCreationMode, chartId });
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
   const [getChartTitleId] = useGetChartTitleIdMutation();
-  
+
   const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateChartData(
@@ -82,7 +83,13 @@ export default function StackedBarChart({
       startingRange,
       endingRange
     );
-  }, [xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange]);
+  }, [
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+  ]);
 
   /*   TOTAL   */
   const totalEmployees = useMemo(() => {
@@ -103,7 +110,7 @@ export default function StackedBarChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = async() => {
+  const handleDownload = async () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -143,7 +150,6 @@ export default function StackedBarChart({
   };
 
   const handleAddTierClick = () => {
-    console.log(chartId, "ChartId")
     setShowAddTierModal(true);
     setShowPopover(false);
   };
@@ -162,11 +168,7 @@ export default function StackedBarChart({
       <div className="bg-white p-3 border rounded shadow-lg">
         <p className="font-semibold mb-2">{row.name}</p>
         {legendValues.map((l) => (
-          <p
-            key={l.field}
-            style={{ color: l.color }}
-            className="text-sm"
-          >
+          <p key={l.field} style={{ color: l.color }} className="text-sm">
             {l.label}: {row[l.field]}
           </p>
         ))}
@@ -177,7 +179,9 @@ export default function StackedBarChart({
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-         childTiers?.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+          childTiers?.length > 0
+            ? "cursor-pointer hover:shadow-lg transition-shadow"
+            : ""
         }`}
         onClick={handleChartClick}
       >
@@ -187,10 +191,7 @@ export default function StackedBarChart({
             <div className="flex gap-6 mt-3">
               {legendValues.map((l) =>
                 l.label ? (
-                  <div
-                    key={l.field}
-                    className="flex items-center gap-2"
-                  >
+                  <div key={l.field} className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: l.color }}
@@ -202,7 +203,10 @@ export default function StackedBarChart({
             </div>
           </div>
 
-          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <p className="text-sm text-gray-500">Total {totalEmployees}</p>
 
             <div className="flex gap-2 border-l pl-4 relative">
@@ -268,16 +272,18 @@ export default function StackedBarChart({
                     </button>
                   )}
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddTierClick();
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <GoPlus size={18} />
-                    <span>Add Tier</span>
-                  </button>
+                  {!isCreationMode && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddTierClick();
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                    >
+                      <GoPlus size={18} />
+                      <span>Add Tier</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>

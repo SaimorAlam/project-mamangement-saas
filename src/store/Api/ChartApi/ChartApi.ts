@@ -21,6 +21,12 @@ const chartApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getChartByProjectId: builder.query({
+      query: (id) => ({
+        url: `/charts/project/${id}`,
+        method: "GET",
+      }),
+    }),
     getChartById: builder.query({
       query: (id) => ({
         url: `/chart/${id}`,
@@ -35,5 +41,7 @@ export const {
   useGetActiveInChartQuery,
   useGetActiveChartQuery,
   useGetChartByIdQuery,
+  useLazyGetChartByIdQuery,
+  useGetChartByProjectIdQuery,
 } = chartApi;
 export default chartApi;

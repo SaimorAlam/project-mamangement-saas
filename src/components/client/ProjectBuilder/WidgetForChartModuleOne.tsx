@@ -48,7 +48,7 @@ const WidgetForChartModuleOne = ({
   setEndingRange: React.Dispatch<React.SetStateAction<number>>;
   onClose?: () => void;
 }) => {
-  const programId = useAppSelector((state)=> state.chartSlice.programId)
+  const projectId = useAppSelector((state)=> state.chartSlice.projectId)
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
@@ -114,6 +114,7 @@ const WidgetForChartModuleOne = ({
   const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const downloadCSV = async() => {
+    const toastId = toast.loading("Creating chart...")
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
     for (let i = 0; i < legendValues.length; i++) {
       if (!legendValues[i].label) {
@@ -146,8 +147,8 @@ const WidgetForChartModuleOne = ({
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
       lastFiledDAtaset: endingRange,
-      showWidgets: legendValues.map((l) => ({
-        legend_name: l.label,
+      widgets: legendValues.map((l) => ({
+        legendName: l.label,
         color: l.color,
       })),
       title: widgetTitle,
@@ -159,15 +160,15 @@ const WidgetForChartModuleOne = ({
       }),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
-      programId,
+      projectId,
     };
     try {
       const res = await createChart(payload).unwrap()
       if(res?.success){
-        toast.success("Chart created successfully")
+        toast.success("Chart created successfully", {id: toastId})
       }
     } catch {
-      toast.error("Chart creation failed")
+      toast.error("Chart creation failed", {id: toastId})
     }
 
     // DownloadAndSaveCSVforModuleOneWidget(
