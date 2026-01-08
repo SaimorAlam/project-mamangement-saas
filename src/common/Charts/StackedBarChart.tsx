@@ -68,6 +68,8 @@ export default function StackedBarChart({
   isCreationMode = false,
 }: Props) {
   const { childTiers } = useChartData({ newData, isCreationMode, chartId });
+  console.log(childTiers)
+  console.log(newData)
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
