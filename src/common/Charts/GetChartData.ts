@@ -4,13 +4,11 @@ import { useMemo, useEffect, useState } from "react";
 
 
 const useChartData = ({newData}: {newData?: any}) => {
-    // console.log(newData)
     const [childTiers, setChildTiers] = useState<any[]>([]);
     const {projectId} = useAppSelector((state) => state.chartSlice)
       const [getProjectTree,{data:childNodes}] = useLazyGetProjectTreeQuery()
-    // console.log(isFetching,"Refetch")
       useEffect(()=>{
-        if(!newData){
+        if(!newData || newData.length === 0){
             getProjectTree(projectId)
         }
       },[projectId, newData])
