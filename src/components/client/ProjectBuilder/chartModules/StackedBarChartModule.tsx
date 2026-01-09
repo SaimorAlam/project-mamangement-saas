@@ -76,6 +76,7 @@ const StackedBarChartModule = () => {
         startingRange={startingRange}
         endingRange={endingRange}
         onToggleWidget={handleToggleWidget}
+        isCreationMode={true}
       />
       {showWidget && (
         <ProjectConfiguration

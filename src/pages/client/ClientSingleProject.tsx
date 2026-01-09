@@ -1,7 +1,7 @@
 import { useAppSelector } from "@/hooks/useRedux";
 import Papa from "papaparse";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HotTable } from "@handsontable/react";
+import { HotTable } from "@handsontable/react-wrapper";
 import "handsontable/dist/handsontable.full.css";
 import {
   useUploadSheetMutation /*useUpdateSheetMutation*/,

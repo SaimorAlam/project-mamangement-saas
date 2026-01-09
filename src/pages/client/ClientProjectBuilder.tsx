@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {  useState } from "react";
 
 // import AreaChart from "@/common/Charts/AreaChart";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
@@ -9,7 +9,7 @@ import HeatmapChart from "@/common/Charts/HeatmapChart";
 // import PieChart from "@/common/Charts/PieChart";
 import ProgressRing from "@/common/Charts/ProgressRingTest";
 import RadarCharts from "@/common/Charts/RadarChart";
-// import StackedBarChart from "@/common/Charts/StackedBarChart";
+import StackedBarChart from "@/common/Charts/StackedBarChart";
 // import ProjectConfiguration from "@/components/client/ProjectBuilder/ProjectConfiguration";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
@@ -18,11 +18,15 @@ import LineChartModule from "@/components/client/ProjectBuilder/chartModules/Lin
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
 import HorizontalBarChartModule from './../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule';
+import { useAppSelector } from "@/hooks/useRedux";
+import { useGetChartByProjectIdQuery } from "@/store/Api/ChartApi/ChartApi";
 
 const ClientProjectBuilder = () => {
+  const projectId = useAppSelector((state) => state.chartSlice?.projectId)
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [activeWidget, setActiveWidget] = useState("KPI Widget");
-
+  const {data:projectsChart} = useGetChartByProjectIdQuery(projectId)
+  const projectsChartsData = projectsChart?.data
   const handleWidgetSelect = (widgetId: string) => {
     if (widgetId === "kpi") {
       setSelectedWidgets([]);
@@ -39,14 +43,44 @@ const ClientProjectBuilder = () => {
       setActiveWidget(widgetId);
     }
   };
-
   return (
     <div className="flex gap-6">
       <ProjectWidget onWidgetSelect={handleWidgetSelect} />
       <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10">
         <ProjectStats activeWidget={activeWidget} />
 
-        {selectedWidgets.length === 0 && (
+    {
+      projectsChartsData?.length > 0 ? (
+        <div className="flex flex-wrap gap-6">
+{projectsChartsData?.map((item: any) => {
+
+            if (item.category === "Bar" || item.category === "BAR") {
+              return (
+                <div key={item.id} className="w-full">
+                  <StackedBarChart
+                    widgetTitle={item.title}
+                    xAxisValues={item.xAxis?.labels || []}
+                    legendValues={item.barChart?.widgets?.map((w: any) => ({
+                      label: w.legendName,
+                      color: w.color,
+                    })) || []}
+                    numOfLegendDataSet={item.numberOfDataset}
+                    startingRange={item.firstFiledDataset}
+                    endingRange={item.lastFiledDAtaset}
+                    // chartId={item.id}
+                  />
+                </div>
+              );
+            }
+            return (
+              <div key={item.id}>
+                {/* <h2>{item.title}</h2> */}
+                {/* <p>{item.description}</p> */}
+              </div>
+            );
+          })}
+        </div>
+      ): (
           <>
             {/* <StackedBarChart /> */}
             <div className="flex gap-4">
@@ -78,8 +112,8 @@ const ClientProjectBuilder = () => {
             </div>
             <HeatmapChart />
           </>
-        )}
-
+        )
+        }
         {selectedWidgets.includes("bar-chart") && <StackedBarChartModule />}
         {selectedWidgets.includes("progress-ring") && (
           <ProgressRing
