@@ -17,6 +17,7 @@ import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import useChartData from "./GetChartData";
 
 /*       TYPES       */
 
@@ -40,6 +41,7 @@ export type TierChart = {
 };
 
 type Props = {
+  newData?: any[];
   widgetTitle?: string;
   xAxisValues?: string[];
   legendValues?: LegendValue[];
@@ -51,9 +53,8 @@ type Props = {
   chartId?: string;
 };
 
-/*       COMPONENT       */
-
 export default function StackedBarChart({
+  newData,
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
@@ -62,19 +63,16 @@ export default function StackedBarChart({
   endingRange,
   onToggleWidget,
   tierLevel = 0,
-  chartId = "root",
+  chartId,
 }: Props) {
+  const {childTiers} = useChartData({newData})
+
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
-
-  // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
-  const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
-
   const [getChartTitleId] = useGetChartTitleIdMutation();
-
-  /*   DATA   */
+  
   const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateChartData(
@@ -105,7 +103,7 @@ export default function StackedBarChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = () => {
+  const handleDownload = async() => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -126,7 +124,7 @@ export default function StackedBarChart({
     };
     setIsDownloading(true);
 
-    DownloadAndSaveCSVforModuleOneWidget(
+    await DownloadAndSaveCSVforModuleOneWidget(
       payload,
       getChartTitleId,
       widgetTitle,
@@ -145,30 +143,17 @@ export default function StackedBarChart({
   };
 
   const handleAddTierClick = () => {
+    console.log(chartId, "ChartId")
     setShowAddTierModal(true);
     setShowPopover(false);
   };
 
-  const handleSaveTier = (tierName: string) => {
-    const newTier: TierChart = {
-      id: `${chartId}-tier-${Date.now()}`,
-      name: tierName,
-      xAxisValues: xAxisValues,
-      legendValues: legendValues,
-      children: [],
-    };
-    setChildTiers([...childTiers, newTier]);
-    setShowAddTierModal(false);
-  };
-
   const handleChartClick = () => {
-    if (childTiers.length > 0) {
+    if (childTiers?.length > 0) {
       setShowChildrenModal(true);
     }
   };
 
-  /*   TOOLTIP   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
     const row = payload[0].payload;
@@ -188,14 +173,11 @@ export default function StackedBarChart({
       </div>
     );
   };
-
-  /*   RENDER   */
-
   return (
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+         childTiers?.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
         }`}
         onClick={handleChartClick}
       >
@@ -258,6 +240,7 @@ export default function StackedBarChart({
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
                   >
                     <Download size={18} />
+
                     <span>Download</span>
                   </button>
 
@@ -307,7 +290,7 @@ export default function StackedBarChart({
             <XAxis dataKey="name" />
             <YAxis domain={[startingRange, endingRange]} />
             <Tooltip content={<CustomTooltip />} />
-            {legendValues.map((l, i) => (
+            {legendValues?.map((l, i) => (
               <Bar
                 key={l.field}
                 dataKey={l.field}
@@ -322,10 +305,10 @@ export default function StackedBarChart({
         </ResponsiveContainer>
 
         {/* Indicator if chart has children */}
-        {childTiers.length > 0 && (
+        {childTiers?.length > 0 && (
           <div className="mt-4 text-center">
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
             </p>
           </div>
         )}
@@ -335,7 +318,8 @@ export default function StackedBarChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        onSave={handleSaveTier}
+        // onSave={handleSaveTier}
+        chartId={chartId}
         parentChartName={widgetTitle}
       />
 
@@ -348,19 +332,22 @@ export default function StackedBarChart({
           title={widgetTitle}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers.map((tier) => (
+            {childTiers && childTiers?.map((tier:any) => {
+              return(
               <StackedBarChart
-                key={tier.id}
-                widgetTitle={tier.name}
-                xAxisValues={tier.xAxisValues}
-                legendValues={tier.legendValues}
-                numOfLegendDataSet={tier.legendValues.length}
+                newData = {tier?.children || []}
+                key={tier?.id}
+                widgetTitle={tier?.name || tier?.taskName}
+                xAxisValues={tier?.xAxisValues}
+                legendValues={tier?.legendValues}
+                numOfLegendDataSet={tier?.legendValues?.length}
                 startingRange={startingRange}
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
-                chartId={tier.id}
+                chartId={tier?.id}
               />
-            ))}
+            )
+            })}
           </div>
         </TierChartModal>
       )}

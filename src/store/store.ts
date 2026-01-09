@@ -5,6 +5,7 @@ import baseApi from "./Api/BaseApi/BaseApi";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import fileReducer from "./Slices/FileSlice/FileSlice";
+import chartSliceReducer from "./Slices/ChartSlice/ChartSlice";
 
 const persistConfig = {
   key: "root",
@@ -21,6 +22,7 @@ export const store = configureStore({
     auth: persistedAuthReducer,
     form: formReducer,
     file: fileReducer,
+    chartSlice: chartSliceReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

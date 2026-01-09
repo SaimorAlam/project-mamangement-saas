@@ -20,15 +20,22 @@ import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/Char
 import HorizontalBarChartModule from './../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule';
 
 const ClientProjectBuilder = () => {
-  const [selectedWidget, setSelectedWidget] = useState<string>("");
+  const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [activeWidget, setActiveWidget] = useState("KPI Widget");
 
   const handleWidgetSelect = (widgetId: string) => {
     if (widgetId === "kpi") {
-      setSelectedWidget("");
+      setSelectedWidgets([]);
       setActiveWidget("KPI widget");
     } else {
-      setSelectedWidget(widgetId);
+      // Toggle widget selection - add if not present, remove if already selected
+      setSelectedWidgets((prev) => {
+        if (prev.includes(widgetId)) {
+          return prev.filter((id) => id !== widgetId);
+        } else {
+          return [...prev, widgetId];
+        }
+      });
       setActiveWidget(widgetId);
     }
   };
@@ -39,7 +46,7 @@ const ClientProjectBuilder = () => {
       <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10">
         <ProjectStats activeWidget={activeWidget} />
 
-        {!selectedWidget && (
+        {selectedWidgets.length === 0 && (
           <>
             {/* <StackedBarChart /> */}
             <div className="flex gap-4">
@@ -73,8 +80,8 @@ const ClientProjectBuilder = () => {
           </>
         )}
 
-        {selectedWidget === "bar-chart" && <StackedBarChartModule />}
-        {selectedWidget === "progress-ring" && (
+        {selectedWidgets.includes("bar-chart") && <StackedBarChartModule />}
+        {selectedWidgets.includes("progress-ring") && (
           <ProgressRing
             title="Project Progress"
             centerLabel="Total Progress"
@@ -107,37 +114,37 @@ const ClientProjectBuilder = () => {
           />
         )}
 
-        {selectedWidget === "pie-chart" && (
+        {selectedWidgets.includes("pie-chart") && (
           <ChartModuleTwo chartName="pie-chart" />
         )}
 
-        {selectedWidget === "line-chart" && <LineChartModule />}
+        {selectedWidgets.includes("line-chart") && <LineChartModule />}
 
-        {selectedWidget === "data-table" && (
+        {selectedWidgets.includes("data-table") && (
           <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
             Data Table coming soon...
           </div>
         )}
 
-        {selectedWidget === "gantt-chart" && (
+        {selectedWidgets.includes("gantt-chart") && (
           <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
             <GanttChart />
           </div>
         )}
 
-        {selectedWidget === "picture-video" && (
+        {selectedWidgets.includes("picture-video") && (
           <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
             Picture/Video coming soon...
           </div>
         )}
 
-        {selectedWidget === "horizontal-bar-chart" && (
+        {selectedWidgets.includes("horizontal-bar-chart") && (
           <HorizontalBarChartModule />
         )}
 
-        {selectedWidget === "heat-map-chart" && <HeatmapChart />}
+        {selectedWidgets.includes("heat-map-chart") && <HeatmapChart />}
 
-        {selectedWidget === "area-chart" && (
+        {selectedWidgets.includes("area-chart") && (
           <ChartModuleOne chartName="area-chart" />
         )}
       </div>

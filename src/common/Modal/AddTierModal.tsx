@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { X, Save } from "lucide-react";
+import { useAppSelector } from "@/hooks/useRedux";
+import { useCreateNodeMutation } from "@/store/Api/NodeApi/NodeApi";
+import { toast } from "sonner";
 
 interface AddTierModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (tierName: string) => void;
-  parentChartName: string;
+  onSave?: (tierName: string) => void;
+  parentChartName?: string;
+  chartId?: string;
 }
 
 const AddTierModal: React.FC<AddTierModalProps> = ({
@@ -13,16 +17,35 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
   onClose,
   onSave,
   parentChartName,
+  chartId,
 }) => {
+  const {programId,projectId} = useAppSelector((state) => state.chartSlice);
+  const [createNode] = useCreateNodeMutation()
   const [tierName, setTierName] = useState("");
 
-  const handleSave = () => {
+  const handleSave = async() => {
+    try {
+      const payload = {
+        taskName: tierName,
+        programId: programId,
+        projectId: projectId,
+      }
+      const response = await createNode(chartId ? {...payload, parentId: chartId} : payload).unwrap()
+      console.log(response)
+      if(response.success){
+        toast.success("Node Created Successfully")
+      }
+    } catch {
+      toast.error("Cannot Create Node")
+    }
+    
     if (tierName.trim()) {
-      onSave(tierName);
+      onSave?.(tierName);   
+      console.log(tierName)
       setTierName("");
     } else {
-      alert("Please enter a tier name");
-    }
+      toast.error("Please enter a tier name");
+     }
   };
 
   const handleClose = () => {

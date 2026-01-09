@@ -7,14 +7,11 @@ import StackedBarChart from "@/common/Charts/StackedBarChart";
 const StackedBarChartModule = () => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
-
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
     useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
-
   const [numOfLegendDataSet, setNumOfLegendDataSet] =
     useState<number>(3);
-
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#13A490" },
     { label: "", field: "", color: "#35B6EE" },
@@ -22,7 +19,6 @@ const StackedBarChartModule = () => {
   ]);
   const [startingRange, setStartingRange] = useState<number>(0); //for y axis
   const [endingRange, setEndingRange] = useState<number>(100); // for y axis
-
   const minXaxisField = 1;
   const maxXaxisField = 7;
   const handleSetNumOfXAxisDataSet = (
