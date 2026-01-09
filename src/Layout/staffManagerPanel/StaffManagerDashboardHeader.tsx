@@ -20,7 +20,7 @@ const StaffManagerDashboardHeader = () => {
   const navigate = useNavigate();
   const StaffManagerSidebarItems = getStaffManagerSidebarItems();
   // const { heading, breadcrumb, showButton } = useHeaderContext();
-  const { breadcrumb, showButton } = useHeaderContext();
+  const { breadcrumb } = useHeaderContext();
 
   const location = useLocation();
   const currentPath = location.pathname;
@@ -31,6 +31,22 @@ const StaffManagerDashboardHeader = () => {
   const currentRoute = allRoutes.find(
     (route) => route.path === currentPath
   );
+
+  const previewButtonPaths = [
+    "/staff-manager-panel/projects/upload-submission",
+    "/staff-manager-panel/project-builder",
+  ];
+  const saveDraftButtonPaths = [
+    "/staff-manager-panel/project-builder",
+  ];
+  const publishButtonPaths = [
+    "/staff-manager-panel/projects/upload-submission",
+    "/staff-manager-panel/project-builder",
+  ];
+  const uploadSubmissionButtonPaths = [
+    "/staff-manager-panel/projects",
+    "/staff-manager-panel",
+  ];
 
   return (
     <div>
@@ -82,7 +98,7 @@ const StaffManagerDashboardHeader = () => {
         </div>
 
         {/* Search */}
-        <GlobalSearch/>
+        <GlobalSearch />
 
         {/* Right Controls */}
         <div className="flex items-center justify-between gap-2 relative">
@@ -97,64 +113,42 @@ const StaffManagerDashboardHeader = () => {
             onClose={() => setIsOpen(false)}
           />
 
-          {currentPath === "/staff-manager-panel/projects/upload-submission" && (
-            <>
-              {/* Preview */}
-              <PrimaryButton
-                leftIcon={<Eye className="text-2xl" />}
-                title="Preview"
-                type={"Outline"}
-                onClick={() => setIsOpen(true)}
-              />
-
-              {/* Save Draft */}
-              <PrimaryButton
-                leftIcon={<FileText className="text-2xl" />}
-                title="Save Draft"
-                type={"Outline"}
-                onClick={() => setIsOpen(true)}
-              />
-
-              {/* Publish */}
-              <PrimaryButton
-                leftIcon={<Megaphone className="text-2xl" />}
-                title="Publish"
-                type={"Primary"}
-                onClick={() => setIsOpen(true)}
-              />
-            </>
-          )
-          }
-
-          {/* Conditional Quick Action */}
-          {currentPath === "/staff-manager-panel" && (
-            <div className="relative">
-              <>
-                {showButton && (
-                  <PrimaryButton
-                    leftIcon={<Upload className="text-2xl" />}
-                    title="Upload Submission"
-                    type="Primary"
-                    onClick={() => navigate("/staff-manager-panel/projects/upload-submission")}
-                  />
-                )}
-              </>
-            </div>
+          {previewButtonPaths.includes(currentPath) && (
+            <PrimaryButton
+              leftIcon={<Eye className="text-2xl" />}
+              title="Preview"
+              type={"Outline"}
+              onClick={() => setIsOpen(true)}
+            />
           )}
-          {currentPath === "/staff-manager-panel/projects" && (
-            <div className="relative">
-              <>
-                {showButton && (
-                  <PrimaryButton
-                    leftIcon={<Upload className="text-2xl" />}
-                    title="Upload Submission"
-                    type="Primary"
-                    onClick={() => navigate("/staff-manager-panel/projects/upload-submission")}
-                  />
-                )}
-              </>
-            </div>
+
+          {saveDraftButtonPaths.includes(currentPath) && (
+            <PrimaryButton
+              leftIcon={<FileText className="text-2xl" />}
+              title="Save Draft"
+              type={"Outline"}
+              onClick={() => setIsOpen(true)}
+            />
           )}
+          {publishButtonPaths.includes(currentPath) && (
+            <PrimaryButton
+              leftIcon={<Megaphone className="text-2xl" />}
+              title="Publish"
+              type={"Primary"}
+              onClick={() => setIsOpen(true)}
+            />
+          )}
+
+          {uploadSubmissionButtonPaths.includes(currentPath) && (
+            <PrimaryButton
+              leftIcon={<Upload className="text-2xl" />}
+              title="Upload Submission"
+              type="Primary"
+              onClick={() => navigate("/staff-manager-panel/projects/upload-submission")}
+            />
+          )}
+
+
         </div>
       </div>
 
