@@ -24,6 +24,7 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
   const [tierName, setTierName] = useState("");
 
   const handleSave = async() => {
+    const toastId = toast.loading("Creating Node...")
     try {
       const payload = {
         taskName: tierName,
@@ -31,20 +32,19 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
         projectId: projectId,
       }
       const response = await createNode(chartId ? {...payload, parentId: chartId} : payload).unwrap()
-      console.log(response)
       if(response.success){
-        toast.success("Node Created Successfully")
+        toast.success("Node Created Successfully", {id: toastId})
+        onClose()
       }
     } catch {
-      toast.error("Cannot Create Node")
+      toast.error("Cannot Create Node", {id: toastId})
     }
     
     if (tierName.trim()) {
       onSave?.(tierName);   
-      console.log(tierName)
       setTierName("");
     } else {
-      toast.error("Please enter a tier name");
+      toast.error("Please enter a tier name", {id: toastId});
      }
   };
 
@@ -60,13 +60,7 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <button
-            onClick={handleClose}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <X size={24} />
-          </button>
-          <h2 className="text-xl font-semibold text-blue-600">Add New Tire</h2>
+          <h2 className="text-xl font-semibold text-blue-600">Add New Tier</h2>
           <button
             onClick={handleClose}
             className="text-red-500 hover:text-red-700"
@@ -87,7 +81,7 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
           <div>
             <input
               type="text"
-              placeholder="New Tire name"
+              placeholder="New Tier name"
               value={tierName}
               onChange={(e) => setTierName(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"

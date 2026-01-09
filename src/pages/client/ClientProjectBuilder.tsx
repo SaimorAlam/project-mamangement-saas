@@ -50,8 +50,8 @@ const ClientProjectBuilder = () => {
         <ProjectStats activeWidget={activeWidget} />
 
     {
-      projectsChartsData?.length > 0 && (
-        <div className="flex gap-6">
+      projectsChartsData?.length > 0 ? (
+        <div className="flex flex-wrap gap-6">
 {projectsChartsData?.map((item: any) => {
 
             if (item.category === "Bar" || item.category === "BAR") {
@@ -68,22 +68,19 @@ const ClientProjectBuilder = () => {
                     startingRange={item.firstFiledDataset}
                     endingRange={item.lastFiledDAtaset}
                     // chartId={item.id}
-                    
                   />
                 </div>
               );
             }
             return (
               <div key={item.id}>
-                <h2>{item.title}</h2>
-                <p>{item.description}</p>
+                {/* <h2>{item.title}</h2> */}
+                {/* <p>{item.description}</p> */}
               </div>
             );
           })}
         </div>
-      )
-    }
-        {selectedWidgets.length === 0 && (
+      ): (
           <>
             {/* <StackedBarChart /> */}
             <div className="flex gap-4">
@@ -115,8 +112,8 @@ const ClientProjectBuilder = () => {
             </div>
             <HeatmapChart />
           </>
-        )}
-
+        )
+        }
         {selectedWidgets.includes("bar-chart") && <StackedBarChartModule />}
         {selectedWidgets.includes("progress-ring") && (
           <ProgressRing

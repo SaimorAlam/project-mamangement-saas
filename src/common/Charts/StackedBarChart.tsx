@@ -9,11 +9,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Copy, Trash2, Download } from "lucide-react";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
-import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
@@ -67,14 +67,12 @@ export default function StackedBarChart({
   chartId,
   isCreationMode = false,
 }: Props) {
-  const { childTiers } = useChartData({ newData, isCreationMode, chartId });
-  console.log(childTiers)
-  console.log(newData)
+  const { childTiers } = useChartData({ newData, isCreationMode, chartId, xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange });
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
-  const [getChartTitleId] = useGetChartTitleIdMutation();
+
 
   const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
@@ -112,36 +110,82 @@ export default function StackedBarChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = async () => {
-    const payload = {
-      numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
-      showWidgets: legendValues.map((l) => ({
-        legend_name: l.label,
-        color: l.color,
-      })),
-      title: widgetTitle,
-      status: "ACTIVE",
-      category: "BAR",
-      xAxis: JSON.stringify({
-        labels: xAxisValues,
-        values: [],
-      }),
-      yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
-    };
+  const handleDownload = () => {
     setIsDownloading(true);
+    try {
+      const wb = XLSX.utils.book_new();
+      const usedNames = new Set<string>();
 
-    await DownloadAndSaveCSVforModuleOneWidget(
-      payload,
-      getChartTitleId,
-      widgetTitle,
-      xAxisValues,
-      legendValues
-    );
+      const getUniqueSheetName = (name: string) => {
+        // Excel sheet names max 31 chars, no special chars
+        let baseName = (name || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim();
+        if (baseName.length > 25) baseName = baseName.substring(0, 25);
+        if (!baseName) baseName = "Sheet"; 
 
-    setIsDownloading(false);
+        let uniqueName = baseName;
+        let counter = 1;
+        while (usedNames.has(uniqueName.toLowerCase())) {
+          uniqueName = `${baseName}_${counter}`;
+          counter++;
+        }
+        usedNames.add(uniqueName.toLowerCase());
+        return uniqueName;
+      };
+
+      // Helper to process data with correct headers (Legend Labels) but empty values
+      const processNodeData = (
+        name: string,
+        xAxis: string[],
+        legends: LegendValue[]
+      ) => {
+        // Create structure: Rows for each xAxis label, empty values for legend columns
+        const structureData = xAxis.map((label) => {
+          const newRow: any = { name: label };
+          legends.forEach((l) => {
+            newRow[l.label] = "";
+          });
+          return newRow;
+        });
+
+        const ws = XLSX.utils.json_to_sheet(structureData);
+        XLSX.utils.book_append_sheet(wb, ws, getUniqueSheetName(name));
+      };
+
+
+      // 1. Add current chart data
+      if (xAxisValues && legendValues) {
+        processNodeData(widgetTitle, xAxisValues, legendValues);
+      }
+
+      // 2. Recursive function for children
+      const processChildren = (nodes: any[]) => {
+        nodes.forEach((node) => {
+          if (node.xAxisValues && node.legendValues) {
+             processNodeData(
+              node.name || node.taskName,
+              node.xAxisValues,
+              node.legendValues
+             );
+          }
+
+          if (node.children && node.children.length > 0) {
+            processChildren(node.children);
+          }
+        });
+      };
+
+      if (childTiers && childTiers.length > 0) {
+        processChildren(childTiers);
+      }
+
+      XLSX.writeFile(wb, `${widgetTitle}.xlsx`);
+      toast.success("Excel downloaded successfully");
+    } catch (error) {
+      console.error("Excel download failed", error);
+      toast.error("Failed to download Excel");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleWidgetClick = () => {
@@ -236,6 +280,8 @@ export default function StackedBarChart({
                     <span>Copy</span>
                   </button>
 
+                  {/* Only show download on root chart (tierLevel === 0) */}
+                  {tierLevel === 0 && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -246,9 +292,9 @@ export default function StackedBarChart({
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
                   >
                     <Download size={18} />
-
                     <span>Download</span>
                   </button>
+                  )}
 
                   <button
                     onClick={(e) => {

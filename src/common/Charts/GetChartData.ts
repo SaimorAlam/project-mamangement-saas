@@ -7,10 +7,20 @@ const useChartData = ({
   newData,
   isCreationMode,
   chartId,
+  xAxisValues,
+  legendValues,
+  numOfLegendDataSet,
+  startingRange,
+  endingRange,
 }: {
   newData?: any;
   isCreationMode?: boolean;
   chartId?: string;
+  xAxisValues?: string[];
+  legendValues?: { label: string; color: string }[];
+  numOfLegendDataSet?: number;
+  startingRange?: number;
+  endingRange?: number;
 }) => {
   const [childTiers, setChildTiers] = useState<any[]>([]);
   const { projectId } = useAppSelector((state) => state.chartSlice);
@@ -20,17 +30,30 @@ const useChartData = ({
       getProjectTree(projectId);
     }
   }, [projectId, newData, isCreationMode]);
-  console.log(childNodes, "childNodes");
-  const projectTreeData = useMemo(
-    () =>
-      childNodes?.data?.map((item: any) => ({
+
+  const projectTreeData = useMemo(() => {
+    const processData = (items: any[]): any[] =>
+      items.map((item: any) => ({
         ...item,
         id: item.id,
         name: item.taskName,
-        children: item.children,
-      })) || [],
-    [childNodes]
-  );
+        xAxisValues,
+        legendValues,
+        numOfLegendDataSet,
+        startingRange,
+        endingRange,
+        children: item.children ? processData(item.children) : [],
+      }));
+
+    return childNodes?.data ? processData(childNodes.data) : [];
+  }, [
+    childNodes,
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+  ]);
 
   const findNodeById = (nodes: any[], id: string): any => {
     for (const node of nodes) {
