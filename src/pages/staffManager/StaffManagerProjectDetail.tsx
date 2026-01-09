@@ -1,4 +1,5 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState } from "react";
 import {
   Calendar,
   Clock,
@@ -7,15 +8,18 @@ import {
   TrendingUp,
   AlertCircle,
   ArrowLeft,
-  Trash2,
+  Eraser,
+  PencilLine,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import { useRemoveProjectFromFavoriteMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import { useDeleteManagerProjectMutation, useGetFavoriteProjectsQuery, useRemoveProjectFromFavoriteMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import ErrorPage from "@/common/ErrorPage";
 import { FaSpinner } from "react-icons/fa";
+import DeleteModal from "@/common/Modal/DeleteModal";
+import { ConfirmAlertModal } from "@/common/Modal/ConfirmAlertModal";
 
 const formatDate = (date: string | null) => {
   if (!date) return "—";
@@ -51,23 +55,30 @@ const getPriorityStyles = (priority: string) => {
 export default function StaffManagerProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data, isLoading, isError, error } = useGetProjectByIdQuery(
+  const [, setOpen] = useState(false);
+  const { data: projectData, isLoading, isError, error } = useGetProjectByIdQuery(
     id!
   );
-  const [deleteProject, { isLoading: isDeleting }] =
+  const { data: favoriteData } = useGetFavoriteProjectsQuery();
+  const [removeProjectFromFavorite] =
     useRemoveProjectFromFavoriteMutation();
 
-  const project = data?.data?.project || {};
+  const [deleteProject] = useDeleteManagerProjectMutation();
 
-  const handleDelete = async () => {
+  const project = projectData?.data?.project || {};
+
+  const handleRemove = async () => {
     if (!project) return;
-    if (
-      window.confirm("Are you sure you want to delete this project?")
-    ) {
-      await deleteProject(id).unwrap();
+
+      await removeProjectFromFavorite(id).unwrap();
       navigate("/staff-manager-panel");
-    }
+
   };
+  
+    const handleDelete = (id: string)=>{
+      deleteProject({id})
+      setOpen(false)
+    }
 
   if (isLoading) {
     return (
@@ -97,14 +108,41 @@ export default function StaffManagerProjectDetail() {
           </Button>
         </div>
 
-        <div className="flex items-center gap-9">
+        {/* action buttons  */}
+        <div className="flex items-center gap-6">
+          {favoriteData.data.some((element: any) => element.projectId === id) && (
+            <div className="mr-2">
+              {/* <div
+                onClick={handleRemove}
+                className="text-yellow-700"
+                title="Remove from favorite"
+              >
+                <Eraser size={18} />
+              </div> */}
+              <ConfirmAlertModal
+                id={project.id}
+                handleConfirm={handleRemove}
+                button={
+                  <div
+                    className="text-yellow-700"
+                    title="Remove from favorite"
+                  >
+                    <Eraser size={18} />
+                  </div>
+                }
+              />
+            </div>
+          )}
           <div
-            className="p-3 rounded-lg flex items-center gap-3 cursor-pointer bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
-            onClick={handleDelete}
+          title="Edit"
           >
-            <Trash2 size={18} />
-            {isDeleting ? "Removing..." : "Remove from Favourites"}
+            <PencilLine className="w-4 h-4 text-blue-500"/>
           </div>
+          <DeleteModal
+            deletingItemTitle={project.name}
+            deletingItemId={project.id}
+            onDelete={handleDelete}
+          />
         </div>
       </div>
 

@@ -40,7 +40,7 @@ const ProjectReviewStats = () => {
     {
       key: "OVERDUE",
       title: "Overdue",
-      value: "0%",
+      value: 0,
       growth: "",
       growth_type: "down",
       description: "Overdue projects",
