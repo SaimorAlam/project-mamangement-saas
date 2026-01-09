@@ -15,6 +15,5 @@ const formSlice = createSlice({
     },
   },
 });
-
 export const { submitForm } = formSlice.actions;
 export default formSlice.reducer;

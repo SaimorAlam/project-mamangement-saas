@@ -1,12 +1,13 @@
-import Layout from './Layout/Layout'
+import { Toaster } from "sonner";
+import Layout from "./Layout/Layout";
 
 function App() {
-
   return (
     <>
-     <Layout></Layout>
+      <Layout />
+      <Toaster position="top-right" />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

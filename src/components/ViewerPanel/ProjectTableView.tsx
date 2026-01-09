@@ -1,0 +1,158 @@
+import { Eye, Flag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
+import RenderStaffAvatars from "./RenderStaffAvater";
+import { useNavigate } from "react-router-dom";
+
+export interface StaffMember {
+  name: string;
+  avatar: string;
+}
+
+export interface ProgramCardProps {
+  id: string;
+  programName: string;
+  projectName: string;
+  status: string;
+  staffMembers: StaffMember[];
+  startDate: string;
+  endDate: string;
+  priority: "High" | "Medium" | "Low" | string;
+  progress: number;
+}
+
+export type StatusType =
+  | "Live"
+  | "Returned"
+  | "Overdue"
+  | "Draft"
+  | "In Review"
+  | "Submitted";
+
+interface AllProgramProjectGridViewProps {
+  allProgramProjectData: ProgramCardProps[];
+}
+
+const ProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
+  allProgramProjectData: paginatedData,
+}) => {
+  const priorityColors = {
+    High: "text-red-600",
+    Medium: "text-orange-600",
+    Low: "text-blue-600",
+    Default: "text-gray-600",
+  };
+
+  const renderPriority = (priority: ProgramCardProps["priority"]) => (
+    <div className="flex items-center gap-1">
+      <Flag
+        className={`w-4 h-4 ${
+          priorityColors[priority as keyof typeof priorityColors] ||
+          priorityColors.Default
+        }`}
+      />
+      <span
+        className={`text-sm font-medium ${
+          priorityColors[priority as keyof typeof priorityColors] ||
+          priorityColors.Default
+        }`}
+      >
+        {priority}
+      </span>
+    </div>
+  );
+  const navigate = useNavigate();
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  return (
+    <Card className="w-full shadow-none border-none">
+      <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full min-h-[420px]">
+        <Table className="">
+          <TableHeader>
+            <TableRow className="border-b border-[#E2E8F0] bg-[#F7F9FA]">
+              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+                Program
+              </TableHead>
+              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+                Project
+              </TableHead>
+              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+                Assign Staff
+              </TableHead>
+              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+                Priority
+              </TableHead>
+              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+                Started On
+              </TableHead>
+              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+                Deadline
+              </TableHead>
+              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+                Action
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedData?.map((item) => (
+              <TableRow
+                key={item.id}
+                className="border-b border-[#E2E8F0] hover:bg-muted/30 transition-colors odd:bg-white even:bg-[#F7F9FA]"
+              >
+                <TableCell className="text-base font-medium px-6 py-3.5">
+                  {item.programName}
+                </TableCell>
+                <TableCell className="text-base px-6 py-3.5">
+                  {item.projectName}
+                </TableCell>
+                <TableCell className="px-6 py-3.5">
+                  <RenderStaffAvatars staff={item.staffMembers} />
+                </TableCell>
+                <TableCell className="px-6 py-3.5">
+                  {renderPriority(item.priority)}
+                </TableCell>
+                <TableCell className="px-6 py-3.5 text-base text-muted-foreground">
+                  {formatDate(item.startDate)}
+                </TableCell>
+                <TableCell className="px-6 py-3.5 text-base text-muted-foreground">
+                  {formatDate(item.endDate)}
+                </TableCell>
+                <TableCell className="px-6 py-3.5">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="default"
+                      className=" p-4 bg-blue-500 text-white"
+                      size="sm"
+                      onClick={() => {
+                        navigate("/viewer-panel/projects", {
+                          state: { id: item?.id },
+                        });
+                      }}
+                    >
+                      <Eye className="w-4 h-4" />
+                      View Project
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default ProjectTableView;

@@ -1,0 +1,432 @@
+# Chart Widget Specifications for LawalX Project
+
+I'll provide corrected and detailed widget specifications for each chart type, aligned with your Stacked Bar Chart widget pattern.
+
+---
+
+## 1) **STACKED BAR CHART** ✓
+**Status:** Already designed (reference template)
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- X-field selector (auto-populate from dataset)
+- Series Manager (min 2, max 5):
+    - Series label input
+    - Color picker
+    - Include in stack toggle
+    - Drag-to-reorder handle
+- Mode toggle: Absolute / 100%
+- Aggregate function dropdown: Sum / Count / Avg
+- Sort categories dropdown: Alphabetical / By Total / Custom
+- Values display toggle: Raw / Percentage
+- Legend toggle + Position selector: Top / Bottom / Left / Right
+- Tooltip toggle: Raw + Percentage
+- Filters section: Field filters + Date range picker
+- Accessibility label input
+
+---
+
+## 2) **PIE CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- Slice Manager (min 1, max 5):
+    - Slice label input
+    - Value source selector: Field / Static value
+    - Field selector (if field mode) / Number input (if static)
+    - Color picker
+    - Show in legend toggle
+- Display mode toggle: Values / Percentages
+- Inner radius toggle (converts to donut)
+- Inner radius slider: 0-70% (only if donut enabled)
+- Label position toggle: Inside / Outside
+- Sort slices toggle: By value (descending)
+- Filters section: Field filters + Date range picker
+- Start angle slider: 0-360°
+
+---
+
+## 3) **DOUGHNUT CHART**
+
+**Widget Controls:**
+- Title input
+- Segments Manager (min 1, max 8):
+    - Segment label input
+    - Value input (number)
+    - Color picker
+    - Delete button
+- Inner radius slider: 30-80%
+- Outer radius slider: 80-120%
+- Display mode toggle: Values / Percentages
+- Center label toggle
+- Center label text input (if enabled)
+- Legend toggle + Position selector: Top / Bottom / Left / Right
+- Tooltip toggle
+- Rotation angle slider: 0-360°
+
+---
+
+## 4) **RADAR CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- Axes Manager (min 3, max 6):
+    - Axis label input
+    - Max range input (optional, auto-calculate if empty)
+    - Delete button
+- Series Manager (min 1, max 5):
+    - Series name input
+    - Field selector dropdown
+    - Color picker
+    - Delete button
+- Grid shape toggle: Circle / Polygon
+- Show axis labels toggle
+- Show grid toggle
+- Tooltip toggle
+- Legend toggle + Position selector
+
+---
+
+## 5) **HEATMAP CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- X-labels field selector dropdown
+- Y-labels field selector dropdown
+- Value field selector dropdown
+- Aggregation function dropdown: Sum / Avg / Count / Max
+- Color scale picker (3+ color stops):
+    - Add/remove color stops
+    - Color picker per stop
+    - Value threshold input per stop
+- Min value input (auto/manual)
+- Max value input (auto/manual)
+- Cell labels toggle: None / Values / Percentages
+- Cell label position toggle: Center / Corner
+- Tooltip toggle
+- Reverse color scale toggle
+
+---
+
+## 6) **MULTI-AXIS LINE CHART**
+
+**Widget Controls:**
+- Title input
+- X-axis categories field selector
+- Y-axes Manager (max 3):
+    - Axis label input
+    - Min value input
+    - Max value input
+    - Position toggle: Left / Right
+    - Delete button
+- Datasets Manager (min 1, max 5):
+    - Dataset name input
+    - Y-axis binding dropdown
+    - Color picker
+    - Line style selector: Solid / Dashed / Dotted
+    - Show dots toggle
+    - Stroke width slider: 1-5px
+    - Delete button
+- Legend toggle + Position selector
+- Tooltip toggle
+- Grid toggle
+
+---
+
+## 7) **HORIZONTAL BAR CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- Bar field selector dropdown (for values)
+- Bar label field selector dropdown
+- Bar manager mode: Manual / Auto from dataset
+    - If Manual:
+        - Bars Manager (min 1, max 10):
+            - Label input
+            - Value input
+            - Color picker
+            - Delete button
+    - If Auto from dataset: Use field selectors above
+- Show grid toggle
+- Sort toggle: By value (ascending/descending)
+- Show values on bars toggle
+- Legend toggle
+- Tooltip toggle
+
+---
+
+## 8) **AREA CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- X-labels field selector dropdown
+- Datasets Manager (min 1, max 5):
+    - Dataset name input
+    - Field selector dropdown
+    - Color picker
+    - Opacity slider: 0-100%
+    - Show dots toggle
+    - Delete button
+- Curve type selector: Smooth / Straight / Monotone
+- Stack areas toggle: Yes / No
+- Show legend toggle + Position selector
+- Tooltip toggle
+- Show grid toggle
+- Animate chart on load toggle
+
+---
+
+## 9) **PARETO CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown (or manual mode)
+- Categories Manager (min 2, max 10):
+    - Category label input
+    - Value input
+    - Color picker
+    - Delete button
+- Bar color picker (default for all categories)
+- Line (cumulative) color picker
+- Show cumulative percentage toggle
+- Cumulative line style selector: Solid / Dashed
+- Show cumulative values toggle
+- Sort categories toggle: By value descending
+- Legend toggle + Position selector
+- Tooltip toggle
+
+---
+
+## 10) **FUNNEL CHART**
+
+**Widget Controls:**
+- Title input
+- Funnel orientation selector: Top-down / Bottom-up / Left-right
+- Steps Manager (min 2, max 8):
+    - Step label input
+    - Value input
+    - Color picker
+    - Show percentage toggle (compared to first step)
+    - Delete button
+- Display type toggle: Solid / Gradient / Outline
+- Show values inside toggle
+- Show percentage inside toggle
+- Legend toggle
+- Tooltip toggle
+- Animate on load toggle
+
+---
+
+## 11) **SCATTER CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- X-axis label input
+- Y-axis label input
+- X-field selector dropdown
+- Y-field selector dropdown
+- Datasets Manager (min 1, max 5):
+    - Dataset name input
+    - Color picker
+    - Bubble size field selector (optional)
+    - Show data labels toggle
+    - Delete button
+- Bubble size slider: 3-20px
+- Show grid toggle
+- Legend toggle + Position selector
+- Tooltip toggle
+- Zoom/Pan toggle
+
+---
+
+## 12) **HISTOGRAM CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- Value field selector dropdown
+- Number of bins input: 3-50
+- Bar color picker
+- Show mean line toggle
+- Mean line color picker (if enabled)
+- Show median line toggle
+- Median line color picker (if enabled)
+- Show normal distribution curve toggle
+- Legend toggle
+- Tooltip toggle
+- Grid toggle
+- X-axis label input
+- Y-axis label input
+
+---
+
+## 13) **BUBBLE CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- X-field selector dropdown
+- Y-field selector dropdown
+- Bubble size field selector dropdown
+- Bubble color field selector dropdown (optional, for color gradient)
+- Datasets Manager (min 1, max 5):
+    - Dataset name input
+    - Color picker
+    - Opacity slider: 0-100%
+    - Delete button
+- Min bubble size slider: 5-15px
+- Max bubble size slider: 15-50px
+- Legend toggle + Position selector
+- Tooltip toggle: Show X, Y, Size values
+- Grid toggle
+
+---
+
+## 14) **WATERFALL CHART**
+
+**Widget Controls:**
+- Title input
+- Steps Manager (min 2, max 10):
+    - Step name input
+    - Value input (positive/negative)
+    - Color picker (or auto: green for positive, red for negative)
+    - Delete button
+- Total step toggle: Yes / No
+- Color for positive values picker
+- Color for negative values picker
+- Show values on bars toggle
+- Show connector lines toggle
+- Legend toggle
+- Tooltip toggle
+- Sort steps toggle: By value
+
+---
+
+## 15) **SOLID GAUGE CHART**
+
+**Widget Controls:**
+- Title input
+- Min value input
+- Max value input
+- Current value input / Data field selector
+- Gauge color picker
+- Threshold zones (optional):
+    - Add/remove zones
+    - Zone range inputs (from-to)
+    - Zone color picker per range
+- Show percentage toggle
+- Show value label toggle
+- Gauge size selector: Small / Medium / Large
+- Animation on load toggle
+- Needle color picker
+- Center label input (optional)
+
+---
+
+## 16) **CANDLESTICK CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- X-field selector dropdown (dates)
+- Open field selector dropdown
+- High field selector dropdown
+- Low field selector dropdown
+- Close field selector dropdown
+- Volume field selector dropdown (optional)
+- Up color picker (bullish candle)
+- Down color picker (bearish candle)
+- Show volume chart toggle (below main chart)
+- Legend toggle
+- Tooltip toggle: Show OHLC values
+- Moving average toggle: 5-day / 10-day / 20-day
+- MA color picker (if enabled)
+- Grid toggle
+
+---
+
+## 17) **GEOGRAPHIC MAP CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- Region selector dropdown: World / Continent / Country (with sub-regions)
+- Location field selector (country/state codes)
+- Value field selector dropdown
+- Aggregation function (if multiple values per location)
+- Color scale picker (2-3 color stops):
+    - Min color picker
+    - Max color picker
+    - Mid color picker (optional)
+- Min value input (auto/manual)
+- Max value input (auto/manual)
+- Show labels toggle
+- Legend toggle
+- Tooltip toggle: Show location + value
+- Zoom controls toggle
+- Map style selector: Light / Dark / Satellite (if available)
+
+---
+
+## 18) **SPLINE CHART**
+
+**Widget Controls:**
+- Title input
+- Dataset selector dropdown
+- X-axis field selector dropdown
+- Datasets Manager (min 1, max 5):
+    - Dataset name input
+    - Y-field selector dropdown
+    - Color picker
+    - Line style selector: Solid / Dashed / Dotted
+    - Show dots toggle
+    - Stroke width slider: 1-5px
+    - Delete button
+- Spline type selector: Catmull Rom / Natural / Linear
+- Show grid toggle
+- Legend toggle + Position selector
+- Tooltip toggle
+- Animate on load toggle
+- Smooth curve tension slider: 0-1
+
+---
+
+## **General Widget Features (All Charts):**
+
+1. **Header Section:**
+     - Chart title input field
+     - Chart type display (read-only)
+     - Preview toggle (eye icon)
+
+2. **Data Section:**
+     - Dataset selector
+     - Field selectors (context-dependent)
+     - Filter panel (collapse/expand)
+
+3. **Appearance Section:**
+     - Color pickers (organized by element)
+     - Legend controls
+     - Label toggles
+     - Position selectors
+
+4. **Advanced Section (Collapsible):**
+     - Animation toggles
+     - Custom CSS/styling
+     - Accessibility options
+     - Tooltips configuration
+
+5. **Footer Section:**
+     - Save/Cancel buttons
+     - Reset to defaults button
+     - Preview/Live toggle
+
+---
+
+This structure aligns with your Stacked Bar Chart template and provides comprehensive, organized controls for your UI/UX designer.
