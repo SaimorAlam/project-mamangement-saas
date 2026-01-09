@@ -59,33 +59,30 @@ const StaffEmployeeDashboardHeader = () => {
             onClose={() => setIsOpen(false)}
           />
 
-          {/* Preview */}
-          <PrimaryButton
-            leftIcon={<Eye className="text-2xl" />}
-            title="Preview"
-            type={"Outline"}
-            onClick={() => setIsOpen(true)}
-          />
-
-          {/* Save Draft */}
-          <PrimaryButton
-            leftIcon={<FileText className="text-2xl" />}
-            title="Save Draft"
-            type={"Outline"}
-            onClick={() => setIsOpen(true)}
-          />
-
-          {/* Publish */}
-          <PrimaryButton
-            leftIcon={<Megaphone className="text-2xl" />}
-            title="Publish"
-            type={
-              currentPath === "/staff-manager-panel"
-                ? "Outline"
-                : "Primary"
-            }
-            onClick={() => setIsOpen(true)}
-          />
+          {currentPath === "/staff-employee-panel/projects" && (
+            <PrimaryButton
+              leftIcon={<Eye className="text-2xl" />}
+              title="Preview"
+              type={"Outline"}
+              onClick={() => setIsOpen(true)}
+            />
+          )}
+          {currentPath === "/staff-employee-panel/projects" && (
+            <PrimaryButton
+              leftIcon={<FileText className="text-2xl" />}
+              title="Save Draft"
+              type={"Outline"}
+              onClick={() => setIsOpen(true)}
+            />
+          )}
+          {currentPath === "/staff-employee-panel/projects" && (
+            <PrimaryButton
+              leftIcon={<Megaphone className="text-2xl" />}
+              title="Publish"
+              type={"Primary"}
+              onClick={() => setIsOpen(true)}
+            />
+          )}
 
           {/* Conditional Quick Action */}
           {currentPath === "/staff-employee-panel" && (
@@ -110,13 +107,13 @@ const StaffEmployeeDashboardHeader = () => {
               <BreadcrumbItem>
                 <BreadcrumbPage className="text-[#356DF0] flex items-center justify-center gap-1 ">
                   {currentRoute.icon &&
-                  React.isValidElement(currentRoute.icon)
+                    React.isValidElement(currentRoute.icon)
                     ? cloneElement(
-                        currentRoute.icon as React.ReactElement<{
-                          className?: string;
-                        }>,
-                        { className: "w-4 h-4" }
-                      )
+                      currentRoute.icon as React.ReactElement<{
+                        className?: string;
+                      }>,
+                      { className: "w-4 h-4" }
+                    )
                     : null}
                   {currentRoute.name}
                 </BreadcrumbPage>

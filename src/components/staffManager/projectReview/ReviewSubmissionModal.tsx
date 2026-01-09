@@ -27,7 +27,6 @@ const ReviewSubmissionModal = ({
     onClose();
   }
 
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
