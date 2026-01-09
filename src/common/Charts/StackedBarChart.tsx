@@ -140,7 +140,8 @@ export default function StackedBarChart({
       ) => {
         // Create structure: Rows for each xAxis label, empty values for legend columns
         const structureData = xAxis.map((label) => {
-          const newRow: any = { name: label };
+          // Use "Label" as the header for the first column containing x-axis values
+          const newRow: any = { "Label": label };
           legends.forEach((l) => {
             newRow[l.label] = "";
           });
