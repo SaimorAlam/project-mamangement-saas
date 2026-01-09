@@ -138,17 +138,19 @@ export default function StackedBarChart({
         xAxis: string[],
         legends: LegendValue[]
       ) => {
-        // Create structure: Rows for each xAxis label, empty values for legend columns
-        const structureData = xAxis.map((label) => {
-          // Use "Label" as the header for the first column containing x-axis values
-          const newRow: any = { "Label": label };
-          legends.forEach((l) => {
-            newRow[l.label] = "";
-          });
-          return newRow;
-        });
+        // Create headers: "Label" followed by legend labels
+        const headers = ["Label", ...legends.map(l => l.label)];
 
-        const ws = XLSX.utils.json_to_sheet(structureData);
+        // Create rows: label followed by empty strings for each legend
+        const rows = xAxis.map(label => [
+          label,
+          ...legends.map(() => "")
+        ]);
+
+        // Combine headers and rows
+        const data = [headers, ...rows];
+
+        const ws = XLSX.utils.aoa_to_sheet(data);
         XLSX.utils.book_append_sheet(wb, ws, getUniqueSheetName(name));
       };
 
