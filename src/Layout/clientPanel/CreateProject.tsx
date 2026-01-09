@@ -83,7 +83,6 @@ const CreateProject = ({
 }) => {
   const { allEmployees: allEmployeesData, isLoading: employeeLoading } =
     useGetAllEmployees();
-  console.log(allEmployeesData);
   const [createProject, { isLoading, isSuccess }] = useCreateProjectMutation();
 
   // Queries
@@ -267,7 +266,7 @@ const CreateProject = ({
         managerId: data.managerId || null,
         employeeIds: selectedStaffs,
         startDate: toISO(data.startDate),
-        progress: 0,
+        computedProgress: 0,
         chartList: [],
         estimatedCompletedDate: toISO(data.estimatedCompletedDate),
         currentRate: data.currentRate || "0",

@@ -47,7 +47,7 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^12.23.25",
     "handsontable": "^16.2.0",
-    "jspdf": "^3.0.4",
+    "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.2",
     "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
