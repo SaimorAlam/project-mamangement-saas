@@ -6,6 +6,7 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import fileReducer from "./Slices/FileSlice/FileSlice";
 import chartSliceReducer from "./Slices/ChartSlice/ChartSlice";
+import adminApi from "./Api/BaseApi/AdminApi";
 
 const persistConfig = {
   key: "root",
@@ -19,6 +20,7 @@ const persistedAuthReducer = persistReducer(
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
+    [adminApi.reducerPath]: adminApi.reducer,
     auth: persistedAuthReducer,
     form: formReducer,
     file: fileReducer,
@@ -27,7 +29,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(baseApi.middleware),
+    }).concat(baseApi.middleware, adminApi.middleware),
 });
 
 // Define RootState and AppDispatch types

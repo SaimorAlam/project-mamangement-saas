@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setUser } from "@/store/Slices/AuthSlice/authSlice";
 import { jwtDecode } from "jwt-decode";
+import { useAdminLoginMutation } from "@/store/Api/AuthApi/AdminApi";
 
 const Role = {
   VIEWER: "viewer-panel",
@@ -26,6 +27,7 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const [login] = useLoginMutation();
+  const [adminLogin] = useAdminLoginMutation();
   const dispatch = useAppDispatch();
   const {
     register,
@@ -45,8 +47,14 @@ const Login = () => {
     const toastId = toast.loading("Logging in...");
     try {
       const res = await login(data).unwrap();
+      const resAdmin = await adminLogin(data).unwrap();
+      console.log(resAdmin, "Res Admin")
       if (res.success) {
-        dispatch(setUser(res?.data));
+        const data ={
+          ...res.data,
+          adminData: resAdmin.data
+        }
+        dispatch(setUser(data));
         toast.success("Logged in successfully", { id: toastId });
         if (res.data.specialToken) {
           navigate("/verification");

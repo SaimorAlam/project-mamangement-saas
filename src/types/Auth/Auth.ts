@@ -12,6 +12,8 @@ export interface User {
   profileImage?: string;
   status?: string;
   id?: string;
+  adminAccessToken?: string;
+  adminRefreshToken?: string;
 }
 
 export interface Role {
