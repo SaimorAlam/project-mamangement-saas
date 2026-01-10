@@ -8,6 +8,7 @@ const chartApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Charts"]
     }),
     getActiveInChart: builder.query({
       query: () => ({
@@ -26,6 +27,7 @@ const chartApi = baseApi.injectEndpoints({
         url: `/charts/project/${id}`,
         method: "GET",
       }),
+      providesTags: ["Charts"]
     }),
     getChartById: builder.query({
       query: (id) => ({

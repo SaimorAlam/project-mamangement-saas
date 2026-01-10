@@ -69,6 +69,7 @@ const baseApi = createApi({
     "Favorite",
     "Clients",
     "Nodes",
+    "Charts",
   ],
 });
 export default baseApi;
