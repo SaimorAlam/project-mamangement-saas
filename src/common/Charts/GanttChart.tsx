@@ -42,12 +42,35 @@ const GanttChart = () => {
       tooltip: true,
     });
 
+    gantt.config.layout = {
+  css: "gantt_container",
+  cols: [
+    {
+      width: 420,     // initial left width
+      min_width: 250, // minimum left size
+      rows: [
+        { view: "grid", scrollX: "gridScroll", scrollY: "scrollVer" },
+        { view: "scrollbar", id: "gridScroll", group: "horizontal" }
+      ]
+    },
+    { resizer: true, width: 1 },   // 👈 THIS IS THE DRAG HANDLE
+    {
+      rows: [
+        { view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer" },
+        { view: "scrollbar", id: "scrollHor", group: "horizontal" }
+      ]
+    },
+    { view: "scrollbar", id: "scrollVer" }
+  ]
+};
+
+
     //    CORE CONFIG   
     gantt.config.date_format = "%Y-%m-%d";
     gantt.config.drag_progress = true;
     gantt.config.drag_resize = true;
     gantt.config.drag_move = true;
-    gantt.config.grid_resize = true;
+    // gantt.config.grid_resize = true;
     gantt.config.fit_tasks = true;
     gantt.config.order_branch = true;
     gantt.config.order_branch_free = true;
@@ -218,7 +241,7 @@ const GanttChart = () => {
       if (task.parent) enforceParentRange(task.parent);
     });
 
-    gantt.attachEvent("onAfterTaskDelete", function (id:any, task:any) {
+    gantt.attachEvent("onAfterTaskDelete", function (_id:any, task:any) {
       if (task.parent) enforceParentRange(task.parent);
     });
 
