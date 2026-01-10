@@ -34,7 +34,7 @@ const EmployeeTable = () => {
 
   const users = data?.data?.data || [];
   const meta = data?.data?.meta;
-
+  console.log(users,"users")
   useEffect(() => {
     if (currentPage !== 1) {
       setPageLoading(true);
@@ -197,9 +197,9 @@ const EmployeeTable = () => {
             >
               Role {renderSortIcon("role")}
             </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold">
+            {/* <th className="px-4 py-3 text-left text-sm font-semibold">
               Assign Project
-            </th>
+            </th> */}
             <th
               className="px-4 py-3 text-left text-sm font-semibold cursor-pointer"
               onClick={() => handleSort("lastActive")}
@@ -215,7 +215,9 @@ const EmployeeTable = () => {
         <tbody>
           {isLoading
             ? renderSkeleton()
-            : filteredUsers.map((user: any) => (
+            : filteredUsers.map((user: any) => {
+              console.log(user)
+              return (
                 <tr
                   key={user.id}
                   className="even:bg-gray-50 odd:bg-white hover:bg-gray-100 transition h-12"
@@ -250,7 +252,7 @@ const EmployeeTable = () => {
                       {user.role}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 align-middle">
+                  {/* <td className="px-4 py-3 align-middle">
                     <div className="flex flex-wrap gap-1">
                       {user.assignedProjects?.length
                         ? user.assignedProjects.map((p: any) => (
@@ -264,7 +266,7 @@ const EmployeeTable = () => {
                           ))
                         : ""}
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {user.lastActive
                       ? new Date(user.lastActive).toLocaleDateString("en-US")
@@ -316,7 +318,9 @@ const EmployeeTable = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )
+            }
+            )}
 
           {/* Fill remaining rows to maintain table height */}
           {!loading &&
