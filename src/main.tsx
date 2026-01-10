@@ -7,6 +7,12 @@ import { Provider } from "react-redux";
 import { persistor, store } from "./store/store.ts";
 import { PersistGate } from "redux-persist/integration/react";
 
+import "@syncfusion/ej2-base/styles/material.css";
+import "@syncfusion/ej2-buttons/styles/material.css";
+import "@syncfusion/ej2-react-gantt/styles/material.css";
+import "@syncfusion/ej2-react-dropdowns/styles/material.css";
+
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
