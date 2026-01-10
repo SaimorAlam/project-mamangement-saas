@@ -53,7 +53,6 @@ const ClientProjectBuilder = () => {
       projectsChartsData?.length > 0 ? (
         <div className="flex flex-wrap gap-6">
 {projectsChartsData?.map((item: any) => {
-
             if (item.category === "Bar" || item.category === "BAR") {
               return (
                 <div key={item.id} className="w-full">
@@ -80,7 +79,7 @@ const ClientProjectBuilder = () => {
             );
           })}
         </div>
-      ): (
+      ): selectedWidgets.length === 0 && (
           <>
             {/* <StackedBarChart /> */}
             <div className="flex gap-4">
