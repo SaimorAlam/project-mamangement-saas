@@ -1,12 +1,15 @@
 import BoxContainer from "@/common/BoxContainer";
 import DescriptionTextArea from "@/common/DescriptionTextArea";
 import PrimaryButton from "@/common/PrimaryButton";
+import GanttModule from "@/modules/gantt/GanttModule";
+// import SyncfusionGanttModule from "@/modules/gantt/SyncfusionGanttModule";
 import { Send } from "lucide-react";
 
 const StaffManagerFeedback = () => {
   const handleAttachment = () => {};
   const handleEmoji = () => {};
   return (
+    <>
     <div className="w-1/3 mx-auto">
       <BoxContainer>
         <div className="space-y-6">
@@ -37,6 +40,9 @@ const StaffManagerFeedback = () => {
         </div>
       </BoxContainer>
     </div>
+    <GanttModule />
+    {/* <SyncfusionGanttModule /> */}
+    </>
   );
 };
 

@@ -65,3 +65,52 @@
     -moz-appearance: textfield;
   }
 }
+
+/* this is for gannt chart from sheet  */
+.today {
+  background: red;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.toolbar-btn:hover {
+  background: #e2e8f0;
+}
+
+.toolbar-btn-1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 2px solid #d4d4d4;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.toolbar-btn-2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  color: white;
+  background: #1C73E0;
+  border: 2px solid #1C73E0;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.toolbar-btn-1:hover {
+  background: #e2e8f0;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+}
+.toolbar-btn-2:hover {
+  background: #267eeb;
+  border: 2px solid #267eeb;
+  cursor: pointer;
+}

@@ -13,6 +13,7 @@ import {
   Megaphone,
   Building2,
   Store,
+  FolderClosed,
 } from "lucide-react";
 import { IoSettingsOutline } from "react-icons/io5";
 
@@ -50,28 +51,28 @@ export const getStaffManagerSidebarItems = (): SidebarGroup[] => {
           name: "Project Builder",
           path: "/staff-manager-panel/project-builder",
         },
-        {
-          icon: <FileChartColumnIncreasing />,
-          name: "Project Review",
-          path: "/staff-manager-panel/project-review/all-projects",
-        },
         // {
         //   icon: <FileChartColumnIncreasing />,
         //   name: "Project Review",
-        //   path: "/staff-manager-panel/project-review",
-        //   children: [
-        //     {
-        //       icon: <FileChartColumnIncreasing />,
-        //       name: "Project Review",
-        //       path: "all-projects",
-        //     },
-        //     {
-        //       icon: <FolderClosed />,
-        //       name: "Carlyle Hall",
-        //       path: "carlyle-hall",
-        //     },
-        //   ],
+        //   path: "/staff-manager-panel/project-review/all-projects",
         // },
+        {
+          icon: <FileChartColumnIncreasing />,
+          name: "Project Review",
+          path: "/staff-manager-panel/project-review",
+          children: [
+            {
+              icon: <FileChartColumnIncreasing />,
+              name: "Project Review",
+              path: "all-projects",
+            },
+            {
+              icon: <FolderClosed />,
+              name: "Carlyle Hall",
+              path: "carlyle-hall",
+            },
+          ],
+        },
       ],
     },
     {

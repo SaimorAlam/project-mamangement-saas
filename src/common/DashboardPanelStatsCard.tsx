@@ -71,6 +71,7 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
 
             <h3 className="text-gray-700 font-semibold text-lg">{title}</h3>
           </div>
+          
 
           {/* Value and growth */}
           <div className="flex items-center justify-between overflow-hidden">
