@@ -13,14 +13,12 @@ const baseQuery = fetchBaseQuery({
   prepareHeaders: (headers, { getState }) => {
     const state = getState() as any;
     const token = state.auth.user?.adminAccessToken;
-    console.log(token,"Admin Access Token")
     if (token) {
       headers.set("Authorization", `${token}`);
     }
     return headers;
   },
 });
-
 
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
@@ -31,7 +29,6 @@ const baseQueryWithReauth: BaseQueryFn<
   if (result.error && result.error.status === 401) {
     const state = api.getState() as any;
     const refreshToken = state.auth.user?.adminRefreshToken;
-    console.log(refreshToken,"Admin Refresh Token")
     if (!refreshToken) {
       api.dispatch(logOut());
       return result;

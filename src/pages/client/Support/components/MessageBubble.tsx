@@ -1,21 +1,22 @@
 import React from "react";
 import { FileIcon } from "lucide-react";
 import { Message } from "./types";
+import { useAppSelector } from "@/hooks/useRedux";
 
 interface MessageBubbleProps {
   msg: Message;
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ msg }) => {
+  const role = useAppSelector((state) => state.auth.user?.role);
   return (
     <div
-      className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+      className={`flex ${(msg.sender === "CLIENT" && role === "CLIENT") ? "justify-end" : "justify-start"}`}
     >
       <div className="max-w-[85%] flex flex-col space-y-1">
         <div
           className={`rounded-2xl px-4 py-2.5 text-sm shadow-sm transition-all duration-200 ${
-            msg.sender === "user"
-              ? "bg-linear-to-tr from-blue-600 to-blue-500 text-white rounded-br-none hover:shadow-blue-200/50"
+            (msg.sender === "CLIENT" && role === "CLIENT") ? "bg-linear-to-tr from-blue-600 to-blue-500 text-white rounded-br-none hover:shadow-blue-200/50"
               : "bg-white border border-slate-100 text-slate-800 rounded-bl-none hover:border-slate-200"
           }`}
         >
@@ -45,7 +46,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ msg }) => {
         </div>
         <span
           className={`text-[10px] text-slate-400 px-1 ${
-            msg.sender === "user" ? "text-right" : "text-left"
+            (msg.sender === "CLIENT" && role === "CLIENT") ? "text-right" : "text-left"
           }`}
         >
           {new Date(msg.timestamp).toLocaleTimeString([], {
