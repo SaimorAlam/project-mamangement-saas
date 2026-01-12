@@ -1,7 +1,7 @@
-import baseApi from "../BaseApi/BaseApi";
+import adminApi from "../BaseApi/AdminApi";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const ClientSupportApi = baseApi.injectEndpoints({
+const ClientSupportApi = adminApi.injectEndpoints({
   endpoints: (builder) => ({
     createSupport: builder.mutation({
       query: (data: any) => ({

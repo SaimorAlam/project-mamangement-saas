@@ -8,7 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Copy, Trash2, Download } from "lucide-react";
+import { Copy, Trash2, Download, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { BsThreeDots } from "react-icons/bs";
@@ -52,6 +52,7 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
   isCreationMode?: boolean;
+  allUploadedData?: { [key: string]: ChartData[] };
 };
 
 export default function StackedBarChart({
@@ -66,7 +67,9 @@ export default function StackedBarChart({
   tierLevel = 0,
   chartId,
   isCreationMode = false,
+  allUploadedData,
 }: Props) {
+  const [localUploadedData, setLocalUploadedData] = useState<{ [key: string]: ChartData[] } | undefined>(allUploadedData);
   const { childTiers } = useChartData({ newData, isCreationMode, chartId, xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange });
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
@@ -75,6 +78,20 @@ export default function StackedBarChart({
 
 
   const chartData: ChartData[] = useMemo(() => {
+    // Check if we have uploaded data for this specific chart
+    const sheetName = (widgetTitle || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim().substring(0, 31);
+    
+    // Try to find the data in localUploadedData (priority) or allUploadedData
+    const dataToUse = localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+
+    if (dataToUse && dataToUse.length > 0) {
+      // Validate that the data matches the current xAxisValues and legendValues
+      // Or just trust it? Let's try to match it.
+      // We need to ensure the keys in dataToUse match legendValues fields.
+      // If the uploaded data uses labels as keys, we need to map them.
+      return dataToUse;
+    }
+
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateChartData(
       xAxisValues,
@@ -89,6 +106,9 @@ export default function StackedBarChart({
     numOfLegendDataSet,
     startingRange,
     endingRange,
+    widgetTitle,
+    localUploadedData,
+    allUploadedData
   ]);
 
   /*   TOTAL   */
@@ -209,6 +229,47 @@ export default function StackedBarChart({
     }
   };
 
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const bstr = evt.target?.result as string;
+        const wb = XLSX.read(bstr, { type: "binary" });
+        const allData: { [key: string]: ChartData[] } = {};
+
+        wb.SheetNames.forEach((sheetName) => {
+          const ws = wb.Sheets[sheetName];
+          const rawData: any[] = XLSX.utils.sheet_to_json(ws);
+          
+          if (rawData.length > 0) {
+            const processedData = rawData.map((row: any) => {
+              const item: ChartData = { name: row["Label"] || "" };
+              legendValues.forEach(l => {
+                if (row[l.label] !== undefined) {
+                  item[l.field] = Number(row[l.label]);
+                } else if (row[l.field] !== undefined) {
+                  item[l.field] = Number(row[l.field]);
+                }
+              });
+              return item;
+            });
+            allData[sheetName] = processedData;
+          }
+        });
+
+        setLocalUploadedData(allData);
+        toast.success("Data uploaded successfully");
+      } catch (err) {
+        console.error("Upload failed", err);
+        toast.error("Failed to parse Excel file");
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
     const row = payload[0].payload;
@@ -297,6 +358,30 @@ export default function StackedBarChart({
                     <Download size={18} />
                     <span>Download</span>
                   </button>
+                  )}
+
+                  {/* Only show upload on root chart */}
+                  {tierLevel === 0 && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        document.getElementById(`upload-input-${chartId || widgetTitle}`)?.click();
+                        setShowPopover(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                    >
+                      <Upload size={18} />
+                      <span>Upload Data</span>
+                    </button>
+                    <input
+                      id={`upload-input-${chartId || widgetTitle}`}
+                      type="file"
+                      accept=".xlsx, .xls"
+                      className="hidden"
+                      onChange={handleUpload}
+                    />
+                  </>
                   )}
 
                   <button
@@ -402,6 +487,7 @@ export default function StackedBarChart({
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
                 chartId={tier?.id}
+                allUploadedData={localUploadedData || allUploadedData}
               />
             )
             })}

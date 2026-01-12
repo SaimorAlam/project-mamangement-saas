@@ -304,7 +304,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
           Widget Library
         </h2>
         <p className="text-xs text-gray-500 mb-4">
-          Drag widgets to the canvas
+          Click widgets to add to the canvas
         </p>
       </div>
 
@@ -366,8 +366,8 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
         {/* Instructions */}
         <div className=" py-6 border-t border-b border-gray-200">
           <p className="text-xs text-gray-600 leading-relaxed">
-            Drag and drop widgets to add them to your dashboard. Click
-            on a placed widget to configure it.
+            Click on widgets to add them to your dashboard. Click on a placed
+            widget to configure it.
           </p>
         </div>
 

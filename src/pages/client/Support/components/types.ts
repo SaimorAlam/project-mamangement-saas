@@ -11,7 +11,7 @@ export interface Message {
   ticketId: string;
   text?: string;
   fileUrl?: string;
-  sender: "user" | "agent";
+  sender: "CLIENT" | "SUPPORT";
   timestamp: string;
   senderName?: string;
 }

@@ -38,7 +38,7 @@ const SupportDashboard = () => {
   ] = useLazyGetTicketMessagesQuery();
 
   const tickets = data?.data;
-  const accessToken = useAppSelector((state) => state.auth.user?.accessToken);
+  const accessToken = useAppSelector((state) => state.auth.user?.adminAccessToken);
 
   // Initialize Socket
   useEffect(() => {
@@ -50,8 +50,25 @@ const SupportDashboard = () => {
       reconnection: true,
       reconnectionAttempts: 5,
     });
+    newSocket.on("connect", ()=>{
+      console.log("🔌 Connected to socket ID: ",newSocket.id);
+    })
+    newSocket.on("connection_error", (error)=>{
+      console.log(error,"connection_error")
+    })
+    newSocket.on("error", (error)=>{
+      console.log(error,"error")
+    })
+    newSocket.io.on("reconnect_attempt", (attempt)=>{
+      console.log(`🔌 Reconnecting... #${attempt}`)
+    })
+    newSocket.io.on("reconnect_error", (error)=>{
+      console.log(error,"reconnect_error")
+    })
+    newSocket.io.on("reconnect_failed", ()=>{
+      console.log("🔌 Reconnect failed")
+    })
     setSocket(newSocket);
-
     return () => {
       console.log("🔌 Disconnecting socket...");
       newSocket.disconnect();
@@ -64,17 +81,20 @@ const SupportDashboard = () => {
 
     const onNewMessage = (msg: any) => {
       if (msg.ticketId !== selectedTicket?.id) return;
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: msg.id,
-          ticketId: msg.ticketId,
-          text: msg.message || "",
-          fileUrl: msg.file,
-          sender: msg.senderRole === "CLIENT" ? "user" : "agent",
-          timestamp: msg.createdAt,
-        },
-      ]);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === msg.id)) return prev;
+        return [
+          ...prev,
+          {
+            id: msg.id,
+            ticketId: msg.ticketId,
+            text: msg.message || "",
+            fileUrl: msg.file,
+          sender: msg.senderRole === "CLIENT" ? "CLIENT" : "SUPPORT",
+            timestamp: msg.createdAt,
+          },
+        ];
+      });
     };
 
     const onTyping = (data: { isTyping: boolean; ticketId: string }) => {
@@ -114,7 +134,7 @@ const SupportDashboard = () => {
         ticketId: msg.ticketId,
         text: msg.message,
         fileUrl: msg.file,
-        sender: msg.senderRole === "CLIENT" ? "user" : "agent",
+        sender: msg.senderRole === "CLIENT" ? "CLIENT" : "SUPPORT",
         timestamp: msg.createdAt,
         senderName: msg.sender?.name,
       }));
@@ -149,15 +169,6 @@ const SupportDashboard = () => {
 
     socket.emit("sendMessage", messagePayload);
 
-    const optimisticMessage: Message = {
-      id: String(Date.now()),
-      ticketId: selectedTicket.id,
-      text: inputValue,
-      fileUrl: filePreview || undefined,
-      sender: "user",
-      timestamp: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, optimisticMessage]);
     setInputValue("");
     setSelectedFile(null);
     setFilePreview(null);
