@@ -21,9 +21,9 @@ import { CiExport } from "react-icons/ci";
 
 /*   COLOR POOL FOR ROOT PROJECTS   */
 const PROJECT_COLORS = [
+  "#3b82f6",
   "#22c55e",
   "#eab308",
-  "#3b82f6",
   "#ec4899",
   "#8b5cf6",
   "#f97316",
@@ -42,49 +42,63 @@ const GanttChart = () => {
       tooltip: true,
     });
 
-    gantt.config.layout = {
-  css: "gantt_container",
-  cols: [
-    {
-      width: 420,     // initial left width
-      min_width: 250, // minimum left size
-      rows: [
-        { view: "grid", scrollX: "gridScroll", scrollY: "scrollVer" },
-        { view: "scrollbar", id: "gridScroll", group: "horizontal" }
-      ]
-    },
-    { resizer: true, width: 1 },   // 👈 THIS IS THE DRAG HANDLE
-    {
-      rows: [
-        { view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer" },
-        { view: "scrollbar", id: "scrollHor", group: "horizontal" }
-      ]
-    },
-    { view: "scrollbar", id: "scrollVer" }
-  ]
-};
+    /*    COLUMN TOOLS    */
+
+    function renameColumn(colName: string) {
+      const col = gantt.config.columns.find((c: any) => c.name === colName);
+      if (!col) return;
+
+      const newName = prompt("Enter new column name", "");
+      if (!newName) return;
+
+      if (colName.startsWith("custom_")) {
+        col.label = `
+      <div class="col-header">
+        <span class="col-title">${newName}</span>
+        <span class="delete-col-btn" data-col="${colName}">✖</span>
+      </div>
+    `;
+      } else {
+        // System column: just change text
+        col.label = newName;
+      }
+
+      gantt.render();
+    }
 
 
-    //    CORE CONFIG   
+    function deleteColumn(colName: string) {
+      if (!colName.startsWith("custom_")) {
+        alert("Only custom columns can be deleted.");
+        return;
+      }
+
+      gantt.config.columns = gantt.config.columns.filter(
+        (c: any) => c.name !== colName
+      );
+
+      gantt.render();
+    }
+
+    /*    CORE CONFIG    */
+
     gantt.config.date_format = "%Y-%m-%d";
     gantt.config.drag_progress = true;
     gantt.config.drag_resize = true;
     gantt.config.drag_move = true;
-    // gantt.config.grid_resize = true;
+    gantt.config.grid_resize = true;
     gantt.config.fit_tasks = true;
     gantt.config.order_branch = true;
     gantt.config.order_branch_free = true;
     gantt.config.autosize = "y";
     gantt.config.open_tree_initially = true;
 
-    //    LIGHTBOX   
-    gantt.attachEvent("onTaskDblClick", function (id:any) {
+    /*    LIGHTBOX    */
+
+    gantt.attachEvent("onTaskDblClick", function (id: any) {
       gantt.showLightbox(id);
       return false;
     });
-
-    gantt.config.details_on_dblclick = true;
-    gantt.config.details_on_create = true;
 
     gantt.config.lightbox.sections = [
       { name: "text", height: 38, map_to: "text", type: "textarea", focus: true },
@@ -92,16 +106,17 @@ const GanttChart = () => {
       { name: "time", type: "duration", map_to: "auto" },
     ];
 
-    gantt.config.editable = false;
+    gantt.config.editable = true;
 
-    //    COLUMNS   
+    /*    COLUMNS    */
+
     gantt.config.columns = [
       {
         name: "all",
         label: "All",
         align: "center",
-        width: 70,
-        template: (task:any) => gantt.getGlobalTaskIndex(task.id) + 1,
+        width: 40,
+        template: (task: any) => gantt.getGlobalTaskIndex(task.id) + 1,
       },
       {
         name: "text",
@@ -109,33 +124,47 @@ const GanttChart = () => {
         tree: true,
         width: 260,
         resize: true,
+        editor: { type: "text", map_to: "text" },
       },
-      { name: "duration", label: "Duration", align: "center", width: 90 },
-      { name: "start_date", label: "Start Date", align: "center", width: 110 },
+      {
+        name: "duration",
+        label: "Duration",
+        align: "center",
+        width: 90,
+        editor: { type: "number", map_to: "duration" },
+      },
+      {
+        name: "start_date",
+        label: "Start Date",
+        align: "center",
+        width: 110,
+        editor: { type: "date", map_to: "start_date" },
+      },
       {
         name: "end_date",
         label: "Finished Date",
         align: "center",
         width: 110,
-        template: (task:any) =>
+        template: (task: any) =>
           task.end_date ? gantt.templates.date_grid(task.end_date) : "",
       },
-      { name: "owner", label: "Assigned", align: "center", width: 130 },
+      {
+        name: "owner",
+        label: "Assigned",
+        align: "center",
+        width: 130,
+        editor: { type: "text", map_to: "owner" },
+      },
       {
         name: "add",
         label: "",
         width: 44,
-        template: () => `<span class="add-child-btn">+</span>`,
-      },
-      {
-        name: "delete",
-        label: "",
-        width: 44,
-        template: () => `<span class="delete-btn-hover">-</span>`,
+        template: () => `<span class="add-child-btn"></span>`,
       },
     ];
 
-    //    ZOOM   
+    /*    ZOOM    */
+
     gantt.ext.zoom.init({
       levels: [
         {
@@ -161,21 +190,22 @@ const GanttChart = () => {
 
     gantt.ext.zoom.setLevel("month");
 
-    //    TODAY MARKER   
+    /*    MARKER    */
+
     gantt.addMarker({
       start_date: new Date(),
       css: "today",
       text: "Today",
     });
 
-    //    COLOR SYSTEM   
-    gantt.templates.task_class = function (_start:any, _end:any, task:any) {
+    /*    COLORS    */
+
+    gantt.templates.task_class = function (_start: any, _end: any, task: any) {
       if (task.rootColor !== undefined) return "task-root-" + task.rootColor;
       return "";
     };
 
-    // Assign color to root projects
-    gantt.attachEvent("onTaskCreated", function (task:any) {
+    gantt.attachEvent("onTaskCreated", function (task: any) {
       if (!task.parent || task.parent === 0) {
         const index = gantt.getTaskCount() % PROJECT_COLORS.length;
         task.rootColor = index;
@@ -183,8 +213,7 @@ const GanttChart = () => {
       return true;
     });
 
-    // Inherit parent color
-    gantt.attachEvent("onBeforeTaskAdd", function (_id:any, task:any) {
+    gantt.attachEvent("onBeforeTaskAdd", function (_id: any, task: any) {
       if (task.parent) {
         const parent = gantt.getTask(task.parent);
         task.rootColor = parent.rootColor;
@@ -192,61 +221,9 @@ const GanttChart = () => {
       return true;
     });
 
-    //    PARENT AUTO-EXPAND LOGIC   
-    function enforceParentRange(parentId: any) {
-      if (!parentId || parentId === 0) return;
+    /*    GRID BUTTONS    */
 
-      const parent = gantt.getTask(parentId);
-      const children = gantt.getChildren(parentId);
-      if (!children.length) return;
-
-      let minStart = parent.start_date;
-      let maxEnd = parent.end_date;
-
-      children.forEach((cid: any) => {
-        const child = gantt.getTask(cid);
-        if (child.start_date < minStart) minStart = child.start_date;
-        if (child.end_date > maxEnd) maxEnd = child.end_date;
-      });
-
-      let changed = false;
-
-      if (minStart < parent.start_date) {
-        parent.start_date = minStart;
-        changed = true;
-      }
-
-      if (maxEnd > parent.end_date) {
-        parent.end_date = maxEnd;
-        parent.duration = gantt.calculateDuration(
-          parent.start_date,
-          parent.end_date
-        );
-        changed = true;
-      }
-
-      if (changed) {
-        gantt.updateTask(parent.id);
-        enforceParentRange(parent.parent); // recursive
-      }
-    }
-
-    gantt.attachEvent("onAfterTaskUpdate", function (id:any) {
-      const task = gantt.getTask(id);
-      if (task.parent) enforceParentRange(task.parent);
-    });
-
-    gantt.attachEvent("onAfterTaskAdd", function (id:any) {
-      const task = gantt.getTask(id);
-      if (task.parent) enforceParentRange(task.parent);
-    });
-
-    gantt.attachEvent("onAfterTaskDelete", function (_id:any, task:any) {
-      if (task.parent) enforceParentRange(task.parent);
-    });
-
-    //    GRID BUTTONS   
-    (gantt as any).attachEvent("onGridClick", function (id: any, e: any) {
+    gantt.attachEvent("onGridClick", function (id: any, e: any) {
       const target = e.target as HTMLElement;
 
       if (target.classList.contains("add-child-btn")) {
@@ -262,18 +239,44 @@ const GanttChart = () => {
         return false;
       }
 
-      if (target.classList.contains("delete-btn-hover")) {
-        gantt.deleteTask(id);
+      return true;
+    });
+
+    /*    HEADER CLICK    */
+    gantt.attachEvent("onGridHeaderClick", function (name: string, e: any) {
+      const target = e.target as HTMLElement;
+
+      // Case 1: Click on delete button
+      if (target.classList.contains("delete-col-btn")) {
+        const colName = target.dataset.col;
+        if (colName) deleteColumn(colName);
+        return false;
+      }
+
+      // Case 2: Click on custom column title
+      if (target.classList.contains("col-title")) {
+        const parent = target.closest(".col-header");
+        const delBtn = parent?.querySelector(".delete-col-btn") as HTMLElement;
+        const colName = delBtn?.dataset.col;
+        if (colName) renameColumn(colName);
+        return false;
+      }
+
+      // Case 3: Click on normal column header (Task name, Duration, etc)
+      if (name) {
+        renameColumn(name);
         return false;
       }
 
       return true;
     });
 
-    //    INIT   
+
+
+    /*    INIT    */
+
     gantt.init(ganttContainer.current as HTMLDivElement);
 
-    //    DEMO DATA   
     gantt.parse({
       data: [
         {
@@ -296,22 +299,26 @@ const GanttChart = () => {
     return () => gantt.clearAll();
   }, []);
 
-  //    ACTIONS   
+  /*    ACTIONS    */
+
   const addTask = () => gantt.createTask();
+
   const deleteTask = () => {
     const id = gantt.getSelectedId();
     if (id) gantt.deleteTask(id);
   };
+
   const undo = () => gantt.undo();
   const redo = () => gantt.redo();
   const zoomIn = () => gantt.ext.zoom.zoomIn();
   const zoomOut = () => gantt.ext.zoom.zoomOut();
 
-  //    CSV   
+  /*    CSV    */
+
   const exportCSV = () => {
     const tasks = gantt.serialize().data;
     const csv = Papa.unparse(tasks);
-    saveAs(new Blob([csv]), "sheet-to-gannt.csv");
+    saveAs(new Blob([csv]), "sheet-to-gantt.csv");
   };
 
   const importCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -328,25 +335,74 @@ const GanttChart = () => {
     });
   };
 
+  function addCustomColumn() {
+    const id = Date.now();
+    const colName = "custom_" + id;
+
+    gantt.config.columns.splice(gantt.config.columns.length - 1, 0, {
+      name: colName,
+      label: `
+  <div class="col-header pl-4">
+    <span class="col-title">Custom</span>
+    <span class="delete-col-btn" data-col="${colName}" title="Delete this column">✖</span>
+  </div>
+`,
+      width: 140,
+      align: "center",
+      template: (task: any) => task[colName] || "",
+      editor: { type: "text", map_to: colName },
+    });
+
+    gantt.render();
+  }
+
+  /*    UI    */
+
   return (
     <div className="p-4 h-screen bg-white">
-      <div className="flex justify-between items-center gap-2 mb-3 flex-wrap">
-        <div className="flex items-center gap-3">
-          <button onClick={addTask} className="toolbar-btn"><Plus size={16} /> Add</button>
-          <button onClick={deleteTask} className="toolbar-btn"><Trash2 size={16} /> Delete</button>
-          <button onClick={undo} className="toolbar-btn"><Undo2 size={16} /></button>
-          <button onClick={redo} className="toolbar-btn"><Redo2 size={16} /></button>
-          <button onClick={zoomIn} className="toolbar-btn"><ZoomIn size={16} /></button>
-          <button onClick={zoomOut} className="toolbar-btn"><ZoomOut size={16} /></button>
+      <div className="flex justify-between gap-2 mb-3 flex-wrap">
+        <div className="flex gap-3 items-center">
+          <button onClick={addTask} className="toolbar-btn">
+            <Plus size={16} /> Add Root Task
+          </button>
+
+          <button onClick={addCustomColumn} className="toolbar-btn">
+            <Plus size={16} /> Add Column
+          </button>
+
+          <button onClick={deleteTask} className="toolbar-btn">
+            <Trash2 size={16} /> Delete a Row
+          </button>
+
+          <button onClick={undo} className="toolbar-btn">
+            <Undo2 size={16} />
+          </button>
+
+          <button onClick={redo} className="toolbar-btn">
+            <Redo2 size={16} />
+          </button>
+
+          <button onClick={zoomIn} className="toolbar-btn">
+            <ZoomIn size={16} />
+          </button>
+
+          <button onClick={zoomOut} className="toolbar-btn">
+            <ZoomOut size={16} />
+          </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex gap-3 items-center">
           <input type="file" hidden ref={fileInputRef} onChange={importCSV} />
-          <button onClick={() => fileInputRef.current?.click()} className="toolbar-btn">
+
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="toolbar-btn"
+          >
             <Download size={16} /> Import
           </button>
-          <button onClick={exportCSV} className="toolbar-btn">
-            <CiExport /> Export
+
+          <button onClick={exportCSV} className="toolbar-btn bg-blue-500! text-white! hover:bg-blue-600!">
+            <CiExport size={16}/> Export
           </button>
         </div>
       </div>
@@ -358,17 +414,28 @@ const GanttChart = () => {
       <style>
         {`
           ${PROJECT_COLORS.map(
-            (c, i) => `
-            .task-root-${i} .gantt_task_content {
-              background: ${c} !important;
-              border-color: ${c} !important;
-            }
-          `
-          ).join("")}
+          (c, i) => `
+              .task-root-${i} .gantt_task_content {
+                background: ${c} !important;
+                border-color: ${c} !important;
+              }
+            `
+        ).join("")}
 
           .add-child-btn { cursor: pointer; }
-          .delete-btn-hover { cursor: pointer; opacity: 0; }
-          .gantt_row:hover .delete-btn-hover { opacity: 1; }
+
+          .col-header {
+            display: flex;
+            justify-content: space-center;
+            align-items: center;
+          }
+
+          .delete-col-btn {
+            cursor: pointer;
+            color: red;
+            font-weight: bold;
+            margin-left: 6px;
+          }
         `}
       </style>
     </div>

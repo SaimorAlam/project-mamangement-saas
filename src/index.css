@@ -114,3 +114,13 @@
   border: 2px solid #267eeb;
   cursor: pointer;
 }
+
+.delete-col-btn {
+  margin-left: 6px;
+  cursor: pointer;
+  color: red;
+  font-weight: bold;
+}
+.gantt_grid_head_cell {
+  cursor: pointer;
+}
