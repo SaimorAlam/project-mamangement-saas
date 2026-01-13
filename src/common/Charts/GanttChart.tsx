@@ -16,6 +16,7 @@ import {
   ZoomIn,
   ZoomOut,
   Download,
+  Search,
 } from "lucide-react";
 import { CiExport } from "react-icons/ci";
 
@@ -29,9 +30,37 @@ const PROJECT_COLORS = [
   "#f97316",
 ];
 
+function extractColumnTitle(label: string) {
+  if (!label) return "";
+
+  const div = document.createElement("div");
+  div.innerHTML = label;
+
+  const title = div.querySelector(".col-title");
+  if (title) return title.textContent || "";
+
+  return div.textContent || "";
+}
+
+function highlightText(text: any, query: string) {
+  if (!text) return "";
+  if (!query) return String(text);
+
+  const safe = String(text);
+  const q = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`(${q})`, "gi");
+
+  return safe.replace(regex, `<span class="gantt-search-hit">$1</span>`);
+}
+
+
+
+
 const GanttChart = () => {
   const ganttContainer = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const searchTextRef = useRef<string>("");
+
 
   useEffect(() => {
     gantt.clearAll();
@@ -99,6 +128,51 @@ const GanttChart = () => {
       gantt.showLightbox(id);
       return false;
     });
+
+    gantt.attachEvent("onAfterTaskUpdate", function (id: any) {
+      const task = gantt.getTask(id);
+      if (task.parent) {
+        expandParentIfNeeded(task.parent);
+      }
+    });
+
+    gantt.attachEvent("onAfterTaskAdd", function (id: any) {
+      const task = gantt.getTask(id);
+      if (task.parent) {
+        expandParentIfNeeded(task.parent);
+      }
+    });
+
+    gantt.attachEvent("onAfterTaskDelete", function (_id: any, task: any) {
+      if (task && task.parent) {
+        expandParentIfNeeded(task.parent);
+      }
+    });
+
+    gantt.attachEvent("onBeforeTaskDisplay", function (id: any, task: any) {
+      const query = searchTextRef.current.trim().toLowerCase();
+
+      if (!query) return true;
+
+      // Search in ALL fields including custom columns
+      const columns = gantt.config.columns;
+
+      for (const col of columns) {
+        const field = col.name;
+        if (!field || field === "add" || field === "all") continue;
+
+        const value = task[field];
+        if (!value) continue;
+
+        if (String(value).toLowerCase().includes(query)) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+
+
 
     gantt.config.lightbox.sections = [
       { name: "text", height: 38, map_to: "text", type: "textarea", focus: true },
@@ -271,6 +345,66 @@ const GanttChart = () => {
       return true;
     });
 
+    /*    PARENT AUTO SYNC LOGIC    */
+
+
+    /*    PARENT EXPAND ONLY LOGIC (NO SHRINK)    */
+
+    function expandParentIfNeeded(parentId: any) {
+      if (!parentId || parentId === 0) return;
+
+      const parent = gantt.getTask(parentId);
+      const children = gantt.getChildren(parentId);
+
+      if (!children || !children.length) return;
+
+      let newStart = new Date(parent.start_date);
+      let newEnd = new Date(parent.end_date);
+
+      let changed = false;
+
+      children.forEach((cid: any) => {
+        const child = gantt.getTask(cid);
+
+        // Expand to left if needed
+        if (child.start_date < newStart) {
+          newStart = new Date(child.start_date);
+          changed = true;
+        }
+
+        // Expand to right if needed
+        if (child.end_date > newEnd) {
+          newEnd = new Date(child.end_date);
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        parent.start_date = newStart;
+        parent.end_date = newEnd;
+        parent.duration = gantt.calculateDuration(newStart, newEnd);
+
+        gantt.updateTask(parent.id);
+
+        // Recursively expand upper levels
+        if (parent.parent) {
+          expandParentIfNeeded(parent.parent);
+        }
+      }
+    }
+
+// Highlight normal columns
+gantt.templates.grid_cell = function (task: any, column: any) {
+  const value = task[column.name];
+  return highlightText(value, searchTextRef.current.trim());
+};
+
+// Highlight tree column (task name)
+gantt.templates.tree_cell = function (task: any, column: any) {
+  const value = task[column.name];
+  return highlightText(value, searchTextRef.current.trim());
+};
+
 
 
     /*    INIT    */
@@ -314,12 +448,57 @@ const GanttChart = () => {
   const zoomOut = () => gantt.ext.zoom.zoomOut();
 
   /*    CSV    */
-
   const exportCSV = () => {
     const tasks = gantt.serialize().data;
-    const csv = Papa.unparse(tasks);
+
+    const baseFields = [
+      "text",
+      "start_date",
+      "duration",
+      "end_date",
+      "progress",
+      "owner",
+    ];
+
+    // All visible columns
+    const columns = gantt.config.columns;
+
+    // Build field list: base + custom
+    const customFields = columns
+      .map((c: any) => c.name)
+      .filter((n: string) => n.startsWith("custom_"));
+
+    const allowedFields = [...baseFields, ...customFields];
+
+    const exportData = tasks.map((task: any) => {
+      const row: any = {};
+
+      allowedFields.forEach((field) => {
+        let value = task[field];
+
+        if (
+          (field === "start_date" || field === "end_date") &&
+          value instanceof Date
+        ) {
+          value = gantt.templates.xml_format(value);
+        }
+
+        // Find column config
+        const col = columns.find((c: any) => c.name === field);
+
+        // Extract clean header text
+        const header = col ? extractColumnTitle(col.label || field) : field;
+
+        row[header] = value ?? "";
+      });
+
+      return row;
+    });
+
+    const csv = Papa.unparse(exportData);
     saveAs(new Blob([csv]), "sheet-to-gantt.csv");
   };
+
 
   const importCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -392,6 +571,23 @@ const GanttChart = () => {
         </div>
 
         <div className="flex gap-3 items-center">
+          <div className="relative w-64">
+  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+    <Search className="h-4 w-4 text-gray-400" />
+  </div>
+
+  <input
+    type="text"
+    placeholder="Search..."
+    className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none  focus:border-blue-500 focus:ring-1  focus:ring-blue-500/30 transition-colors
+    "
+    onChange={(e) => {
+      searchTextRef.current = e.target.value;
+      gantt.render();
+    }}
+  />
+</div>
+
           <input type="file" hidden ref={fileInputRef} onChange={importCSV} />
 
           <button
@@ -402,7 +598,7 @@ const GanttChart = () => {
           </button>
 
           <button onClick={exportCSV} className="toolbar-btn bg-blue-500! text-white! hover:bg-blue-600!">
-            <CiExport size={16}/> Export
+            <CiExport size={16} /> Export
           </button>
         </div>
       </div>
