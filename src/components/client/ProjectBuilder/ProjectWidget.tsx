@@ -38,16 +38,17 @@ interface Widget {
 
 interface ProjectWidgetProps {
   onWidgetSelect: (widgetId: string) => void;
+  selectedWidgets: string[];
 }
 
 const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   onWidgetSelect,
+  selectedWidgets
 }) => {
   const {pathname} = useLocation();
   const isProgramBuilder = pathname.split('/')[2] === "program-builder";
   const [selectedProgram, setSelectedProgram] = useState<string>("");
   const [selectedProject, setSelectedProject] = useState<string>("");
-  const [selectedWidget, setSelectedWidget] = useState<string>("kpi"); // default KPI widget active
   const widgets: Widget[] = [
     {
       id: "kpi",
@@ -317,19 +318,18 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
               <div
                 key={widget.id}
                 onClick={() => {
-                  setSelectedWidget(widget.id);
                   onWidgetSelect(widget.id);
                 }}
                 className={`flex items-start p-3 rounded-lg cursor-pointer transition-all border
                   ${
-                    selectedWidget === widget.id
+                    selectedWidgets.includes(widget.id) || (widget.id === 'kpi' && selectedWidgets.length === 0)
                       ? "bg-gray-200 border-transparent"
                       : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
                   }`}
               >
                 <div
                   className={`mt-0.5 ${
-                    selectedWidget === widget.id
+                    selectedWidgets.includes(widget.id) || (widget.id === 'kpi' && selectedWidgets.length === 0)
                       ? "text-website-color-darkGray"
                       : "text-gray-600"
                   }`}
@@ -339,7 +339,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
                 <div className="ml-3 flex-1">
                   <h3
                     className={`text-sm font-medium ${
-                      selectedWidget === widget.id
+                      selectedWidgets.includes(widget.id) || (widget.id === 'kpi' && selectedWidgets.length === 0)
                         ? "text-website-color-darkGray"
                         : "text-gray-900"
                     }`}
@@ -348,7 +348,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
                   </h3>
                   <p
                     className={`text-xs mt-0.5 ${
-                      selectedWidget === widget.id
+                      selectedWidgets.includes(widget.id) || (widget.id === 'kpi' && selectedWidgets.length === 0)
                         ? "text-website-color-darkGray"
                         : "text-gray-500"
                     }`}

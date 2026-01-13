@@ -1,25 +1,31 @@
 import {  useState } from "react";
-
-// import AreaChart from "@/common/Charts/AreaChart";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
-// import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
-// import MultiAxisLineChart from "@/common/Charts/LineChart";
-// import PieChart from "@/common/Charts/PieChart";
-import ProgressRing from "@/common/Charts/ProgressRingTest";
 import RadarCharts from "@/common/Charts/RadarChart";
 import StackedBarChart from "@/common/Charts/StackedBarChart";
-// import ProjectConfiguration from "@/components/client/ProjectBuilder/ProjectConfiguration";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
 import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
-import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
-import HorizontalBarChartModule from './../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule';
+import HorizontalBarChartModule from '../../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule';
 import { useAppSelector } from "@/hooks/useRedux";
 import { useGetChartByProjectIdQuery } from "@/store/Api/ChartApi/ChartApi";
+import FunnelChartModule from "@/components/client/ProjectBuilder/chartModules/FunnelChartModule";
+import ScatterChartModule from "@/components/client/ProjectBuilder/chartModules/ScatterChartModule";
+import ParetoChartModule from "@/components/client/ProjectBuilder/chartModules/ParetoChartModule";
+import WaterfallChartModule from "@/components/client/ProjectBuilder/chartModules/WaterfallChartModule";
+import RadarChartModule from "@/components/client/ProjectBuilder/chartModules/RadarChartModule";
+import CandleChartModule from "@/components/client/ProjectBuilder/chartModules/CandleChartModule";
+import ProgressRingModule from "@/components/client/ProjectBuilder/chartModules/ProgressRingModule";
+import HistogramChartModule from "@/components/client/ProjectBuilder/chartModules/HistogramChartModule";
+import GaugeChartModule from "@/components/client/ProjectBuilder/chartModules/GaugeChartModule";
+import BubbleChartModule from "@/components/client/ProjectBuilder/chartModules/BubbleChartModule";
+import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModules/ColumnBarChartModule";
+import PieChartModule from "@/components/client/ProjectBuilder/chartModules/PieChartModule";
+import DefaultChartData from "./Components/DefaultChartData";
+import { toast } from "sonner";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -43,42 +49,30 @@ const ClientProjectBuilder = () => {
       setActiveWidget(widgetId);
     }
   };
+
+  const handleWidgetDelete = (widgetId: string) => {
+    const toastId = toast.loading("Deleting widget...");
+    setSelectedWidgets((prev) => {
+      return (
+        prev.filter((id) => id !== widgetId)
+      )
+    });
+    toast.success("Widget deleted successfully", { id:toastId })
+    
+  };
+
   return (
     <div className="flex gap-6">
-      <ProjectWidget onWidgetSelect={handleWidgetSelect} />
+      <ProjectWidget
+        onWidgetSelect={handleWidgetSelect}
+        selectedWidgets={selectedWidgets}
+      />
       <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10">
         <ProjectStats activeWidget={activeWidget} />
 
     {
       projectsChartsData?.length > 0 ? (
-        <div className="flex flex-wrap gap-6">
-{projectsChartsData?.map((item: any) => {
-            if (item.category === "Bar" || item.category === "BAR") {
-              return (
-                <div key={item.id} className="w-full">
-                  <StackedBarChart
-                    widgetTitle={item.title}
-                    xAxisValues={item.xAxis?.labels || []}
-                    legendValues={item.barChart?.widgets?.map((w: any) => ({
-                      label: w.legendName,
-                      color: w.color,
-                    })) || []}
-                    numOfLegendDataSet={item.numberOfDataset}
-                    startingRange={item.firstFiledDataset}
-                    endingRange={item.lastFiledDAtaset}
-                    // chartId={item.id}
-                  />
-                </div>
-              );
-            }
-            return (
-              <div key={item.id}>
-                {/* <h2>{item.title}</h2> */}
-                {/* <p>{item.description}</p> */}
-              </div>
-            );
-          })}
-        </div>
+        <DefaultChartData projectsChartsData={projectsChartsData} />
       ): selectedWidgets.length === 0 && (
           <>
             {/* <StackedBarChart /> */}
@@ -113,45 +107,24 @@ const ClientProjectBuilder = () => {
           </>
         )
         }
-        {selectedWidgets.includes("bar-chart") && <StackedBarChartModule />}
-        {selectedWidgets.includes("progress-ring") && (
-          <ProgressRing
-            title="Project Progress"
-            centerLabel="Total Progress"
-            data={[
-              {
-                name: "In Progress",
-                value: 65,
-                count: 12,
-                color: "#5D8AF3",
-              },
-              {
-                name: "Completed",
-                value: 14,
-                count: 30,
-                color: "#169E7B",
-              },
-              {
-                name: "Overdue",
-                value: 13,
-                count: 8,
-                color: "#DA4352",
-              },
-              {
-                name: "Not Started",
-                value: 8,
-                count: 8,
-                color: "#E2E8F0",
-              },
-            ]}
+        {selectedWidgets.includes("bar-chart") && (
+          <StackedBarChartModule
+            onDelete={() => handleWidgetDelete("bar-chart")}
+          />
+        )}
+       {selectedWidgets.includes("progress-ring") && (
+          <ProgressRingModule
+            onDelete={() => handleWidgetDelete("progress-ring")}
           />
         )}
 
         {selectedWidgets.includes("pie-chart") && (
-          <ChartModuleTwo chartName="pie-chart" />
+          <PieChartModule onDelete={() => handleWidgetDelete("pie-chart")} />
         )}
 
-        {selectedWidgets.includes("line-chart") && <LineChartModule />}
+        {selectedWidgets.includes("line-chart") && (
+          <LineChartModule onDelete={() => handleWidgetDelete("line-chart")} />
+        )}
 
         {selectedWidgets.includes("data-table") && (
           <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
@@ -172,14 +145,43 @@ const ClientProjectBuilder = () => {
         )}
 
         {selectedWidgets.includes("horizontal-bar-chart") && (
-          <HorizontalBarChartModule />
+          <HorizontalBarChartModule
+            onDelete={() => handleWidgetDelete("horizontal-bar-chart")}
+          />
         )}
 
-        {selectedWidgets.includes("heat-map-chart") && <HeatmapChart />}
+        {selectedWidgets.includes("heat-map-chart") && (
+          <ChartModuleOne
+            chartName="heat-map-chart"
+            onDelete={() => handleWidgetDelete("heat-map-chart")}
+          />
+        )}
 
         {selectedWidgets.includes("area-chart") && (
-          <ChartModuleOne chartName="area-chart" />
+          <ChartModuleOne
+            chartName="area-chart"
+            onDelete={() => handleWidgetDelete("area-chart")}
+          />
         )}
+
+        {selectedWidgets.includes("gauge-chart") && (
+          <GaugeChartModule onDelete={() => handleWidgetDelete("gauge-chart")} />
+        )}
+
+        {selectedWidgets.includes("histogram-chart") && (
+          <HistogramChartModule />
+        )}
+
+        {selectedWidgets.includes("bubble-chart") && <BubbleChartModule />}
+        {selectedWidgets.includes("column-chart") && (
+          <ColumnBarChartModule />
+        )}
+        {selectedWidgets.includes("funnel-chart") && <FunnelChartModule />}
+        {selectedWidgets.includes("scatter-chart") && <ScatterChartModule />}
+        {selectedWidgets.includes("pareto-chart") && <ParetoChartModule />}
+        {selectedWidgets.includes("waterfall-chart") && <WaterfallChartModule />}
+        {selectedWidgets.includes("radar-chart") && <RadarChartModule />}
+        {selectedWidgets.includes("candle-chart") && <CandleChartModule />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>

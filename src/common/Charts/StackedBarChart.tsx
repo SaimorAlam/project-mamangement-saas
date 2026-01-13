@@ -49,6 +49,7 @@ type Props = {
   startingRange: number;
   endingRange: number;
   onToggleWidget?: () => void;
+  onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
   isCreationMode?: boolean;
@@ -64,6 +65,7 @@ export default function StackedBarChart({
   startingRange,
   endingRange,
   onToggleWidget,
+  onDelete,
   tierLevel = 0,
   chartId,
   isCreationMode = false,
@@ -112,17 +114,17 @@ export default function StackedBarChart({
   ]);
 
   /*   TOTAL   */
-  const totalEmployees = useMemo(() => {
-    return chartData.reduce((sum, row) => {
-      return (
-        sum +
-        legendValues.reduce(
-          (inner, l) => inner + Number(row[l.field] || 0),
-          0
-        )
-      );
-    }, 0);
-  }, [chartData, legendValues]);
+  // const totalEmployees = useMemo(() => {
+  //   return chartData.reduce((sum, row) => {
+  //     return (
+  //       sum +
+  //       legendValues.reduce(
+  //         (inner, l) => inner + Number(row[l.field] || 0),
+  //         0
+  //       )
+  //     );
+  //   }, 0);
+  // }, [chartData, legendValues]);
 
   /*   ACTIONS   */
 
@@ -317,7 +319,7 @@ export default function StackedBarChart({
             className="flex items-center gap-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-sm text-gray-500">Total {totalEmployees}</p>
+            {/* <p className="text-sm text-gray-500">Total {totalEmployees}</p> */}
 
             <div className="flex gap-2 border-l pl-4 relative">
               <button
@@ -387,6 +389,7 @@ export default function StackedBarChart({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (onDelete) onDelete();
                       setShowPopover(false);
                     }}
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"

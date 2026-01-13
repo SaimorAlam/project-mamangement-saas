@@ -4,7 +4,7 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import StackedBarChart from "@/common/Charts/StackedBarChart";
 
-const StackedBarChartModule = () => {
+const StackedBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
@@ -17,8 +17,8 @@ const StackedBarChartModule = () => {
     { label: "", field: "", color: "#35B6EE" },
     { label: "", field: "", color: "#6F78F9" },
   ]);
-  const [startingRange, setStartingRange] = useState<number>(0); //for y axis
-  const [endingRange, setEndingRange] = useState<number>(100); // for y axis
+  const [startingRange, setStartingRange] = useState<number>(0); 
+  const [endingRange, setEndingRange] = useState<number>(100); 
   const minXaxisField = 1;
   const maxXaxisField = 7;
   const handleSetNumOfXAxisDataSet = (
@@ -76,6 +76,7 @@ const StackedBarChartModule = () => {
         startingRange={startingRange}
         endingRange={endingRange}
         onToggleWidget={handleToggleWidget}
+        onDelete={onDelete}
         isCreationMode={true}
       />
       {showWidget && (

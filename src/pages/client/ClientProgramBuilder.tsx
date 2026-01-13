@@ -5,7 +5,7 @@
 // import WidgetLibrary from "@/components/client/ProgramBuilder/WidgetLibrary";
 // import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 // import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
-import ClientProjectBuilder from "./ClientProjectBuilder";
+import ClientProjectBuilder from "./ProjectBuilder/ClientProjectBuilder";
 
 
 const ClientProgramBuilder = () => {

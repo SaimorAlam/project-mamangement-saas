@@ -9,7 +9,7 @@ export type LegendValue = {
   color: string;
 };
 
-const GaugeChartModule = () => {
+const GaugeChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -59,6 +59,7 @@ const GaugeChartModule = () => {
         fontSize={fontSize}
         shadeIntensity={shadeIntensity}
         onToggleWidget={handleToggleWidget}
+        onDelete={onDelete}
       />
       {showWidget && (
         <GaugeChartConfiguration

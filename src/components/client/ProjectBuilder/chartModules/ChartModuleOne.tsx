@@ -8,7 +8,7 @@ import MultiAxisLineChart from '@/common/Charts/LineChart';
 import WidgetForChartModuleOne from '../WidgetForChartModuleOne';
 import HeatmapChartNew from '@/common/Charts/HeatmapChartNew';
 
-const ChartModuleOne = ({ chartName }: { chartName: string }) => {
+const ChartModuleOne = ({ chartName, onDelete }: { chartName: string, onDelete?: () => void }) => {
     const [widgetTitle, setWidgetTitle] = useState("My-CSV");
     const [showWidget, setShowWidget] = useState(false);
     const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1)
@@ -74,6 +74,7 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                             numOfLegendDataSet={numOfLegendDataSet}
                             startingRange={startingRange}
                             endingRange={endingRange}
+                            onDelete={onDelete}
                         />
                     );
                 } else if (chartName === "area-chart") {
@@ -82,9 +83,10 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                             widgetTitle={widgetTitle}
                             xAxisValues={xAxisValues}
                             legendValues={legendValues}
-                            startingRange={startingRange}
+                             startingRange={startingRange}
                             endingRange={endingRange}
                             onToggleWidget={handleToggleWidget}
+                            onDelete={onDelete}
                         />
                     );
                 } else if (chartName === "line-chart") {
@@ -95,6 +97,7 @@ const ChartModuleOne = ({ chartName }: { chartName: string }) => {
                             legendValues={legendValues}
                             startingRange={startingRange}
                             endingRange={endingRange}
+                            onDelete={onDelete}
                         />
                     )
                 } else if (chartName === "heat-map-chart") {

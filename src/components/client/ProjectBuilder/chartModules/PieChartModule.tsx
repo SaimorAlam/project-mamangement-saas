@@ -4,7 +4,7 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import PieChartWidget from "@/common/Charts/PieChart";
 
-const PieChartModule = () => {
+const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -49,6 +49,7 @@ const PieChartModule = () => {
         legendValues={legendValues}
         numOfLegendDataSet={numOfLegendDataSet}
         onToggleWidget={handleToggleWidget}
+        onDelete={onDelete}
       />
       {showWidget && (
         <ProjectConfiguration

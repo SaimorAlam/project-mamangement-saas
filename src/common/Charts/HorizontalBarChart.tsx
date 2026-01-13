@@ -38,6 +38,7 @@ type Props = {
   startingRange: number;
   endingRange: number;
   onToggleWidget?: () => void;
+  onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
 };
@@ -52,6 +53,7 @@ export default function HorizontalBarChart({
   startingRange,
   endingRange,
   onToggleWidget,
+  onDelete,
   tierLevel = 0,
   chartId = "root",
 }: Props) {
@@ -240,6 +242,7 @@ export default function HorizontalBarChart({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (onDelete) onDelete();
                       setShowPopover(false);
                     }}
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"

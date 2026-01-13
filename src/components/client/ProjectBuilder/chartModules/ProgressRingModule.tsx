@@ -4,7 +4,7 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import ProgressRing from "@/common/Charts/ProgressRing";
 
-const ProgressRingModule = () => {
+const ProgressRingModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -51,6 +51,7 @@ const ProgressRingModule = () => {
         startingRange={startingRange}
         endingRange={endingRange}
         onToggleWidget={handleToggleWidget}
+        onDelete={onDelete}
       />
       {showWidget && (
         <ProjectConfiguration
