@@ -40,6 +40,7 @@ type Props = {
   fontSize?: number; // NEW
   shadeIntensity?: number; // NEW
   onToggleWidget?: () => void;
+  onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
 };
@@ -90,6 +91,7 @@ export default function GaugeChart({
   fontSize = 22, // NEW
   shadeIntensity = 0.4, // NEW
   onToggleWidget,
+  onDelete,
   tierLevel = 0,
   chartId = "root",
 }: Props) {
@@ -378,6 +380,7 @@ export default function GaugeChart({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (onDelete) onDelete();
                       setShowPopover(false);
                     }}
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"

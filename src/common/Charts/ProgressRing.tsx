@@ -43,6 +43,7 @@ type Props = {
   startingRange?: number;
   endingRange?: number;
   onToggleWidget?: () => void;
+  onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
 };
@@ -64,6 +65,7 @@ export default function ProgressRing({
   startingRange = 0,
   endingRange = 100,
   onToggleWidget,
+  onDelete,
   tierLevel = 0,
   chartId = "root",
 }: Props) {
@@ -232,6 +234,7 @@ export default function ProgressRing({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (onDelete) onDelete();
                       setShowPopover(false);
                     }}
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"

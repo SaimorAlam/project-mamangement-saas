@@ -15,7 +15,7 @@ import ClientHighwayExpansion from "@/pages/client/ClientHighwayExpansion";
 import ClientAllHighway from "@/pages/client/ClientAllHighway";
 import ClientCarlyleHall from "@/pages/client/ClientCarlyleHall";
 import ClientProjectReview from "@/pages/client/ProjectReview/ClientProjectReview";
-import ClientProjectBuilder from "@/pages/client/ClientProjectBuilder";
+import ClientProjectBuilder from "@/pages/client/ProjectBuilder/ClientProjectBuilder";
 import ClientSettings from "@/pages/client/Settings/ClientSettings";
 import ClientActivityLog from "@/pages/client/ClientActivityLog";
 import ClientHelp from "@/pages/client/ClientHelp";

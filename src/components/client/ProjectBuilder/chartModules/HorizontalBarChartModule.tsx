@@ -4,7 +4,7 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 
-const HorizontalBarChartModule = () => {
+const HorizontalBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -80,6 +80,7 @@ const HorizontalBarChartModule = () => {
         startingRange={startingRange}
         endingRange={endingRange}
         onToggleWidget={handleToggleWidget}
+        onDelete={onDelete}
       />
       {showWidget && (
         <ProjectConfiguration

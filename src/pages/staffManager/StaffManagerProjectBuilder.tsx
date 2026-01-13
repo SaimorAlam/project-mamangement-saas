@@ -39,10 +39,19 @@ const StaffManagerProjectBuilder = () => {
       setActiveWidget(widgetId);
     }
   };
+  const handleWidgetDelete = (widgetId: string) => {
+    if (selectedWidget === widgetId) {
+      setSelectedWidget("");
+      setActiveWidget("KPI widget");
+    }
+  };
 
   return (
     <div className="flex gap-6">
-      <ProjectWidget onWidgetSelect={handleWidgetSelect} />
+      <ProjectWidget
+        onWidgetSelect={handleWidgetSelect}
+        selectedWidgets={selectedWidget ? [selectedWidget] : []}
+      />
       <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10">
         <ProjectStats activeWidget={activeWidget} />
 
@@ -80,7 +89,11 @@ const StaffManagerProjectBuilder = () => {
           </>
         )}
 
-        {selectedWidget === "bar-chart" && <StackedBarChartModule />}
+        {selectedWidget === "bar-chart" && (
+          <StackedBarChartModule
+            onDelete={() => handleWidgetDelete("bar-chart")}
+          />
+        )}
         {selectedWidget === "progress-ring" && <ProgressRingModule />}
 
         {selectedWidget === "pie-chart" && <PieChartModule />}
