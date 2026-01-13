@@ -60,6 +60,22 @@ const GanttChart = () => {
   const ganttContainer = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const searchTextRef = useRef<string>("");
+  const resizingRef = useRef<{
+    name: string;
+    startX: number;
+    startWidth: number;
+  } | null>(null);
+
+  /*   HELPER FOR RESIZABLE LABELS   */
+  const wrapLabel = (text: string, name: string, isCustom = false) => {
+    return `
+      <div class="col-header-wrap" data-column="${name}">
+        <span class="col-title">${text}</span>
+        ${isCustom ? `<span class="delete-col-btn" data-col="${name}">✖</span>` : ""}
+        <div class="column-resizer-handle" data-column="${name}"></div>
+      </div>
+    `;
+  };
 
 
   useEffect(() => {
@@ -81,15 +97,9 @@ const GanttChart = () => {
       if (!newName) return;
 
       if (colName.startsWith("custom_")) {
-        col.label = `
-      <div class="col-header">
-        <span class="col-title">${newName}</span>
-        <span class="delete-col-btn" data-col="${colName}">✖</span>
-      </div>
-    `;
+        col.label = wrapLabel(newName, colName, true);
       } else {
-        // System column: just change text
-        col.label = newName;
+        col.label = wrapLabel(newName, colName, false);
       }
 
       gantt.render();
@@ -116,11 +126,46 @@ const GanttChart = () => {
     gantt.config.drag_resize = true;
     gantt.config.drag_move = true;
     gantt.config.grid_resize = true;
-    gantt.config.fit_tasks = true;
+    gantt.config.resize_grid_columns = true;
+    gantt.config.fit_tasks = false; // Disable to allow horizontal scroll
     gantt.config.order_branch = true;
     gantt.config.order_branch_free = true;
-    gantt.config.autosize = "y";
     gantt.config.open_tree_initially = true;
+
+    /*    LAYOUT FOR SCROLLBARS    */
+    gantt.config.layout = {
+      css: "gantt_container",
+      rows: [
+        {
+          cols: [
+            {
+              view: "grid",
+              id: "grid",
+              scrollX: "gridScroll",
+              scrollY: "verticalScroll"
+            },
+            { resizer: true, width: 1 },
+            {
+              view: "timeline",
+              id: "timeline",
+              scrollX: "timelineScroll",
+              scrollY: "verticalScroll"
+            },
+            {
+              view: "scrollbar",
+              id: "verticalScroll"
+            }
+          ]
+        },
+        {
+          cols: [
+            { view: "scrollbar", id: "gridScroll", group: "horizontal" },
+            { resizer: true, width: 1 },
+            { view: "scrollbar", id: "timelineScroll", group: "horizontal" }
+          ]
+        }
+      ]
+    };
 
     /*    LIGHTBOX    */
 
@@ -187,47 +232,66 @@ const GanttChart = () => {
     gantt.config.columns = [
       {
         name: "all",
-        label: "All",
-        align: "center",
-        width: 40,
-        template: (task: any) => gantt.getGlobalTaskIndex(task.id) + 1,
+        label: wrapLabel("#", "all"),
+        align: "left",
+        width: 100,
+        template: (task: any) => {
+          const idx = gantt.getGlobalTaskIndex(task.id) + 1;
+          return `
+            <div class="all-col-content">
+              <span class="row-index">${idx}</span>
+              <div class="row-icons">
+                <span class="figma-icon">📎</span>
+                <span class="figma-icon">💬</span>
+                <span class="figma-icon">📊</span>
+              </div>
+            </div>
+          `;
+        },
       },
       {
         name: "text",
-        label: "Task name",
+        label: wrapLabel("Task name", "text"),
         tree: true,
-        width: 260,
-        resize: true,
-        editor: { type: "text", map_to: "text" },
+        width: 280,
+        template: (task: any) => {
+          let colorBar = "";
+          if (task.rootColor !== undefined) {
+             const color = PROJECT_COLORS[task.rootColor % PROJECT_COLORS.length];
+             colorBar = `<div class="row-color-bar" style="background-color: ${color}"></div>`;
+          }
+          const highlighted = highlightText(task.text, searchTextRef.current.trim());
+          return `<div class="task-name-wrapper">${colorBar}<span class="task-name-text">${highlighted}</span></div>`;
+        }
       },
       {
         name: "duration",
-        label: "Duration",
+        label: wrapLabel("Duration", "duration"),
         align: "center",
-        width: 90,
-        editor: { type: "number", map_to: "duration" },
+        width: 80,
+        template: (task: any) => (task.duration || 0) + " Days",
       },
       {
         name: "start_date",
-        label: "Start Date",
+        label: wrapLabel("Start", "start_date"),
         align: "center",
-        width: 110,
-        editor: { type: "date", map_to: "start_date" },
+        width: 90,
+        template: (task: any) => task.start_date ? gantt.templates.date_grid(task.start_date) : "",
       },
       {
         name: "end_date",
-        label: "Finished Date",
+        label: wrapLabel("Finish", "end_date"),
         align: "center",
-        width: 110,
+        width: 90,
         template: (task: any) =>
           task.end_date ? gantt.templates.date_grid(task.end_date) : "",
       },
       {
         name: "owner",
-        label: "Assigned",
+        label: wrapLabel("Assigned", "owner"),
         align: "center",
-        width: 130,
-        editor: { type: "text", map_to: "owner" },
+        width: 120,
+        template: (task: any) => task.owner || "Unassigned",
       },
       {
         name: "add",
@@ -236,6 +300,14 @@ const GanttChart = () => {
         template: () => `<span class="add-child-btn"></span>`,
       },
     ];
+
+    // Format for date columns in grid
+    gantt.templates.date_grid = (date: Date) => {
+       const d = date.getDate();
+       const m = date.getMonth() + 1;
+       const y = date.getFullYear().toString().slice(-2);
+       return `${m}/${d}/${y}`;
+    };
 
     /*    ZOOM    */
 
@@ -283,6 +355,9 @@ const GanttChart = () => {
       if (!task.parent || task.parent === 0) {
         const index = gantt.getTaskCount() % PROJECT_COLORS.length;
         task.rootColor = index;
+      } else {
+        const parent = gantt.getTask(task.parent);
+        task.rootColor = parent.rootColor;
       }
       return true;
     });
@@ -291,8 +366,24 @@ const GanttChart = () => {
       if (task.parent) {
         const parent = gantt.getTask(task.parent);
         task.rootColor = parent.rootColor;
+      } else if (task.rootColor === undefined) {
+        task.rootColor = gantt.getTaskCount() % PROJECT_COLORS.length;
       }
       return true;
+    });
+
+    // Color assignment for parsed data
+    gantt.attachEvent("onParse", function() {
+       gantt.eachTask((task: any) => {
+          if (!task.parent || task.parent === 0) {
+             if (task.rootColor === undefined) {
+                task.rootColor = gantt.getGlobalTaskIndex(task.id) % PROJECT_COLORS.length;
+             }
+          } else {
+             const parent = gantt.getTask(task.parent);
+             task.rootColor = parent.rootColor;
+          }
+       });
     });
 
     /*    GRID BUTTONS    */
@@ -411,6 +502,104 @@ gantt.templates.tree_cell = function (task: any, column: any) {
 
     gantt.init(ganttContainer.current as HTMLDivElement);
 
+    /*    CUSTOM RESIZE LISTENERS    */
+    const container = ganttContainer.current;
+    if (container) {
+      const onMouseDown = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        console.log("Gantt: mousedown on", target.className);
+        
+        // 1. Check for Column Header Resizer
+        if (target.classList.contains("column-resizer-handle")) {
+          e.preventDefault();
+          e.stopPropagation();
+          const colName = target.dataset.column;
+          const col = gantt.config.columns.find((c: any) => c.name === colName);
+          if (col) {
+            resizingRef.current = {
+              name: colName as string,
+              startX: e.pageX,
+              startWidth: col.width || 0
+            };
+            document.body.style.cursor = "col-resize";
+            console.log("Gantt: Started resizing column", colName);
+            return;
+          }
+        }
+
+        // 2. Check for Grid/Table boundary resizer (between table and chart)
+        const grid = container.querySelector(".gantt_grid");
+        if (grid) {
+          const rect = grid.getBoundingClientRect();
+          const xInGrid = e.clientX - rect.left;
+          
+          // Debugging info
+          console.log("Gantt: Click X relative to grid:", xInGrid, "Grid Rect Width:", rect.width);
+
+          // If click is within 15px of the right edge of the grid
+          if (Math.abs(xInGrid - rect.width) <= 20) {
+            console.log("Gantt: Started resizing Grid boundary");
+            e.preventDefault();
+            resizingRef.current = {
+              name: "GRID_WIDTH_RESIZE",
+              startX: e.pageX,
+              startWidth: gantt.config.grid_width || rect.width
+            };
+            document.body.style.cursor = "col-resize";
+          }
+        }
+      };
+
+      const onMouseMove = (e: MouseEvent) => {
+        if (!resizingRef.current) {
+          // Visual feedback: change cursor if near grid boundary
+          const grid = container.querySelector(".gantt_grid");
+          if (grid) {
+            const rect = grid.getBoundingClientRect();
+            const xInGrid = e.clientX - rect.left;
+            if (Math.abs(xInGrid - rect.width) <= 15) {
+              container.style.cursor = "col-resize";
+            } else {
+              container.style.cursor = "";
+            }
+          }
+          return;
+        }
+
+        const { name, startX, startWidth } = resizingRef.current;
+        const diff = e.pageX - startX;
+
+        if (name === "GRID_WIDTH_RESIZE") {
+          const newWidth = Math.max(100, startWidth + diff);
+          gantt.config.grid_width = newWidth;
+          gantt.render(); // Full render to ensure scrollbars update
+        } else {
+          const col = gantt.config.columns.find((c: any) => c.name === name);
+          if (col) {
+            col.width = Math.max(30, startWidth + diff);
+            gantt.render();
+          }
+        }
+      };
+
+      const onMouseUp = () => {
+        if (resizingRef.current) {
+          resizingRef.current = null;
+          document.body.style.cursor = "";
+        }
+      };
+
+      container.addEventListener("mousedown", onMouseDown);
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
+
+      (container as any)._cleanupResize = () => {
+        container.removeEventListener("mousedown", onMouseDown);
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", onMouseUp);
+      };
+    }
+
     gantt.parse({
       data: [
         {
@@ -430,7 +619,10 @@ gantt.templates.tree_cell = function (task: any, column: any) {
       ],
     });
 
-    return () => gantt.clearAll();
+    return () => {
+      gantt.clearAll();
+      if ((container as any)._cleanupResize) (container as any)._cleanupResize();
+    };
   }, []);
 
   /*    ACTIONS    */
@@ -520,13 +712,9 @@ gantt.templates.tree_cell = function (task: any, column: any) {
 
     gantt.config.columns.splice(gantt.config.columns.length - 1, 0, {
       name: colName,
-      label: `
-  <div class="col-header pl-4">
-    <span class="col-title">Custom</span>
-    <span class="delete-col-btn" data-col="${colName}" title="Delete this column">✖</span>
-  </div>
-`,
+      label: wrapLabel("Custom", colName, true),
       width: 140,
+      resize: true,
       align: "center",
       template: (task: any) => task[colName] || "",
       editor: { type: "text", map_to: colName },
@@ -620,10 +808,41 @@ gantt.templates.tree_cell = function (task: any, column: any) {
 
           .add-child-btn { cursor: pointer; }
 
-          .col-header {
+          .col-header-wrap {
+            position: relative;
             display: flex;
-            justify-content: space-center;
+            justify-content: center;
             align-items: center;
+            width: 100%;
+            height: 100%;
+          }
+
+          .column-resizer-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 8px;
+            height: 100%;
+            cursor: col-resize;
+            z-index: 50;
+          }
+
+          .column-resizer-handle:hover {
+            background: rgba(59, 130, 246, 0.5);
+          }
+
+          .gantt_grid {
+             border-right: 5px solid transparent !important;
+             transition: border-right-color 0.2s;
+          }
+
+          .gantt_grid:hover {
+             border-right: 5px solid rgba(59, 130, 246, 0.4) !important;
+          }
+
+          /* Match the divider color when resizing */
+          .gantt_resizer {
+            background-color: rgba(59, 130, 246, 0.5) !important;
           }
 
           .delete-col-btn {
@@ -631,6 +850,71 @@ gantt.templates.tree_cell = function (task: any, column: any) {
             color: red;
             font-weight: bold;
             margin-left: 6px;
+          }
+
+          /* Figma specific styling */
+          .all-col-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 5px;
+          }
+          .row-index {
+            min-width: 20px;
+            font-weight: 500;
+          }
+          .row-icons {
+            display: flex;
+            gap: 4px;
+            opacity: 0.6;
+          }
+          .figma-icon {
+            font-size: 14px;
+            cursor: pointer;
+          }
+          .task-name-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding-left: 5px;
+            overflow: visible;
+          }
+          .row-color-bar {
+            position: absolute;
+            left: -15px;
+            top: 4px;
+            bottom: 4px;
+            width: 4px;
+            border-radius: 2px;
+            z-index: 10;
+          }
+          .task-name-text {
+            font-weight: 500;
+            color: #374151;
+            white-space: nowrap;
+          }
+          .gantt_tree_content {
+             padding-left: 20px !important;
+             overflow: visible !important;
+          }
+
+          /* Ensure horizontal scrollbars are visible and styled modernly */
+          ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+          }
+          ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+          }
+          ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+          }
+
+          .gantt_layout_cell.gantt_hor_scroll {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
           }
         `}
       </style>
