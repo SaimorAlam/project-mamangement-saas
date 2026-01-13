@@ -34,7 +34,7 @@ const StaffEmployeeProjectBuilder = () => {
 
   return (
     <div className="flex gap-6">
-      <ProjectWidget onWidgetSelect={handleWidgetSelect} />
+      <ProjectWidget onWidgetSelect={handleWidgetSelect} selectedWidgets={[]} />
       <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10">
         <ProjectStats activeWidget={activeWidget} />
 
