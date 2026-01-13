@@ -124,3 +124,9 @@
 .gantt_grid_head_cell {
   cursor: pointer;
 }
+
+.gantt-search-hit {
+  background: #fde047;
+  padding: 1px 3px;
+  border-radius: 3px;
+}

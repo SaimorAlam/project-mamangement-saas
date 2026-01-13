@@ -16,6 +16,7 @@ import {
   ZoomIn,
   ZoomOut,
   Download,
+  Search,
 } from "lucide-react";
 import { CiExport } from "react-icons/ci";
 
@@ -41,10 +42,25 @@ function extractColumnTitle(label: string) {
   return div.textContent || "";
 }
 
+function highlightText(text: any, query: string) {
+  if (!text) return "";
+  if (!query) return String(text);
+
+  const safe = String(text);
+  const q = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`(${q})`, "gi");
+
+  return safe.replace(regex, `<span class="gantt-search-hit">$1</span>`);
+}
+
+
+
 
 const GanttChart = () => {
   const ganttContainer = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const searchTextRef = useRef<string>("");
+
 
   useEffect(() => {
     gantt.clearAll();
@@ -132,6 +148,30 @@ const GanttChart = () => {
         expandParentIfNeeded(task.parent);
       }
     });
+
+    gantt.attachEvent("onBeforeTaskDisplay", function (id: any, task: any) {
+      const query = searchTextRef.current.trim().toLowerCase();
+
+      if (!query) return true;
+
+      // Search in ALL fields including custom columns
+      const columns = gantt.config.columns;
+
+      for (const col of columns) {
+        const field = col.name;
+        if (!field || field === "add" || field === "all") continue;
+
+        const value = task[field];
+        if (!value) continue;
+
+        if (String(value).toLowerCase().includes(query)) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+
 
 
     gantt.config.lightbox.sections = [
@@ -353,6 +393,18 @@ const GanttChart = () => {
       }
     }
 
+// Highlight normal columns
+gantt.templates.grid_cell = function (task: any, column: any) {
+  const value = task[column.name];
+  return highlightText(value, searchTextRef.current.trim());
+};
+
+// Highlight tree column (task name)
+gantt.templates.tree_cell = function (task: any, column: any) {
+  const value = task[column.name];
+  return highlightText(value, searchTextRef.current.trim());
+};
+
 
 
     /*    INIT    */
@@ -396,56 +448,56 @@ const GanttChart = () => {
   const zoomOut = () => gantt.ext.zoom.zoomOut();
 
   /*    CSV    */
-const exportCSV = () => {
-  const tasks = gantt.serialize().data;
+  const exportCSV = () => {
+    const tasks = gantt.serialize().data;
 
-  const baseFields = [
-    "text",
-    "start_date",
-    "duration",
-    "end_date",
-    "progress",
-    "owner",
-  ];
+    const baseFields = [
+      "text",
+      "start_date",
+      "duration",
+      "end_date",
+      "progress",
+      "owner",
+    ];
 
-  // All visible columns
-  const columns = gantt.config.columns;
+    // All visible columns
+    const columns = gantt.config.columns;
 
-  // Build field list: base + custom
-  const customFields = columns
-    .map((c: any) => c.name)
-    .filter((n: string) => n.startsWith("custom_"));
+    // Build field list: base + custom
+    const customFields = columns
+      .map((c: any) => c.name)
+      .filter((n: string) => n.startsWith("custom_"));
 
-  const allowedFields = [...baseFields, ...customFields];
+    const allowedFields = [...baseFields, ...customFields];
 
-  const exportData = tasks.map((task: any) => {
-    const row: any = {};
+    const exportData = tasks.map((task: any) => {
+      const row: any = {};
 
-    allowedFields.forEach((field) => {
-      let value = task[field];
+      allowedFields.forEach((field) => {
+        let value = task[field];
 
-      if (
-        (field === "start_date" || field === "end_date") &&
-        value instanceof Date
-      ) {
-        value = gantt.templates.xml_format(value);
-      }
+        if (
+          (field === "start_date" || field === "end_date") &&
+          value instanceof Date
+        ) {
+          value = gantt.templates.xml_format(value);
+        }
 
-      // Find column config
-      const col = columns.find((c: any) => c.name === field);
+        // Find column config
+        const col = columns.find((c: any) => c.name === field);
 
-      // Extract clean header text
-      const header = col ? extractColumnTitle(col.label || field) : field;
+        // Extract clean header text
+        const header = col ? extractColumnTitle(col.label || field) : field;
 
-      row[header] = value ?? "";
+        row[header] = value ?? "";
+      });
+
+      return row;
     });
 
-    return row;
-  });
-
-  const csv = Papa.unparse(exportData);
-  saveAs(new Blob([csv]), "sheet-to-gantt.csv");
-};
+    const csv = Papa.unparse(exportData);
+    saveAs(new Blob([csv]), "sheet-to-gantt.csv");
+  };
 
 
   const importCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -519,6 +571,23 @@ const exportCSV = () => {
         </div>
 
         <div className="flex gap-3 items-center">
+          <div className="relative w-64">
+  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+    <Search className="h-4 w-4 text-gray-400" />
+  </div>
+
+  <input
+    type="text"
+    placeholder="Search..."
+    className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none  focus:border-blue-500 focus:ring-1  focus:ring-blue-500/30 transition-colors
+    "
+    onChange={(e) => {
+      searchTextRef.current = e.target.value;
+      gantt.render();
+    }}
+  />
+</div>
+
           <input type="file" hidden ref={fileInputRef} onChange={importCSV} />
 
           <button
