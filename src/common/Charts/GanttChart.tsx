@@ -149,7 +149,7 @@ const GanttChart = () => {
       }
     });
 
-    gantt.attachEvent("onBeforeTaskDisplay", function (id: any, task: any) {
+    gantt.attachEvent("onBeforeTaskDisplay", function (_id: any, task: any) {
       const query = searchTextRef.current.trim().toLowerCase();
 
       if (!query) return true;
