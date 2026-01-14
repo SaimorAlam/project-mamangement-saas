@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { Copy, Trash2, Download } from "lucide-react";
+import { Copy, Trash2, Download, CloudCog } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
@@ -18,6 +18,12 @@ export type TierChart = {
     xAxisValues: string[];
     children: TierChart[];
 };
+type LegendValue = {
+  label: string;
+  field: string;
+  color: string;
+};
+
 
 type Props = {
     widgetTitle?: string;
@@ -27,7 +33,8 @@ type Props = {
     onToggleWidget?: () => void;
     tierLevel?: number;
     chartId?: string;
-    legendValues?: string;
+    onDelete?: () => void;
+    legendValues?: LegendValue[];
 };
 
 /* ---------- COMPONENT ---------- */
@@ -39,8 +46,9 @@ export default function SplineAreaChart({
     endingRange,
     onToggleWidget,
     tierLevel = 0,
+    onDelete,
+    legendValues,
     chartId = "root",
-
 }: Props) {
     const [isDownloading, setIsDownloading] = useState(false);
     const [showPopover, setShowPopover] = useState(false);
@@ -48,7 +56,7 @@ export default function SplineAreaChart({
     const [childTiers, setChildTiers] = useState<TierChart[]>([]);
     const [showChildrenModal, setShowChildrenModal] = useState(false);
     const [getChartTitleId] = useGetChartTitleIdMutation();
-
+    console.log("legendValues", legendValues);
     /* ---------- DATA ---------- */
 
     const chartData = useMemo(() => {
@@ -150,6 +158,7 @@ export default function SplineAreaChart({
             value: chartData[index],
         }));
         navigator.clipboard.writeText(JSON.stringify(copyData, null, 2));
+        setShowPopover(false);
     };
 
     const handleDownload = () => {
@@ -220,7 +229,7 @@ export default function SplineAreaChart({
                         className="flex items-center gap-4"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <p className="text-sm text-gray-500">Total {totalValue}</p>
+                        {/* <p className="text-sm text-gray-500">Total {totalValue}</p> */}
 
                         <div className="relative border-l pl-4">
                             <button
@@ -253,7 +262,10 @@ export default function SplineAreaChart({
 
                                     {onToggleWidget && (
                                         <button
-                                            onClick={onToggleWidget}
+                                            onClick={() => {
+                                                onToggleWidget();
+                                                setShowPopover(false);
+                                            }}
                                             className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
                                         >
                                             <MdOutlineWidgets size={18} /> Widget
@@ -261,7 +273,10 @@ export default function SplineAreaChart({
                                     )}
 
                                     <button
-                                        onClick={() => setShowAddTierModal(true)}
+                                        onClick={() => {
+                                            setShowAddTierModal(true);
+                                            setShowPopover(false);
+                                        }}
                                         className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
                                     >
                                         <GoPlus size={18} /> Add Tier
