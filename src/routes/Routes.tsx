@@ -96,9 +96,9 @@ const routes = createBrowserRouter([
       {
         path: "/client-panel",
         element: (
-          <ProtectedRoute allowedRoles={["CLIENT"]}>
+          // <ProtectedRoute allowedRoles={["CLIENT"]}>
           <ClientDashboardLayout />
-          </ProtectedRoute>
+          // </ProtectedRoute>
         ),
         children: getClientRoutes(),
       },
@@ -108,7 +108,7 @@ const routes = createBrowserRouter([
         path: "/staff-manager-panel",
         element: (
           // <ProtectedRoute allowedRoles={["MANAGER"]}>
-            <StaffManagerDashboardLayout />
+          <StaffManagerDashboardLayout />
           // </ProtectedRoute>
         ),
         children: getStaffManagerRoutes(),
