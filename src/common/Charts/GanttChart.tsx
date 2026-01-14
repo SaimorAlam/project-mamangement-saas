@@ -791,7 +791,7 @@ gantt.templates.tree_cell = function (task: any, column: any) {
         </div>
       </div>
 
-      <div className="w-full h-[calc(100vh-120px)] border rounded overflow-hidden">
+      <div className="w-full h-full rounded overflow-hidden">
         <div ref={ganttContainer} className="w-full h-full" />
       </div>
 
