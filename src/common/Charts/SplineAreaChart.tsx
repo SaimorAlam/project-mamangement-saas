@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { Copy, Trash2, Download, CloudCog } from "lucide-react";
+import { Copy, Trash2, Download } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
@@ -46,7 +46,6 @@ export default function SplineAreaChart({
     endingRange,
     onToggleWidget,
     tierLevel = 0,
-    onDelete,
     legendValues,
     chartId = "root",
 }: Props) {
@@ -74,7 +73,7 @@ export default function SplineAreaChart({
         () => chartData.reduce((sum, val) => sum + val, 0),
         [chartData]
     );
-
+    console.log("totalValue", totalValue);
     /* ---------- CHART CONFIG ---------- */
 
     const chartOptions: any = useMemo(
