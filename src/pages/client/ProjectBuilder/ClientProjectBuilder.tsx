@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useState } from "react";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
@@ -30,7 +30,7 @@ const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [activeWidget, setActiveWidget] = useState("KPI Widget");
-  const {data:projectsChart} = useGetChartByProjectIdQuery(projectId)
+  const { data: projectsChart } = useGetChartByProjectIdQuery(projectId)
   const projectsChartsData = projectsChart?.data
   const handleWidgetSelect = (widgetId: string) => {
     if (widgetId === "kpi") {
@@ -56,8 +56,8 @@ const ClientProjectBuilder = () => {
         prev.filter((id) => id !== widgetId)
       )
     });
-    toast.success("Widget deleted successfully", { id:toastId })
-    
+    toast.success("Widget deleted successfully", { id: toastId })
+
   };
 
   return (
@@ -69,49 +69,49 @@ const ClientProjectBuilder = () => {
       <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10">
         <ProjectStats activeWidget={activeWidget} />
 
-    {
-      projectsChartsData?.length > 0 ? (
-        <DefaultChartData projectsChartsData={projectsChartsData} />
-      ): selectedWidgets.length === 0 && (
-          <>
-            {/* <StackedBarChart /> */}
-            <div className="flex gap-4">
-              <RadarCharts />
-              <DoughnutChart
-                title="Doughnut Pie"
-                centerLabel="Total Visitor"
-                data={[
-                  {
-                    name: "Paid traffic",
-                    value: 65,
-                    count: 12,
-                    color: "#19A1E9",
-                  },
-                  {
-                    name: "Social traffic",
-                    value: 21,
-                    count: 30,
-                    color: "#F7AF21",
-                  },
-                  {
-                    name: "Organic traffic",
-                    value: 14,
-                    count: 8,
-                    color: "#10A683",
-                  },
-                ]}
-              />
-            </div>
-            <HeatmapChart />
-          </>
-        )
+        {
+          projectsChartsData?.length > 0 ? (
+            <DefaultChartData projectsChartsData={projectsChartsData} />
+          ) : selectedWidgets.length === 0 && (
+            <>
+              {/* <StackedBarChart /> */}
+              <div className="flex gap-4">
+                <RadarCharts />
+                <DoughnutChart
+                  title="Doughnut Pie"
+                  centerLabel="Total Visitor"
+                  data={[
+                    {
+                      name: "Paid traffic",
+                      value: 65,
+                      count: 12,
+                      color: "#19A1E9",
+                    },
+                    {
+                      name: "Social traffic",
+                      value: 21,
+                      count: 30,
+                      color: "#F7AF21",
+                    },
+                    {
+                      name: "Organic traffic",
+                      value: 14,
+                      count: 8,
+                      color: "#10A683",
+                    },
+                  ]}
+                />
+              </div>
+              <HeatmapChart />
+            </>
+          )
         }
         {selectedWidgets.includes("bar-chart") && (
           <StackedBarChartModule
             onDelete={() => handleWidgetDelete("bar-chart")}
           />
         )}
-       {selectedWidgets.includes("progress-ring") && (
+        {selectedWidgets.includes("progress-ring") && (
           <ProgressRingModule
             onDelete={() => handleWidgetDelete("progress-ring")}
           />
@@ -160,6 +160,12 @@ const ClientProjectBuilder = () => {
           <ChartModuleOne
             chartName="area-chart"
             onDelete={() => handleWidgetDelete("area-chart")}
+          />
+        )}
+        {selectedWidgets.includes("spline-area-chart") && (
+          <ChartModuleOne
+            chartName="spline-area-chart"
+            onDelete={() => handleWidgetDelete("spline-area-chart")}
           />
         )}
 

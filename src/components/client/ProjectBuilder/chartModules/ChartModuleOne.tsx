@@ -7,6 +7,7 @@ import AreaChart from '@/common/Charts/AreaChart';
 import MultiAxisLineChart from '@/common/Charts/LineChart';
 import WidgetForChartModuleOne from '../WidgetForChartModuleOne';
 import HeatmapChartNew from '@/common/Charts/HeatmapChartNew';
+import SplineAreaChart from '@/common/Charts/SplineAreaChart';
 
 const ChartModuleOne = ({ chartName, onDelete }: { chartName: string, onDelete?: () => void }) => {
     const [widgetTitle, setWidgetTitle] = useState("My-CSV");
@@ -83,7 +84,19 @@ const ChartModuleOne = ({ chartName, onDelete }: { chartName: string, onDelete?:
                             widgetTitle={widgetTitle}
                             xAxisValues={xAxisValues}
                             legendValues={legendValues}
-                             startingRange={startingRange}
+                            startingRange={startingRange}
+                            endingRange={endingRange}
+                            onToggleWidget={handleToggleWidget}
+                            onDelete={onDelete}
+                        />
+                    );
+                } else if (chartName === "spline-area-chart") {
+                    return (
+                        <SplineAreaChart
+                            widgetTitle={widgetTitle}
+                            xAxisValues={xAxisValues}
+                            legendValues={legendValues}
+                            startingRange={startingRange}
                             endingRange={endingRange}
                             onToggleWidget={handleToggleWidget}
                             onDelete={onDelete}

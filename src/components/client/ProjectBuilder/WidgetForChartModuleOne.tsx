@@ -48,7 +48,7 @@ const WidgetForChartModuleOne = ({
   setEndingRange: React.Dispatch<React.SetStateAction<number>>;
   onClose?: () => void;
 }) => {
-  const projectId = useAppSelector((state)=> state.chartSlice.projectId)
+  const projectId = useAppSelector((state) => state.chartSlice.projectId)
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
@@ -113,7 +113,7 @@ const WidgetForChartModuleOne = ({
 
   const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
-  const downloadCSV = async() => {
+  const downloadCSV = async () => {
     const toastId = toast.loading("Creating chart...")
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
     for (let i = 0; i < legendValues.length; i++) {
@@ -164,11 +164,11 @@ const WidgetForChartModuleOne = ({
     };
     try {
       const res = await createChart(payload).unwrap()
-      if(res?.success){
-        toast.success("Chart created successfully", {id: toastId})
+      if (res?.success) {
+        toast.success("Chart created successfully", { id: toastId })
       }
     } catch {
-      toast.error("Chart creation failed", {id: toastId})
+      toast.error("Chart creation failed", { id: toastId })
     }
 
     // DownloadAndSaveCSVforModuleOneWidget(
@@ -247,15 +247,14 @@ const WidgetForChartModuleOne = ({
                   key={index}
                   type="text"
                   required
-                  placeholder={`Enter ${index + 1}${
-                    index === 0
+                  placeholder={`Enter ${index + 1}${index === 0
                       ? "st"
                       : index === 1
-                      ? "nd"
-                      : index === 2
-                      ? "rd"
-                      : "th"
-                  } field name here...`}
+                        ? "nd"
+                        : index === 2
+                          ? "rd"
+                          : "th"
+                    } field name here...`}
                   value={xAxisValues[index] || ""}
                   onChange={(e) =>
                     handleXAxisValueChange(index, e.target.value)
@@ -281,14 +280,12 @@ const WidgetForChartModuleOne = ({
             />
             <div
               onClick={() => setShowFilter(!showFilter)}
-              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
-                showFilter ? "bg-blue-600" : "bg-gray-300"
-              }`}
+              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showFilter ? "bg-blue-600" : "bg-gray-300"
+                }`}
             >
               <div
-                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
-                  showFilter ? "translate-x-5" : "translate-x-0"
-                }`}
+                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showFilter ? "translate-x-5" : "translate-x-0"
+                  }`}
               />
             </div>
           </div>
@@ -397,14 +394,12 @@ const WidgetForChartModuleOne = ({
                 />
                 <div
                   onClick={() => setShowLegend(!showLegend)}
-                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
-                    showLegend ? "bg-blue-600" : "bg-gray-300"
-                  }`}
+                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showLegend ? "bg-blue-600" : "bg-gray-300"
+                    }`}
                 >
                   <div
-                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
-                      showLegend ? "translate-x-5" : "translate-x-0"
-                    }`}
+                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showLegend ? "translate-x-5" : "translate-x-0"
+                      }`}
                   />
                 </div>
               </div>
@@ -424,10 +419,10 @@ const WidgetForChartModuleOne = ({
                     {index === 0
                       ? "st"
                       : index === 1
-                      ? "nd"
-                      : index === 2
-                      ? "rd"
-                      : "th"}{" "}
+                        ? "nd"
+                        : index === 2
+                          ? "rd"
+                          : "th"}{" "}
                     Legend Name:
                   </label>
 
@@ -453,10 +448,10 @@ const WidgetForChartModuleOne = ({
                       {index === 0
                         ? "st"
                         : index === 1
-                        ? "nd"
-                        : index === 2
-                        ? "rd"
-                        : "th"}{" "}
+                          ? "nd"
+                          : index === 2
+                            ? "rd"
+                            : "th"}{" "}
                       Legend Color:
                     </label>
 
