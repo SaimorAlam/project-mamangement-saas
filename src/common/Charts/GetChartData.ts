@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAppSelector } from "@/hooks/useRedux";
 import { useLazyGetProjectTreeQuery } from "@/store/Api/NodeApi/NodeApi";
 import { useMemo, useEffect, useState } from "react";

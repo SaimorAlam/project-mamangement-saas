@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
@@ -20,7 +21,7 @@ const initialData: CostData[] = [
 ]
 
 export default function ProjectCostChart() {
-  const [data, _setData] = useState<CostData[]>(initialData)
+  const [data, ] = useState<CostData[]>(initialData)
   const [hoveredBar, setHoveredBar] = useState<string | null>(null)
 
   const calculateTotal = (key: keyof Omit<CostData, "phase">) => {
