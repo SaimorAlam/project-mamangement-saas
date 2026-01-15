@@ -41,6 +41,7 @@ export const useChartTiers = (
   };
 
   return {
+    widgetTitle,
     childTiers,
     setChildTiers,
     showAddTierModal,

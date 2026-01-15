@@ -54,7 +54,7 @@ export default function SparkLinesChart({
 }: Props) {
   /* ---------- HOOKS ---------- */
   const { isDownloading, handleCopy, handleDownloadWrapper } = useChartTools();
-  
+
   const {
     childTiers,
     showAddTierModal,
