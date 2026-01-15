@@ -27,6 +27,7 @@ import DefaultChartData from "./Components/DefaultChartData";
 import { toast } from "sonner";
 import SparkLineChartModule from "@/components/client/ProjectBuilder/chartModules/SparkLineChartModule";
 import LogarithmicChartModule from "@/components/client/ProjectBuilder/chartModules/LogarithmicChartModule";
+import DecompositionTreeModule from "@/components/client/ProjectBuilder/chartModules/DecompositionTreeModule";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -178,6 +179,11 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("logarithmic-chart") && (
           <LogarithmicChartModule
             onDelete={() => handleWidgetDelete("logarithmic-chart")}
+          />
+        )}
+        {selectedWidgets.includes("decomposition-tree") && (
+          <DecompositionTreeModule
+            onDelete={() => handleWidgetDelete("decomposition-tree")}
           />
         )}
 
