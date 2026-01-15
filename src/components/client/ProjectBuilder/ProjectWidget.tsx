@@ -188,6 +188,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Show candle chart",
       icon: <ChartCandlestick className="w-5 h-5" />,
     },
+    {
+      id: "logarithmic-chart",
+      name: "Logarithmic Chart",
+      description: "Display data on a logarithmic scale",
+      icon: <ChartLine className="w-5 h-5" />, // Reusing ChartLine or similar
+    },
     // {
     //   id: "rader-chart",
     //   name: "Rader Chart",

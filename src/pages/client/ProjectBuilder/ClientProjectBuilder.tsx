@@ -26,6 +26,7 @@ import PieChartModule from "@/components/client/ProjectBuilder/chartModules/PieC
 import DefaultChartData from "./Components/DefaultChartData";
 import { toast } from "sonner";
 import SparkLineChartModule from "@/components/client/ProjectBuilder/chartModules/SparkLineChartModule";
+import LogarithmicChartModule from "@/components/client/ProjectBuilder/chartModules/LogarithmicChartModule";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -172,6 +173,11 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("sparklines-chart") && (
           <SparkLineChartModule
             onDelete={() => handleWidgetDelete("sparklines-chart")}
+          />
+        )}
+        {selectedWidgets.includes("logarithmic-chart") && (
+          <LogarithmicChartModule
+            onDelete={() => handleWidgetDelete("logarithmic-chart")}
           />
         )}
 

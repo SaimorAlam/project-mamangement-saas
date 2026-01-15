@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
+// import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { useAppSelector } from "@/hooks/useRedux";
 import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
 import { toast } from "sonner";
@@ -52,7 +52,7 @@ const WidgetForChartModuleOne = ({
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
-  const [createChart] = useCreateChartMutation();
+  const [createChart, {isLoading}] = useCreateChartMutation();
   // for showing user info below
   const assignedBy = {
     name: "Alexis Burg",
@@ -111,7 +111,7 @@ const WidgetForChartModuleOne = ({
     });
   };
 
-  const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
+  // const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const downloadCSV = async () => {
     const toastId = toast.loading("Creating chart...")
