@@ -62,7 +62,7 @@ export default function SparkLinesChart({
   /* ---------- DATA ---------- */
 
   const generateData = useMemo(
-    () => (index: number) => {
+    () => () => {
       if (!xAxisValues.length) return [];
       // Randomize slightly for sparklines effect
       return xAxisValues.map(
