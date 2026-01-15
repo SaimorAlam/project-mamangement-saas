@@ -99,6 +99,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       icon: <ChartArea className="w-5 h-5" />,
     },
     {
+      id: "sparklines-chart",
+      name: "Sparklines Chart",
+      description: "Show trends over time with filled areas",
+      icon: <ChartArea className="w-5 h-5" />,
+    },
+    {
       id: "data-table",
       name: "Data Table",
       description: "Display detailed data records",

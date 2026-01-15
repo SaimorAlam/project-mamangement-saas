@@ -25,6 +25,7 @@ import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModule
 import PieChartModule from "@/components/client/ProjectBuilder/chartModules/PieChartModule";
 import DefaultChartData from "./Components/DefaultChartData";
 import { toast } from "sonner";
+import SparkLineChartModule from "@/components/client/ProjectBuilder/chartModules/SparkLineChartModule";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -166,6 +167,11 @@ const ClientProjectBuilder = () => {
           <ChartModuleOne
             chartName="spline-area-chart"
             onDelete={() => handleWidgetDelete("spline-area-chart")}
+          />
+        )}
+        {selectedWidgets.includes("sparklines-chart") && (
+          <SparkLineChartModule
+            onDelete={() => handleWidgetDelete("sparklines-chart")}
           />
         )}
 
