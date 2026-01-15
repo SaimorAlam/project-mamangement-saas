@@ -5,10 +5,11 @@ import { Copy, Trash2, Download } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
-import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
+// import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
+// import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import { downloadCSVForModuleOne } from "@/utils/DownlaodChartCSV";
 
 /* ---------- TYPES ---------- */
 
@@ -45,7 +46,7 @@ export default function SplineAreaChart({
   endingRange,
   onToggleWidget,
   tierLevel = 0,
-  // legendValues,
+  legendValues,
   chartId = "root",
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -53,23 +54,23 @@ export default function SplineAreaChart({
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
-  const [getChartTitleId] = useGetChartTitleIdMutation();
+//   const [getChartTitleId] = useGetChartTitleIdMutation();
   /* ---------- DATA ---------- */
 
-  const chartData = useMemo(() => {
-    if (!xAxisValues.length) return [];
+//   const [getChartTitleId] = useGetChartTitleIdMutation();
+  /* ---------- DATA ---------- */
 
+  const generateData = useMemo(() => (index: number) => {
+    if (!xAxisValues.length) return [];
+    // Add small variation based on index
+    const variation = index * 5; 
     const step = (endingRange - startingRange) / (xAxisValues.length - 1 || 1);
 
-    return xAxisValues.map((_, index) =>
-      Math.round(startingRange + step * index)
+    return xAxisValues.map((_, i) =>
+      Math.round(startingRange + step * i + variation)
     );
   }, [xAxisValues, startingRange, endingRange]);
 
-  // const totalValue = useMemo(
-  //     () => chartData.reduce((sum, val) => sum + val, 0),
-  //     [chartData]
-  // );
   /* ---------- CHART CONFIG ---------- */
 
   const chartOptions: any = useMemo(
@@ -106,7 +107,7 @@ export default function SplineAreaChart({
         enabled: false,
       },
 
-      colors: ["#00E396"],
+      colors: legendValues?.map(l => l.color) || ["#00E396"],
 
       xaxis: {
         categories: xAxisValues?.map((v) => v || ""),
@@ -129,63 +130,47 @@ export default function SplineAreaChart({
       },
 
       legend: {
-        show: false,
+        show: true,
+        position: 'top',
+        horizontalAlign: 'right', 
       },
     }),
-    [xAxisValues]
+    [xAxisValues, legendValues]
   );
-  const series = useMemo(
-    () => [
-      {
-        name: widgetTitle,
-        data: chartData,
-      },
-    ],
-    [chartData, widgetTitle]
-  );
-  console.log(series, "Series");
+
+  const series = useMemo(() => {
+    if (legendValues?.length) {
+      return legendValues.map((legend, index) => ({
+        name: legend.label,
+        data: generateData(index)
+      }));
+    }
+    // Fallback if no legends
+    return [{
+       name: widgetTitle,
+       data: generateData(0)
+    }];
+  }, [legendValues, widgetTitle, generateData]);
+
   /* ---------- ACTIONS ---------- */
 
   const handleCopy = () => {
+    // Copy first series data for now
+    const dataToCopy = series[0]?.data || [];
     const copyData = xAxisValues.map((label, index) => ({
       label,
-      value: chartData[index],
+      value: dataToCopy[index],
     }));
     navigator.clipboard.writeText(JSON.stringify(copyData, null, 2));
     setShowPopover(false);
   };
 
   const handleDownload = () => {
-    const payload = {
-      numberOfDataset: xAxisValues.length,
-      firstFiledDataset: 0,
-      lastFiledDAtaset: 100,
-      showWidgets: xAxisValues.map((l, index) => ({
-        legend_name: l,
-        value: chartData[index],
-      })),
-      title: widgetTitle,
-      status: "ACTIVE",
-      category: "AREA",
-      xAxis: JSON.stringify({ labels: [], values: [] }),
-      yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
-    };
-
     setIsDownloading(true);
 
-    const csvData = xAxisValues.map((label, index) => ({
-      label,
-      value: chartData[index],
-    }));
+    downloadCSVForModuleOne(widgetTitle, xAxisValues, legendValues && legendValues.length > 0 ? legendValues : [{ label: widgetTitle }]);
 
-    DownloadAndSaveCSVforModuleTwoWidget(
-      payload,
-      getChartTitleId,
-      widgetTitle,
-      csvData
-    );
-
+      setShowPopover(false);
     setIsDownloading(false);
   
   };
