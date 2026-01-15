@@ -176,12 +176,19 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Show candle chart",
       icon: <ChartCandlestick className="w-5 h-5" />,
     },
-    // {
-    //   id: "rader-chart",
-    //   name: "Rader Chart",
-    //   description: "Division of same category",
-    //   icon: <ChartScatter className="w-5 h-5" />,
-    // },
+    {
+      id: "treemap-chart",
+      name: "Treemap Chart",
+      description: "Show treemap chart",
+      icon: <ChartCandlestick className="w-5 h-5" />,
+    },
+    {
+      id: "calendar-heatmap-chart",
+      name: "Calendar Heatmap Chart",
+      description: "Show calendar heatmap chart",
+      icon: <ChartCandlestick className="w-5 h-5" />,
+    }
+
   ];
   const { programs ,isLoading} = useGetAllProgram();
   const {projects,isLoading:isProjectsLoading ,isFetching:projectFetching} = useGetLazyProject(selectedProgram,isProgramBuilder);

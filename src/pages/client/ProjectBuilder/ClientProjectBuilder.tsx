@@ -25,6 +25,8 @@ import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModule
 import PieChartModule from "@/components/client/ProjectBuilder/chartModules/PieChartModule";
 import DefaultChartData from "./Components/DefaultChartData";
 import { toast } from "sonner";
+import TreemapChartModule from "@/components/client/ProjectBuilder/chartModules/TreemapChartModule";
+import CalendarHeatmapModule from "@/components/client/ProjectBuilder/chartModules/CalendarHeatmapModule";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -181,6 +183,9 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("waterfall-chart") && <WaterfallChartModule />}
         {selectedWidgets.includes("radar-chart") && <RadarChartModule />}
         {selectedWidgets.includes("candle-chart") && <CandleChartModule />}
+        {selectedWidgets.includes("treemap-chart") && <TreemapChartModule />}
+        {selectedWidgets.includes("calendar-heatmap-chart") && <CalendarHeatmapModule />}
+
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
