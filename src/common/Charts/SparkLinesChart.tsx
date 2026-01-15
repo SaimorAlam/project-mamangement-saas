@@ -82,17 +82,17 @@ export default function SparkLinesChart({
 
   const series = useMemo(() => {
     if (legendValues?.length) {
-      return legendValues.map((legend, index) => ({
+      return legendValues.map((legend) => ({
         name: legend.label,
         color: legend.color,
-        data: generateData(index),
+        data: generateData(),
       }));
     }
     return [
       {
         name: widgetTitle,
         color: "#13A490",
-        data: generateData(0),
+        data: generateData(),
       },
     ];
   }, [legendValues, widgetTitle, generateData]);
