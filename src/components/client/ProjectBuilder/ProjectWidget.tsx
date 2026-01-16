@@ -21,6 +21,9 @@ import {
   FileChartPie,
   SquareKanban,
   ChartCandlestick,
+  Map,
+  CalendarDays,
+  SquareChartGantt,
 } from "lucide-react";
 import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
@@ -180,25 +183,25 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       id: "treemap-chart",
       name: "Treemap Chart",
       description: "Show treemap chart",
-      icon: <ChartCandlestick className="w-5 h-5" />,
+      icon: <Map className="w-5 h-5" />,
     },
     {
       id: "calendar-heatmap-chart",
       name: "Calendar Heatmap Chart",
       description: "Show calendar heatmap chart",
-      icon: <ChartCandlestick className="w-5 h-5" />,
+      icon: <CalendarDays className="w-5 h-5" />,
     },
     {
       id: "gantt-new-chart",
       name: "Gantt New Chart",
       description: "Show gantt chart",
-      icon: <ChartCandlestick className="w-5 h-5" />,
+      icon: <SquareChartGantt className="w-5 h-5" />,
     },
     {
       id: "matrix-table-chart",
       name: "Matrix Table Chart",
       description: "Show matrix table chart",
-      icon: <ChartCandlestick className="w-5 h-5" />,
+      icon: <Table className="w-5 h-5" />,
     },
 
   ];

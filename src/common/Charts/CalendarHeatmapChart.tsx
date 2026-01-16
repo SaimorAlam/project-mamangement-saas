@@ -2,15 +2,14 @@
 import { useMemo, useState } from "react";
 import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
-import { Copy, Trash2, Download, Upload } from "lucide-react";
-import * as XLSX from "xlsx";
-import { toast } from "sonner";
+import { Copy, Trash2, Download } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
+import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
+import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-import useChartData from "./GetChartData";
 
 /*       TYPES       */
 
@@ -33,7 +32,6 @@ export type TierChart = {
 };
 
 type Props = {
-  newData?: any[];
   widgetTitle?: string;
   legendValues?: LegendValue[];
   numOfLegendDataSet?: number;
@@ -41,8 +39,8 @@ type Props = {
   onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
+  months?: string[];
   isCreationMode?: boolean;
-  allUploadedData?: { [key: string]: CalendarValue[] };
 };
 
 /*       HELPER FUNCTIONS       */
@@ -58,72 +56,94 @@ const generateCalendarData = (
 ): CalendarValue[] => {
   const values: CalendarValue[] = [];
   const currentDate = new Date(startDate);
+  // Ensure we don't go into infinite loop if dates are messed up
+  const finalDate = new Date(endDate);
+  
+  // Clone to avoid modifying original
+  const iterDate = new Date(currentDate);
 
-  while (currentDate <= endDate) {
+  while (iterDate <= finalDate) {
+    // Add random data for some days (not every day)
     if (Math.random() > 0.3) {
       values.push({
-        date: currentDate.toISOString().split("T")[0],
+        date: iterDate.toISOString().split("T")[0],
         count: getRandomCount(),
       });
     }
-    currentDate.setDate(currentDate.getDate() + 1);
+    iterDate.setDate(iterDate.getDate() + 1);
   }
 
   return values;
 };
 
+
+
 /*       COMPONENT       */
 
 export default function CalendarHeatmapChart({
-  newData,
   widgetTitle = "Activity Calendar",
   legendValues = [],
   numOfLegendDataSet = 1,
   onToggleWidget,
   onDelete,
   tierLevel = 0,
-  chartId,
-  isCreationMode = false,
-  allUploadedData,
+  chartId = "root",
+  months = [],
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<{ [key: string]: CalendarValue[] } | undefined>(allUploadedData);
-  const { childTiers } = useChartData({
-    newData,
-    isCreationMode,
-    chartId,
-    xAxisValues: [],
-    legendValues,
-    numOfLegendDataSet,
-    startingRange: 0,
-    endingRange: 100,
-  });
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
+
+  // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
+  const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
+  const [getChartTitleId] = useGetChartTitleIdMutation();
+
   /*   DATE RANGE   */
-  const { startDate, endDate } = useMemo(() => {
+  const { startDate, endDate, customMonthLabels } = useMemo(() => {
+    // If specific months are provided
+    if (months && months.length > 0 && months.some(m => m.trim() !== "")) {
+      const currentYear = new Date().getFullYear();
+      const validMonths = months.filter(m => m.trim() !== "");
+      
+      // Always start from January if custom labels are provided
+      // This ensures our labels align with the displayed months (Jan = index 0)
+      const start = new Date(currentYear, 0, 1);
+      
+      // End date is determined by how many labels we have
+      // e.g., 3 labels -> Jan, Feb, Mar -> End date is end of Mar
+      const end = new Date(currentYear, validMonths.length, 0); 
+
+      // Create the 12-element array required by the library
+      const labels = new Array(12).fill("");
+      validMonths.forEach((m, i) => {
+        if (i < 12) labels[i] = m;
+      });
+
+      return { 
+        startDate: start, 
+        endDate: end, 
+        customMonthLabels: labels as [string, string, string, string, string, string, string, string, string, string, string, string] 
+      };
+    }
+
+    // Default behavior
     const end = new Date();
     const start = new Date();
-    start.setMonth(start.getMonth() - 3);
-    return { startDate: start, endDate: end };
-  }, []);
+    start.setMonth(start.getMonth() - 3); // 3 months back
+    return { startDate: start, endDate: end, customMonthLabels: undefined };
+  }, [months]);
 
   /*   DATA GENERATION   */
   const calendarValues = useMemo(() => {
-    const sheetName = (widgetTitle || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim().substring(0, 31);
-    const dataToUse = localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
-
-    if (dataToUse && dataToUse.length > 0) {
-      return dataToUse;
-    }
-
     return generateCalendarData(startDate, endDate);
-  }, [startDate, endDate, widgetTitle, localUploadedData, allUploadedData]);
+  }, [startDate, endDate]);
 
   const totalActiveDays = calendarValues.length;
   const totalCount = calendarValues.reduce((sum, v) => sum + v.count, 0);
+
+  const isAllLegendFieldEmpty = legendValues.filter((l) => l.label !== "");
 
   /*   PRIMARY COLOR   */
   const primaryColor = useMemo(() => {
@@ -138,58 +158,54 @@ export default function CalendarHeatmapChart({
   };
 
   const handleDownload = () => {
+    const csvId = generateId();
+
+    const payload = {
+      numberOfDataset: numOfLegendDataSet,
+      firstFiledDataset: 0,
+      lastFiledDAtaset: 100,
+      showWidgets: legendValues.map((l) => ({
+        legend_name: l.label,
+        color: l.color,
+      })),
+      title: widgetTitle,
+      status: "ACTIVE",
+      category: "CALENDAR",
+      xAxis: JSON.stringify({
+        labels: [],
+        values: [],
+      }),
+      yAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({}),
+    };
     setIsDownloading(true);
-    try {
-      const wb = XLSX.utils.book_new();
-      const usedNames = new Set<string>();
 
-      const getUniqueSheetName = (name: string) => {
-        let baseName = (name || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim();
-        if (baseName.length > 25) baseName = baseName.substring(0, 25);
-        if (!baseName) baseName = "Sheet";
+    // For CSV export
+    const header = "Date,Count";
+    const rows = calendarValues.map((item) => `${item.date},${item.count}`);
 
-        let uniqueName = baseName;
-        let counter = 1;
-        while (usedNames.has(uniqueName.toLowerCase())) {
-          uniqueName = `${baseName}_${counter}`;
-          counter++;
-        }
-        usedNames.add(uniqueName.toLowerCase());
-        return uniqueName;
-      };
+    const csvContent = [header, ...rows].join("\n");
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
 
-      const processNodeData = (name: string) => {
-        const headers = ["Date", "Count"];
-        const rows = [headers, ...Array(30).map(() => ["", ""])];
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${widgetTitle}-${csvId}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
 
-        const ws = XLSX.utils.aoa_to_sheet(rows);
-        XLSX.utils.book_append_sheet(wb, ws, getUniqueSheetName(name));
-      };
+    // Also save to backend
+    DownloadAndSaveCSVforModuleOneWidget(
+      payload,
+      getChartTitleId,
+      widgetTitle,
+      [],
+      legendValues
+    );
 
-      processNodeData(widgetTitle);
-
-      const processChildren = (nodes: any[]) => {
-        nodes.forEach((node) => {
-          processNodeData(node.name || node.taskName);
-
-          if (node.children && node.children.length > 0) {
-            processChildren(node.children);
-          }
-        });
-      };
-
-      if (childTiers && childTiers.length > 0) {
-        processChildren(childTiers);
-      }
-
-      XLSX.writeFile(wb, `${widgetTitle}.xlsx`);
-      toast.success("Excel downloaded successfully");
-    } catch (error) {
-      console.error("Excel download failed", error);
-      toast.error("Failed to download Excel");
-    } finally {
-      setIsDownloading(false);
-    }
+    setIsDownloading(false);
   };
 
   const handleWidgetClick = () => {
@@ -204,47 +220,21 @@ export default function CalendarHeatmapChart({
     setShowPopover(false);
   };
 
-  const handleChartClick = () => {
-    if (childTiers?.length > 0) {
-      setShowChildrenModal(true);
-    }
+  const handleSaveTier = (tierName: string) => {
+    const newTier: TierChart = {
+      id: `${chartId}-tier-${Date.now()}`,
+      name: tierName,
+      legendValues: legendValues,
+      children: [],
+    };
+    setChildTiers([...childTiers, newTier]);
+    setShowAddTierModal(false);
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const bstr = evt.target?.result as string;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const allData: { [key: string]: CalendarValue[] } = {};
-
-        wb.SheetNames.forEach((sheetName) => {
-          const ws = wb.Sheets[sheetName];
-          const rawData: any[] = XLSX.utils.sheet_to_json(ws);
-
-          if (rawData.length > 0) {
-            const calendarData = rawData
-              .map((row) => ({
-                date: row.Date || "",
-                count: Number(row.Count) || 0,
-              }))
-              .filter((item) => item.date);
-            
-            allData[sheetName] = calendarData;
-          }
-        });
-
-        setLocalUploadedData(allData);
-        toast.success("Data uploaded successfully");
-      } catch (err) {
-        console.error("Upload failed", err);
-        toast.error("Failed to parse Excel file");
-      }
-    };
-    reader.readAsBinaryString(file);
+  const handleChartClick = () => {
+    if (childTiers.length > 0) {
+      setShowChildrenModal(true);
+    }
   };
 
   /*   RENDER   */
@@ -253,7 +243,7 @@ export default function CalendarHeatmapChart({
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 relative ${
-          childTiers?.length > 0
+          childTiers.length > 0
             ? "cursor-pointer hover:shadow-lg transition-shadow"
             : ""
         }`}
@@ -298,43 +288,18 @@ export default function CalendarHeatmapChart({
                     <span>Copy</span>
                   </button>
 
-                  {tierLevel === 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload();
-                        setShowPopover(false);
-                      }}
-                      disabled={isDownloading}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <Download size={18} />
-                      <span>Download</span>
-                    </button>
-                  )}
-
-                  {tierLevel === 0 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          document.getElementById(`upload-input-${chartId || widgetTitle}`)?.click();
-                          setShowPopover(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                      >
-                        <Upload size={18} />
-                        <span>Upload Data</span>
-                      </button>
-                      <input
-                        id={`upload-input-${chartId || widgetTitle}`}
-                        type="file"
-                        accept=".xlsx, .xls"
-                        className="hidden"
-                        onChange={handleUpload}
-                      />
-                    </>
-                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownload();
+                      setShowPopover(false);
+                    }}
+                    disabled={isDownloading}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <Download size={18} />
+                    <span>Download</span>
+                  </button>
 
                   <button
                     onClick={(e) => {
@@ -361,18 +326,16 @@ export default function CalendarHeatmapChart({
                     </button>
                   )}
 
-                  {!isCreationMode && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddTierClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <GoPlus size={18} />
-                      <span>Add Tier</span>
-                    </button>
-                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddTierClick();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <GoPlus size={18} />
+                    <span>Add Tier</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -414,7 +377,7 @@ export default function CalendarHeatmapChart({
             startDate={startDate}
             endDate={endDate}
             values={calendarValues}
-            classForValue={(value) => {
+            classForValue={(value: any) : any => {
               if (!value) {
                 return "color-empty";
               }
@@ -423,7 +386,7 @@ export default function CalendarHeatmapChart({
               if (value.count < 10) return "color-scale-3";
               return "color-scale-4";
             }}
-            tooltipDataAttrs={(value: any) => {
+            tooltipDataAttrs={(value: any) : any => {
               if (!value || !value.date) {
                 return {};
               }
@@ -432,6 +395,7 @@ export default function CalendarHeatmapChart({
               };
             }}
             showWeekdayLabels
+            monthLabels={customMonthLabels}
           />
         </div>
 
@@ -461,12 +425,18 @@ export default function CalendarHeatmapChart({
           <span className="text-xs text-gray-500">More</span>
         </div>
 
+        {isAllLegendFieldEmpty.length === 0 && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400 text-center">
+            No data available. Configure color in the widget settings.
+          </div>
+        )}
+
         {/* Indicator if chart has children */}
-        {childTiers?.length > 0 && (
+        {childTiers.length > 0 && (
           <div className="mt-4 text-center">
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier
-              {childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           </div>
         )}
@@ -476,7 +446,7 @@ export default function CalendarHeatmapChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
+        onSave={handleSaveTier}
         parentChartName={widgetTitle}
       />
 
@@ -489,19 +459,16 @@ export default function CalendarHeatmapChart({
           title={widgetTitle}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers &&
-              childTiers?.map((tier: any) => (
-                <CalendarHeatmapChart
-                  newData={tier?.children || []}
-                  key={tier?.id}
-                  widgetTitle={tier?.name || tier?.taskName}
-                  legendValues={tier?.legendValues}
-                  numOfLegendDataSet={tier?.legendValues?.length}
-                  tierLevel={tierLevel + 1}
-                  chartId={tier?.id}
-                  allUploadedData={localUploadedData || allUploadedData}
-                />
-              ))}
+            {childTiers.map((tier) => (
+              <CalendarHeatmapChart
+                key={tier.id}
+                widgetTitle={tier.name}
+                legendValues={tier.legendValues}
+                numOfLegendDataSet={tier.legendValues.length}
+                tierLevel={tierLevel + 1}
+                chartId={tier.id}
+              />
+            ))}
           </div>
         </TierChartModal>
       )}
