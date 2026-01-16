@@ -1,105 +1,64 @@
 import { useState } from "react";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../WidgetForChartModuleOne";
 import TreemapChart from "@/common/Charts/TreemapChart";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
-
-type TreemapDataPoint = {
-  x: string;
-  y: number;
-};
 
 const TreemapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
-  const [widgetTitle, setWidgetTitle] = useState("City Population Treemap");
+  const [widgetTitle, setWidgetTitle] = useState("Treemap Chart");
   const [showWidget, setShowWidget] = useState(false);
 
-  // X-Axis configuration for treemap labels
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState(5);
-  const [xAxisValues, setXAxisValues] = useState([
-    "New Delhi",
-    "Mumbai",
-    "Kolkata",
-    "Bangalore",
-    "Chennai",
-  ]);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(12);
 
-  // Legend configuration
-  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState(3);
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
-    { label: "High", field: "high", color: "#13A490" },
-    { label: "Medium", field: "medium", color: "#35B6EE" },
-    { label: "Low", field: "low", color: "#6F78F9" },
+    { label: "", field: "", color: "#3B93A5" },
+    { label: "", field: "", color: "#F7B844" },
+    { label: "", field: "", color: "#ADD8C7" },
+    { label: "", field: "", color: "#EC3C65" },
+    { label: "", field: "", color: "#CDD7B6" },
+    { label: "", field: "", color: "#C1F666" },
+    { label: "", field: "", color: "#D43F97" },
+    { label: "", field: "", color: "#1E5D8C" },
+    { label: "", field: "", color: "#421243" },
+    { label: "", field: "", color: "#7F94B0" },
+    { label: "", field: "", color: "#EF6537" },
+    { label: "", field: "", color: "#C0ADDB" },
   ]);
 
-  // Y-Axis range for data values
-  const [startingRange, setStartingRange] = useState(20);
-  const [endingRange, setEndingRange] = useState(250);
+  // Treemap charts don't use X-axis values or Y-axis ranges
+  const [numOfXAxisDataSet] = useState<number>(0);
+  const [xAxisValues] = useState<string[]>([]);
+  const [startingRange] = useState<number>(0);
+  const [endingRange] = useState<number>(100);
 
-  // Generate random data for treemap
-  const generateRandomValue = () =>
-    Math.floor(Math.random() * (endingRange - startingRange + 1)) + startingRange;
-
-  const treemapData: TreemapDataPoint[] = xAxisValues
-    .filter((v) => v.trim() !== "")
-    .map((label) => ({
-      x: label,
-      y: generateRandomValue(),
-    }));
-
-  // Handlers
-  const handleSetNumOfXAxisDataSet = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (isNaN(value) || value < 1 || value > 20) {
-      alert("Please enter a number between 1 and 20");
-      return;
-    }
-
-    setNumOfXAxisDataSet(value);
-    setXAxisValues((prev) => {
-      const updated = [...prev];
-      while (updated.length < value) {
-        updated.push("");
-      }
-      return updated.slice(0, value);
-    });
+  // Dummy handlers (not used in Treemap chart)
+  const handleSetNumOfXAxisDataSet = () => {
+    // Not used for Treemap chart
   };
 
-  const handleXAxisValueChange = (index: number, value: string) => {
-    setXAxisValues((prev) => {
-      const updated = [...prev];
-      updated[index] = value;
-      return updated;
-    });
+  const handleXAxisValueChange = () => {
+    // Not used for Treemap chart
   };
 
+  // Toggle widget visibility
   const handleToggleWidget = () => {
     setShowWidget(!showWidget);
   };
 
+  // Close widget
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
-//   const handleSave = () => {
-//     console.log("Saving Treemap config:", {
-//       widgetTitle,
-//       xAxisValues,
-//       legendValues,
-//       startingRange,
-//       endingRange,
-//     });
-//     setShowWidget(false);
-//   };
-
   return (
-    <div className="flex gap-4">
-      <div className="flex-1">
-        <TreemapChart
-          widgetTitle={widgetTitle}
-          data={treemapData}
-          onToggleWidget={handleToggleWidget}
-          onDelete={onDelete}
-        />
-      </div>
-
+    <div className="flex gap-3">
+      <TreemapChart
+        widgetTitle={widgetTitle}
+        legendValues={legendValues}
+        numOfLegendDataSet={numOfLegendDataSet}
+        onToggleWidget={handleToggleWidget}
+        onDelete={onDelete}
+      />
       {showWidget && (
         <ProjectConfiguration
           widgedName="Treemap Chart"
@@ -115,9 +74,9 @@ const TreemapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
           legendValues={legendValues}
           setLegendValues={setLegendValues}
           startingRange={startingRange}
-          setStartingRange={setStartingRange}
+          setStartingRange={() => {}}
           endingRange={endingRange}
-          setEndingRange={setEndingRange}
+          setEndingRange={() => {}}
           onClose={handleCloseWidget}
         />
       )}

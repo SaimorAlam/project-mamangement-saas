@@ -2,31 +2,35 @@ import { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
-import CalendarHeatmapChart from "@/common/Charts/CalendarHeatmapChart";
+import GanttChartNew from "@/common/Charts/GanttChartNew";
 
-const CalendarHeatmapModule = ({ onDelete }: { onDelete?: () => void }) => {
-  const [widgetTitle, setWidgetTitle] = useState("Activity Calendar");
+const GanttChartNewModule = ({ onDelete }: { onDelete?: () => void }) => {
+  const [widgetTitle, setWidgetTitle] = useState("Project Timeline");
   const [showWidget, setShowWidget] = useState(false);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(1);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(5);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
-    { label: "", field: "", color: "#216e39" },
+    { label: "", field: "", color: "#008FFB" },
+    { label: "", field: "", color: "#00E396" },
+    { label: "", field: "", color: "#775DD0" },
+    { label: "", field: "", color: "#FEB019" },
+    { label: "", field: "", color: "#FF4560" },
   ]);
 
-  // Calendar heatmap doesn't use X-axis values or Y-axis ranges
+  // Gantt charts don't use X-axis values or Y-axis ranges
   const [numOfXAxisDataSet] = useState<number>(0);
   const [xAxisValues] = useState<string[]>([]);
   const [startingRange] = useState<number>(0);
   const [endingRange] = useState<number>(100);
 
-  // Dummy handlers (not used in Calendar heatmap)
+  // Dummy handlers (not used in Gantt chart)
   const handleSetNumOfXAxisDataSet = () => {
-    // Not used for Calendar heatmap
+    // Not used for Gantt chart
   };
 
   const handleXAxisValueChange = () => {
-    // Not used for Calendar heatmap
+    // Not used for Gantt chart
   };
 
   // Toggle widget visibility
@@ -41,7 +45,7 @@ const CalendarHeatmapModule = ({ onDelete }: { onDelete?: () => void }) => {
 
   return (
     <div className="flex gap-3">
-      <CalendarHeatmapChart
+      <GanttChartNew
         widgetTitle={widgetTitle}
         legendValues={legendValues}
         numOfLegendDataSet={numOfLegendDataSet}
@@ -50,9 +54,9 @@ const CalendarHeatmapModule = ({ onDelete }: { onDelete?: () => void }) => {
       />
       {showWidget && (
         <ProjectConfiguration
-          widgedName="Calendar Heatmap"
+          widgedName="Gantt Chart"
           widgetTitle={widgetTitle}
-          widgetCategory="CALENDAR"
+          widgetCategory="GANTT"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -73,4 +77,4 @@ const CalendarHeatmapModule = ({ onDelete }: { onDelete?: () => void }) => {
   );
 };
 
-export default CalendarHeatmapModule;
+export default GanttChartNewModule;

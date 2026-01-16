@@ -187,7 +187,13 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       name: "Calendar Heatmap Chart",
       description: "Show calendar heatmap chart",
       icon: <ChartCandlestick className="w-5 h-5" />,
-    }
+    },
+    {
+      id: "gantt-new-chart",
+      name: "Gantt New Chart",
+      description: "Show gantt chart",
+      icon: <ChartCandlestick className="w-5 h-5" />,
+    },
 
   ];
   const { programs ,isLoading} = useGetAllProgram();

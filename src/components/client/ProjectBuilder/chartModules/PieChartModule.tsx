@@ -77,3 +77,4 @@ const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
 };
 
 export default PieChartModule;
+

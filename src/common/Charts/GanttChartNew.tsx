@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import CalendarHeatmap from "react-calendar-heatmap";
-import "react-calendar-heatmap/dist/styles.css";
+import ReactApexChart from "react-apexcharts";
 import { Copy, Trash2, Download } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
@@ -13,9 +12,10 @@ import TierChartModal from "../Modal/TierChartModal";
 
 /*       TYPES       */
 
-type CalendarValue = {
-  date: string;
-  count: number;
+type GanttDataPoint = {
+  x: string;
+  y: [number, number];
+  fillColor: string;
 };
 
 type LegendValue = {
@@ -46,33 +46,28 @@ type Props = {
 const generateId = () =>
   crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
 
-const getRandomCount = () => Math.floor(Math.random() * 15);
+const generateRandomDateRange = (baseDate: Date, index: number): [number, number] => {
+  const startDaysOffset = index * 3; // Each task starts 3 days after previous
+  const durationDays = Math.floor(Math.random() * 5) + 2; // 2-6 days duration
+  
+  const startDate = new Date(baseDate);
+  startDate.setDate(startDate.getDate() + startDaysOffset);
+  
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + durationDays);
+  
+  return [startDate.getTime(), endDate.getTime()];
+};
 
-const generateCalendarData = (
-  startDate: Date,
-  endDate: Date
-): CalendarValue[] => {
-  const values: CalendarValue[] = [];
-  const currentDate = new Date(startDate);
-
-  while (currentDate <= endDate) {
-    // Add random data for some days (not every day)
-    if (Math.random() > 0.3) {
-      values.push({
-        date: currentDate.toISOString().split("T")[0],
-        count: getRandomCount(),
-      });
-    }
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  return values;
+const calculateDaysDiff = (start: number, end: number): number => {
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round((end - start) / msPerDay);
 };
 
 /*       COMPONENT       */
 
-export default function CalendarHeatmapChart({
-  widgetTitle = "Activity Calendar",
+export default function GanttChartNew({
+  widgetTitle = "Project Timeline",
   legendValues = [],
   numOfLegendDataSet = 1,
   onToggleWidget,
@@ -90,34 +85,89 @@ export default function CalendarHeatmapChart({
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
-  /*   DATE RANGE   */
-  const { startDate, endDate } = useMemo(() => {
-    const end = new Date();
-    const start = new Date();
-    start.setMonth(start.getMonth() - 3); // 3 months back
-    return { startDate: start, endDate: end };
-  }, []);
-
   /*   DATA GENERATION   */
-  const calendarValues = useMemo(() => {
-    return generateCalendarData(startDate, endDate);
-  }, [startDate, endDate]);
-
-  const totalActiveDays = calendarValues.length;
-  const totalCount = calendarValues.reduce((sum, v) => sum + v.count, 0);
+  const ganttData: GanttDataPoint[] = useMemo(() => {
+    if (!legendValues.length) return [];
+    
+    const baseDate = new Date();
+    baseDate.setHours(0, 0, 0, 0);
+    
+    return legendValues
+      .filter((l) => l.label)
+      .map((l, index) => {
+        const [start, end] = generateRandomDateRange(baseDate, index);
+        return {
+          x: l.label,
+          y: [start, end],
+          fillColor: l.color,
+        };
+      });
+  }, [legendValues]);
 
   const isAllLegendFieldEmpty = legendValues.filter((l) => l.label !== "");
 
-  /*   PRIMARY COLOR   */
-  const primaryColor = useMemo(() => {
-    const firstLegend = legendValues.find((l) => l.label);
-    return firstLegend?.color || "#216e39";
-  }, [legendValues]);
+  /*   CHART OPTIONS   */
+  const chartOptions: any = useMemo(
+    () => ({
+      chart: {
+        height: 350,
+        type: "rangeBar",
+        toolbar: {
+          show: false,
+        },
+      },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+          distributed: true,
+          dataLabels: {
+            hideOverflowingLabels: false,
+          },
+        },
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val: any, opts: any) {
+          const label = opts.w.globals.labels[opts.dataPointIndex];
+          const diff = calculateDaysDiff(val[0], val[1]);
+          return label + ": " + diff + (diff > 1 ? " days" : " day");
+        },
+        style: {
+          colors: ["#f3f4f5", "#fff"],
+        },
+      },
+      xaxis: {
+        type: "datetime",
+      },
+      yaxis: {
+        show: false,
+      },
+      grid: {
+        row: {
+          colors: ["#f3f4f5", "#fff"],
+          opacity: 1,
+        },
+      },
+      legend: {
+        show: false,
+      },
+    }),
+    []
+  );
+
+  const series = useMemo(
+    () => [
+      {
+        data: ganttData,
+      },
+    ],
+    [ganttData]
+  );
 
   /*   ACTIONS   */
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(calendarValues, null, 2));
+    navigator.clipboard.writeText(JSON.stringify(ganttData, null, 2));
   };
 
   const handleDownload = () => {
@@ -133,7 +183,7 @@ export default function CalendarHeatmapChart({
       })),
       title: widgetTitle,
       status: "ACTIVE",
-      category: "CALENDAR",
+      category: "GANTT",
       xAxis: JSON.stringify({
         labels: [],
         values: [],
@@ -143,9 +193,14 @@ export default function CalendarHeatmapChart({
     };
     setIsDownloading(true);
 
-    // For CSV export
-    const header = "Date,Count";
-    const rows = calendarValues.map((item) => `${item.date},${item.count}`);
+    // For CSV export with labels and date ranges
+    const header = "Task,Start Date,End Date,Duration (days)";
+    const rows = ganttData.map((item) => {
+      const startDate = new Date(item.y[0]).toISOString().split("T")[0];
+      const endDate = new Date(item.y[1]).toISOString().split("T")[0];
+      const duration = calculateDaysDiff(item.y[0], item.y[1]);
+      return `${item.x},${startDate},${endDate},${duration}`;
+    });
 
     const csvContent = [header, ...rows].join("\n");
     const blob = new Blob([csvContent], {
@@ -222,10 +277,6 @@ export default function CalendarHeatmapChart({
             className="flex items-center gap-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="text-sm text-gray-500">
-              {totalActiveDays} days • {totalCount} total
-            </div>
-
             <div className="flex gap-2 border-l pl-4 relative">
               <button
                 onClick={(e) => {
@@ -305,91 +356,48 @@ export default function CalendarHeatmapChart({
           </div>
         </div>
 
-        {/* Calendar Heatmap */}
-        <div className="calendar-heatmap-container">
-          <style>{`
-            .calendar-heatmap-container .react-calendar-heatmap {
-              width: 100%;
-              height: auto;
-            }
-            .calendar-heatmap-container .react-calendar-heatmap-month-label {
-              font-size: 12px;
-              fill: #6b7280;
-            }
-            .calendar-heatmap-container .react-calendar-heatmap-weekday-label {
-              font-size: 10px;
-              fill: #9ca3af;
-            }
-            .calendar-heatmap-container .react-calendar-heatmap .color-empty {
-              fill: #ebedf0;
-            }
-            .calendar-heatmap-container .react-calendar-heatmap .color-scale-1 {
-              fill: ${primaryColor}33;
-            }
-            .calendar-heatmap-container .react-calendar-heatmap .color-scale-2 {
-              fill: ${primaryColor}66;
-            }
-            .calendar-heatmap-container .react-calendar-heatmap .color-scale-3 {
-              fill: ${primaryColor}99;
-            }
-            .calendar-heatmap-container .react-calendar-heatmap .color-scale-4 {
-              fill: ${primaryColor};
-            }
-          `}</style>
-          <CalendarHeatmap
-            startDate={startDate}
-            endDate={endDate}
-            values={calendarValues}
-            classForValue={(value) => {
-              if (!value) {
-                return "color-empty";
-              }
-              if (value.count < 3) return "color-scale-1";
-              if (value.count < 6) return "color-scale-2";
-              if (value.count < 10) return "color-scale-3";
-              return "color-scale-4";
-            }}
-            tooltipDataAttrs={(value: any) : any => {
-              if (!value || !value.date) {
-                return {};
-              }
-              return {
-                "data-tip": `${value.date}: ${value.count || 0} activities`,
-              };
-            }}
-            showWeekdayLabels
-          />
+        {/* Task Timeline Legend */}
+        <div className="flex gap-8 mb-6 flex-wrap">
+          {ganttData.map((item) => {
+            const duration = calculateDaysDiff(item.y[0], item.y[1]);
+            return (
+              <div key={item.x} className="flex items-baseline gap-2">
+                <div
+                  className="w-3 h-3 rounded-sm"
+                  style={{ backgroundColor: item.fillColor }}
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{item.x}</p>
+                  <p className="text-xs text-gray-500">
+                    {duration} {duration > 1 ? "days" : "day"}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center justify-end gap-2 mt-4">
-          <span className="text-xs text-gray-500">Less</span>
-          <div className="flex gap-1">
-            {[0, 1, 2, 3, 4].map((level) => (
-              <div
-                key={level}
-                className="w-3 h-3 rounded-sm"
-                style={{
-                  backgroundColor:
-                    level === 0
-                      ? "#ebedf0"
-                      : level === 1
-                      ? `${primaryColor}33`
-                      : level === 2
-                      ? `${primaryColor}66`
-                      : level === 3
-                      ? `${primaryColor}99`
-                      : primaryColor,
-                }}
-              />
-            ))}
+        {/* Gantt Chart */}
+        {ganttData.length > 0 ? (
+          <div style={{ height: "400px", width: "100%" }}>
+            <ReactApexChart
+              options={chartOptions}
+              series={series}
+              type="rangeBar"
+              height={350}
+            />
           </div>
-          <span className="text-xs text-gray-500">More</span>
-        </div>
+        ) : (
+          <div className="h-[400px] flex items-center justify-center text-gray-400">
+            No data available. Please fill the input fields to generate the
+            chart and then download the CSV.
+          </div>
+        )}
 
-        {isAllLegendFieldEmpty.length === 0 && (
+        {isAllLegendFieldEmpty.length === 0 && ganttData.length === 0 && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400 text-center">
-            No data available. Configure color in the widget settings.
+            No data available. Please fill the input field to generate the chart
+            and then download the CSV.
           </div>
         )}
 
@@ -422,7 +430,7 @@ export default function CalendarHeatmapChart({
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers.map((tier) => (
-              <CalendarHeatmapChart
+              <GanttChartNew
                 key={tier.id}
                 widgetTitle={tier.name}
                 legendValues={tier.legendValues}
