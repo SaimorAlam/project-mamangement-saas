@@ -194,6 +194,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Show gantt chart",
       icon: <ChartCandlestick className="w-5 h-5" />,
     },
+    {
+      id: "matrix-table-chart",
+      name: "Matrix Table Chart",
+      description: "Show matrix table chart",
+      icon: <ChartCandlestick className="w-5 h-5" />,
+    },
 
   ];
   const { programs ,isLoading} = useGetAllProgram();

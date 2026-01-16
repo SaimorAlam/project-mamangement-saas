@@ -79,8 +79,15 @@ const useChartData = ({
     }
   }, [childNodes, newData, projectTreeData, isCreationMode, chartId]);
 
+  const refetch = () => {
+    if (projectId) {
+        getProjectTree(projectId);
+    }
+  }
+
   return {
     childTiers,
+    refetch
   };
 };
 

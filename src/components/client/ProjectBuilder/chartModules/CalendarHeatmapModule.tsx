@@ -4,7 +4,7 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import CalendarHeatmapChart from "@/common/Charts/CalendarHeatmapChart";
 
-const CalendarHeatmapModule = ({ onDelete }: { onDelete?: () => void }) => {
+const CalendarHeatmapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [widgetTitle, setWidgetTitle] = useState("Activity Calendar");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -47,6 +47,7 @@ const CalendarHeatmapModule = ({ onDelete }: { onDelete?: () => void }) => {
         numOfLegendDataSet={numOfLegendDataSet}
         onToggleWidget={handleToggleWidget}
         onDelete={onDelete}
+        isCreationMode={true}
       />
       {showWidget && (
         <ProjectConfiguration
@@ -73,4 +74,4 @@ const CalendarHeatmapModule = ({ onDelete }: { onDelete?: () => void }) => {
   );
 };
 
-export default CalendarHeatmapModule;
+export default CalendarHeatmapChartModule;
