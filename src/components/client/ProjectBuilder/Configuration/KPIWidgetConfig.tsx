@@ -21,8 +21,8 @@ interface KPIWidgetConfigProps {
 const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
   config,
   setConfig,
-  data,
-  onUpdateData,
+//   data,
+//   onUpdateData,
   onClose,
 }) => {
   const handleChange = (key: keyof KPISettings) => {
@@ -32,11 +32,11 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
     }));
   };
 
-  const handleDataChange = (key: string, value: string) => {
-    if (onUpdateData && data) {
-        onUpdateData({ ...data, [key]: value });
-    }
-  }
+//   const handleDataChange = (key: string, value: string) => {
+//     if (onUpdateData && data) {
+//         onUpdateData({ ...data, [key]: value });
+//     }
+//   }
 
   return (
     <div className="w-full bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col h-full">
@@ -55,14 +55,14 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
 
       <div className="flex-1 px-4 py-4 space-y-6 overflow-y-auto max-h-[600px]">
         {/* Widget Details Link */}
-        <div>
+        {/* <div>
            <a href="#" className="text-blue-500 font-medium text-xs hover:underline">
                KPI Widget Details
            </a>
-        </div>
+        </div> */}
         
         {/* Data Fields */}
-        {data && (
+        {/* {data && (
             <div className="space-y-3">
                  <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">Title</label>
@@ -134,7 +134,7 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
         </div>
 
         {/* Assigned By */}
-        <div>
+        {/* <div>
            <h3 className="text-gray-800 font-medium text-xs mb-3">Assigned by</h3>
            <div className="flex items-center gap-3">
                <div className="w-8 h-8 rounded-full bg-pink-100 overflow-hidden">
@@ -149,7 +149,7 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
                    <p className="text-xs text-gray-500">Admin</p>
                </div>
            </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Footer Actions */}
