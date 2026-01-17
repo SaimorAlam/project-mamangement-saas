@@ -2,34 +2,35 @@ import { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
-import PieChartWidget from "@/common/Charts/PieChart";
+import GanttChartNew from "@/common/Charts/GanttChartNew";
 
-const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
-  const [widgetTitle, setWidgetTitle] = useState("My-CSV");
-  const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
+const GanttChartNewModule = ({ onDelete }: { onDelete?: () => void }) => {
+  const [widgetTitle, setWidgetTitle] = useState("Project Timeline");
+  const [showWidget, setShowWidget] = useState(false);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] =
-    useState<number>(3);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(5);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
-    { label: "", field: "", color: "#13A490" },
-    { label: "", field: "", color: "#35B6EE" },
-    { label: "", field: "", color: "#6F78F9" },
+    { label: "", field: "", color: "#008FFB" },
+    { label: "", field: "", color: "#00E396" },
+    { label: "", field: "", color: "#775DD0" },
+    { label: "", field: "", color: "#FEB019" },
+    { label: "", field: "", color: "#FF4560" },
   ]);
 
-  // Pie charts don't use X-axis values or Y-axis ranges, but we need placeholders for ProjectConfiguration
+  // Gantt charts don't use X-axis values or Y-axis ranges
   const [numOfXAxisDataSet] = useState<number>(0);
   const [xAxisValues] = useState<string[]>([]);
   const [startingRange] = useState<number>(0);
   const [endingRange] = useState<number>(100);
 
-  // Dummy handler for X-axis (not used in pie chart)
+  // Dummy handlers (not used in Gantt chart)
   const handleSetNumOfXAxisDataSet = () => {
-    // Not used for pie chart
+    // Not used for Gantt chart
   };
 
   const handleXAxisValueChange = () => {
-    // Not used for pie chart
+    // Not used for Gantt chart
   };
 
   // Toggle widget visibility
@@ -37,14 +38,14 @@ const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
     setShowWidget(!showWidget);
   };
 
-  // Close widget (for X button)
+  // Close widget
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
     <div className="flex gap-3">
-      <PieChartWidget
+      <GanttChartNew
         widgetTitle={widgetTitle}
         legendValues={legendValues}
         numOfLegendDataSet={numOfLegendDataSet}
@@ -53,9 +54,9 @@ const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
       />
       {showWidget && (
         <ProjectConfiguration
-          widgedName="Pie Chart"
+          widgedName="Gantt Chart"
           widgetTitle={widgetTitle}
-          widgetCategory="PIE"
+          widgetCategory="GANTT"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -76,5 +77,4 @@ const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   );
 };
 
-export default PieChartModule;
-
+export default GanttChartNewModule;

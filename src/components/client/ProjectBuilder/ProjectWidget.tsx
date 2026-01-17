@@ -21,6 +21,10 @@ import {
   FileChartPie,
   SquareKanban,
   ChartCandlestick,
+  Map,
+  CalendarDays,
+  SquareChartGantt,
+  ChartNoAxesCombined,
 } from "lucide-react";
 import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
@@ -176,12 +180,37 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Show candle chart",
       icon: <ChartCandlestick className="w-5 h-5" />,
     },
-    // {
-    //   id: "rader-chart",
-    //   name: "Rader Chart",
-    //   description: "Division of same category",
-    //   icon: <ChartScatter className="w-5 h-5" />,
-    // },
+    {
+      id: "treemap-chart",
+      name: "Treemap Chart",
+      description: "Show treemap chart",
+      icon: <Map className="w-5 h-5" />,
+    },
+    {
+      id: "calendar-heatmap-chart",
+      name: "Calendar Heatmap Chart",
+      description: "Show calendar heatmap chart",
+      icon: <CalendarDays className="w-5 h-5" />,
+    },
+    {
+      id: "gantt-new-chart",
+      name: "Gantt New Chart",
+      description: "Show gantt chart",
+      icon: <SquareChartGantt className="w-5 h-5" />,
+    },
+    {
+      id: "matrix-table-chart",
+      name: "Matrix Table Chart",
+      description: "Show matrix table chart",
+      icon: <Table className="w-5 h-5" />,
+    },
+    {
+      id: "combo-chart",
+      name: "Combo Chart",
+      description: "Show combo chart",
+      icon: <ChartNoAxesCombined className="w-5 h-5" />
+    },
+
   ];
   const { programs ,isLoading} = useGetAllProgram();
   const {projects,isLoading:isProjectsLoading ,isFetching:projectFetching} = useGetLazyProject(selectedProgram,isProgramBuilder);

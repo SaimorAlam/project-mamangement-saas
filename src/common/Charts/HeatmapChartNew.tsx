@@ -79,13 +79,13 @@ export default function HeatmapChartNew({
 
     return legendValues
       .filter((l) => l.label)
-      .map((legend, rIdx) => ({
+      .map((legend) => ({
         label: legend.label,
         values: xAxisValues
           .filter(Boolean)
           .map(
-            (_, cIdx) =>
-              ((rIdx + cIdx) % (endingRange - startingRange + 1)) +
+            () =>
+              Math.floor(Math.random() * (endingRange - startingRange + 1)) +
               startingRange
           ),
       }));

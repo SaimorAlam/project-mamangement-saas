@@ -2,34 +2,31 @@ import { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
-import PieChartWidget from "@/common/Charts/PieChart";
+import CalendarHeatmapChart from "@/common/Charts/CalendarHeatmapChart";
 
-const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
-  const [widgetTitle, setWidgetTitle] = useState("My-CSV");
-  const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
+const CalendarHeatmapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+  const [widgetTitle, setWidgetTitle] = useState("Activity Calendar");
+  const [showWidget, setShowWidget] = useState(false);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] =
-    useState<number>(3);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(1);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
-    { label: "", field: "", color: "#13A490" },
-    { label: "", field: "", color: "#35B6EE" },
-    { label: "", field: "", color: "#6F78F9" },
+    { label: "", field: "", color: "#216e39" },
   ]);
 
-  // Pie charts don't use X-axis values or Y-axis ranges, but we need placeholders for ProjectConfiguration
+  // Calendar heatmap doesn't use X-axis values or Y-axis ranges
   const [numOfXAxisDataSet] = useState<number>(0);
   const [xAxisValues] = useState<string[]>([]);
   const [startingRange] = useState<number>(0);
   const [endingRange] = useState<number>(100);
 
-  // Dummy handler for X-axis (not used in pie chart)
+  // Dummy handlers (not used in Calendar heatmap)
   const handleSetNumOfXAxisDataSet = () => {
-    // Not used for pie chart
+    // Not used for Calendar heatmap
   };
 
   const handleXAxisValueChange = () => {
-    // Not used for pie chart
+    // Not used for Calendar heatmap
   };
 
   // Toggle widget visibility
@@ -37,25 +34,26 @@ const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
     setShowWidget(!showWidget);
   };
 
-  // Close widget (for X button)
+  // Close widget
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
     <div className="flex gap-3">
-      <PieChartWidget
+      <CalendarHeatmapChart
         widgetTitle={widgetTitle}
         legendValues={legendValues}
         numOfLegendDataSet={numOfLegendDataSet}
         onToggleWidget={handleToggleWidget}
         onDelete={onDelete}
+        isCreationMode={true}
       />
       {showWidget && (
         <ProjectConfiguration
-          widgedName="Pie Chart"
+          widgedName="Calendar Heatmap"
           widgetTitle={widgetTitle}
-          widgetCategory="PIE"
+          widgetCategory="CALENDAR"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -76,5 +74,4 @@ const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   );
 };
 
-export default PieChartModule;
-
+export default CalendarHeatmapChartModule;
