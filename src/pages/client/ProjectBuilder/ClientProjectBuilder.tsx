@@ -29,6 +29,7 @@ import SparkLineChartModule from "@/components/client/ProjectBuilder/chartModule
 import LogarithmicChartModule from "@/components/client/ProjectBuilder/chartModules/LogarithmicChartModule";
 import DecompositionTreeModule from "@/components/client/ProjectBuilder/chartModules/DecompositionTreeModule";
 import MarimekkoChartModule from "@/components/client/ProjectBuilder/chartModules/MarimekkoChartModule";
+import BoxPlotChartModule from "@/components/client/ProjectBuilder/chartModules/BoxPlotChartModule";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -209,6 +210,7 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("radar-chart") && <RadarChartModule />}
         {selectedWidgets.includes("candle-chart") && <CandleChartModule />}
         {selectedWidgets.includes("marimekko-chart") && <MarimekkoChartModule onDelete={() => handleWidgetDelete("marimekko-chart")} />}
+        {selectedWidgets.includes("box-plot") && <BoxPlotChartModule onDelete={() => handleWidgetDelete("box-plot")} />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>

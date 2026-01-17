@@ -206,6 +206,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Variable width stacked bars for mix/size",
       icon: <ChartColumnStacked className="w-5 h-5" />, 
     },
+    {
+      id: "box-plot",
+      name: "Box & Whisker Plot",
+      description: "Distribution: median, quartiles, outliers",
+      icon: <ChartCandlestick className="w-5 h-5" />, 
+    },
     // {
     //   id: "rader-chart",
     //   name: "Rader Chart",
