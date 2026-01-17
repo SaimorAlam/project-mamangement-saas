@@ -32,9 +32,11 @@ import DecompositionTreeModule from "@/components/client/ProjectBuilder/chartMod
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
-  const [activeWidget, setActiveWidget] = useState("KPI Widget");
+  const [activeWidget, setActiveWidget] = useState("KPI widget");
+
   const { data: projectsChart } = useGetChartByProjectIdQuery(projectId)
   const projectsChartsData = projectsChart?.data
+  
   const handleWidgetSelect = (widgetId: string) => {
     if (widgetId === "kpi") {
       setSelectedWidgets([]);
@@ -69,7 +71,7 @@ const ClientProjectBuilder = () => {
         onWidgetSelect={handleWidgetSelect}
         selectedWidgets={selectedWidgets}
       />
-      <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10">
+      <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10 relative">
         <ProjectStats activeWidget={activeWidget} />
 
         {

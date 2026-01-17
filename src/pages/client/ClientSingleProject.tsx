@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAppSelector } from "@/hooks/useRedux";
 import Papa from "papaparse";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -15,10 +16,14 @@ export default function ClientSingleProject() {
 
   const [sheetData, setSheetData] = useState<any[][]>([]);
   const [sheetId, setSheetId] = useState<string>(""); // store sheetId from filename
-  const [uploadedExcelData, setUploadedExcelData] = useState<{ [key: string]: ChartData[] } | null>(null);
+  const [uploadedExcelData, setUploadedExcelData] = useState<{
+    [key: string]: ChartData[];
+  } | null>(null);
 
   const { projectId } = useAppSelector((state) => state.chartSlice);
-  const { data: chartResponse } = useGetChartByProjectIdQuery(projectId, { skip: !projectId });
+  const { data: chartResponse } = useGetChartByProjectIdQuery(projectId, {
+    skip: !projectId,
+  });
   const charts = chartResponse?.data || [];
   // Use an `any` ref to avoid type mismatch with the HotTable instance (hotInstance)
   const hotRef = useRef<any>(null);
@@ -55,21 +60,24 @@ export default function ClientSingleProject() {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         const data = e.target.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
+        const workbook = XLSX.read(data, { type: "binary" });
         const allSheetsData: { [key: string]: ChartData[] } = {};
 
-        workbook.SheetNames.forEach(sheetName => {
+        workbook.SheetNames.forEach((sheetName) => {
           const worksheet = workbook.Sheets[sheetName];
           const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
-          
+
           if (jsonData.length > 0) {
             // Find the active chart to get legend fields
-            const activeChart = charts.find((c: any) => c.category === "Bar" || c.category === "BAR");
-            const legendValues = activeChart?.barChart?.widgets?.map((w: any) => ({
-              label: w.legendName,
-              field: w.legendName, // In XLSX export, we use label as headers
-              color: w.color,
-            })) || [];
+            const activeChart = charts.find(
+              (c: any) => c.category === "Bar" || c.category === "BAR"
+            );
+            const legendValues =
+              activeChart?.barChart?.widgets?.map((w: any) => ({
+                label: w.legendName,
+                field: w.legendName, // In XLSX export, we use label as headers
+                color: w.color,
+              })) || [];
 
             const processedData = jsonData.map((row: any) => {
               const item: ChartData = { name: row["Label"] || "" };
@@ -86,7 +94,7 @@ export default function ClientSingleProject() {
         setUploadedExcelData(allSheetsData);
       };
 
-      if (csvFile.name.endsWith('.xlsx') || csvFile.name.endsWith('.xls')) {
+      if (csvFile.name.endsWith(".xlsx") || csvFile.name.endsWith(".xls")) {
         reader.readAsBinaryString(csvFile);
       }
 
@@ -114,7 +122,7 @@ export default function ClientSingleProject() {
       });
     },
     [submitCells, charts]
-);
+  );
 
   /* ------------------------ INITIAL LOAD ------------------------ */
   useEffect(() => {
@@ -137,9 +145,7 @@ export default function ClientSingleProject() {
   };
 
   /* ------------------------ CSV IMPORT ------------------------ */
-  const handleImportCsv = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleImportCsv = (e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = e.target.files?.[0];
     if (uploadedFile) parseCsvFile(uploadedFile);
   };
@@ -235,17 +241,19 @@ export default function ClientSingleProject() {
       {uploadedExcelData && charts.length > 0 && (
         <div className="mb-8 grid grid-cols-1 gap-6">
           {charts.map((item: any) => {
-             if (item.category === "Bar" || item.category === "BAR") {
+            if (item.category === "Bar" || item.category === "BAR") {
               return (
                 <div key={item.id} className="w-full">
                   <StackedBarChart
                     widgetTitle={item.title}
                     xAxisValues={item.xAxis?.labels || []}
-                    legendValues={item.barChart?.widgets?.map((w: any) => ({
-                      label: w.legendName,
-                      color: w.color,
-                      field: w.legendName,
-                    })) || []}
+                    legendValues={
+                      item.barChart?.widgets?.map((w: any) => ({
+                        label: w.legendName,
+                        color: w.color,
+                        field: w.legendName,
+                      })) || []
+                    }
                     numOfLegendDataSet={item.numberOfDataset}
                     startingRange={item.firstFiledDataset}
                     endingRange={item.lastFiledDAtaset}
@@ -294,14 +302,12 @@ export default function ClientSingleProject() {
             afterChange={(changes: any[] | null, source?: string) => {
               if (source === "loadData" || !changes) return;
 
-              const payload = changes.map(
-                ([row, col, _oldValue, newValue]: any) => ({
-                  row,
-                  col,
-                  value: newValue,
-                  sheetId: sheetId || "default",
-                })
-              );
+              const payload = changes.map(([row, col, newValue]: any) => ({
+                row,
+                col,
+                value: newValue,
+                sheetId: sheetId || "default",
+              }));
 
               submitCells(payload);
             }}
