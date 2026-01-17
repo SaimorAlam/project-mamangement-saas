@@ -62,6 +62,19 @@ type Props = {
   allUploadedData?: { [key: string]: { [key: string]: BulletData } };
 };
 
+const hidden = { visible: false };
+
+const tooltipRender = (e: TooltipContext) => {
+  const { value } = e.point;
+  return (
+    <span>
+      Target: {value.target}
+      <br />
+      Current: {value.current}
+    </span>
+  );
+};
+
 export default function BulletChart({
   newData,
   widgetTitle = "Bullet Chart",
@@ -94,7 +107,7 @@ export default function BulletChart({
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
-  const hidden = { visible: false };
+
 
   /*   PLOT BANDS   */
   const plotBands: PlotBand[] = useMemo(() => {
@@ -130,11 +143,28 @@ export default function BulletChart({
   }, [startingRange, endingRange]);
 
   /*   DATA GENERATION   */
+  // Stable random data generation
+  const generatedData = useMemo(() => {
+    return legendValues
+
+      .filter((l: any) => l.label)
+      .reduce((acc, legend) => {
+        const range = endingRange - startingRange;
+        const current =
+          startingRange + Math.floor(Math.random() * range * 0.6);
+        const target = startingRange + Math.floor(Math.random() * range * 0.9);
+        acc[legend.label] = [current, target];
+        return acc;
+      }, {} as { [key: string]: BulletData });
+  }, [legendValues, startingRange, endingRange]);
+
   const bulletCharts = useMemo(() => {
     const sheetName = (widgetTitle || "Sheet")
       .replace(/[:\/?*\[\]\\]/g, " ")
       .trim()
       .substring(0, 31);
+    
+    // Check if we have specific data for this sheet/title
     const dataToUse =
       localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
@@ -150,40 +180,26 @@ export default function BulletChart({
 
     if (!legendValues.length) return [];
 
+    // Fallback to stable generated data
     return legendValues
       .filter((l) => l.label)
       .map((legend) => {
-        const range = endingRange - startingRange;
-        const current =
-          startingRange + Math.floor(Math.random() * range * 0.6);
-        const target = startingRange + Math.floor(Math.random() * range * 0.9);
-
+        const data = generatedData[legend.label] || [0, 0];
         return {
           title: legend.label,
           color: legend.color,
-          data: [[current, target] as BulletData],
+          data: [data],
         };
       });
   }, [
     legendValues,
-    startingRange,
-    endingRange,
     widgetTitle,
     localUploadedData,
     allUploadedData,
+    generatedData,
   ]);
 
-  /*   TOOLTIP   */
-  const tooltipRender = (e: TooltipContext) => {
-    const { value } = e.point;
-    return (
-      <span>
-        Target: {value.target}
-        <br />
-        Current: {value.current}
-      </span>
-    );
-  };
+
 
   /*   ACTIONS   */
 

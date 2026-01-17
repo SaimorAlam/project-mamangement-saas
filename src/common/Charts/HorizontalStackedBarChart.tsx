@@ -325,7 +325,7 @@ export default function HorizontalStackedBarChart({
   };
 
   return (
-    <>
+    <div className="min-w-3xl">
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
           childTiers?.length > 0
@@ -337,7 +337,7 @@ export default function HorizontalStackedBarChart({
         <div className="flex justify-between mb-6">
           <div>
             <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <div className="flex gap-6 mt-3">
+            {/* <div className="flex gap-6 mt-3">
               {legendValues.map((l) =>
                 l.label ? (
                   <div key={l.field} className="flex items-center gap-2">
@@ -349,7 +349,7 @@ export default function HorizontalStackedBarChart({
                   </div>
                 ) : null
               )}
-            </div>
+            </div> */}
           </div>
 
           <div
@@ -519,6 +519,6 @@ export default function HorizontalStackedBarChart({
           </div>
         </TierChartModal>
       )}
-    </>
+    </div>
   );
 }
