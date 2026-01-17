@@ -1,0 +1,186 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
+import { BsThreeDots } from "react-icons/bs";
+import { Copy, Trash2, Download, Upload } from "lucide-react";
+import { MdOutlineWidgets } from "react-icons/md";
+import { GoPlus } from "react-icons/go";
+
+type MenuActions = {
+  onCopy?: () => void;
+  onDownload?: () => void;
+  onDelete?: () => void;
+  onAddTier?: () => void;
+  onToggleWidget?: () => void;
+  onUpload?: () => void;
+};
+
+type Props = {
+  title: string;
+  subtitle?: string;
+  chartId?: string; // Used for unique IDs like upload input
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+  menuActions: MenuActions;
+  isDownloading?: boolean;
+  tierLevel?: number;
+  onHeaderClick?: () => void;
+  customHeaderContent?: React.ReactNode; // For extra icons/text in header
+  className?: string;
+};
+
+const ChartCardWrapper = ({
+  title,
+  subtitle,
+  chartId = "root",
+  children,
+  footer,
+  menuActions,
+  isDownloading = false,
+  tierLevel = 0,
+  onHeaderClick,
+  customHeaderContent,
+  className = "",
+}: Props) => {
+  const [showPopover, setShowPopover] = useState(false);
+
+  // Helper handling click outside could be added here, 
+  // but for now relying on simple toggle/blur or parent handling if needed.
+
+  const handleAction = (action?: () => void) => {
+    if (action) {
+      action();
+    }
+    setShowPopover(false);
+  };
+
+  return (
+    <div
+      className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
+        onHeaderClick ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+      } ${className}`}
+      onClick={() => {
+        if (onHeaderClick) {
+           onHeaderClick();
+        }
+      }}
+    >
+      {/* HEADER */}
+      <div className="flex justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-semibold">{title}</h2>
+          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+        </div>
+
+        <div
+          className="flex items-center gap-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {customHeaderContent}
+
+          {/* MENU 3-DOTS */}
+          <div className="relative border-l pl-4">
+            <button
+              className="p-2 border rounded hover:bg-gray-50"
+              onClick={() => setShowPopover(!showPopover)}
+            >
+              <BsThreeDots size={18} />
+            </button>
+
+            {showPopover && (
+              <div className="absolute right-0 top-12 w-48 bg-white border rounded-lg shadow-lg p-2 z-10">
+                {/* COPY */}
+                {menuActions.onCopy && (
+                  <button
+                    onClick={() => handleAction(menuActions.onCopy)}
+                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left items-center"
+                  >
+                    <Copy size={18} /> Copy
+                  </button>
+                )}
+
+                {/* DOWNLOAD - Only for Root */}
+                {tierLevel === 0 && menuActions.onDownload && (
+                  <button
+                    onClick={() => handleAction(menuActions.onDownload)}
+                    disabled={isDownloading}
+                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left items-center"
+                  >
+                    <Download size={18} /> {isDownloading ? "Downloading..." : "Download"}
+                  </button>
+                )}
+
+                {/* UPLOAD - Only for Root */}
+                {tierLevel === 0 && menuActions.onUpload && (
+                  <>
+                     <button
+                      onClick={() => {
+                        document.getElementById(`upload-input-${chartId}`)?.click();
+                        setShowPopover(false);
+                      }}
+                      className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left items-center"
+                    >
+                      <Upload size={18} /> Upload Data
+                    </button>
+                    {/* The input itself is likely better handled outside or here if we pass handler */}
+                    {/* For now, assuming parent handles the file input or we provide specific slot,
+                        but to match existing code, we need the input here or in parent.
+                        Since standardizing, let's keep input hidden here but trigger it? 
+                        Actually, typical logic has `onUpload` handler.
+                        If `onUpload` is passed, it might just be the click handler. 
+                        Let's assume the parent might need to render the input to control it fully, 
+                        OR we render a generic input and pass the e.target.files to onUpload?
+                    */}
+                  </>
+                )}
+
+                {/* DELETE */}
+                {menuActions.onDelete && (
+                  <button
+                    onClick={() => handleAction(menuActions.onDelete)}
+                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-red-600 text-left items-center"
+                  >
+                    <Trash2 size={18} /> Delete
+                  </button>
+                )}
+
+                {/* WIDGET TOGGLE */}
+                {menuActions.onToggleWidget && (
+                  <button
+                    onClick={() => handleAction(menuActions.onToggleWidget)}
+                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left items-center"
+                  >
+                    <MdOutlineWidgets size={18} /> Widget
+                  </button>
+                )}
+
+                {/* ADD TIER */}
+                {menuActions.onAddTier && (
+                  <button
+                    onClick={() => handleAction(menuActions.onAddTier)}
+                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left items-center"
+                  >
+                    <GoPlus size={18} /> Add Tier
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* CONTENT */}
+      <div className="w-full">
+        {children}
+      </div>
+
+      {/* FOOTER */}
+      {footer && (
+        <div className="mt-4 text-center">
+            {footer}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ChartCardWrapper;

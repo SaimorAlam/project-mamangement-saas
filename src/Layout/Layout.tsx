@@ -20,7 +20,7 @@ const Layout: React.FC = () => {
   ].some((route) => location.pathname.startsWith(route));
 
   return (
-    <div>
+    <div>∏
       {!isDashboardRoute && <Navbar />}
       <main>
         <Outlet />
