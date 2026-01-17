@@ -30,6 +30,8 @@ import CalendarHeatmapModule from "@/components/client/ProjectBuilder/chartModul
 import GanttChartNewModule from "@/components/client/ProjectBuilder/chartModules/GanttChartNewModule";
 import MatrixTableChartModule from "@/components/client/ProjectBuilder/chartModules/MatrixTableChartModule";
 import ComboChartModule from "@/components/client/ProjectBuilder/chartModules/ComboChartModule";
+import BulletChartModule from "@/components/client/ProjectBuilder/chartModules/BulletChartModule";
+import HorizontalStackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/HorizontalStackedBarChartModule";
 import SparkLineChartModule from "@/components/client/ProjectBuilder/chartModules/SparkLineChartModule";
 import LogarithmicChartModule from "@/components/client/ProjectBuilder/chartModules/LogarithmicChartModule";
 import DecompositionTreeModule from "@/components/client/ProjectBuilder/chartModules/DecompositionTreeModule";
@@ -217,6 +219,8 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("gantt-new-chart") && <GanttChartNewModule onDelete={() => handleWidgetDelete("gantt-new-chart")}/>}
         {selectedWidgets.includes("matrix-table-chart") && <MatrixTableChartModule onDelete={() => handleWidgetDelete("matrix-table-chart")}/>}
         {selectedWidgets.includes("combo-chart") && <ComboChartModule onDelete={() => handleWidgetDelete("combo-chart")}/>}
+        {selectedWidgets.includes("horisontal-stacked-bar-chart") && <HorizontalStackedBarChartModule onDelete={() => handleWidgetDelete("horisontal-stacked-bar-chart")}/>}
+        {selectedWidgets.includes("bullet-chart") && <BulletChartModule onDelete={() => handleWidgetDelete("bullet-chart")}/>}
 
       </div>
       {/* <ProjectConfiguration /> */}

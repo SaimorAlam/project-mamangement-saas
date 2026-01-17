@@ -25,6 +25,8 @@ import {
   CalendarDays,
   SquareChartGantt,
   ChartNoAxesCombined,
+  PanelTopBottomDashed,
+  NotepadTextDashed,
 } from "lucide-react";
 import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
@@ -221,6 +223,18 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       name: "Combo Chart",
       description: "Show combo chart",
       icon: <ChartNoAxesCombined className="w-5 h-5" />
+    },
+    {
+      id: "horisontal-stacked-bar-chart",
+      name: "Horisontal Stacked Bar Chart",
+      description: "Show horisontal stacked bar chart",
+      icon: <PanelTopBottomDashed className="w-5 h-5" />
+    },
+    {
+      id: "bullet-chart",
+      name: "Bullet Chart",
+      description: "Show bullet chart",
+      icon: <NotepadTextDashed className="w-5 h-5" />
     },
     {
       id: "logarithmic-chart",
