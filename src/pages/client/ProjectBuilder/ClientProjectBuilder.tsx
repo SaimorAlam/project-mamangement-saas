@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import SparkLineChartModule from "@/components/client/ProjectBuilder/chartModules/SparkLineChartModule";
 import LogarithmicChartModule from "@/components/client/ProjectBuilder/chartModules/LogarithmicChartModule";
 import DecompositionTreeModule from "@/components/client/ProjectBuilder/chartModules/DecompositionTreeModule";
+import MarimekkoChartModule from "@/components/client/ProjectBuilder/chartModules/MarimekkoChartModule";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -207,6 +208,7 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("waterfall-chart") && <WaterfallChartModule />}
         {selectedWidgets.includes("radar-chart") && <RadarChartModule />}
         {selectedWidgets.includes("candle-chart") && <CandleChartModule />}
+        {selectedWidgets.includes("marimekko-chart") && <MarimekkoChartModule onDelete={() => handleWidgetDelete("marimekko-chart")} />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
