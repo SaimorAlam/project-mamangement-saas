@@ -14,9 +14,25 @@ import { Link, useLocation } from "react-router-dom";
 
 interface IProps {
   item: IClientPanelStats;
+  showIndex?: boolean; // Controls Growth/Trend display based on "Show Index" config
+  showFooter?: boolean;
+  showFooterLabel?: boolean;
+  showFooterButton?: boolean;
+  onToggleWidget?: () => void;
 }
 
-const DashboardPanelStatsCard = ({ item }: IProps) => {
+import { BsThreeDots } from "react-icons/bs";
+import { MdOutlineWidgets } from "react-icons/md";
+
+const DashboardPanelStatsCard = ({ 
+  item, 
+  showIndex = true, 
+  showFooter = true, 
+  showFooterLabel = true, 
+  showFooterButton = true,
+  onToggleWidget
+}: IProps) => {
+  const [showPopover, setShowPopover] = useState(false);
   const {
     title,
     value,
@@ -28,6 +44,8 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
     icon_bg_color,
   } = item;
   const [iconType] = useState(icon);
+
+  // ... (keeping icon logic same)
 
   const IconCollection: Record<string, JSX.Element> = {
     FolderIcon: <Folders />,
@@ -46,8 +64,6 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
 
   // getting path
   const location = useLocation();
-
-  // Get the path after the domain name (e.g., '/products/5')
   const currentPathname = location.pathname;
   const isInStaffManager = currentPathname === "/staff-manager-panel/project-review/all-projects";
 
@@ -57,11 +73,39 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
         className={`${growth_type === "up"
           ? "bg-[#EBFFF2] text-green-600"
           : "bg-[#FDF4F5] text-red-600"
-          }  bg-[#EBFFF2] rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102`}
+          }  bg-[#EBFFF2] rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102 relative`}
       >
+         {/* Menu Button - Absolute Top Right */}
+         <div className="absolute right-2 top-2 z-10">
+            <button
+               onClick={(e) => {
+                 e.stopPropagation();
+                 setShowPopover(!showPopover);
+               }}
+               className="p-1 hover:bg-gray-100/50 rounded-full text-gray-400 hover:text-gray-600"
+            >
+               <BsThreeDots />
+            </button>
+            {showPopover && (
+               <div className="absolute right-0 top-6 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-20">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onToggleWidget) onToggleWidget();
+                      setShowPopover(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
+                  >
+                    <MdOutlineWidgets size={16} /> Widget
+                  </button>
+               </div>
+            )}
+         </div>
+
         <div className="bg-white shadow-xs shadow-gray-100 rounded-lg p-5 ">
           {/* Icon & Title */}
           <div className="flex items-center gap-3 mb-3">
+             {/* ... */}
             <div
               className="p-2 border border-[#CAD2DB] rounded-xl text-[28px] text-white"
               style={{ backgroundColor: icon_bg_color }}
@@ -79,7 +123,7 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
             {title==="Overdue" && Number.isFinite(Number(value)) && "%"}
             </span>
 
-            {growth && (
+            {showIndex && growth && (
               <span
                 className={`flex items-center gap-1 text-sm font-medium px-2 py-1 rounded ${growth_type === "up"
                   ? "bg-green-100 text-[#169E7B]"
@@ -93,18 +137,22 @@ const DashboardPanelStatsCard = ({ item }: IProps) => {
           </div>
         </div>
         {/* Description & Link */}
+        {showFooter && (
           <div className="flex items-center justify-between text-sm text-gray-700 px-6 py-4">
-        {
+            {
               !isInStaffManager && (
                 <>
-              <span className="">{description && description}</span>
-              <Link to={`#`} className="text-blue-500 hover:underline">
-                {link_text} &rarr;
-              </Link>
-              </>
-          )
-        }
-            </div>
+                  {showFooterLabel && <span className="">{description && description}</span>}
+                  {showFooterButton && (
+                    <Link to={`#`} className="text-blue-500 hover:underline">
+                      {link_text} &rarr;
+                    </Link>
+                  )}
+                </>
+              )
+            }
+          </div>
+        )}
       </div>
     </div>
   );
