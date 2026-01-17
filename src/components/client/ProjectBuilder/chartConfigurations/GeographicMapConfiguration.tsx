@@ -138,7 +138,7 @@ const GeographicMapConfiguration = ({
                 <label className="block text-[10px] text-gray-500 mb-1 uppercase">Overlay</label>
                 <select 
                     value={overlayType}
-                    onChange={(e) => setOverlayType(e.target.value as any)}
+                    onChange={(e) => setOverlayType(e.target.value as "bubble" | "choropleth")}
                     className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
                 >
                     <option value="bubble">Bubble</option>
