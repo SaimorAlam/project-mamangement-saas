@@ -27,6 +27,7 @@ import {
   ChartNoAxesCombined,
   PanelTopBottomDashed,
   NotepadTextDashed,
+  Users,
 } from "lucide-react";
 import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
@@ -260,6 +261,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Distribution: median, quartiles, outliers",
       icon: <ChartCandlestick className="w-5 h-5" />, 
     },
+    {
+      id: "cohort-analysis",
+      name: "Cohort Analysis",
+      description: "Track group survival/retention over time",
+      icon: <Users className="w-5 h-5" />,
+    },
     // {
     //   id: "rader-chart",
     //   name: "Rader Chart",
@@ -273,7 +280,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   useEffect(() => {
     dispatch(setProgramId(selectedProgram))
     dispatch(setProjectId(selectedProject))
-  }, [selectedProgram, selectedProject]);
+  }, [selectedProgram, selectedProject, dispatch]);
 
   return (
     <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 flex flex-col">
