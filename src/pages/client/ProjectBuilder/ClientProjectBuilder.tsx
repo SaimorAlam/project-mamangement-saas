@@ -35,6 +35,8 @@ import HorizontalStackedBarChartModule from "@/components/client/ProjectBuilder/
 import SparkLineChartModule from "@/components/client/ProjectBuilder/chartModules/SparkLineChartModule";
 import LogarithmicChartModule from "@/components/client/ProjectBuilder/chartModules/LogarithmicChartModule";
 import DecompositionTreeModule from "@/components/client/ProjectBuilder/chartModules/DecompositionTreeModule";
+import MarimekkoChartModule from "@/components/client/ProjectBuilder/chartModules/MarimekkoChartModule";
+import BoxPlotChartModule from "@/components/client/ProjectBuilder/chartModules/BoxPlotChartModule";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -222,6 +224,8 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("horisontal-stacked-bar-chart") && <HorizontalStackedBarChartModule onDelete={() => handleWidgetDelete("horisontal-stacked-bar-chart")}/>}
         {selectedWidgets.includes("bullet-chart") && <BulletChartModule onDelete={() => handleWidgetDelete("bullet-chart")}/>}
 
+        {selectedWidgets.includes("marimekko-chart") && <MarimekkoChartModule onDelete={() => handleWidgetDelete("marimekko-chart")} />}
+        {selectedWidgets.includes("box-plot") && <BoxPlotChartModule onDelete={() => handleWidgetDelete("box-plot")} />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
