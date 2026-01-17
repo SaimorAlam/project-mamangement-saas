@@ -192,7 +192,13 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       id: "logarithmic-chart",
       name: "Logarithmic Chart",
       description: "Display data on a logarithmic scale",
-      icon: <ChartLine className="w-5 h-5" />, // Reusing ChartLine or similar
+      icon: <ChartLine className="w-5 h-5" />, 
+    },
+    {
+      id: "decomposition-tree",
+      name: "Decomposition Tree",
+      description: "Visualize hierarchical data breakdown",
+      icon: <SquareKanban className="w-5 h-5 rotate-90" />, // Rotated for tree-like look or just use existing
     },
     // {
     //   id: "rader-chart",
