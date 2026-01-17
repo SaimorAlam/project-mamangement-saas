@@ -24,6 +24,7 @@ import {
   Map,
   CalendarDays,
   SquareChartGantt,
+  ChartNoAxesCombined,
 } from "lucide-react";
 import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
@@ -202,6 +203,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       name: "Matrix Table Chart",
       description: "Show matrix table chart",
       icon: <Table className="w-5 h-5" />,
+    },
+    {
+      id: "combo-chart",
+      name: "Combo Chart",
+      description: "Show combo chart",
+      icon: <ChartNoAxesCombined className="w-5 h-5" />
     },
 
   ];

@@ -29,6 +29,7 @@ import TreemapChartModule from "@/components/client/ProjectBuilder/chartModules/
 import CalendarHeatmapModule from "@/components/client/ProjectBuilder/chartModules/CalendarHeatmapModule";
 import GanttChartNewModule from "@/components/client/ProjectBuilder/chartModules/GanttChartNewModule";
 import MatrixTableChartModule from "@/components/client/ProjectBuilder/chartModules/MatrixTableChartModule";
+import ComboChartModule from "@/components/client/ProjectBuilder/chartModules/ComboChartModule";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -189,6 +190,7 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("calendar-heatmap-chart") && <CalendarHeatmapModule  onDelete={() => handleWidgetDelete("calendar-heatmap-chart")}/>}
         {selectedWidgets.includes("gantt-new-chart") && <GanttChartNewModule onDelete={() => handleWidgetDelete("gantt-new-chart")}/>}
         {selectedWidgets.includes("matrix-table-chart") && <MatrixTableChartModule onDelete={() => handleWidgetDelete("matrix-table-chart")}/>}
+        {selectedWidgets.includes("combo-chart") && <ComboChartModule onDelete={() => handleWidgetDelete("combo-chart")}/>}
 
       </div>
       {/* <ProjectConfiguration /> */}
