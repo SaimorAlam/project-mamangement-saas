@@ -210,6 +210,18 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Show combo chart",
       icon: <ChartNoAxesCombined className="w-5 h-5" />
     },
+    {
+      id: "horisontal-stacked-bar-chart",
+      name: "Horisontal Stacked Bar Chart",
+      description: "Show horisontal stacked bar chart",
+      icon: <ChartNoAxesCombined className="w-5 h-5" />
+    },
+    {
+      id: "bullet-chart",
+      name: "Bullet Chart",
+      description: "Show bullet chart",
+      icon: <ChartNoAxesCombined className="w-5 h-5" />
+    },
 
   ];
   const { programs ,isLoading} = useGetAllProgram();
