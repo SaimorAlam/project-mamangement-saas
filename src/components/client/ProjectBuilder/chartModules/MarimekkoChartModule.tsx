@@ -49,8 +49,8 @@ const MarimekkoChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   return (
-    <div className="flex gap-3 relative">
-      <div className="flex-1 w-full relative">
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
          <MarimekkoChart
             widgetTitle={widgetTitle}
             xAxisValues={xAxisValues}

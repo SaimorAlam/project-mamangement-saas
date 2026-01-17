@@ -55,14 +55,16 @@ const FunnelChartModule = () => {
   };
 
   return (
-    <div className="flex gap-3">
-      <FunnelChart
-        widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-      />
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
+        <FunnelChart
+          widgetTitle={widgetTitle}
+          xAxisValues={xAxisValues}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          onToggleWidget={handleToggleWidget}
+        />
+      </div>
       {showWidget && (
         <div className="w-96 bg-white border border-gray-200 rounded-lg p-6 h-fit">
           {/* Header */}

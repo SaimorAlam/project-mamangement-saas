@@ -26,15 +26,17 @@ const ScatterChartModule = () => {
   };
 
   return (
-    <div className="flex gap-3">
-      <ScatterChart
-        widgetTitle={widgetTitle}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-      />
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
+        <ScatterChart
+          widgetTitle={widgetTitle}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          onToggleWidget={handleToggleWidget}
+        />
+      </div>
       {showWidget && (
         <WidgetForChartModuleTwo
           widgedName="Scatter Chart"

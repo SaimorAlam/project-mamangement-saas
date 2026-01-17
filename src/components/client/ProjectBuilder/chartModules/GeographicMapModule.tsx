@@ -42,8 +42,8 @@ const GeographicMapModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   return (
-    <div className="flex gap-3 h-full min-h-[500px]">
-      <div className="flex-1">
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
         <GeographicMapChart
           widgetTitle={widgetTitle}
           points={points}

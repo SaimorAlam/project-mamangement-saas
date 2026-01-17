@@ -169,7 +169,7 @@ export default function GeographicMapChart({
                 </button>
                 {onToggleWidget && (
                   <button onClick={() => {onToggleWidget(); setShowPopover(false);}} className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-sm items-center">
-                    <MdOutlineWidgets size={16} /> Configure
+                    <MdOutlineWidgets size={16} /> Widget
                   </button>
                 )}
               </div>

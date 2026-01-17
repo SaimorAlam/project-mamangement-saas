@@ -64,69 +64,72 @@ const ChartModuleOne = ({ chartName, onDelete }: { chartName: string, onDelete?:
         setShowWidget(!showWidget);
     };
     return (
-        <div className="flex justify-between gap-3">
-            {(() => {
-                if (chartName === "bar-chart") {
-                    return (
-                        <StackedBarChart
-                            widgetTitle={widgetTitle}
-                            xAxisValues={xAxisValues}
-                            legendValues={legendValues}
-                            numOfLegendDataSet={numOfLegendDataSet}
-                            startingRange={startingRange}
-                            endingRange={endingRange}
-                            onDelete={onDelete}
-                        />
-                    );
-                } else if (chartName === "area-chart") {
-                    return (
-                        <AreaChart
-                            widgetTitle={widgetTitle}
-                            xAxisValues={xAxisValues}
-                            legendValues={legendValues}
-                            startingRange={startingRange}
-                            endingRange={endingRange}
-                            onToggleWidget={handleToggleWidget}
-                            onDelete={onDelete}
-                        />
-                    );
-                } else if (chartName === "spline-area-chart") {
-                    return (
-                        <SplineAreaChart
-                            widgetTitle={widgetTitle}
-                            xAxisValues={xAxisValues}
-                            legendValues={legendValues}
-                            startingRange={startingRange}
-                            endingRange={endingRange}
-                            onToggleWidget={handleToggleWidget}
-                            onDelete={onDelete}
-                        />
-                    );
-                } else if (chartName === "line-chart") {
-                    return (
-                        <MultiAxisLineChart
-                            widgetTitle={widgetTitle}
-                            xAxisValues={xAxisValues}
-                            legendValues={legendValues}
-                            startingRange={startingRange}
-                            endingRange={endingRange}
-                            onDelete={onDelete}
-                        />
-                    )
-                } else if (chartName === "heat-map-chart") {
-                    return (
-                        <HeatmapChartNew
-                            widgetTitle={widgetTitle}
-                            xAxisValues={xAxisValues}
-                            legendValues={legendValues}
-                            startingRange={startingRange}
-                            endingRange={endingRange}
-                            onToggleWidget={handleToggleWidget}
-                        />
-                    )
-                }
-                return null;
-            })()}
+        <div className="flex gap-3 h-full">
+            <div className="flex-1 h-full sticky top-5">
+                {(() => {
+                    if (chartName === "bar-chart") {
+                        return (
+                            <StackedBarChart
+                                widgetTitle={widgetTitle}
+                                xAxisValues={xAxisValues}
+                                legendValues={legendValues}
+                                numOfLegendDataSet={numOfLegendDataSet}
+                                startingRange={startingRange}
+                                endingRange={endingRange}
+                                onDelete={onDelete}
+                            />
+                        );
+                    } else if (chartName === "area-chart") {
+                        return (
+                            <AreaChart
+                                widgetTitle={widgetTitle}
+                                xAxisValues={xAxisValues}
+                                legendValues={legendValues}
+                                startingRange={startingRange}
+                                endingRange={endingRange}
+                                onToggleWidget={handleToggleWidget}
+                                onDelete={onDelete}
+                            />
+                        );
+                    } else if (chartName === "spline-area-chart") {
+                        return (
+                            <SplineAreaChart
+                                widgetTitle={widgetTitle}
+                                xAxisValues={xAxisValues}
+                                legendValues={legendValues}
+                                startingRange={startingRange}
+                                endingRange={endingRange}
+                                onToggleWidget={handleToggleWidget}
+                                onDelete={onDelete}
+                            />
+                        );
+                    } else if (chartName === "line-chart") {
+                        return (
+                            <MultiAxisLineChart
+                                widgetTitle={widgetTitle}
+                                xAxisValues={xAxisValues}
+                                legendValues={legendValues}
+                                startingRange={startingRange}
+                                endingRange={endingRange}
+                                onDelete={onDelete}
+                            />
+                        );
+                    } else if (chartName === "heat-map-chart") {
+                        return (
+                            <HeatmapChartNew
+                                widgetTitle={widgetTitle}
+                                xAxisValues={xAxisValues}
+                                legendValues={legendValues}
+                                startingRange={startingRange}
+                                endingRange={endingRange}
+                                onToggleWidget={handleToggleWidget}
+                                onDelete={onDelete}
+                            />
+                        );
+                    }
+                    return null;
+                })()}
+            </div>
 
             {showWidget && (
                 <WidgetForChartModuleOne
@@ -154,6 +157,7 @@ const ChartModuleOne = ({ chartName, onDelete }: { chartName: string, onDelete?:
                     setStartingRange={setStartingRange}
                     endingRange={endingRange}
                     setEndingRange={setEndingRange}
+                    onClose={() => setShowWidget(false)}
                 />
             )}
         </div>

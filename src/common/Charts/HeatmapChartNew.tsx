@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { useMemo, useState, MouseEvent } from "react";
 import { Copy, Download, Trash2 } from "lucide-react";
 import { BsThreeDots } from "react-icons/bs";
@@ -44,6 +42,7 @@ type Props = {
   endingRange: number;
   numOfLegendDataSet?: number;
   onToggleWidget?: () => void;
+  onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
 };
@@ -58,6 +57,7 @@ export default function HeatmapChartNew({
   endingRange,
   numOfLegendDataSet = 1,
   onToggleWidget,
+  onDelete,
   tierLevel = 0,
   chartId = "root",
 }: Props) {
@@ -241,6 +241,7 @@ export default function HeatmapChartNew({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    onDelete?.();
                     setShowPopover(false);
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
@@ -312,7 +313,7 @@ export default function HeatmapChartNew({
           <div className="inline-block">
             {heatmapData.map((row, rIdx) => (
               <div key={rIdx} className="flex mb-3">
-                <div className="w-36 pr-3 text-right text-sm text-gray-700 break-words">
+                <div className="w-36 pr-3 text-right text-sm text-gray-700 wrap-break-word">
                   {row.label}
                 </div>
 
@@ -337,7 +338,7 @@ export default function HeatmapChartNew({
               {xAxisValues.map((x, i) => (
                 <div
                   key={i}
-                  className="w-28 text-sm text-center break-words text-gray-600 mx-1"
+                  className="w-28 text-sm text-center wrap-break-word text-gray-600 mx-1"
                 >
                   {x}
                 </div>
