@@ -267,6 +267,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Track group survival/retention over time",
       icon: <Users className="w-5 h-5" />,
     },
+    {
+      id: "geographic-map",
+      name: "Geographic Map",
+      description: "Choropleth or bubble overlays on global map",
+      icon: <Map className="w-5 h-5" />,
+    },
     // {
     //   id: "rader-chart",
     //   name: "Rader Chart",
