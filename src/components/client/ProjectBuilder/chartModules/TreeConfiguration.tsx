@@ -208,11 +208,11 @@ const TreeConfiguration = ({
   };
 
   return (
-    <div className="w-[450px] h-fit max-h-[calc(100vh-100px)] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col">
+    <div className="min-w-[350px] w-1/3 h-fit max-h-[calc(100vh-100px)] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col shrink-0 transition-all duration-300">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 shrink-0">
         <h3 className="text-lg font-semibold text-gray-800">
-          Tree Configuration
+          Configuration
         </h3>
         <button
           onClick={onClose}
@@ -248,6 +248,21 @@ const TreeConfiguration = ({
           </div>
           {renderTreeNode(treeData)}
         </div>
+      </div>
+
+       <div className="flex items-center justify-between gap-3 p-4 border-t border-gray-200 bg-gray-50 shrink-0">
+        <button
+          onClick={onClose}
+          className="px-4 py-2 text-xs font-medium border border-gray-200 rounded-md cursor-pointer text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-50 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={onClose}
+          className="px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer shadow-sm transition-colors"
+        >
+          Save Changes
+        </button>
       </div>
     </div>
   );
