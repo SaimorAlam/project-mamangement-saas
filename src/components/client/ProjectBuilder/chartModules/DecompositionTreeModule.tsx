@@ -1,68 +1,65 @@
-import React, { useState } from "react";
-import ProjectConfiguration, {
-    LegendValue,
-} from "../WidgetForChartModuleOne";
-import DecompositionTreeChart from "@/common/Charts/DecompositionTreeChart";
+import { useState } from "react";
+import DecompositionTreeChart, { TreeDataNode } from "@/common/Charts/DecompositionTreeChart";
+import TreeConfiguration from "./TreeConfiguration";
+
+const generateSampleTree = (): TreeDataNode => ({
+  id: "root",
+  name: "Total Sales",
+  value: 1000000,
+  color: "#8b5cf6",
+  children: [
+    {
+      id: "region-na",
+      name: "North America",
+      value: 600000,
+      color: "#3b82f6",
+      children: [
+        { id: "usa", name: "USA", value: 450000, color: "#10b981" },
+        { id: "canada", name: "Canada", value: 150000, color: "#06b6d4" },
+      ],
+    },
+    {
+      id: "region-eu",
+      name: "Europe",
+      value: 300000,
+      color: "#f59e0b",
+      children: [
+        { id: "uk", name: "UK", value: 120000, color: "#ef4444" },
+        { id: "germany", name: "Germany", value: 100000, color: "#ec4899" },
+        { id: "france", name: "France", value: 80000, color: "#8b5cf6" },
+      ],
+    },
+    {
+      id: "region-asia",
+      name: "Asia",
+      value: 100000,
+      color: "#14b8a6",
+    },
+  ],
+});
 
 const DecompositionTreeModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [widgetTitle, setWidgetTitle] = useState("Sales Decomposition");
   const [showWidget, setShowWidget] = useState(false);
-
-  // For now, simpler ProjectConfiguration doesn't support deep tree editing.
-  // We will expose basic title editing and perhaps generic fields that we can ignore or map to root.
-  // Ideally, a new TreeConfiguration component is needed, but we reuse existing for consistency.
-
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
-  const [xAxisValues, setXAxisValues] = useState<string[]>(["Root Value"]);
-
-  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(1);
-  const [legendValues, setLegendValues] = useState<LegendValue[]>([
-    { label: "Total", field: "total", color: "#13A490" },
-  ]);
-
-  const [startingRange, setStartingRange] = useState<number>(0);
-  const [endingRange, setEndingRange] = useState<number>(100);
-
-  // We won't use x/y axis logic for the tree visually, but we keep state to satisfy component props
-  const handleSetNumOfXAxisDataSet = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // no-op or simple state update
-      setNumOfXAxisDataSet(Number(e.target.value));
-  };
-  const handleXAxisValueChange = (i: number, v: string) => {
-      // update root name maybe?
-      const newV = [...xAxisValues];
-      newV[i] = v;
-      setXAxisValues(newV);
-  };
-
+  const [treeData, setTreeData] = useState<TreeDataNode>(generateSampleTree());
 
   return (
     <div className="flex gap-3">
+      <div className="w-full sticky top-5 h-full">
       <DecompositionTreeChart
         widgetTitle={widgetTitle}
+        data={treeData}
         onToggleWidget={() => setShowWidget(!showWidget)}
         onDelete={onDelete}
-        // Passing dummy data or controlled data would happen here
-        // For this demo, the chart generates its own sample data unless passed
+        onDataChange={setTreeData}
       />
+      </div>
       {showWidget && (
-        <ProjectConfiguration
-          widgedName="Decomposition Tree"
+        <TreeConfiguration
           widgetTitle={widgetTitle}
-          widgetCategory="TREE"
           setWidgetTitle={setWidgetTitle}
-          numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
-          xAxisValues={xAxisValues}
-          handleXAxisValueChange={handleXAxisValueChange}
-          numOfLegendDataSet={numOfLegendDataSet}
-          setNumOfLegendDataSet={setNumOfLegendDataSet}
-          legendValues={legendValues}
-          setLegendValues={setLegendValues}
-          startingRange={startingRange}
-          setStartingRange={setStartingRange}
-          endingRange={endingRange}
-          setEndingRange={setEndingRange}
+          treeData={treeData}
+          onTreeDataChange={setTreeData}
           onClose={() => setShowWidget(false)}
         />
       )}
@@ -71,3 +68,4 @@ const DecompositionTreeModule = ({ onDelete }: { onDelete?: () => void }) => {
 };
 
 export default DecompositionTreeModule;
+
