@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useState } from "react";
 import { ResponsiveContainer } from "recharts";
 import { BsThreeDots } from "react-icons/bs";
@@ -133,7 +134,7 @@ const RibbonChart: React.FC<RibbonChartProps> = ({
 
   return (
     <div
-      className={`w-full bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow bg-white ${className}`}
+      className={`w-full border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow bg-white ${className}`}
       onClick={() => {
         // if (onToggleWidget) onToggleWidget();
       }}

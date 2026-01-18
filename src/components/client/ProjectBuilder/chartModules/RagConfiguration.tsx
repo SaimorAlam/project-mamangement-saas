@@ -29,7 +29,11 @@ const RagConfiguration: React.FC<RagConfigurationProps> = ({
     }));
   };
 
-  const handleDataChange = (index: number, field: keyof RagDataPoint, value: string) => {
+  const handleDataChange = (
+    index: number,
+    field: keyof RagDataPoint,
+    value: string,
+  ) => {
     const newData = [...data];
     if (field === "name") {
       newData[index].name = value;
@@ -48,9 +52,9 @@ const RagConfiguration: React.FC<RagConfigurationProps> = ({
   };
 
   return (
-    <div className="w-[400px] h-fit max-h-[calc(100vh-100px)] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col shrink-0">
+    <div className="max-w-78 min-w-78 h-fit max-h-[calc(100vh-100px)] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col shrink-0 transition-all duration-300">
       <div className="flex justify-between items-center p-4 border-b bg-gray-50">
-        <h3 className="text-lg font-semibold text-gray-800">Chart Configuration</h3>
+        <h3 className="text-lg font-semibold text-gray-800">Configuration</h3>
         <button
           onClick={onClose}
           className="p-1 hover:bg-gray-200 rounded transition-colors"
@@ -62,7 +66,9 @@ const RagConfiguration: React.FC<RagConfigurationProps> = ({
       <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide">
         {/* Widget Title */}
         <div className="space-y-3">
-          <label className="text-sm font-semibold text-gray-700">Widget Title</label>
+          <label className="text-sm font-semibold text-gray-700">
+            Widget Title
+          </label>
           <input
             type="text"
             value={widgetTitle}
@@ -74,28 +80,38 @@ const RagConfiguration: React.FC<RagConfigurationProps> = ({
 
         {/* Thresholds Configuration */}
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Zone Thresholds</h3>
+          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+            Zone Thresholds
+          </h3>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-gray-600 block mb-1">Poor Zone (0 - X)</label>
+              <label className="text-xs text-gray-600 block mb-1">
+                Poor Zone (0 - X)
+              </label>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-[#ff7875]" />
                 <input
                   type="number"
                   value={thresholds.poor}
-                  onChange={(e) => handleThresholdChange("poor", e.target.value)}
+                  onChange={(e) =>
+                    handleThresholdChange("poor", e.target.value)
+                  }
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 outline-none"
                 />
               </div>
             </div>
             <div>
-              <label className="text-xs text-gray-600 block mb-1">Average Zone (Poor - X)</label>
+              <label className="text-xs text-gray-600 block mb-1">
+                Average Zone (Poor - X)
+              </label>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-[#ffd666]" />
                 <input
                   type="number"
                   value={thresholds.average}
-                  onChange={(e) => handleThresholdChange("average", e.target.value)}
+                  onChange={(e) =>
+                    handleThresholdChange("average", e.target.value)
+                  }
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 outline-none"
                 />
               </div>
@@ -103,13 +119,17 @@ const RagConfiguration: React.FC<RagConfigurationProps> = ({
             {/* Good zone is automatic above average, but we can set a max if needed for scale, 
                 but using 'good' threshold as a visual max guide or upper bound */}
             <div>
-              <label className="text-xs text-gray-600 block mb-1">Good Zone Target (Upper Bound)</label>
+              <label className="text-xs text-gray-600 block mb-1">
+                Good Zone Target (Upper Bound)
+              </label>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-[#95de64]" />
                 <input
                   type="number"
                   value={thresholds.good}
-                  onChange={(e) => handleThresholdChange("good", e.target.value)}
+                  onChange={(e) =>
+                    handleThresholdChange("good", e.target.value)
+                  }
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 outline-none"
                 />
               </div>
@@ -120,7 +140,9 @@ const RagConfiguration: React.FC<RagConfigurationProps> = ({
         {/* Data Points Configuration */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Data Points</h3>
+            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+              Data Points
+            </h3>
             <button
               onClick={handleAddDataPoint}
               className="text-xs flex items-center gap-1 text-blue-600 font-medium hover:text-blue-700"
@@ -128,21 +150,28 @@ const RagConfiguration: React.FC<RagConfigurationProps> = ({
               <Plus className="w-3 h-3" /> Add Point
             </button>
           </div>
-          
+
           <div className="space-y-2">
             {data.map((point, index) => (
-              <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg group">
+              <div
+                key={index}
+                className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg group"
+              >
                 <input
                   type="text"
                   value={point.name}
-                  onChange={(e) => handleDataChange(index, "name", e.target.value)}
+                  onChange={(e) =>
+                    handleDataChange(index, "name", e.target.value)
+                  }
                   className="w-1/3 px-2 py-1 text-sm bg-white border border-gray-200 rounded focus:border-blue-500 outline-none"
                   placeholder="Label"
                 />
                 <input
                   type="number"
                   value={point.value}
-                  onChange={(e) => handleDataChange(index, "value", e.target.value)}
+                  onChange={(e) =>
+                    handleDataChange(index, "value", e.target.value)
+                  }
                   className="w-1/3 px-2 py-1 text-sm bg-white border border-gray-200 rounded focus:border-blue-500 outline-none"
                   placeholder="Value"
                 />
@@ -168,9 +197,7 @@ const RagConfiguration: React.FC<RagConfigurationProps> = ({
               className="w-8 h-8 rounded-full mr-2"
             />
             <div>
-              <p className="text-xs font-medium text-gray-900">
-                Alexis Burg
-              </p>
+              <p className="text-xs font-medium text-gray-900">Alexis Burg</p>
               <p className="text-xs text-gray-500">Admin</p>
             </div>
           </div>

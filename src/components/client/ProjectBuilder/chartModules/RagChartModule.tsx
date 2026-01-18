@@ -26,7 +26,7 @@ const RagChartModule = ({ onDelete }: { onDelete?: () => void }) => {
 
   return (
     <div className="flex gap-3">
-      <div className="w-full sticky top-5 h-full">
+      <div className="flex-1 sticky top-5 h-full min-w-0">
         <RagChart
           widgetTitle={widgetTitle}
           data={data}

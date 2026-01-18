@@ -181,7 +181,7 @@ const RagChart: React.FC<RagChartProps> = ({
         </div>
       </div>
 
-      <div className="h-[350px] w-full">
+      <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={data}

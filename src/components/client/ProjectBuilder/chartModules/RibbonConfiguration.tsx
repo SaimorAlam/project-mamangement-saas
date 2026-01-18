@@ -29,7 +29,7 @@ const RibbonConfiguration: React.FC<RibbonConfigurationProps> = ({
       series.map((s) => ({
         ...s,
         data: [...s.data, 0],
-      }))
+      })),
     );
   };
 
@@ -51,16 +51,23 @@ const RibbonConfiguration: React.FC<RibbonConfigurationProps> = ({
       series.map((s) => ({
         ...s,
         data: s.data.filter((_, i) => i !== index),
-      }))
+      })),
     );
   };
 
   // --- Series Handlers ---
   const handleAddSeries = () => {
     const newId = `s-${Date.now()}`;
-    const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#0088fe", "#00c49f"];
+    const colors = [
+      "#8884d8",
+      "#82ca9d",
+      "#ffc658",
+      "#ff8042",
+      "#0088fe",
+      "#00c49f",
+    ];
     const randomColor = colors[series.length % colors.length];
-    
+
     setSeries([
       ...series,
       {
@@ -89,7 +96,11 @@ const RibbonConfiguration: React.FC<RibbonConfigurationProps> = ({
   };
 
   // --- Value Handler ---
-  const handleValueChange = (seriesIndex: number, catIndex: number, value: string) => {
+  const handleValueChange = (
+    seriesIndex: number,
+    catIndex: number,
+    value: string,
+  ) => {
     const numValue = parseInt(value) || 0;
     const newSeries = [...series];
     newSeries[seriesIndex].data[catIndex] = numValue;
@@ -97,18 +108,23 @@ const RibbonConfiguration: React.FC<RibbonConfigurationProps> = ({
   };
 
   return (
-    <div className="min-w-[350px] w-1/3 h-fit max-h-[calc(100vh-100px)] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col shrink-0 transition-all duration-300">
-      <div className="flex justify-between items-center p-4 border-b bg-gray-50">
+    <div className="max-w-78 min-w-78 h-full min-h-[calc(100vh-100px)] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col shrink-0 transition-all duration-300">
+      <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
         <h3 className="text-lg font-semibold text-gray-800">Configuration</h3>
-        <button onClick={onClose} className="p-1 hover:bg-gray-200 rounded transition-colors">
+        <button
+          onClick={onClose}
+          className="p-1 hover:bg-gray-200 rounded transition-colors"
+        >
           <X className="w-5 h-5 text-gray-500" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div className="flex-1 h-full  p-4 space-y-6 scrollbar-hide">
         {/* Widget Title */}
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-gray-700">Widget Title</label>
+          <label className="text-sm font-semibold text-gray-700">
+            Widget Title
+          </label>
           <input
             type="text"
             value={widgetTitle}
@@ -119,78 +135,111 @@ const RibbonConfiguration: React.FC<RibbonConfigurationProps> = ({
         </div>
 
         {/* Categories Manager */}
-        <div className="space-y-3">
-            <div className="flex justify-between items-center">
-                <label className="text-sm font-semibold text-gray-700">Categories (X-Axis)</label>
-                <button onClick={handleAddCategory} className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
-                    <Plus className="w-3 h-3" /> Add
+        <div className="space-y-3 ">
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-semibold text-gray-700">
+              Categories (X-Axis)
+            </label>
+            <button
+              onClick={handleAddCategory}
+              className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+            >
+              <Plus className="w-3 h-3" /> Add
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat, i) => (
+              <div
+                key={i}
+                className="flex items-center bg-gray-100 rounded-full px-3 py-1 border border-gray-200 group hover:border-blue-300 transition-colors"
+              >
+                <input
+                  value={cat}
+                  onChange={(e) => handleCategoryChange(i, e.target.value)}
+                  className="bg-transparent border-none outline-none text-xs w-16 text-center focus:w-24 transition-all"
+                />
+                <button
+                  onClick={() => handleDeleteCategory(i)}
+                  className="ml-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-3 h-3" />
                 </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-                {categories.map((cat, i) => (
-                    <div key={i} className="flex items-center bg-gray-100 rounded-full px-3 py-1 border border-gray-200 group hover:border-blue-300 transition-colors">
-                        <input 
-                            value={cat}
-                            onChange={(e) => handleCategoryChange(i, e.target.value)}
-                            className="bg-transparent border-none outline-none text-xs w-16 text-center focus:w-24 transition-all"
-                        />
-                         <button 
-                            onClick={() => handleDeleteCategory(i)}
-                            className="ml-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                            <X className="w-3 h-3" />
-                        </button>
-                    </div>
-                ))}
-            </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Series Data Manager */}
         <div className="space-y-3">
-             <div className="flex justify-between items-center">
-                <label className="text-sm font-semibold text-gray-700">Series Data</label>
-                <button onClick={handleAddSeries} className="text-xs text-green-600 hover:text-green-800 font-medium flex items-center gap-1">
-                    <Plus className="w-3 h-3" /> Add Series
-                </button>
-            </div>
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-semibold text-gray-700">
+              Series Data
+            </label>
+            <button
+              onClick={handleAddSeries}
+              className="text-xs text-green-600 hover:text-green-800 font-medium flex items-center gap-1"
+            >
+              <Plus className="w-3 h-3" /> Add Series
+            </button>
+          </div>
 
-            <div className="space-y-3">
-                {series.map((s, sIndex) => (
-                    <div key={s.id} className="border border-gray-200 rounded-lg p-3 bg-gray-50/50 hover:bg-white hover:shadow-sm transition-all">
-                        <div className="flex items-center gap-3 mb-3">
-                            <input 
-                                type="color" 
-                                value={s.color} 
-                                onChange={(e) => handleSeriesColorChange(sIndex, e.target.value)}
-                                className="w-6 h-6 rounded cursor-pointer border-none bg-transparent shrink-0"
-                            />
-                            <input 
-                                value={s.name} 
-                                onChange={(e) => handleSeriesNameChange(sIndex, e.target.value)}
-                                className="font-medium text-sm bg-transparent border-b border-transparent focus:border-blue-400 outline-none w-full"
-                                placeholder="Series Name"
-                            />
-                             <button onClick={() => handleDeleteSeries(sIndex)} className="text-gray-400 hover:text-red-600 p-1">
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-2">
-                            {categories.map((cat, cIndex) => (
-                                <div key={cIndex} className="flex items-center justify-between bg-white rounded border border-gray-100 px-2 py-1">
-                                    <span className="text-[10px] text-gray-500 truncate mr-2 max-w-[50px]" title={cat}>{cat}</span>
-                                    <input 
-                                        type="number" 
-                                        value={s.data[cIndex]} 
-                                        onChange={(e) => handleValueChange(sIndex, cIndex, e.target.value)} 
-                                        className="w-16 text-right text-xs outline-none bg-transparent font-mono"
-                                    />
-                                </div>
-                            ))}
-                        </div>
+          <div className="space-y-3">
+            {series.map((s, sIndex) => (
+              <div
+                key={s.id}
+                className="border border-gray-200 rounded-lg p-3 bg-gray-50/50 hover:bg-white hover:shadow-sm transition-all"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <input
+                    type="color"
+                    value={s.color}
+                    onChange={(e) =>
+                      handleSeriesColorChange(sIndex, e.target.value)
+                    }
+                    className="w-6 h-6 rounded cursor-pointer border-none bg-transparent shrink-0"
+                  />
+                  <input
+                    value={s.name}
+                    onChange={(e) =>
+                      handleSeriesNameChange(sIndex, e.target.value)
+                    }
+                    className="font-medium text-sm bg-transparent border-b border-transparent focus:border-blue-400 outline-none w-full"
+                    placeholder="Series Name"
+                  />
+                  <button
+                    onClick={() => handleDeleteSeries(sIndex)}
+                    className="text-gray-400 hover:text-red-600 p-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {categories.map((cat, cIndex) => (
+                    <div
+                      key={cIndex}
+                      className="flex items-center justify-between bg-white rounded border border-gray-100 px-2 py-1"
+                    >
+                      <span
+                        className="text-[10px] text-gray-500 truncate mr-2 max-w-[50px]"
+                        title={cat}
+                      >
+                        {cat}
+                      </span>
+                      <input
+                        type="number"
+                        value={s.data[cIndex]}
+                        onChange={(e) =>
+                          handleValueChange(sIndex, cIndex, e.target.value)
+                        }
+                        className="w-16 text-right text-xs outline-none bg-transparent font-mono"
+                      />
                     </div>
-                ))}
-            </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Assigned By */}
@@ -205,16 +254,14 @@ const RibbonConfiguration: React.FC<RibbonConfigurationProps> = ({
               className="w-8 h-8 rounded-full mr-2"
             />
             <div>
-              <p className="text-xs font-medium text-gray-900">
-                Alexis Burg
-              </p>
+              <p className="text-xs font-medium text-gray-900">Alexis Burg</p>
               <p className="text-xs text-gray-500">Admin</p>
             </div>
           </div>
         </div>
       </div>
 
-       <div className="flex items-center justify-between gap-3 p-4 border-t border-gray-200 bg-gray-50">
+      <div className="flex items-center justify-between gap-3 p-4 border-t border-gray-200 bg-gray-50">
         <button
           onClick={onClose}
           className="px-4 py-2 text-xs font-medium border border-gray-200 rounded-md cursor-pointer text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-50 transition-colors"
