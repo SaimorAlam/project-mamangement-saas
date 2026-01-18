@@ -70,16 +70,18 @@ const SparkLineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   return (
-    <div className="flex gap-3">
-      <SparkLinesChart
-        widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
-        legendValues={legendValues}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-        onDelete={onDelete}
-      />
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
+        <SparkLinesChart
+          widgetTitle={widgetTitle}
+          xAxisValues={xAxisValues}
+          legendValues={legendValues}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+        />
+      </div>
       {showWidget && (
         <ProjectConfiguration
           widgedName="Sparkline Chart"

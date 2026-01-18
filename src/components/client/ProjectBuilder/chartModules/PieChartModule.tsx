@@ -43,14 +43,16 @@ const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   return (
-    <div className="flex gap-3">
-      <PieChartWidget
-        widgetTitle={widgetTitle}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        onToggleWidget={handleToggleWidget}
-        onDelete={onDelete}
-      />
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
+        <PieChartWidget
+          widgetTitle={widgetTitle}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+        />
+      </div>
       {showWidget && (
         <ProjectConfiguration
           widgedName="Pie Chart"

@@ -70,17 +70,20 @@ const CandleChartModule = () => {
     setShowWidget(false);
   };
 
+
   return (
-    <div className="flex gap-3">
-      <CandleChart
-        widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-      />
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
+        <CandleChart
+          widgetTitle={widgetTitle}
+          xAxisValues={xAxisValues}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          onToggleWidget={handleToggleWidget}
+        />
+      </div>
       {showWidget && (
         <ProjectConfiguration
           widgedName="Candlestick Chart"

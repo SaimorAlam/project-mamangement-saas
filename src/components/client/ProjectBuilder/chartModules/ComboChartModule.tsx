@@ -65,18 +65,20 @@ const ComboChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   return (
-    <div className="flex gap-3">
-      <ComboChart
-        widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-        onDelete={onDelete}
-        isCreationMode={true}
-      />
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
+        <ComboChart
+          widgetTitle={widgetTitle}
+          xAxisValues={xAxisValues}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isCreationMode={true}
+        />
+      </div>
       {showWidget && (
         <ProjectConfiguration
           widgedName="Combo Chart"

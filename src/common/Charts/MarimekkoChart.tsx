@@ -206,7 +206,7 @@ export default function MarimekkoChart({
                     }}
                     className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
                   >
-                    <MdOutlineWidgets size={18} /> Configure
+                    <MdOutlineWidgets size={18} /> Widget
                   </button>
                 )}
               </div>

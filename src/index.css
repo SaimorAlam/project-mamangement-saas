@@ -130,3 +130,12 @@
   padding: 1px 3px;
   border-radius: 3px;
 }
+
+/* Hide vertical scrollbar but keep scrolling */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}

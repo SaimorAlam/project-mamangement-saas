@@ -37,6 +37,9 @@ import LogarithmicChartModule from "@/components/client/ProjectBuilder/chartModu
 import DecompositionTreeModule from "@/components/client/ProjectBuilder/chartModules/DecompositionTreeModule";
 import MarimekkoChartModule from "@/components/client/ProjectBuilder/chartModules/MarimekkoChartModule";
 import BoxPlotChartModule from "@/components/client/ProjectBuilder/chartModules/BoxPlotChartModule";
+import CohortAnalysisModule from "@/components/client/ProjectBuilder/chartModules/CohortAnalysisModule";
+import GeographicMapModule from "@/components/client/ProjectBuilder/chartModules/GeographicMapModule";
+
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId)
@@ -226,6 +229,8 @@ const ClientProjectBuilder = () => {
 
         {selectedWidgets.includes("marimekko-chart") && <MarimekkoChartModule onDelete={() => handleWidgetDelete("marimekko-chart")} />}
         {selectedWidgets.includes("box-plot") && <BoxPlotChartModule onDelete={() => handleWidgetDelete("box-plot")} />}
+        {selectedWidgets.includes("cohort-analysis") && <CohortAnalysisModule onDelete={() => handleWidgetDelete("cohort-analysis")} />}
+        {selectedWidgets.includes("geographic-map") && <GeographicMapModule onDelete={() => handleWidgetDelete("geographic-map")} />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
