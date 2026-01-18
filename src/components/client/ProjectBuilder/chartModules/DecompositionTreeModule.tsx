@@ -1,5 +1,7 @@
 import { useState } from "react";
-import DecompositionTreeChart, { TreeDataNode } from "@/common/Charts/DecompositionTreeChart";
+import DecompositionTreeChart, {
+  TreeDataNode,
+} from "@/common/Charts/DecompositionTreeChart";
 import TreeConfiguration from "./TreeConfiguration";
 
 const generateSampleTree = (): TreeDataNode => ({
@@ -46,13 +48,13 @@ const DecompositionTreeModule = ({ onDelete }: { onDelete?: () => void }) => {
   return (
     <div className="flex gap-3">
       <div className="w-full sticky top-5 h-full">
-      <DecompositionTreeChart
-        widgetTitle={widgetTitle}
-        data={treeData}
-        onToggleWidget={() => setShowWidget(!showWidget)}
-        onDelete={onDelete}
-        onDataChange={setTreeData}
-      />
+        <DecompositionTreeChart
+          widgetTitle={widgetTitle}
+          data={treeData}
+          onToggleWidget={() => setShowWidget(!showWidget)}
+          onDelete={onDelete}
+          onDataChange={setTreeData}
+        />
       </div>
       {showWidget && (
         <TreeConfiguration
@@ -68,4 +70,3 @@ const DecompositionTreeModule = ({ onDelete }: { onDelete?: () => void }) => {
 };
 
 export default DecompositionTreeModule;
-
