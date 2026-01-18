@@ -276,6 +276,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Choropleth or bubble overlays on global map",
       icon: <Map className="w-5 h-5" />,
     },
+    {
+      id: "rag-chart",
+      name: "RAG Chart",
+      description: "Monitor status with Red-Amber-Green zones",
+      icon: <ChartLine className="w-5 h-5" />,
+    },
     // {
     //   id: "rader-chart",
     //   name: "Rader Chart",

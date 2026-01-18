@@ -39,6 +39,7 @@ import MarimekkoChartModule from "@/components/client/ProjectBuilder/chartModule
 import BoxPlotChartModule from "@/components/client/ProjectBuilder/chartModules/BoxPlotChartModule";
 import CohortAnalysisModule from "@/components/client/ProjectBuilder/chartModules/CohortAnalysisModule";
 import GeographicMapModule from "@/components/client/ProjectBuilder/chartModules/GeographicMapModule";
+import RagChartModule from "@/components/client/ProjectBuilder/chartModules/RagChartModule";
 
 
 const ClientProjectBuilder = () => {
@@ -231,6 +232,7 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("box-plot") && <BoxPlotChartModule onDelete={() => handleWidgetDelete("box-plot")} />}
         {selectedWidgets.includes("cohort-analysis") && <CohortAnalysisModule onDelete={() => handleWidgetDelete("cohort-analysis")} />}
         {selectedWidgets.includes("geographic-map") && <GeographicMapModule onDelete={() => handleWidgetDelete("geographic-map")} />}
+        {selectedWidgets.includes("rag-chart") && <RagChartModule onDelete={() => handleWidgetDelete("rag-chart")} />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>
