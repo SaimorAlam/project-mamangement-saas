@@ -40,6 +40,7 @@ import BoxPlotChartModule from "@/components/client/ProjectBuilder/chartModules/
 import CohortAnalysisModule from "@/components/client/ProjectBuilder/chartModules/CohortAnalysisModule";
 import GeographicMapModule from "@/components/client/ProjectBuilder/chartModules/GeographicMapModule";
 import RagChartModule from "@/components/client/ProjectBuilder/chartModules/RagChartModule";
+import RibbonChartModule from "@/components/client/ProjectBuilder/chartModules/RibbonChartModule";
 
 
 const ClientProjectBuilder = () => {
@@ -233,6 +234,7 @@ const ClientProjectBuilder = () => {
         {selectedWidgets.includes("cohort-analysis") && <CohortAnalysisModule onDelete={() => handleWidgetDelete("cohort-analysis")} />}
         {selectedWidgets.includes("geographic-map") && <GeographicMapModule onDelete={() => handleWidgetDelete("geographic-map")} />}
         {selectedWidgets.includes("rag-chart") && <RagChartModule onDelete={() => handleWidgetDelete("rag-chart")} />}
+        {selectedWidgets.includes("ribbon-chart") && <RibbonChartModule onDelete={() => handleWidgetDelete("ribbon-chart")} />}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>

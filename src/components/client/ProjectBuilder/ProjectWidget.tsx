@@ -28,6 +28,7 @@ import {
   PanelTopBottomDashed,
   NotepadTextDashed,
   Users,
+  Spline,
 } from "lucide-react";
 import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
@@ -281,6 +282,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       name: "RAG Chart",
       description: "Monitor status with Red-Amber-Green zones",
       icon: <ChartLine className="w-5 h-5" />,
+    },
+    {
+      id: "ribbon-chart",
+      name: "Ribbon Chart",
+      description: "Rank tracking flow chart",
+      icon: <Spline className="w-5 h-5" />,
     },
     // {
     //   id: "rader-chart",
