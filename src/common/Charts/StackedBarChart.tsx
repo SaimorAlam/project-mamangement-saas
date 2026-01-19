@@ -72,20 +72,34 @@ export default function StackedBarChart({
   isCreationMode = false,
   allUploadedData,
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<{ [key: string]: ChartData[] } | undefined>(allUploadedData);
-  const { childTiers } = useChartData({ newData, isCreationMode, chartId, xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange });
+  const [localUploadedData, setLocalUploadedData] = useState<
+    { [key: string]: ChartData[] } | undefined
+  >(allUploadedData);
+  const { childTiers } = useChartData({
+    newData,
+    isCreationMode,
+    chartId,
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+  });
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
-
   const chartData: ChartData[] = useMemo(() => {
     // Check if we have uploaded data for this specific chart
-    const sheetName = (widgetTitle || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim().substring(0, 31);
-    
+    const sheetName = (widgetTitle || "Sheet")
+      .replace(/[:\/?*\[\]\\]/g, " ")
+      .trim()
+      .substring(0, 31);
+
     // Try to find the data in localUploadedData (priority) or allUploadedData
-    const dataToUse = localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const dataToUse =
+      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
       // Validate that the data matches the current xAxisValues and legendValues
@@ -101,7 +115,7 @@ export default function StackedBarChart({
       legendValues,
       numOfLegendDataSet,
       startingRange,
-      endingRange
+      endingRange,
     );
   }, [
     xAxisValues,
@@ -111,7 +125,7 @@ export default function StackedBarChart({
     endingRange,
     widgetTitle,
     localUploadedData,
-    allUploadedData
+    allUploadedData,
   ]);
 
   /*   TOTAL   */
@@ -143,7 +157,7 @@ export default function StackedBarChart({
         // Excel sheet names max 31 chars, no special chars
         let baseName = (name || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim();
         if (baseName.length > 25) baseName = baseName.substring(0, 25);
-        if (!baseName) baseName = "Sheet"; 
+        if (!baseName) baseName = "Sheet";
 
         let uniqueName = baseName;
         let counter = 1;
@@ -159,16 +173,13 @@ export default function StackedBarChart({
       const processNodeData = (
         name: string,
         xAxis: string[],
-        legends: LegendValue[]
+        legends: LegendValue[],
       ) => {
         // Create headers: "Label" followed by legend labels
-        const headers = ["Label", ...legends.map(l => l.label)];
+        const headers = ["Label", ...legends.map((l) => l.label)];
 
         // Create rows: label followed by empty strings for each legend
-        const rows = xAxis.map(label => [
-          label,
-          ...legends.map(() => "")
-        ]);
+        const rows = xAxis.map((label) => [label, ...legends.map(() => "")]);
 
         // Combine headers and rows
         const data = [headers, ...rows];
@@ -176,7 +187,6 @@ export default function StackedBarChart({
         const ws = XLSX.utils.aoa_to_sheet(data);
         XLSX.utils.book_append_sheet(wb, ws, getUniqueSheetName(name));
       };
-
 
       // 1. Add current chart data
       if (xAxisValues && legendValues) {
@@ -187,11 +197,11 @@ export default function StackedBarChart({
       const processChildren = (nodes: any[]) => {
         nodes.forEach((node) => {
           if (node.xAxisValues && node.legendValues) {
-             processNodeData(
+            processNodeData(
               node.name || node.taskName,
               node.xAxisValues,
-              node.legendValues
-             );
+              node.legendValues,
+            );
           }
 
           if (node.children && node.children.length > 0) {
@@ -246,11 +256,11 @@ export default function StackedBarChart({
         wb.SheetNames.forEach((sheetName) => {
           const ws = wb.Sheets[sheetName];
           const rawData: any[] = XLSX.utils.sheet_to_json(ws);
-          
+
           if (rawData.length > 0) {
             const processedData = rawData.map((row: any) => {
               const item: ChartData = { name: row["Label"] || "" };
-              legendValues.forEach(l => {
+              legendValues.forEach((l) => {
                 if (row[l.label] !== undefined) {
                   item[l.field] = Number(row[l.label]);
                 } else if (row[l.field] !== undefined) {
@@ -291,7 +301,7 @@ export default function StackedBarChart({
   return (
     <>
       <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
+        className={`w-full bg-white border border-gray-200 rounded-lg p-6${
           childTiers?.length > 0
             ? "cursor-pointer hover:shadow-lg transition-shadow"
             : ""
@@ -311,7 +321,7 @@ export default function StackedBarChart({
                     />
                     <span className="text-sm">{l.label}</span>
                   </div>
-                ) : null
+                ) : null,
               )}
             </div>
           </div>
@@ -349,42 +359,46 @@ export default function StackedBarChart({
 
                   {/* Only show download on root chart (tierLevel === 0) */}
                   {tierLevel === 0 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDownload();
-                      setShowPopover(false);
-                    }}
-                    disabled={isDownloading}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Download size={18} />
-                    <span>Download</span>
-                  </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload();
+                        setShowPopover(false);
+                      }}
+                      disabled={isDownloading}
+                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                    >
+                      <Download size={18} />
+                      <span>Download</span>
+                    </button>
                   )}
 
                   {/* Only show upload on root chart */}
                   {tierLevel === 0 && (
-                  <>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        document.getElementById(`upload-input-${chartId || widgetTitle}`)?.click();
-                        setShowPopover(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <Upload size={18} />
-                      <span>Upload Data</span>
-                    </button>
-                    <input
-                      id={`upload-input-${chartId || widgetTitle}`}
-                      type="file"
-                      accept=".xlsx, .xls"
-                      className="hidden"
-                      onChange={handleUpload}
-                    />
-                  </>
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          document
+                            .getElementById(
+                              `upload-input-${chartId || widgetTitle}`,
+                            )
+                            ?.click();
+                          setShowPopover(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                      >
+                        <Upload size={18} />
+                        <span>Upload Data</span>
+                      </button>
+                      <input
+                        id={`upload-input-${chartId || widgetTitle}`}
+                        type="file"
+                        accept=".xlsx, .xls"
+                        className="hidden"
+                        onChange={handleUpload}
+                      />
+                    </>
                   )}
 
                   <button
@@ -442,9 +456,7 @@ export default function StackedBarChart({
                 dataKey={l.field}
                 stackId="a"
                 fill={l.color}
-                radius={
-                  i === legendValues.length - 1 ? [4, 4, 0, 0] : 0
-                }
+                radius={i === legendValues.length - 1 ? [4, 4, 0, 0] : 0}
               />
             ))}
           </BarChart>
@@ -454,7 +466,8 @@ export default function StackedBarChart({
         {childTiers?.length > 0 && (
           <div className="mt-4 text-center">
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier
+              {childTiers?.length > 1 ? "s" : ""}
             </p>
           </div>
         )}
@@ -478,23 +491,24 @@ export default function StackedBarChart({
           title={widgetTitle}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers && childTiers?.map((tier:any) => {
-              return(
-              <StackedBarChart
-                newData = {tier?.children || []}
-                key={tier?.id}
-                widgetTitle={tier?.name || tier?.taskName}
-                xAxisValues={tier?.xAxisValues}
-                legendValues={tier?.legendValues}
-                numOfLegendDataSet={tier?.legendValues?.length}
-                startingRange={startingRange}
-                endingRange={endingRange}
-                tierLevel={tierLevel + 1}
-                chartId={tier?.id}
-                allUploadedData={localUploadedData || allUploadedData}
-              />
-            )
-            })}
+            {childTiers &&
+              childTiers?.map((tier: any) => {
+                return (
+                  <StackedBarChart
+                    newData={tier?.children || []}
+                    key={tier?.id}
+                    widgetTitle={tier?.name || tier?.taskName}
+                    xAxisValues={tier?.xAxisValues}
+                    legendValues={tier?.legendValues}
+                    numOfLegendDataSet={tier?.legendValues?.length}
+                    startingRange={startingRange}
+                    endingRange={endingRange}
+                    tierLevel={tierLevel + 1}
+                    chartId={tier?.id}
+                    allUploadedData={localUploadedData || allUploadedData}
+                  />
+                );
+              })}
           </div>
         </TierChartModal>
       )}

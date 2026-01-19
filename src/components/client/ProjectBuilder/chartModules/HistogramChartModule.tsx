@@ -47,7 +47,7 @@ const HistogramChartModule = () => {
       // Remove extra values
       setXAxisValues(xAxisValues.slice(0, numOfXAxisDataSet));
     }
-  }, [numOfXAxisDataSet]);
+  }, [numOfXAxisDataSet, xAxisValues]);
 
   // Initialize legendValues based on numOfLegendDataSet
   useEffect(() => {
@@ -76,7 +76,7 @@ const HistogramChartModule = () => {
       // Remove extra legends
       setLegendValues(legendValues.slice(0, numOfLegendDataSet));
     }
-  }, [numOfLegendDataSet]);
+  }, [numOfLegendDataSet, legendValues]);
 
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -113,21 +113,23 @@ const HistogramChartModule = () => {
   };
 
   return (
-    <div className="flex gap-3">
-      <HistogramChart
-        widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        chartHeight={chartHeight}
-        strokeWidth={strokeWidth}
-        dataPointsPerSeries={dataPointsPerSeries}
-        fillOpacity={fillOpacity}
-        binCount={binCount}
-        onToggleWidget={handleToggleWidget}
-      />
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
+        <HistogramChart
+          widgetTitle={widgetTitle}
+          xAxisValues={xAxisValues}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          chartHeight={chartHeight}
+          strokeWidth={strokeWidth}
+          dataPointsPerSeries={dataPointsPerSeries}
+          fillOpacity={fillOpacity}
+          binCount={binCount}
+          onToggleWidget={handleToggleWidget}
+        />
+      </div>
       {showWidget && (
         <HistogramChartConfiguration
           widgetTitle={widgetTitle}

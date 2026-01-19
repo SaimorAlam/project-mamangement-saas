@@ -28,7 +28,7 @@ import getViewerPanelRoutes from "./ViewerRoute";
 import Unauthorized from "@/common/Unauthorized";
 import StaffEmployeeDashboardLayout from "@/Layout/staffEmployeePanel/StaffEmployeeDashboardLayout";
 import getStaffEmployeeRoutes from "./StaffEmployeeRoute";
-import ProtectedRoute from "./ProtectedRoute";
+// import ProtectedRoute from "./ProtectedRoute";
 
 const routes = createBrowserRouter([
   {
@@ -129,9 +129,9 @@ const routes = createBrowserRouter([
       {
         path: "/viewer-panel",
         element: (
-          <ProtectedRoute allowedRoles={["VIEWER"]}>
+          // <ProtectedRoute allowedRoles={["VIEWER"]}>
             <ViewerPanelDashboardLayout />
-          </ProtectedRoute>
+          // </ProtectedRoute>
         ),
         children: getViewerPanelRoutes(),
       },

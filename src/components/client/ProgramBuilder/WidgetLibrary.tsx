@@ -133,7 +133,7 @@ const WidgetLibrary: React.FC<ProjectWidgetProps> = ({
       </div>
 
       {/* Widget Library */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
         <div className="p-4">
           <h2 className="text-xl font-semibold text-gray-900 mb-1">
             Widget Library

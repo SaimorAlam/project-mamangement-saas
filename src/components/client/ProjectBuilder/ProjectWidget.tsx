@@ -27,13 +27,18 @@ import {
   ChartNoAxesCombined,
   PanelTopBottomDashed,
   NotepadTextDashed,
+  Users,
+  Spline,
 } from "lucide-react";
 import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
 import useGetLazyProject from "./utils/useGetLazyProject";
 import { useLocation } from "react-router-dom";
 import { useAppDispatch } from "@/hooks/useRedux";
-import { setProgramId, setProjectId } from "@/store/Slices/ChartSlice/ChartSlice";
+import {
+  setProgramId,
+  setProjectId,
+} from "@/store/Slices/ChartSlice/ChartSlice";
 
 interface Widget {
   id: string;
@@ -49,10 +54,10 @@ interface ProjectWidgetProps {
 
 const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   onWidgetSelect,
-  selectedWidgets
+  selectedWidgets,
 }) => {
   const { pathname } = useLocation();
-  const isProgramBuilder = pathname.split('/')[2] === "program-builder";
+  const isProgramBuilder = pathname.split("/")[2] === "program-builder";
   const [selectedProgram, setSelectedProgram] = useState<string>("");
   const [selectedProject, setSelectedProject] = useState<string>("");
   const widgets: Widget[] = [
@@ -222,31 +227,67 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       id: "combo-chart",
       name: "Combo Chart",
       description: "Show combo chart",
-      icon: <ChartNoAxesCombined className="w-5 h-5" />
+      icon: <ChartNoAxesCombined className="w-5 h-5" />,
     },
     {
       id: "horisontal-stacked-bar-chart",
       name: "Horisontal Stacked Bar Chart",
       description: "Show horisontal stacked bar chart",
-      icon: <PanelTopBottomDashed className="w-5 h-5" />
+      icon: <PanelTopBottomDashed className="w-5 h-5" />,
     },
     {
       id: "bullet-chart",
       name: "Bullet Chart",
       description: "Show bullet chart",
-      icon: <NotepadTextDashed className="w-5 h-5" />
+      icon: <NotepadTextDashed className="w-5 h-5" />,
     },
     {
       id: "logarithmic-chart",
       name: "Logarithmic Chart",
       description: "Display data on a logarithmic scale",
-      icon: <ChartLine className="w-5 h-5" />, 
+      icon: <ChartLine className="w-5 h-5" />,
     },
     {
       id: "decomposition-tree",
       name: "Decomposition Tree",
       description: "Visualize hierarchical data breakdown",
       icon: <SquareKanban className="w-5 h-5 rotate-90" />, // Rotated for tree-like look or just use existing
+    },
+    {
+      id: "marimekko-chart",
+      name: "Marimekko Chart",
+      description: "Variable width stacked bars for mix/size",
+      icon: <ChartColumnStacked className="w-5 h-5" />,
+    },
+    {
+      id: "box-plot",
+      name: "Box & Whisker Plot",
+      description: "Distribution: median, quartiles, outliers",
+      icon: <ChartCandlestick className="w-5 h-5" />,
+    },
+    {
+      id: "cohort-analysis",
+      name: "Cohort Analysis",
+      description: "Track group survival/retention over time",
+      icon: <Users className="w-5 h-5" />,
+    },
+    {
+      id: "geographic-map",
+      name: "Geographic Map",
+      description: "Choropleth or bubble overlays on global map",
+      icon: <Map className="w-5 h-5" />,
+    },
+    {
+      id: "rag-chart",
+      name: "RAG Chart",
+      description: "Monitor status with Red-Amber-Green zones",
+      icon: <ChartLine className="w-5 h-5" />,
+    },
+    {
+      id: "ribbon-chart",
+      name: "Ribbon Chart",
+      description: "Rank tracking flow chart",
+      icon: <Spline className="w-5 h-5" />,
     },
     // {
     //   id: "rader-chart",
@@ -256,56 +297,62 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     // },
   ];
   const { programs, isLoading } = useGetAllProgram();
-  const { projects, isLoading: isProjectsLoading, isFetching: projectFetching } = useGetLazyProject(selectedProgram, isProgramBuilder);
+  const {
+    projects,
+    isLoading: isProjectsLoading,
+    isFetching: projectFetching,
+  } = useGetLazyProject(selectedProgram, isProgramBuilder);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(setProgramId(selectedProgram))
-    dispatch(setProjectId(selectedProject))
-  }, [selectedProgram, selectedProject]);
+    dispatch(setProgramId(selectedProgram));
+    dispatch(setProjectId(selectedProject));
+  }, [selectedProgram, selectedProject, dispatch]);
 
   return (
-    <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 flex flex-col">
+    <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 flex flex-col sticky top-0">
       {/* Header */}
-      {
-        isLoading ? <SelectSkeleton /> : (
-          <div className="px-4 pt-4">
-            <label className="block text-sm font-medium text-website-color-darkGray mb-2">
-              Program Name*
-            </label>
-            <div className="relative">
-              <select
-                value={selectedProgram}
-                onChange={(e) => setSelectedProgram(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {isLoading ? (
+        <SelectSkeleton />
+      ) : (
+        <div className="px-4 pt-4">
+          <label className="block text-sm font-medium text-website-color-darkGray mb-2">
+            Program Name*
+          </label>
+          <div className="relative">
+            <select
+              value={selectedProgram}
+              onChange={(e) => setSelectedProgram(e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Add program or select</option>
+              {programs?.map((program: { id: string; name: string }) => (
+                <option key={program.id} value={program.id}>
+                  {program.name}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <option value="">Add program or select</option>
-                {programs?.map((program: { id: string, name: string }) => (
-                  <option key={program.id} value={program.id}>
-                    {program.name}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </div>
           </div>
-        )
-      }
-      {
-        !isProgramBuilder && (isProjectsLoading || projectFetching ? <SelectSkeleton /> : (
+        </div>
+      )}
+      {!isProgramBuilder &&
+        (isProjectsLoading || projectFetching ? (
+          <SelectSkeleton />
+        ) : (
           <div className="px-4 pt-4">
             <label className="block text-sm font-medium text-website-color-darkGray mb-2">
               Project Name*
@@ -316,12 +363,17 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
                 onChange={(e) => setSelectedProject(e.target.value)}
                 className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">{projects?.length > 0 ? "Select project" : "No projects available"}</option>
-                {projects?.length > 0 && projects?.map((project: { id: string, name: string }) => (
-                  <option key={project.id} value={project.id}>
-                    {project.name}
-                  </option>
-                ))}
+                <option value="">
+                  {projects?.length > 0
+                    ? "Select project"
+                    : "No projects available"}
+                </option>
+                {projects?.length > 0 &&
+                  projects?.map((project: { id: string; name: string }) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
               </select>
               <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                 <svg
@@ -382,7 +434,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       </div>
 
       {/* Widget Library */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
         <div className="p-4">
           {/* Widget List */}
           <div className="flex flex-col gap-3">
@@ -393,33 +445,41 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
                   onWidgetSelect(widget.id);
                 }}
                 className={`flex items-start p-3 rounded-lg cursor-pointer transition-all border
-                  ${selectedWidgets.includes(widget.id) || (widget.id === 'kpi' && selectedWidgets.length === 0)
-                    ? "bg-gray-200 border-transparent"
-                    : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
+                  ${
+                    selectedWidgets.includes(widget.id) ||
+                    (widget.id === "kpi" && selectedWidgets.length === 0)
+                      ? "bg-gray-200 border-transparent"
+                      : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
                   }`}
               >
                 <div
-                  className={`mt-0.5 ${selectedWidgets.includes(widget.id) || (widget.id === 'kpi' && selectedWidgets.length === 0)
-                    ? "text-website-color-darkGray"
-                    : "text-gray-600"
-                    }`}
+                  className={`mt-0.5 ${
+                    selectedWidgets.includes(widget.id) ||
+                    (widget.id === "kpi" && selectedWidgets.length === 0)
+                      ? "text-website-color-darkGray"
+                      : "text-gray-600"
+                  }`}
                 >
                   {widget.icon}
                 </div>
                 <div className="ml-3 flex-1">
                   <h3
-                    className={`text-sm font-medium ${selectedWidgets.includes(widget.id) || (widget.id === 'kpi' && selectedWidgets.length === 0)
-                      ? "text-website-color-darkGray"
-                      : "text-gray-900"
-                      }`}
+                    className={`text-sm font-medium ${
+                      selectedWidgets.includes(widget.id) ||
+                      (widget.id === "kpi" && selectedWidgets.length === 0)
+                        ? "text-website-color-darkGray"
+                        : "text-gray-900"
+                    }`}
                   >
                     {widget.name}
                   </h3>
                   <p
-                    className={`text-xs mt-0.5 ${selectedWidgets.includes(widget.id) || (widget.id === 'kpi' && selectedWidgets.length === 0)
-                      ? "text-website-color-darkGray"
-                      : "text-gray-500"
-                      }`}
+                    className={`text-xs mt-0.5 ${
+                      selectedWidgets.includes(widget.id) ||
+                      (widget.id === "kpi" && selectedWidgets.length === 0)
+                        ? "text-website-color-darkGray"
+                        : "text-gray-500"
+                    }`}
                   >
                     {widget.description}
                   </p>
