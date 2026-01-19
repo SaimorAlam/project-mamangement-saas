@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction } from "react";
 import { X, Plus, Trash2 } from "lucide-react";
 import { RibbonSeries } from "@/common/Charts/RibbonChart";
+import { toast } from "sonner";
 
 interface RibbonConfigurationProps {
   widgetTitle: string;
@@ -41,7 +42,7 @@ const RibbonConfiguration: React.FC<RibbonConfigurationProps> = ({
 
   const handleDeleteCategory = (index: number) => {
     if (categories.length <= 2) {
-      alert("Minimum 2 categories required for ribbon chart.");
+      toast.error("Minimum 2 categories required for ribbon chart.");
       return;
     }
     const newCats = categories.filter((_, i) => i !== index);
