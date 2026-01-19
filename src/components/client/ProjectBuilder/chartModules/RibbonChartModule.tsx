@@ -16,7 +16,7 @@ const RibbonChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [series, setSeries] = useState<RibbonSeries[]>(initialSeries);
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 w-[calc(100%)]">
       <div className="flex-1 sticky top-5 h-full min-w-0">
         <RibbonChart
           widgetTitle={widgetTitle}
