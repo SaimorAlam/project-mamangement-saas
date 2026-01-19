@@ -112,9 +112,9 @@ export default function GeographicMapChart({
 
   const handleDownload = () => {
     setIsDownloading(true);
-    const header = "Name,Latitude,Longitude,Value";
-    const rows = points.map(p => `${p.name},${p.lat},${p.lng},${p.value}`);
-    const csv = [header, ...rows].join("\n");
+    const header = "Name,Latitude,Longitude,Value,Color";
+    const rows = points.map(p => `${p.name},"","","", ${p.color}`);
+    const csv = [header,...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
