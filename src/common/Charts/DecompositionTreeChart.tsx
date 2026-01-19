@@ -262,7 +262,7 @@ export default function DecompositionTreeChart({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `${widgetTitle}.csv`);
+    link.setAttribute("download", `Decomposition_Tree_${widgetTitle.replace(/\s+/g, "_")}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
