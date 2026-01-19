@@ -85,17 +85,14 @@ const WidgetForChartModuleTwo = ({
     ) => {
         setLegendValues((prev) => {
             const updated = [...prev];
-            updated[index].label = value;
-
-            // auto-generate field (camelCase)
-            updated[index].field = value
-                .toLowerCase()
-                .replace(/\s+/g, "");
+            updated[index] = {
+                ...updated[index],
+                label: value,
+                field: value.toLowerCase().replace(/\s+/g, ""),
+            };
 
             return updated;
         });
-
-
     };
 
     const handleLegendColorChange = (
@@ -104,7 +101,10 @@ const WidgetForChartModuleTwo = ({
     ) => {
         setLegendValues((prev) => {
             const updated = [...prev];
-            updated[index].color = color;
+            updated[index] = {
+                ...updated[index],
+                color: color,
+            };
             return updated;
         });
     };
@@ -234,9 +234,9 @@ const WidgetForChartModuleTwo = ({
                         </label>
                         <input
                             type="number"
-                            min={3}
-                            max={5}
-                            defaultValue={numOfLegendDataSet}
+                            min={minLegend}
+                            max={maxLegend}
+                            value={numOfLegendDataSet}
                             onChange={handleSetNumOfLegendDataSet}
                             className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
                         />

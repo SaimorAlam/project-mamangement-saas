@@ -12,7 +12,12 @@ export type BoxPlotData = {
   outliers?: number[];
 };
 
-const BoxPlotChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+type BoxPlotChartModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const BoxPlotChartModule = ({ onDelete, isPreview = false }: BoxPlotChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Box & Whisker Plot");
   const [showConfig, setShowConfig] = useState(false);
   const [chartHeight, setChartHeight] = useState<number>(400);
@@ -24,26 +29,26 @@ const BoxPlotChartModule = ({ onDelete }: { onDelete?: () => void }) => {
     { x: "Group C", min: 5, q1: 15, median: 30, q3: 45, max: 60, outliers: [2, 70] },
   ]);
 
+  const handleToggleWidget = () => {
+    if (!isPreview) {
+      setShowConfig((prev) => !prev);
+    }
+  };
+
   return (
-    <div className="flex gap-3 h-full">
+    <div className="flex gap-3 h-full w-full">
       <div className="flex-1 h-full sticky top-5">
          <BoxPlotChart
             widgetTitle={widgetTitle}
             data={data}
             chartHeight={chartHeight}
-            onToggleWidget={() => setShowConfig(!showConfig)}
+            onToggleWidget={handleToggleWidget}
+            isPreview={isPreview}
+            onDelete={onDelete}
          />
-         {onDelete && (
-            <button 
-                onClick={onDelete} 
-                className="absolute top-6 right-16 p-2 text-gray-400 hover:text-red-500 z-10"
-                title="Remove Widget"
-            >
-            </button>
-         )}
       </div>
       
-      {showConfig && (
+      {!isPreview && showConfig && (
         <BoxPlotChartConfiguration
           widgetTitle={widgetTitle}
           setWidgetTitle={setWidgetTitle}

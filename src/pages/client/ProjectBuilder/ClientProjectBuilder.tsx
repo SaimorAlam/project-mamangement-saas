@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
@@ -43,8 +43,11 @@ import RagChartModule from "@/components/client/ProjectBuilder/chartModules/RagC
 import RibbonChartModule from "@/components/client/ProjectBuilder/chartModules/RibbonChartModule";
 import KpiModule from "@/components/client/ProjectBuilder/chartModules/KpiModule";
 
+
 const ClientProjectBuilder = () => {
-  const projectId = useAppSelector((state) => state.chartSlice?.projectId);
+  const { projectId, isPreview, isPublished, widgetConfigs } = useAppSelector(
+    (state) => state.chartSlice,
+  );
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [activeWidget, setActiveWidget] = useState("KPI widget");
 
@@ -53,10 +56,6 @@ const ClientProjectBuilder = () => {
 
   const handleWidgetSelect = (widgetId: string) => {
     if (widgetId) {
-      //   setSelectedWidgets([]);
-      //   setActiveWidget("KPI widget");
-      // } else {
-      // Toggle widget selection - add if not present, remove if already selected
       setSelectedWidgets((prev) => {
         if (prev.includes(widgetId)) {
           return prev.filter((id) => id !== widgetId);
@@ -76,217 +75,387 @@ const ClientProjectBuilder = () => {
     toast.success("Widget deleted successfully", { id: toastId });
   };
 
+  useEffect(() => {
+    const handleDownload = () => {
+      const headers = ["Widget ID", "Configuration"];
+      const rows = selectedWidgets.map((id) => {
+        const config = widgetConfigs[id] || "Default Configuration";
+        const configStr = typeof config === "string" 
+          ? config 
+          : JSON.stringify(config).replace(/\t/g, " ");
+        return [id, configStr];
+      });
+
+      const csvContent =
+        "data:text/csv;charset=utf-8," +
+        headers.join("\t") +
+        "\n" +
+        rows.map((e) => e.join("\t")).join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "project_configuration.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Configuration downloaded successfully");
+    };
+
+
+    window.addEventListener("download-project-config", handleDownload);
+    return () =>
+      window.removeEventListener("download-project-config", handleDownload);
+  }, [selectedWidgets, widgetConfigs]);
+
+  const isPreviewOrPublished = isPreview || isPublished;
+
   return (
-    <div className="flex gap-6">
-      <ProjectWidget
-        onWidgetSelect={handleWidgetSelect}
-        selectedWidgets={selectedWidgets}
-      />
-      <div className="flex-1 min-w-0 flex flex-col gap-6 border border-gray-200 rounded-lg p-4 h-full mb-10 relative">
-        {projectsChartsData?.length > 0 ? (
-          <DefaultChartData projectsChartsData={projectsChartsData} />
-        ) : (
-          selectedWidgets.length === 0 && (
-            <>
-              <ProjectStats activeWidget={activeWidget} />
-              {/* <StackedBarChart /> */}
-              <div className="flex gap-4">
-                <RadarCharts />
-                <DoughnutChart
-                  title="Doughnut Pie"
-                  centerLabel="Total Visitor"
-                  data={[
-                    {
-                      name: "Paid traffic",
-                      value: 65,
-                      count: 12,
-                      color: "#19A1E9",
-                    },
-                    {
-                      name: "Social traffic",
-                      value: 21,
-                      count: 30,
-                      color: "#F7AF21",
-                    },
-                    {
-                      name: "Organic traffic",
-                      value: 14,
-                      count: 8,
-                      color: "#10A683",
-                    },
-                  ]}
-                />
+    <div className={`flex gap-6 ${isPreviewOrPublished ? "flex-col" : ""}`}>
+      {!isPreviewOrPublished && (
+        <ProjectWidget
+          onWidgetSelect={handleWidgetSelect}
+          selectedWidgets={selectedWidgets}
+        />
+      )}
+      <div
+        className={`flex-1 min-w-0 flex flex-col gap-6 ${
+          !isPreviewOrPublished ? "border border-gray-200 rounded-lg p-4" : ""
+        } h-full mb-10 relative`}
+      >
+        {isPreviewOrPublished && (
+          <div className="mb-4">
+            <h1 className="text-[32px] font-semibold text-[#111827]">
+              Good Morning 👋, Lawal
+            </h1>
+            <p className="text-base text-gray-500">
+              This is dashboard overview of Acme Corporation
+            </p>
+          </div>
+        )}
+
+        <div
+          className={`${
+            isPreviewOrPublished
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6"
+              : "flex flex-col gap-6"
+          }`}
+        >
+          {projectsChartsData && projectsChartsData.length > 0 ? (
+            <div className={isPreviewOrPublished ? "col-span-full" : ""}>
+              <DefaultChartData projectsChartsData={projectsChartsData} />
+            </div>
+          ) : (
+            selectedWidgets.length === 0 && (
+              <div className={isPreviewOrPublished ? "col-span-full" : ""}>
+                <ProjectStats activeWidget={activeWidget} />
+                <div className="flex gap-4 mt-6">
+                  <RadarCharts />
+                  <DoughnutChart
+                    title="Doughnut Pie"
+                    centerLabel="Total Visitor"
+                    data={[
+                      {
+                        name: "Paid traffic",
+                        value: 65,
+                        count: 12,
+                        color: "#19A1E9",
+                      },
+                      {
+                        name: "Social traffic",
+                        value: 21,
+                        count: 30,
+                        color: "#F7AF21",
+                      },
+                      {
+                        name: "Organic traffic",
+                        value: 14,
+                        count: 8,
+                        color: "#10A683",
+                      },
+                    ]}
+                  />
+                </div>
+                <div className="mt-6">
+                  <HeatmapChart />
+                </div>
               </div>
-              <HeatmapChart />
-            </>
-          )
-        )}
-        {selectedWidgets.includes("kpi") && (
-          <KpiModule onDelete={() => handleWidgetDelete("kpi")} />
-        )}
-        {selectedWidgets.includes("bar-chart") && (
-          <StackedBarChartModule
-            onDelete={() => handleWidgetDelete("bar-chart")}
-          />
-        )}
-        {selectedWidgets.includes("progress-ring") && (
-          <ProgressRingModule
-            onDelete={() => handleWidgetDelete("progress-ring")}
-          />
-        )}
+            )
+          )}
 
-        {selectedWidgets.includes("pie-chart") && (
-          <PieChartModule onDelete={() => handleWidgetDelete("pie-chart")} />
-        )}
+          {selectedWidgets.includes("kpi") && (
+            <div className={isPreviewOrPublished ? "col-span-full" : ""}>
+              <KpiModule
+                onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("kpi")}
+                isPreview={isPreviewOrPublished}
+              />
+            </div>
+          )}
 
-        {selectedWidgets.includes("line-chart") && (
-          <LineChartModule onDelete={() => handleWidgetDelete("line-chart")} />
-        )}
+          {selectedWidgets.includes("bar-chart") && (
+            <StackedBarChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("bar-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
 
-        {selectedWidgets.includes("data-table") && (
-          <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
-            Data Table coming soon...
-          </div>
-        )}
+          {selectedWidgets.includes("progress-ring") && (
+            <ProgressRingModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("progress-ring")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
 
-        {selectedWidgets.includes("gantt-chart") && (
-          <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
-            <GanttChart />
-          </div>
-        )}
+          {selectedWidgets.includes("pie-chart") && (
+            <PieChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("pie-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
 
-        {selectedWidgets.includes("picture-video") && (
-          <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
-            Picture/Video coming soon...
-          </div>
-        )}
+          {selectedWidgets.includes("line-chart") && (
+            <LineChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("line-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
 
-        {selectedWidgets.includes("horizontal-bar-chart") && (
-          <HorizontalBarChartModule
-            onDelete={() => handleWidgetDelete("horizontal-bar-chart")}
-          />
-        )}
+          {selectedWidgets.includes("data-table") && (
+            <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
+              Data Table coming soon...
+            </div>
+          )}
 
-        {selectedWidgets.includes("heat-map-chart") && (
-          <ChartModuleOne
-            chartName="heat-map-chart"
-            onDelete={() => handleWidgetDelete("heat-map-chart")}
-          />
-        )}
+          {selectedWidgets.includes("gantt-chart") && (
+            <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
+              <GanttChart />
+            </div>
+          )}
 
-        {selectedWidgets.includes("area-chart") && (
-          <ChartModuleOne
-            chartName="area-chart"
-            onDelete={() => handleWidgetDelete("area-chart")}
-          />
-        )}
-        {selectedWidgets.includes("spline-area-chart") && (
-          <ChartModuleOne
-            chartName="spline-area-chart"
-            onDelete={() => handleWidgetDelete("spline-area-chart")}
-          />
-        )}
-        {selectedWidgets.includes("sparklines-chart") && (
-          <SparkLineChartModule
-            onDelete={() => handleWidgetDelete("sparklines-chart")}
-          />
-        )}
-        {selectedWidgets.includes("logarithmic-chart") && (
-          <LogarithmicChartModule
-            onDelete={() => handleWidgetDelete("logarithmic-chart")}
-          />
-        )}
-        {selectedWidgets.includes("decomposition-tree") && (
-          <DecompositionTreeModule
-            onDelete={() => handleWidgetDelete("decomposition-tree")}
-          />
-        )}
+          {selectedWidgets.includes("picture-video") && (
+            <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
+              Picture/Video coming soon...
+            </div>
+          )}
 
-        {selectedWidgets.includes("gauge-chart") && (
-          <GaugeChartModule
-            onDelete={() => handleWidgetDelete("gauge-chart")}
-          />
-        )}
+          {selectedWidgets.includes("horizontal-bar-chart") && (
+            <HorizontalBarChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("horizontal-bar-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
 
-        {selectedWidgets.includes("histogram-chart") && (
-          <HistogramChartModule />
-        )}
+          {selectedWidgets.includes("heat-map-chart") && (
+            <ChartModuleOne
+              chartName="heat-map-chart"
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("heat-map-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
 
-        {selectedWidgets.includes("bubble-chart") && <BubbleChartModule />}
-        {selectedWidgets.includes("column-chart") && <ColumnBarChartModule />}
-        {selectedWidgets.includes("funnel-chart") && <FunnelChartModule />}
-        {selectedWidgets.includes("scatter-chart") && <ScatterChartModule />}
-        {selectedWidgets.includes("pareto-chart") && <ParetoChartModule />}
-        {selectedWidgets.includes("waterfall-chart") && (
-          <WaterfallChartModule />
-        )}
-        {selectedWidgets.includes("radar-chart") && <RadarChartModule />}
-        {selectedWidgets.includes("candle-chart") && <CandleChartModule />}
-        {selectedWidgets.includes("treemap-chart") && (
-          <TreemapChartModule
-            onDelete={() => handleWidgetDelete("treemap-chart")}
-          />
-        )}
-        {selectedWidgets.includes("calendar-heatmap-chart") && (
-          <CalendarHeatmapModule
-            onDelete={() => handleWidgetDelete("calendar-heatmap-chart")}
-          />
-        )}
-        {selectedWidgets.includes("gantt-new-chart") && (
-          <GanttChartNewModule
-            onDelete={() => handleWidgetDelete("gantt-new-chart")}
-          />
-        )}
-        {selectedWidgets.includes("matrix-table-chart") && (
-          <MatrixTableChartModule
-            onDelete={() => handleWidgetDelete("matrix-table-chart")}
-          />
-        )}
-        {selectedWidgets.includes("combo-chart") && (
-          <ComboChartModule
-            onDelete={() => handleWidgetDelete("combo-chart")}
-          />
-        )}
-        {selectedWidgets.includes("horisontal-stacked-bar-chart") && (
-          <HorizontalStackedBarChartModule
-            onDelete={() => handleWidgetDelete("horisontal-stacked-bar-chart")}
-          />
-        )}
-        {selectedWidgets.includes("bullet-chart") && (
-          <BulletChartModule
-            onDelete={() => handleWidgetDelete("bullet-chart")}
-          />
-        )}
+          {selectedWidgets.includes("area-chart") && (
+            <ChartModuleOne
+              chartName="area-chart"
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("area-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
 
-        {selectedWidgets.includes("marimekko-chart") && (
-          <MarimekkoChartModule
-            onDelete={() => handleWidgetDelete("marimekko-chart")}
-          />
-        )}
-        {selectedWidgets.includes("box-plot") && (
-          <BoxPlotChartModule onDelete={() => handleWidgetDelete("box-plot")} />
-        )}
-        {selectedWidgets.includes("cohort-analysis") && (
-          <CohortAnalysisModule
-            onDelete={() => handleWidgetDelete("cohort-analysis")}
-          />
-        )}
-        {selectedWidgets.includes("geographic-map") && (
-          <GeographicMapModule
-            onDelete={() => handleWidgetDelete("geographic-map")}
-          />
-        )}
-        {selectedWidgets.includes("rag-chart") && (
-          <RagChartModule onDelete={() => handleWidgetDelete("rag-chart")} />
-        )}
-        {selectedWidgets.includes("ribbon-chart") && (
-          <RibbonChartModule
-            onDelete={() => handleWidgetDelete("ribbon-chart")}
-          />
-        )}
+          {selectedWidgets.includes("spline-area-chart") && (
+            <ChartModuleOne
+              chartName="spline-area-chart"
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("spline-area-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("sparklines-chart") && (
+            <SparkLineChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("sparklines-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("logarithmic-chart") && (
+            <LogarithmicChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("logarithmic-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("decomposition-tree") && (
+            <DecompositionTreeModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("decomposition-tree")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("gauge-chart") && (
+            <GaugeChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("gauge-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("histogram-chart") && (
+            <HistogramChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("histogram-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("bubble-chart") && (
+            <BubbleChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("bubble-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("column-chart") && (
+            <ColumnBarChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("column-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("funnel-chart") && (
+            <FunnelChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("funnel-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("scatter-chart") && (
+            <ScatterChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("scatter-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("pareto-chart") && (
+            <ParetoChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("pareto-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("waterfall-chart") && (
+            <WaterfallChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("waterfall-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("radar-chart") && (
+            <RadarChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("radar-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("candle-chart") && (
+            <CandleChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("candle-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("treemap-chart") && (
+            <TreemapChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("treemap-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("calendar-heatmap-chart") && (
+            <CalendarHeatmapModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("calendar-heatmap-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("gantt-new-chart") && (
+            <GanttChartNewModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("gantt-new-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("matrix-table-chart") && (
+            <MatrixTableChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("matrix-table-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("combo-chart") && (
+            <ComboChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("combo-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("horisontal-stacked-bar-chart") && (
+            <HorizontalStackedBarChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("horisontal-stacked-bar-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("bullet-chart") && (
+            <BulletChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("bullet-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("marimekko-chart") && (
+            <MarimekkoChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("marimekko-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("box-plot") && (
+            <BoxPlotChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("box-plot")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("cohort-analysis") && (
+            <CohortAnalysisModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("cohort-analysis")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("geographic-map") && (
+            <GeographicMapModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("geographic-map")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("rag-chart") && (
+            <RagChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("rag-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+
+          {selectedWidgets.includes("ribbon-chart") && (
+            <RibbonChartModule
+              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("ribbon-chart")}
+              isPreview={isPreviewOrPublished}
+            />
+          )}
+        </div>
       </div>
-      {/* <ProjectConfiguration /> */}
     </div>
   );
 };
+
+
 export default ClientProjectBuilder;
+

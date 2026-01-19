@@ -2,14 +2,11 @@
 import { useMemo, useState } from "react";
 import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*       TYPES       */
 
@@ -41,6 +38,7 @@ type Props = {
   chartId?: string;
   months?: string[];
   isCreationMode?: boolean;
+  isPreview?: boolean;
 };
 
 /*       HELPER FUNCTIONS       */
@@ -89,9 +87,9 @@ export default function CalendarHeatmapChart({
   tierLevel = 0,
   chartId = "root",
   months = [],
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
 
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
@@ -142,8 +140,6 @@ export default function CalendarHeatmapChart({
 
   const totalActiveDays = calendarValues.length;
   const totalCount = calendarValues.reduce((sum, v) => sum + v.count, 0);
-
-  const isAllLegendFieldEmpty = legendValues.filter((l) => l.label !== "");
 
   /*   PRIMARY COLOR   */
   const primaryColor = useMemo(() => {
@@ -208,16 +204,8 @@ export default function CalendarHeatmapChart({
     setIsDownloading(false);
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleSaveTier = (tierName: string) => {
@@ -241,107 +229,33 @@ export default function CalendarHeatmapChart({
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 relative ${
-          childTiers.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {widgetTitle}
-          </h2>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-sm text-gray-500">
-              {totalActiveDays} days • {totalCount} total
-            </div>
-
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDownload();
-                      setShowPopover(false);
-                    }}
-                    disabled={isDownloading}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Download size={18} />
-                    <span>Download</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddTierClick();
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <GoPlus size={18} />
-                    <span>Add Tier</span>
-                  </button>
-                </div>
-              )}
-            </div>
+      <ChartCardWrapper
+        title={widgetTitle}
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          <div className="text-sm text-gray-500 font-medium">
+            {totalActiveDays} days • {totalCount} total
           </div>
-        </div>
-
+        }
+        footer={
+          childTiers.length > 0 ? (
+            <p className="text-sm text-blue-600 font-medium text-center">
+              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+            </p>
+          ) : undefined
+        }
+      >
         {/* Calendar Heatmap */}
         <div className="calendar-heatmap-container">
           <style>{`
@@ -424,23 +338,7 @@ export default function CalendarHeatmapChart({
           </div>
           <span className="text-xs text-gray-500">More</span>
         </div>
-
-        {isAllLegendFieldEmpty.length === 0 && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400 text-center">
-            No data available. Configure color in the widget settings.
-          </div>
-        )}
-
-        {/* Indicator if chart has children */}
-        {childTiers.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier
-              {childTiers.length > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-      </div>
+      </ChartCardWrapper>
 
       {/* Add Tier Modal */}
       <AddTierModal
@@ -467,6 +365,8 @@ export default function CalendarHeatmapChart({
                 numOfLegendDataSet={tier.legendValues.length}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
+                isPreview={isPreview}
+                onDelete={onDelete}
               />
             ))}
           </div>

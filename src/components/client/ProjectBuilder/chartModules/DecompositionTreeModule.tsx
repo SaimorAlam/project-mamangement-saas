@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DecompositionTreeChart, {
   TreeDataNode,
 } from "@/common/Charts/DecompositionTreeChart";
 import TreeConfiguration from "./TreeConfiguration";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
 const generateSampleTree = (): TreeDataNode => ({
   id: "root",
@@ -40,10 +42,29 @@ const generateSampleTree = (): TreeDataNode => ({
   ],
 });
 
-const DecompositionTreeModule = ({ onDelete }: { onDelete?: () => void }) => {
+const DecompositionTreeModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("Sales Decomposition");
   const [showWidget, setShowWidget] = useState(false);
   const [treeData, setTreeData] = useState<TreeDataNode>(generateSampleTree());
+
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "decomposition-tree",
+        config: {
+          widgetTitle,
+          treeData,
+        },
+      }),
+    );
+  }, [widgetTitle, treeData, dispatch]);
 
   return (
     <div className="flex gap-3">
@@ -54,9 +75,10 @@ const DecompositionTreeModule = ({ onDelete }: { onDelete?: () => void }) => {
           onToggleWidget={() => setShowWidget(!showWidget)}
           onDelete={onDelete}
           onDataChange={setTreeData}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <TreeConfiguration
           widgetTitle={widgetTitle}
           setWidgetTitle={setWidgetTitle}

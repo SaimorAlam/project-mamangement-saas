@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { Copy, Trash2, Download, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./GetChartData";
-
+import ChartCardWrapper from "./components/ChartCardWrapper";
 /*       TYPES       */
 
 export type ChartData = {
@@ -26,7 +23,7 @@ type LegendValue = {
 };
 
 export type TierChart = {
-  id: string;
+  id?: string;
   name: string;
   xAxisValues: string[];
   legendValues: LegendValue[];
@@ -47,6 +44,7 @@ type Props = {
   chartId?: string;
   isCreationMode?: boolean;
   allUploadedData?: { [key: string]: ChartData[] };
+  isPreview?: boolean;
 };
 
 export default function HorizontalStackedBarChart({
@@ -63,6 +61,7 @@ export default function HorizontalStackedBarChart({
   chartId,
   isCreationMode = false,
   allUploadedData,
+  isPreview = false,
 }: Props) {
   const [localUploadedData, setLocalUploadedData] = useState<{ [key: string]: ChartData[] } | undefined>(allUploadedData);
   const { childTiers } = useChartData({
@@ -76,7 +75,6 @@ export default function HorizontalStackedBarChart({
     endingRange,
   });
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
@@ -265,16 +263,8 @@ export default function HorizontalStackedBarChart({
     }
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleChartClick = () => {
@@ -325,147 +315,56 @@ export default function HorizontalStackedBarChart({
   };
 
   return (
-    <div className="min-w-3xl">
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers?.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        <div className="flex justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            {/* <div className="flex gap-6 mt-3">
-              {legendValues.map((l) =>
-                l.label ? (
-                  <div key={l.field} className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: l.color }}
-                    />
-                    <span className="text-sm">{l.label}</span>
-                  </div>
-                ) : null
-              )}
-            </div> */}
-          </div>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex gap-2 border-l pl-4 relative">
+    <>
+      <ChartCardWrapper
+        title={widgetTitle}
+        subtitle="Stacked Distribution"
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          tierLevel === 0 && (
+            <div className="flex gap-2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setShowPopover(!showPopover);
+                  document
+                    .getElementById(`upload-input-${chartId || widgetTitle}`)
+                    ?.click();
                 }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
+                className="p-1 px-2 text-xs border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-1"
               >
-                <BsThreeDots size={18} />
+                <Upload size={14} />
+                <span>Upload</span>
               </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  {tierLevel === 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload();
-                        setShowPopover(false);
-                      }}
-                      disabled={isDownloading}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <Download size={18} />
-                      <span>Download</span>
-                    </button>
-                  )}
-
-                  {tierLevel === 0 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          document
-                            .getElementById(
-                              `upload-input-${chartId || widgetTitle}`
-                            )
-                            ?.click();
-                          setShowPopover(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                      >
-                        <Upload size={18} />
-                        <span>Upload Data</span>
-                      </button>
-                      <input
-                        id={`upload-input-${chartId || widgetTitle}`}
-                        type="file"
-                        accept=".xlsx, .xls"
-                        className="hidden"
-                        onChange={handleUpload}
-                      />
-                    </>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  {!isCreationMode && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddTierClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <GoPlus size={18} />
-                      <span>Add Tier</span>
-                    </button>
-                  )}
-                </div>
-              )}
+              <input
+                id={`upload-input-${chartId || widgetTitle}`}
+                type="file"
+                accept=".xlsx, .xls"
+                className="hidden"
+                onChange={handleUpload}
+              />
             </div>
-          </div>
-        </div>
-
+          )
+        }
+        footer={
+          childTiers?.length > 0 ? (
+            <p className="text-sm text-blue-600 font-medium">
+              Click chart to view {childTiers?.length} child tier
+              {childTiers?.length > 1 ? "s" : ""}
+            </p>
+          ) : undefined
+        }
+      >
         <div style={{ height: "400px", width: "100%" }}>
           <ReactApexChart
             options={options}
@@ -474,16 +373,7 @@ export default function HorizontalStackedBarChart({
             height={350}
           />
         </div>
-
-        {childTiers?.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier
-              {childTiers?.length > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-      </div>
+      </ChartCardWrapper>
 
       <AddTierModal
         isOpen={showAddTierModal}
@@ -514,11 +404,12 @@ export default function HorizontalStackedBarChart({
                   tierLevel={tierLevel + 1}
                   chartId={tier?.id}
                   allUploadedData={localUploadedData || allUploadedData}
+                  isPreview={isPreview}
                 />
               ))}
           </div>
         </TierChartModal>
       )}
-    </div>
+    </>
   );
 }

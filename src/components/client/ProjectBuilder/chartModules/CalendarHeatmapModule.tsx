@@ -4,7 +4,12 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import CalendarHeatmapChart from "@/common/Charts/CalendarHeatmapChart";
 
-const CalendarHeatmapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+type CalendarHeatmapChartModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const CalendarHeatmapChartModule = ({ onDelete, isPreview = false }: CalendarHeatmapChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Activity Calendar");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -20,18 +25,11 @@ const CalendarHeatmapChartModule = ({ onDelete }: { onDelete?: () => void }) => 
   const [startingRange] = useState<number>(0);
   const [endingRange] = useState<number>(100);
 
-  // Dummy handlers (not used in Calendar heatmap)
-  const handleSetNumOfXAxisDataSet = () => {
-    // Not used for Calendar heatmap
-  };
-
-  const handleXAxisValueChange = () => {
-    // Not used for Calendar heatmap
-  };
-
   // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   // Close widget
@@ -40,7 +38,7 @@ const CalendarHeatmapChartModule = ({ onDelete }: { onDelete?: () => void }) => 
   };
 
   return (
-    <div className="flex gap-3 h-full">
+    <div className="flex gap-3 h-full w-full">
       <div className="flex-1 h-full sticky top-5">
         <CalendarHeatmapChart
           widgetTitle={widgetTitle}
@@ -48,19 +46,19 @@ const CalendarHeatmapChartModule = ({ onDelete }: { onDelete?: () => void }) => 
           numOfLegendDataSet={numOfLegendDataSet}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
-          isCreationMode={true}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Calendar Heatmap"
           widgetTitle={widgetTitle}
           widgetCategory="CALENDAR"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
+          handleSetNumOfXAxisDataSet={() => {}}
           xAxisValues={xAxisValues}
-          handleXAxisValueChange={handleXAxisValueChange}
+          handleXAxisValueChange={() => {}}
           numOfLegendDataSet={numOfLegendDataSet}
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}

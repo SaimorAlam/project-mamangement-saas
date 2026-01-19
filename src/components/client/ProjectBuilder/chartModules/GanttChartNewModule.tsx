@@ -4,7 +4,12 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import GanttChartNew from "@/common/Charts/GanttChartNew";
 
-const GanttChartNewModule = ({ onDelete }: { onDelete?: () => void }) => {
+type GanttChartNewModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const GanttChartNewModule = ({ onDelete, isPreview = false }: GanttChartNewModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Project Timeline");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -24,18 +29,11 @@ const GanttChartNewModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [startingRange] = useState<number>(0);
   const [endingRange] = useState<number>(100);
 
-  // Dummy handlers (not used in Gantt chart)
-  const handleSetNumOfXAxisDataSet = () => {
-    // Not used for Gantt chart
-  };
-
-  const handleXAxisValueChange = () => {
-    // Not used for Gantt chart
-  };
-
   // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   // Close widget
@@ -44,24 +42,27 @@ const GanttChartNewModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   return (
-    <div className="flex gap-3">
-      <GanttChartNew
-        widgetTitle={widgetTitle}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        onToggleWidget={handleToggleWidget}
-        onDelete={onDelete}
-      />
-      {showWidget && (
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
+        <GanttChartNew
+          widgetTitle={widgetTitle}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isPreview={isPreview}
+        />
+      </div>
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Gantt Chart"
           widgetTitle={widgetTitle}
           widgetCategory="GANTT"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
+          handleSetNumOfXAxisDataSet={() => {}}
           xAxisValues={xAxisValues}
-          handleXAxisValueChange={handleXAxisValueChange}
+          handleXAxisValueChange={() => {}}
           numOfLegendDataSet={numOfLegendDataSet}
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}

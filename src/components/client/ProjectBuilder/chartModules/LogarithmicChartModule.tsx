@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
 import LogarithmicChart from "@/common/Charts/LogarithmicChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const LogarithmicChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+const LogarithmicChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("Logarithmic Analysis");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -19,6 +28,28 @@ const LogarithmicChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   ]);
   const [startingRange, setStartingRange] = useState<number>(10);
   const [endingRange, setEndingRange] = useState<number>(10000);
+
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "logarithmic-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          legendValues,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    xAxisValues,
+    legendValues,
+    startingRange,
+    endingRange,
+    dispatch,
+  ]);
 
   const minXaxisField = 1;
   const maxXaxisField = 7;
@@ -61,8 +92,9 @@ const LogarithmicChartModule = ({ onDelete }: { onDelete?: () => void }) => {
         endingRange={endingRange}
         onToggleWidget={() => setShowWidget(!showWidget)}
         onDelete={onDelete}
+        isPreview={isPreview}
       />
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Logarithmic Chart"
           widgetTitle={widgetTitle}

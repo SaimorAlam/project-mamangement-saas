@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
 import PieChartWidget from "@/common/Charts/PieChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+const PieChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -23,46 +32,51 @@ const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [startingRange] = useState<number>(0);
   const [endingRange] = useState<number>(100);
 
-  // Dummy handler for X-axis (not used in pie chart)
-  const handleSetNumOfXAxisDataSet = () => {
-    // Not used for pie chart
-  };
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "pie-chart",
+        config: {
+          widgetTitle,
+          legendValues,
+          numOfLegendDataSet,
+        },
+      }),
+    );
+  }, [widgetTitle, legendValues, numOfLegendDataSet, dispatch]);
 
-  const handleXAxisValueChange = () => {
-    // Not used for pie chart
-  };
-
-  // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
-  // Close widget (for X button)
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 sticky top-5 h-full">
         <PieChartWidget
           widgetTitle={widgetTitle}
           legendValues={legendValues}
           numOfLegendDataSet={numOfLegendDataSet}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Pie Chart"
           widgetTitle={widgetTitle}
           widgetCategory="PIE"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
+          handleSetNumOfXAxisDataSet={() => {}}
           xAxisValues={xAxisValues}
-          handleXAxisValueChange={handleXAxisValueChange}
+          handleXAxisValueChange={() => {}}
           numOfLegendDataSet={numOfLegendDataSet}
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
@@ -79,4 +93,3 @@ const PieChartModule = ({ onDelete }: { onDelete?: () => void }) => {
 };
 
 export default PieChartModule;
-

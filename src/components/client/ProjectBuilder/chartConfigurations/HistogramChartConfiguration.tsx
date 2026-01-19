@@ -116,11 +116,11 @@ const HistogramChartConfiguration = ({
   const handleLegendLabelChange = (index: number, value: string) => {
     setLegendValues((prev) => {
       const updated = [...prev];
-      updated[index].label = value;
-
-      // auto-generate field (camelCase)
-      updated[index].field = value.toLowerCase().replace(/\s+/g, "");
-
+      updated[index] = {
+        ...updated[index],
+        label: value,
+        field: value.toLowerCase().replace(/\s+/g, ""),
+      };
       return updated;
     });
   };
@@ -128,7 +128,10 @@ const HistogramChartConfiguration = ({
   const handleLegendColorChange = (index: number, color: string) => {
     setLegendValues((prev) => {
       const updated = [...prev];
-      updated[index].color = color;
+      updated[index] = {
+        ...updated[index],
+        color: color,
+      };
       return updated;
     });
   };
@@ -138,8 +141,8 @@ const HistogramChartConfiguration = ({
 
   const downloadCSV = () => {
     // Validate that if any of the legend labels or xAxisValues are empty, alert the user
-    for (let i = 0; i < legendValues.length; i++) {
-      if (!legendValues[i].label) {
+    for (let i = 0; i < numOfLegendDataSet; i++) {
+      if (!legendValues[i]?.label) {
         alert(`Please fill in the label for legend ${i + 1}`);
         return;
       }

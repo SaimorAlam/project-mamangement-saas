@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState, useEffect, useRef } from "react";
 import CanvasJSReact from "@canvasjs/react-charts";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -34,6 +31,8 @@ type Props = {
   onToggleWidget?: () => void;
   tierLevel?: number;
   chartId?: string;
+  onDelete?: () => void;
+  isPreview?: boolean;
 };
 
 /*       COMPONENT       */
@@ -46,12 +45,12 @@ export default function ParetoChart({
   onToggleWidget,
   tierLevel = 0,
   chartId = "root",
+  onDelete,
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const chartRef = useRef<any>(null);
 
-  // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
@@ -65,14 +64,13 @@ export default function ParetoChart({
     const range = endingRange - startingRange;
     const step = range / xAxisValues.length;
 
-    // Generate descending values for Pareto effect
     return xAxisValues
       .filter(Boolean)
       .map((label, index) => ({
         label,
         y: Math.round(endingRange - step * index),
       }))
-      .sort((a, b) => b.y - a.y); // Sort descending
+      .sort((a, b) => b.y - a.y);
   }, [xAxisValues, startingRange, endingRange]);
 
   /*   TOTAL VALUE   */
@@ -88,12 +86,10 @@ export default function ParetoChart({
     let yTotal = 0;
     let yPercent = 0;
 
-    // Calculate total
     for (let i = 0; i < chart.data[0].dataPoints.length; i++) {
       yTotal += chart.data[0].dataPoints[i].y;
     }
 
-    // Calculate cumulative percentage
     for (let i = 0; i < chart.data[0].dataPoints.length; i++) {
       const yValue = chart.data[0].dataPoints[i].y;
       yPercent += (yValue / yTotal) * 100;
@@ -103,14 +99,12 @@ export default function ParetoChart({
       });
     }
 
-    // Add line series
     chart.addTo("data", {
       type: "line",
       yValueFormatString: "0.##'%'",
       dataPoints: dps,
     });
 
-    // Configure secondary axis
     chart.data[1].set("axisYType", "secondary", false);
     chart.axisY[0].set("maximum", Math.round(yTotal / 20) * 20);
     chart.axisY2[0].set("maximum", 100);
@@ -120,9 +114,7 @@ export default function ParetoChart({
   const chartOptions = useMemo(
     () => ({
       title: {
-        text: widgetTitle,
-        fontSize: 20,
-        fontWeight: "normal",
+        text: "", // Title handled by ChartCardWrapper
       },
       axisX: {
         title: "Categories",
@@ -149,7 +141,7 @@ export default function ParetoChart({
         },
       ],
     }),
-    [widgetTitle, dataPoints]
+    [dataPoints]
   );
 
   /*   EFFECT TO CREATE PARETO   */
@@ -194,16 +186,8 @@ export default function ParetoChart({
     setIsDownloading(false);
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleSaveTier = (tierName: string) => {
@@ -227,106 +211,33 @@ export default function ParetoChart({
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        <div className="flex justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {dataPoints.length} categories
+      <ChartCardWrapper
+        title={widgetTitle}
+        subtitle={`${dataPoints.length} categories`}
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          <p className="text-sm text-gray-500">Total: {totalValue}</p>
+        }
+        footer={
+          childTiers.length > 0 ? (
+            <p className="text-sm text-blue-600 font-medium">
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
-          </div>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="text-sm text-gray-500">Total: {totalValue}</p>
-
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDownload();
-                      setShowPopover(false);
-                    }}
-                    disabled={isDownloading}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Download size={18} />
-                    <span>Download</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddTierClick();
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <GoPlus size={18} />
-                    <span>Add Tier</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
+          ) : undefined
+        }
+      >
         {dataPoints.length > 0 ? (
           <div style={{ height: "400px", width: "100%" }}>
             <CanvasJSChart
@@ -340,19 +251,8 @@ export default function ParetoChart({
             configuration.
           </div>
         )}
+      </ChartCardWrapper>
 
-        {/* Indicator if chart has children */}
-        {childTiers.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier
-              {childTiers.length > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Add Tier Modal */}
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
@@ -360,7 +260,6 @@ export default function ParetoChart({
         parentChartName={widgetTitle}
       />
 
-      {/* Children Grid Modal */}
       {showChildrenModal && (
         <TierChartModal
           isOpen={showChildrenModal}
@@ -378,6 +277,8 @@ export default function ParetoChart({
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
+                isPreview={isPreview}
+                onDelete={onDelete}
               />
             ))}
           </div>

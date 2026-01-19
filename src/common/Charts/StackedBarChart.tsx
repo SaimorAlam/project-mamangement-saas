@@ -9,16 +9,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Copy, Trash2, Download, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./GetChartData";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*       TYPES       */
 
@@ -55,6 +52,7 @@ type Props = {
   chartId?: string;
   isCreationMode?: boolean;
   allUploadedData?: { [key: string]: ChartData[] };
+  isPreview?: boolean;
 };
 
 export default function StackedBarChart({
@@ -62,7 +60,7 @@ export default function StackedBarChart({
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
-  numOfLegendDataSet = 1,
+  numOfLegendDataSet = 3,
   startingRange,
   endingRange,
   onToggleWidget,
@@ -71,10 +69,13 @@ export default function StackedBarChart({
   chartId,
   isCreationMode = false,
   allUploadedData,
+  isPreview = false,
 }: Props) {
+
   const [localUploadedData, setLocalUploadedData] = useState<
     { [key: string]: ChartData[] } | undefined
   >(allUploadedData);
+  
   const { childTiers } = useChartData({
     newData,
     isCreationMode,
@@ -85,27 +86,21 @@ export default function StackedBarChart({
     startingRange,
     endingRange,
   });
+
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
   const chartData: ChartData[] = useMemo(() => {
-    // Check if we have uploaded data for this specific chart
     const sheetName = (widgetTitle || "Sheet")
       .replace(/[:\/?*\[\]\\]/g, " ")
       .trim()
       .substring(0, 31);
 
-    // Try to find the data in localUploadedData (priority) or allUploadedData
     const dataToUse =
       localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
-      // Validate that the data matches the current xAxisValues and legendValues
-      // Or just trust it? Let's try to match it.
-      // We need to ensure the keys in dataToUse match legendValues fields.
-      // If the uploaded data uses labels as keys, we need to map them.
       return dataToUse;
     }
 
@@ -128,19 +123,6 @@ export default function StackedBarChart({
     allUploadedData,
   ]);
 
-  /*   TOTAL   */
-  // const totalEmployees = useMemo(() => {
-  //   return chartData.reduce((sum, row) => {
-  //     return (
-  //       sum +
-  //       legendValues.reduce(
-  //         (inner, l) => inner + Number(row[l.field] || 0),
-  //         0
-  //       )
-  //     );
-  //   }, 0);
-  // }, [chartData, legendValues]);
-
   /*   ACTIONS   */
 
   const handleCopy = () => {
@@ -154,7 +136,6 @@ export default function StackedBarChart({
       const usedNames = new Set<string>();
 
       const getUniqueSheetName = (name: string) => {
-        // Excel sheet names max 31 chars, no special chars
         let baseName = (name || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim();
         if (baseName.length > 25) baseName = baseName.substring(0, 25);
         if (!baseName) baseName = "Sheet";
@@ -169,31 +150,22 @@ export default function StackedBarChart({
         return uniqueName;
       };
 
-      // Helper to process data with correct headers (Legend Labels) but empty values
       const processNodeData = (
         name: string,
         xAxis: string[],
         legends: LegendValue[],
       ) => {
-        // Create headers: "Label" followed by legend labels
         const headers = ["Label", ...legends.map((l) => l.label)];
-
-        // Create rows: label followed by empty strings for each legend
         const rows = xAxis.map((label) => [label, ...legends.map(() => "")]);
-
-        // Combine headers and rows
         const data = [headers, ...rows];
-
         const ws = XLSX.utils.aoa_to_sheet(data);
         XLSX.utils.book_append_sheet(wb, ws, getUniqueSheetName(name));
       };
 
-      // 1. Add current chart data
       if (xAxisValues && legendValues) {
         processNodeData(widgetTitle, xAxisValues, legendValues);
       }
 
-      // 2. Recursive function for children
       const processChildren = (nodes: any[]) => {
         nodes.forEach((node) => {
           if (node.xAxisValues && node.legendValues) {
@@ -224,16 +196,8 @@ export default function StackedBarChart({
     }
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleChartClick = () => {
@@ -298,191 +262,92 @@ export default function StackedBarChart({
       </div>
     );
   };
+
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6${
-          childTiers?.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        <div className="flex justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <div className="flex gap-6 mt-3">
-              {legendValues.map((l) =>
-                l.label ? (
-                  <div key={l.field} className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: l.color }}
-                    />
-                    <span className="text-sm">{l.label}</span>
-                  </div>
-                ) : null,
-              )}
-            </div>
-          </div>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* <p className="text-sm text-gray-500">Total {totalEmployees}</p> */}
-
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  {/* Only show download on root chart (tierLevel === 0) */}
-                  {tierLevel === 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload();
-                        setShowPopover(false);
-                      }}
-                      disabled={isDownloading}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <Download size={18} />
-                      <span>Download</span>
-                    </button>
-                  )}
-
-                  {/* Only show upload on root chart */}
-                  {tierLevel === 0 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          document
-                            .getElementById(
-                              `upload-input-${chartId || widgetTitle}`,
-                            )
-                            ?.click();
-                          setShowPopover(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                      >
-                        <Upload size={18} />
-                        <span>Upload Data</span>
-                      </button>
-                      <input
-                        id={`upload-input-${chartId || widgetTitle}`}
-                        type="file"
-                        accept=".xlsx, .xls"
-                        className="hidden"
-                        onChange={handleUpload}
-                      />
-                    </>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  {!isCreationMode && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddTierClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <GoPlus size={18} />
-                      <span>Add Tier</span>
-                    </button>
-                  )}
+      <ChartCardWrapper
+        title={widgetTitle}
+        subtitle="Stacked Performance View"
+        chartId={chartId || "root"}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: tierLevel === 0 ? handleDownload : undefined,
+          onUpload: tierLevel === 0 ? () => document.getElementById(`upload-input-${chartId || widgetTitle}`)?.click() : undefined,
+          onDelete: onDelete,
+          onAddTier: !isCreationMode ? handleAddTierClick : undefined,
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          <div className="flex gap-4">
+            {legendValues.slice(0, 3).map((l) =>
+              l.label ? (
+                <div key={l.field} className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: l.color }} />
+                  <span className="text-xs text-gray-500 font-medium">{l.label}</span>
                 </div>
-              )}
-            </div>
+              ) : null
+            )}
+            {legendValues.length > 3 && (
+              <span className="text-xs text-gray-400">+{legendValues.length - 3} more</span>
+            )}
           </div>
-        </div>
-
-        <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="name" />
-            <YAxis domain={[startingRange, endingRange]} />
-            <Tooltip content={<CustomTooltip />} />
-            {legendValues?.map((l, i) => (
-              <Bar
-                key={l.field}
-                dataKey={l.field}
-                stackId="a"
-                fill={l.color}
-                radius={i === legendValues.length - 1 ? [4, 4, 0, 0] : 0}
-              />
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
-
-        {/* Indicator if chart has children */}
-        {childTiers?.length > 0 && (
-          <div className="mt-4 text-center">
+        }
+        footer={
+          childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier
-              {childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
             </p>
-          </div>
-        )}
-      </div>
+          ) : undefined
+        }
+      >
+        <div className="relative">
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+              <YAxis domain={[startingRange, endingRange]} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+              <Tooltip content={<CustomTooltip />} />
+              {legendValues?.map((l, i) => (
+                <Bar
+                  key={l.field}
+                  dataKey={l.field}
+                  stackId="a"
+                  fill={l.color}
+                  radius={i === legendValues.length - 1 ? [4, 4, 0, 0] : 0}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
 
-      {/* Add Tier Modal */}
+          {tierLevel === 0 && (
+            <input
+              id={`upload-input-${chartId || widgetTitle}`}
+              type="file"
+              accept=".xlsx, .xls"
+              className="hidden"
+              onChange={handleUpload}
+            />
+          )}
+
+          {chartData.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
+              No data available. Please configure the widget.
+            </div>
+          )}
+        </div>
+      </ChartCardWrapper>
+
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        // onSave={handleSaveTier}
         chartId={chartId}
         parentChartName={widgetTitle}
       />
 
-      {/* Children Grid Modal */}
       {showChildrenModal && (
         <TierChartModal
           isOpen={showChildrenModal}
@@ -506,6 +371,7 @@ export default function StackedBarChart({
                     tierLevel={tierLevel + 1}
                     chartId={tier?.id}
                     allUploadedData={localUploadedData || allUploadedData}
+                    isPreview={isPreview}
                   />
                 );
               })}

@@ -4,8 +4,13 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import BulletChart from "@/common/Charts/BulletChart";
 
-const BulletChartModule = ({ onDelete }: { onDelete?: () => void }) => {
-  const [widgetTitle, setWidgetTitle] = useState("Bullet Chart");
+type BulletChartModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const BulletChartModule = ({ onDelete, isPreview = false }: BulletChartModuleProps) => {
+  const [widgetTitle, setWidgetTitle] = useState("Bullet Performance");
   const [showWidget, setShowWidget] = useState(false);
 
   const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
@@ -13,7 +18,7 @@ const BulletChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#e62325" },
     { label: "", field: "", color: "#0058e9" },
-    { label: "", field: "", color: "#111" },
+    { label: "#111", field: "", color: "#111" },
   ]);
 
   // Bullet charts don't use X-axis values
@@ -22,45 +27,42 @@ const BulletChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [startingRange, setStartingRange] = useState<number>(-10);
   const [endingRange, setEndingRange] = useState<number>(100);
 
-  // Dummy handlers (not used in Bullet chart)
-  const handleSetNumOfXAxisDataSet = () => {
-    // Not used for Bullet chart
-  };
-
-  const handleXAxisValueChange = () => {
-    // Not used for Bullet chart
-  };
-
+  // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
+  // Close widget
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3">
-      <BulletChart
-        widgetTitle={widgetTitle}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-        onDelete={onDelete}
-        isCreationMode={true}
-      />
-      {showWidget && (
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
+        <BulletChart
+          widgetTitle={widgetTitle}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isPreview={isPreview}
+        />
+      </div>
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Bullet Chart"
           widgetTitle={widgetTitle}
           widgetCategory="BULLET"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
+          handleSetNumOfXAxisDataSet={() => {}}
           xAxisValues={xAxisValues}
-          handleXAxisValueChange={handleXAxisValueChange}
+          handleXAxisValueChange={() => {}}
           numOfLegendDataSet={numOfLegendDataSet}
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}

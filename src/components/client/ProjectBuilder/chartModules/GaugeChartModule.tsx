@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import GaugeChart from "@/common/Charts/GaugeChart";
 import GaugeChartConfiguration from "../chartConfigurations/GaugeChartConfiguration";
 
@@ -9,8 +8,14 @@ export type LegendValue = {
   color: string;
 };
 
-const GaugeChartModule = ({ onDelete }: { onDelete?: () => void }) => {
-  const [widgetTitle, setWidgetTitle] = useState("My-CSV");
+const GaugeChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const [widgetTitle, setWidgetTitle] = useState("Performance Gauge");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
   const [numOfLegendDataSet, setNumOfLegendDataSet] =
@@ -38,60 +43,71 @@ const GaugeChartModule = ({ onDelete }: { onDelete?: () => void }) => {
 
   // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
+  };
+
+  const handleCloseWidget = () => {
+    setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3">
-      <GaugeChart
-        widgetTitle={widgetTitle}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        // PASS ALL NEW PROPS
-        gaugeValue={gaugeValue}
-        chartHeight={chartHeight}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        trackColor={trackColor}
-        strokeWidth={strokeWidth}
-        fontSize={fontSize}
-        shadeIntensity={shadeIntensity}
-        onToggleWidget={handleToggleWidget}
-        onDelete={onDelete}
-      />
-      {showWidget && (
-        <GaugeChartConfiguration
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
+        <GaugeChart
           widgetTitle={widgetTitle}
-          setWidgetTitle={setWidgetTitle}
-          numOfLegendDataSet={numOfLegendDataSet}
-          setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
-          setLegendValues={setLegendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
           startingRange={startingRange}
-          setStartingRange={setStartingRange}
           endingRange={endingRange}
-          setEndingRange={setEndingRange}
           // PASS ALL NEW PROPS
           gaugeValue={gaugeValue}
-          setGaugeValue={setGaugeValue}
           chartHeight={chartHeight}
-          setChartHeight={setChartHeight}
           startAngle={startAngle}
-          setStartAngle={setStartAngle}
           endAngle={endAngle}
-          setEndAngle={setEndAngle}
           trackColor={trackColor}
-          setTrackColor={setTrackColor}
           strokeWidth={strokeWidth}
-          setStrokeWidth={setStrokeWidth}
           fontSize={fontSize}
-          setFontSize={setFontSize}
           shadeIntensity={shadeIntensity}
-          setShadeIntensity={setShadeIntensity}
-          onClose={() => setShowWidget(false)}
+          onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isPreview={isPreview}
         />
+      </div>
+      {!isPreview && showWidget && (
+        <div className="shrink-0 sticky top-5">
+            <GaugeChartConfiguration
+              widgetTitle={widgetTitle}
+              setWidgetTitle={setWidgetTitle}
+              numOfLegendDataSet={numOfLegendDataSet}
+              setNumOfLegendDataSet={setNumOfLegendDataSet}
+              legendValues={legendValues}
+              setLegendValues={setLegendValues}
+              startingRange={startingRange}
+              setStartingRange={setStartingRange}
+              endingRange={endingRange}
+              setEndingRange={setEndingRange}
+              // PASS ALL NEW PROPS
+              gaugeValue={gaugeValue}
+              setGaugeValue={setGaugeValue}
+              chartHeight={chartHeight}
+              setChartHeight={setChartHeight}
+              startAngle={startAngle}
+              setStartAngle={setStartAngle}
+              endAngle={endAngle}
+              setEndAngle={setEndAngle}
+              trackColor={trackColor}
+              setTrackColor={setTrackColor}
+              strokeWidth={strokeWidth}
+              setStrokeWidth={setStrokeWidth}
+              fontSize={fontSize}
+              setFontSize={setFontSize}
+              shadeIntensity={shadeIntensity}
+              setShadeIntensity={setShadeIntensity}
+              onClose={handleCloseWidget}
+            />
+        </div>
       )}
     </div>
   );

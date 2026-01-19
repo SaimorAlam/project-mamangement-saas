@@ -1,15 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-// import { scaleLinear } from "d3-scale"; // Removed to avoid dependency issue
-// import ReactMatrixTable from "@paraboly/react-matrix-table"; // Removed to avoid crash
-import { Copy, Trash2, Download, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./GetChartData";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*       TYPES       */
 
@@ -41,6 +37,7 @@ type Props = {
   chartId?: string;
   isCreationMode?: boolean;
   allUploadedData?: { [key: string]: number[][] };
+  isPreview?: boolean;
 };
 
 export default function MatrixTableChart({
@@ -57,9 +54,8 @@ export default function MatrixTableChart({
   chartId,
   isCreationMode = false,
   allUploadedData,
+  isPreview = false,
 }: Props) {
-    console.log("mounted");
-    
   const [localUploadedData, setLocalUploadedData] = useState<{ [key: string]: number[][] } | undefined>(allUploadedData);
   const { childTiers, refetch } = useChartData({
     newData,
@@ -72,13 +68,12 @@ export default function MatrixTableChart({
     endingRange,
   });
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
   /*   DATA GENERATION   */
   const matrixData: number[][] = useMemo(() => {
-    const sheetName = (widgetTitle || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim().substring(0, 31);
+    const sheetName = (widgetTitle || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim().substring(0, 31);
     const dataToUse = localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
@@ -87,7 +82,6 @@ export default function MatrixTableChart({
 
     if (!xAxisValues.length || !legendValues.length) return [];
 
-    // Generate random data for matrix
     const data: number[][] = [];
     legendValues.forEach(() => {
       const row: number[] = [];
@@ -103,9 +97,8 @@ export default function MatrixTableChart({
   const getOpacity = (value: number) => {
     if (endingRange === startingRange) return 1;
     const normalized = (value - startingRange) / (endingRange - startingRange);
-    // Clamp between 0 and 1
     const clamped = Math.max(0, Math.min(1, normalized));
-    return 0.2 + (clamped * 0.8); // Range [0.2, 1]
+    return 0.2 + (clamped * 0.8);
   };
 
   /*   CELL COLOR FUNCTION   */
@@ -114,7 +107,6 @@ export default function MatrixTableChart({
     const opacity = getOpacity(numValue);
     const primaryColor = legendValues[0]?.color || "#3B93A5";
     
-    // Convert hex to rgb
     const hex = primaryColor.replace("#", "");
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
@@ -199,16 +191,8 @@ export default function MatrixTableChart({
     }
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleChartClick = () => {
@@ -233,9 +217,7 @@ export default function MatrixTableChart({
           const rawData: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
           if (rawData.length > 1) {
-            // Skip header row, process data rows
             const matrixData = rawData.slice(1).map((row) => {
-              // Skip first column (row label), get numeric values
               return row.slice(1).map((cell) => Number(cell) || 0);
             });
             allData[sheetName] = matrixData;
@@ -254,137 +236,45 @@ export default function MatrixTableChart({
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers?.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        <div className="flex justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {rows.length} rows × {columns.length} columns
+      <ChartCardWrapper
+        title={widgetTitle}
+        subtitle={`${rows.length} rows × ${columns.length} columns`}
+        chartId={chartId || "root"}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: tierLevel === 0 ? handleDownload : undefined,
+          onDelete: onDelete,
+          onAddTier: !isCreationMode ? handleAddTierClick : undefined,
+          onToggleWidget: onToggleWidget,
+          onUpload: tierLevel === 0 ? () => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".xlsx, .xls";
+            input.onchange = (event: any) => handleUpload(event);
+            input.click();
+          } : undefined,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        footer={
+          childTiers?.length > 0 ? (
+            <p className="text-sm text-blue-600 font-medium text-center">
+              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
             </p>
-          </div>
-
-          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  {tierLevel === 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload();
-                        setShowPopover(false);
-                      }}
-                      disabled={isDownloading}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <Download size={18} />
-                      <span>Download</span>
-                    </button>
-                  )}
-
-                  {tierLevel === 0 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          document.getElementById(`upload-input-${chartId || widgetTitle}`)?.click();
-                          setShowPopover(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                      >
-                        <Upload size={18} />
-                        <span>Upload Data</span>
-                      </button>
-                      <input
-                        id={`upload-input-${chartId || widgetTitle}`}
-                        type="file"
-                        accept=".xlsx, .xls"
-                        className="hidden"
-                        onChange={handleUpload}
-                      />
-                    </>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  {!isCreationMode && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddTierClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <GoPlus size={18} />
-                      <span>Add Tier</span>
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Matrix Table */}
+          ) : undefined
+        }
+      >
         {rows.length > 0 && columns.length > 0 && matrixData.length > 0 ? (
-          <div className="overflow-x-auto">
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <table className="w-full text-sm text-left text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+          <div className="overflow-x-auto my-2">
+            <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+              <table className="w-full text-sm text-left text-gray-500 border-collapse">
+                <thead className="text-[11px] text-gray-400 uppercase bg-gray-50/50">
                   <tr>
-                    <th className="px-4 py-3 border-r"></th>
+                    <th className="px-4 py-3 border-r border-gray-100 bg-gray-50/80 sticky left-0 z-10"></th>
                     {columns.map((col, i) => (
-                      <th key={i} className="px-4 py-3 border-r last:border-r-0 text-center font-semibold">
+                      <th key={i} className="px-4 py-3 border-r border-gray-100 last:border-r-0 text-center font-bold tracking-wider">
                         {col}
                       </th>
                     ))}
@@ -392,19 +282,18 @@ export default function MatrixTableChart({
                 </thead>
                 <tbody>
                   {rows.map((rowLabel, rowIndex) => (
-                    <tr key={rowIndex} className="bg-white border-b hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900 border-r bg-gray-50">
+                    <tr key={rowIndex} className="border-b border-gray-100 last:border-0">
+                      <td className="px-4 py-3 font-semibold text-gray-700 border-r border-gray-100 bg-gray-50/30 sticky left-0 z-10">
                         {rowLabel}
                       </td>
                       {matrixData[rowIndex]?.map((cellValue, colIndex) => (
                         <td
                           key={colIndex}
-                          className="px-2 py-2 border-r last:border-r-0 text-center transition-colors hover:opacity-80"
+                          className="px-2 py-3 border-r border-gray-100 last:border-r-0 text-center font-medium transition-all duration-200"
                           style={{
                             backgroundColor: cellColorFunction(cellValue),
-                            color: getOpacity(cellValue) > 0.6 ? "#fff" : "#000",
+                            color: getOpacity(cellValue) > 0.6 ? "#fff" : "#374151",
                           }}
-                          title={`Value: ${cellValue}`}
                         >
                           {cellValue}
                         </td>
@@ -416,23 +305,12 @@ export default function MatrixTableChart({
             </div>
           </div>
         ) : (
-          <div className="h-[400px] flex items-center justify-center text-gray-400">
-            No data available. Please configure rows and columns in the widget.
+          <div className="h-[300px] flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-2xl">
+            No data available. Please configure rows and columns.
           </div>
         )}
+      </ChartCardWrapper>
 
-        {/* Indicator if chart has children */}
-        {childTiers?.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier
-              {childTiers?.length > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Add Tier Modal */}
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
@@ -444,7 +322,6 @@ export default function MatrixTableChart({
         }}
       />
 
-      {/* Children Grid Modal */}
       {showChildrenModal && (
         <TierChartModal
           isOpen={showChildrenModal}
@@ -467,6 +344,8 @@ export default function MatrixTableChart({
                   tierLevel={tierLevel + 1}
                   chartId={tier?.id}
                   allUploadedData={localUploadedData || allUploadedData}
+                  isPreview={isPreview}
+                  onDelete={onDelete}
                 />
               ))}
           </div>

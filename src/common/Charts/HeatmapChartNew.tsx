@@ -45,6 +45,7 @@ type Props = {
   onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
+  isPreview?: boolean;
 };
 
 /*    COMPONENT    */
@@ -60,6 +61,7 @@ export default function HeatmapChartNew({
   onDelete,
   tierLevel = 0,
   chartId = "root",
+  isPreview = false,
 }: Props) {
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const [showPopover, setShowPopover] = useState(false);
@@ -203,15 +205,17 @@ export default function HeatmapChartNew({
           <h2 className="text-xl font-semibold">{widgetTitle}</h2>
 
           <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowPopover(!showPopover);
-              }}
-              className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-            >
-              <BsThreeDots size={18} />
-            </button>
+            {!isPreview && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowPopover(!showPopover);
+                }}
+                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
+              >
+                <BsThreeDots size={18} />
+              </button>
+            )}
 
             {showPopover && (
               <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">

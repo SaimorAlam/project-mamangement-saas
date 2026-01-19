@@ -9,14 +9,11 @@ import {
     ResponsiveContainer,
     Tooltip,
 } from "recharts";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*     TYPES     */
 
@@ -49,6 +46,8 @@ type Props = {
     onToggleWidget?: () => void;
     tierLevel?: number;
     chartId?: string;
+    onDelete?: () => void;
+    isPreview?: boolean;
 };
 
 /*     COMPONENT     */
@@ -63,9 +62,10 @@ export default function RadarChartNew({
     onToggleWidget,
     tierLevel = 0,
     chartId = "root",
+    onDelete,
+    isPreview = false,
 }: Props) {
     const [isDownloading, setIsDownloading] = useState(false);
-    const [showPopover, setShowPopover] = useState(false);
 
     const [showAddTierModal, setShowAddTierModal] = useState(false);
     const [childTiers, setChildTiers] = useState<TierChart[]>([]);
@@ -156,16 +156,8 @@ export default function RadarChartNew({
         setIsDownloading(false);
     };
 
-    const handleWidgetClick = () => {
-        if (onToggleWidget) {
-            onToggleWidget();
-        }
-        setShowPopover(false);
-    };
-
     const handleAddTierClick = () => {
         setShowAddTierModal(true);
-        setShowPopover(false);
     };
 
     const handleSaveTier = (tierName: string) => {
@@ -207,113 +199,44 @@ export default function RadarChartNew({
 
     return (
         <>
-            <div
-                className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
-                    }`}
-                onClick={handleChartClick}
+            <ChartCardWrapper
+                title={widgetTitle}
+                chartId={chartId}
+                tierLevel={tierLevel}
+                onHeaderClick={handleChartClick}
+                menuActions={{
+                    onCopy: handleCopy,
+                    onDownload: handleDownload,
+                    onDelete: onDelete,
+                    onAddTier: handleAddTierClick,
+                    onToggleWidget: onToggleWidget,
+                }}
+                isDownloading={isDownloading}
+                isPreview={isPreview}
+                customHeaderContent={
+                    <div className="flex gap-4">
+                        {legendValues.map(
+                            (l) =>
+                                l.label && (
+                                    <div key={l.field} className="flex items-center gap-1.5">
+                                        <div
+                                            className="w-2.5 h-2.5 rounded-full"
+                                            style={{ backgroundColor: l.color }}
+                                        />
+                                        <span className="text-xs text-gray-500 font-medium">{l.label}</span>
+                                    </div>
+                                )
+                        )}
+                    </div>
+                }
+                footer={
+                    childTiers.length > 0 ? (
+                        <p className="text-sm text-blue-600 font-medium">
+                            Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+                        </p>
+                    ) : undefined
+                }
             >
-                {/* HEADER */}
-                <div className="flex justify-between mb-6">
-                    <div>
-                        <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-
-                        <div className="flex gap-6 mt-3">
-                            {legendValues.map(
-                                (l) =>
-                                    l.label && (
-                                        <div key={l.field} className="flex items-center gap-2">
-                                            <div
-                                                className="w-3 h-3 rounded-full"
-                                                style={{ backgroundColor: l.color }}
-                                            />
-                                            <span className="text-sm">{l.label}</span>
-                                        </div>
-                                    )
-                            )}
-                        </div>
-                    </div>
-
-                    {/* ACTION MENU */}
-                    <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
-                        <div className="relative border-l pl-4">
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowPopover(!showPopover);
-                                }}
-                                className="p-2 border rounded hover:bg-gray-50"
-                            >
-                                <BsThreeDots size={18} />
-                            </button>
-
-                            {showPopover && (
-                                <div className="absolute right-0 top-12 bg-white border rounded-lg shadow-lg p-2 w-48 z-10">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleCopy();
-                                            setShowPopover(false);
-                                        }}
-                                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                                    >
-                                        <Copy size={18} />
-                                        <span>Copy</span>
-                                    </button>
-
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDownload();
-                                            setShowPopover(false);
-                                        }}
-                                        disabled={isDownloading}
-                                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                                    >
-                                        <Download size={18} />
-                                        <span>Download</span>
-                                    </button>
-
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setShowPopover(false);
-                                        }}
-                                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                                    >
-                                        <Trash2 size={18} />
-                                        <span>Delete</span>
-                                    </button>
-
-                                    {onToggleWidget && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleWidgetClick();
-                                            }}
-                                            className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                                        >
-                                            <MdOutlineWidgets size={18} />
-                                            <span>Widget</span>
-                                        </button>
-                                    )}
-
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleAddTierClick();
-                                        }}
-                                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                                    >
-                                        <GoPlus size={18} />
-                                        <span>Add Tier</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* CHART */}
                 <div className="relative">
                     <ResponsiveContainer width="100%" height={400}>
                         <ReRadarChart data={radarData}>
@@ -355,16 +278,7 @@ export default function RadarChartNew({
                         </div>
                     )}
                 </div>
-
-                {/* Indicator if chart has children */}
-                {childTiers.length > 0 && (
-                    <div className="mt-4 text-center">
-                        <p className="text-sm text-blue-600 font-medium">
-                            Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
-                        </p>
-                    </div>
-                )}
-            </div>
+            </ChartCardWrapper>
 
             {/* TIER MODALS */}
             <AddTierModal
@@ -393,6 +307,8 @@ export default function RadarChartNew({
                                 endingRange={endingRange}
                                 tierLevel={tierLevel + 1}
                                 chartId={tier.id}
+                                isPreview={isPreview}
+                                onDelete={onDelete}
                             />
                         ))}
                     </div>

@@ -2,9 +2,7 @@
 import { useMemo, useState } from "react";
 import { AgCharts } from "ag-charts-react";
 import type { AgChartOptions } from "ag-charts-community";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 import {
   AnimationModule,
@@ -46,6 +44,8 @@ type Props = {
   chartHeight?: number;
   onToggleWidget?: () => void;
   chartId?: string;
+  onDelete?: () => void;
+  isPreview?: boolean;
 };
 
 const generateId = () =>
@@ -63,9 +63,11 @@ export default function BoxPlotChart({
   ],
   chartHeight = 400,
   onToggleWidget,
+  chartId = "root",
+  onDelete,
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
 
   /*   AG CHARTS OPTIONS   */
   const chartOptions = useMemo((): AgChartOptions => {
@@ -117,7 +119,6 @@ export default function BoxPlotChart({
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-    setShowPopover(false);
   };
 
   const handleDownload = () => {
@@ -138,71 +139,24 @@ export default function BoxPlotChart({
     URL.revokeObjectURL(url);
 
     setIsDownloading(false);
-    setShowPopover(false);
   };
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-      {/* Header */}
-      <div className="flex justify-between mb-4">
-        <div>
-          <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-          <p className="text-sm text-gray-500 mt-1">
-             Distribution: Median, Quartiles, Outliers
-          </p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="relative border-l pl-4">
-            <button
-              onClick={() => setShowPopover(!showPopover)}
-              className="p-2 border rounded hover:bg-gray-50"
-            >
-              <BsThreeDots size={18} />
-            </button>
-
-            {showPopover && (
-              <div className="absolute right-0 top-12 w-48 bg-white border rounded-lg shadow-lg p-2 z-10">
-                <button
-                  onClick={handleCopy}
-                  className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                >
-                  <Copy size={18} /> Copy Data
-                </button>
-
-                <button
-                  onClick={handleDownload}
-                  disabled={isDownloading}
-                  className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                >
-                  <Download size={18} /> Download CSV Template
-                </button>
-
-                <button className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-red-600">
-                  <Trash2 size={18} /> Delete
-                </button>
-
-                {onToggleWidget && (
-                  <button
-                    onClick={() => {
-                      onToggleWidget();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                  >
-                    <MdOutlineWidgets size={18} /> Widget
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Chart */}
+    <ChartCardWrapper
+      title={widgetTitle}
+      chartId={chartId}
+      menuActions={{
+        onCopy: handleCopy,
+        onDownload: handleDownload,
+        onDelete: onDelete,
+        onToggleWidget: onToggleWidget,
+      }}
+      isDownloading={isDownloading}
+      isPreview={isPreview}
+    >
       <div style={{ height: `${chartHeight}px` }}>
         <AgCharts key={data.length} options={chartOptions} />
       </div>
-    </div>
+    </ChartCardWrapper>
   );
 }

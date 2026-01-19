@@ -9,9 +9,7 @@ import {
   ResponsiveContainer,
   ReferenceArea,
 } from "recharts";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 export type RagDataPoint = {
   name: string;
@@ -31,6 +29,7 @@ interface RagChartProps {
   onToggleWidget?: () => void;
   onDelete?: () => void;
   className?: string;
+  isPreview?: boolean;
 }
 
 const RagChart: React.FC<RagChartProps> = ({
@@ -40,8 +39,9 @@ const RagChart: React.FC<RagChartProps> = ({
   onToggleWidget,
   onDelete,
   className,
+  isPreview = false,
 }) => {
-  const [showPopover, setShowPopover] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Calculate max domain to ensure the top zone is visible even if data is low
   const maxValue = Math.max(
@@ -82,10 +82,9 @@ const RagChart: React.FC<RagChartProps> = ({
   };
 
   const handleDownload = () => {
-    // Simple CSV download implementation for RAG data
-    // In a real scenario, this might use the provided utility if adapted
+    setIsDownloading(true);
     const headers = ["Name,Value"];
-    const rows = data.map(d => `${d.name},`);
+    const rows = data.map(d => `${d.name},${d.value}`);
     const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -94,93 +93,22 @@ const RagChart: React.FC<RagChartProps> = ({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setIsDownloading(false);
   };
 
   return (
-    <div
-      className={`w-full bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow ${className}`}
-      onClick={() => {
-        // Optional: Open config on chart click like LineChart?
-        // if (onToggleWidget) onToggleWidget();
+    <ChartCardWrapper
+      title={widgetTitle}
+      menuActions={{
+        onCopy: handleCopy,
+        onDownload: handleDownload,
+        onDelete: onDelete,
+        onToggleWidget: onToggleWidget,
       }}
+      isDownloading={isDownloading}
+      isPreview={isPreview}
+      className={className}
     >
-      <div className="flex justify-between mb-6">
-        <div>
-           <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-        </div>
-
-        <div
-          className="flex items-center gap-4"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex gap-2 border-l pl-4 relative">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowPopover(!showPopover);
-              }}
-              className="p-2 border border-gray-300 rounded hover:bg-gray-50 bg-white"
-            >
-              <BsThreeDots size={18} />
-            </button>
-
-            {showPopover && (
-              <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCopy();
-                    setShowPopover(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                >
-                  <Copy size={18} />
-                  <span>Copy</span>
-                </button>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDownload();
-                    setShowPopover(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                >
-                  <Download size={18} />
-                  <span>Download</span>
-                </button>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (onDelete) onDelete();
-                    setShowPopover(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                >
-                  <Trash2 size={18} />
-                  <span>Delete</span>
-                </button>
-
-                {onToggleWidget && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onToggleWidget();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <MdOutlineWidgets size={18} />
-                    <span>Widget</span>
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
@@ -198,7 +126,7 @@ const RagChart: React.FC<RagChartProps> = ({
                 <stop offset="100%" stopColor="#95de64" />
               </linearGradient>
             </defs>
-{/* Background Gradient Rect with Blur - Moved to top to be behind grid/axes */}
+            {/* Background Gradient Rect with Blur - Moved to top to be behind grid/axes */}
             <ReferenceArea
               y1={0}
               y2={yAxisMax}
@@ -251,7 +179,7 @@ const RagChart: React.FC<RagChartProps> = ({
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </ChartCardWrapper>
   );
 };
 

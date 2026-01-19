@@ -2,24 +2,29 @@ import React, { useState } from "react";
 import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
 import WaterfallChart from "@/common/Charts/WaterfallChart";
 
-const WaterfallChartModule = () => {
+type WaterfallChartModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const WaterfallChartModule = ({ onDelete, isPreview = false }: WaterfallChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Waterfall Chart");
   const [showWidget, setShowWidget] = useState(false);
 
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(3);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(1);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#008FFB" },
     { label: "", field: "", color: "#00E396" },
   ]);
   const [startingRange, setStartingRange] = useState<number>(0);
-  const [endingRange, setEndingRange] = useState<number>(12);
+  const [endingRange, setEndingRange] = useState<number>(100);
 
   const minXaxisField = 1;
-  const maxXaxisField = 7;
+  const maxXaxisField = 10;
 
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -54,7 +59,9 @@ const WaterfallChartModule = () => {
   };
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -62,17 +69,21 @@ const WaterfallChartModule = () => {
   };
 
   return (
-    <div className="flex gap-3">
-      <WaterfallChart
-        widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-      />
-      {showWidget && (
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
+        <WaterfallChart
+          widgetTitle={widgetTitle}
+          xAxisValues={xAxisValues}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          onToggleWidget={handleToggleWidget}
+          isPreview={isPreview}
+          onDelete={onDelete}
+        />
+      </div>
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Waterfall Chart"
           widgetTitle={widgetTitle}

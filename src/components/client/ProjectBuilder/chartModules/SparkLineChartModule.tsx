@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
 import SparkLinesChart from "@/common/Charts/SparkLinesChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const SparkLineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+const SparkLineChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("Sparkline Trend");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -22,6 +31,28 @@ const SparkLineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   ]);
   const [startingRange, setStartingRange] = useState<number>(0); 
   const [endingRange, setEndingRange] = useState<number>(100); 
+
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "sparklines-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          legendValues,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    xAxisValues,
+    legendValues,
+    startingRange,
+    endingRange,
+    dispatch,
+  ]);
 
   const minXaxisField = 1;
   const maxXaxisField = 7;
@@ -80,9 +111,10 @@ const SparkLineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Sparkline Chart"
           widgetTitle={widgetTitle}

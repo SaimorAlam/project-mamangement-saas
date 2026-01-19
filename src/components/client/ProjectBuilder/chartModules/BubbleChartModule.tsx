@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BubbleChartConfigurationWidget, {
   LegendValue,
 } from "../chartConfigurations/BubbleChartConfigurationWidget";
 import BubbleChart from "@/common/Charts/BubbleChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const BubbleChartModule = () => {
-  const [widgetTitle, setWidgetTitle] = useState("My-CSV");
+const BubbleChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
+  const [widgetTitle, setWidgetTitle] = useState("Bubble Chart");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
@@ -31,6 +40,39 @@ const BubbleChartModule = () => {
 
   const minXaxisField = 1;
   const maxXaxisField = 20;
+
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "bubble-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          legendValues,
+          numOfLegendDataSet,
+          startingRange,
+          endingRange,
+          minBubbleSize,
+          maxBubbleSize,
+          opacity,
+          chartHeight,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+    minBubbleSize,
+    maxBubbleSize,
+    opacity,
+    chartHeight,
+    dispatch,
+  ]);
+
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -48,11 +90,9 @@ const BubbleChartModule = () => {
 
     setXAxisValues((prev) => {
       const updated = [...prev];
-      // Adding empty values if increased
       while (updated.length < value) {
         updated.push("");
       }
-      // Removing extra values if decreased
       return updated.slice(0, value);
     });
   };
@@ -63,62 +103,67 @@ const BubbleChartModule = () => {
       updated[index] = value;
       return updated;
     });
-    console.log("parent x values: ", xAxisValues);
   };
 
-  // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
-  // Close widget (for X button)
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3">
-      <BubbleChart
-        widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        minBubbleSize={minBubbleSize}
-        maxBubbleSize={maxBubbleSize}
-        opacity={opacity}
-        chartHeight={chartHeight}
-        onToggleWidget={handleToggleWidget}
-      />
-      {showWidget && (
-        <BubbleChartConfigurationWidget
-          widgedName="Bubble Chart"
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
+        <BubbleChart
           widgetTitle={widgetTitle}
-          widgetCategory="BUBBLE"
-          setWidgetTitle={setWidgetTitle}
-          numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
           xAxisValues={xAxisValues}
-          handleXAxisValueChange={handleXAxisValueChange}
-          numOfLegendDataSet={numOfLegendDataSet}
-          setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
-          setLegendValues={setLegendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
           startingRange={startingRange}
-          setStartingRange={setStartingRange}
           endingRange={endingRange}
-          setEndingRange={setEndingRange}
           minBubbleSize={minBubbleSize}
-          setMinBubbleSize={setMinBubbleSize}
           maxBubbleSize={maxBubbleSize}
-          setMaxBubbleSize={setMaxBubbleSize}
           opacity={opacity}
-          setOpacity={setOpacity}
           chartHeight={chartHeight}
-          setChartHeight={setChartHeight}
-          onClose={handleCloseWidget}
+          onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isPreview={isPreview}
         />
+      </div>
+      {!isPreview && showWidget && (
+        <div className="shrink-0 sticky top-5">
+            <BubbleChartConfigurationWidget
+              widgedName="Bubble Chart"
+              widgetTitle={widgetTitle}
+              widgetCategory="BUBBLE"
+              setWidgetTitle={setWidgetTitle}
+              numOfXAxisDataSet={numOfXAxisDataSet}
+              handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
+              xAxisValues={xAxisValues}
+              handleXAxisValueChange={handleXAxisValueChange}
+              numOfLegendDataSet={numOfLegendDataSet}
+              setNumOfLegendDataSet={setNumOfLegendDataSet}
+              legendValues={legendValues}
+              setLegendValues={setLegendValues}
+              startingRange={startingRange}
+              setStartingRange={setStartingRange}
+              endingRange={endingRange}
+              setEndingRange={setEndingRange}
+              minBubbleSize={minBubbleSize}
+              setMinBubbleSize={setMinBubbleSize}
+              maxBubbleSize={maxBubbleSize}
+              setMaxBubbleSize={setMaxBubbleSize}
+              opacity={opacity}
+              setOpacity={setOpacity}
+              chartHeight={chartHeight}
+              setChartHeight={setChartHeight}
+              onClose={handleCloseWidget}
+            />
+        </div>
       )}
     </div>
   );

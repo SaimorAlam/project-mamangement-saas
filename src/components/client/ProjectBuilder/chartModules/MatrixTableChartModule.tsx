@@ -4,7 +4,13 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import MatrixTableChart from "@/common/Charts/MatrixTableChart";
 
-const MatrixTableChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+const MatrixTableChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
   const [widgetTitle, setWidgetTitle] = useState("Matrix Table");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -58,7 +64,9 @@ const MatrixTableChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -66,8 +74,8 @@ const MatrixTableChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
         <MatrixTableChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
@@ -78,9 +86,10 @@ const MatrixTableChartModule = ({ onDelete }: { onDelete?: () => void }) => {
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
           isCreationMode={true}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Matrix Table"
           widgetTitle={widgetTitle}

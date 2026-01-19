@@ -2,34 +2,24 @@
 import { useMemo, useState } from "react";
 import { AgCharts } from "ag-charts-react";
 import type { AgChartOptions } from "ag-charts-community";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-// import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-// import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 import {
   AnimationModule,
-  // ContextMenuModule,
   CrosshairModule,
-  // LegendModule,
   ModuleRegistry,
   NumberAxisModule,
   CategoryAxisModule,
   BarSeriesModule,
 } from "ag-charts-enterprise";
-// import { MarimekkoSeriesModule } from "ag-charts-enterprise";
 
 // Register modules
 ModuleRegistry.registerModules([
   AnimationModule,
   CrosshairModule,
-  // MarimekkoSeriesModule,
   BarSeriesModule,
-  // LegendModule,
   NumberAxisModule,
   CategoryAxisModule,
-  // ContextMenuModule,
 ]);
 
 /*       TYPES       */
@@ -48,6 +38,8 @@ type Props = {
   chartHeight?: number;
   onToggleWidget?: () => void;
   chartId?: string;
+  onDelete?: () => void;
+  isPreview?: boolean;
 };
 
 const generateId = () =>
@@ -65,10 +57,11 @@ export default function MarimekkoChart({
   ],
   chartHeight = 400,
   onToggleWidget,
+  chartId = "root",
+  onDelete,
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
-  // const [getChartTitleId] = useGetChartTitleIdMutation();
 
   /*   DATA GENERATION   */
   const chartData = useMemo(() => {
@@ -128,7 +121,6 @@ export default function MarimekkoChart({
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
-    setShowPopover(false);
   };
 
   const handleDownload = () => {
@@ -150,75 +142,25 @@ export default function MarimekkoChart({
     a.click();
     URL.revokeObjectURL(url);
 
-    // Save metadata if needed (simplified for this task)
-    // DownloadAndSaveCSVforModuleOneWidget(...) 
-
     setIsDownloading(false);
-    setShowPopover(false);
   };
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-      {/* Header */}
-      <div className="flex justify-between mb-4">
-        <div>
-          <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-          <p className="text-sm text-gray-500 mt-1">
-             Variable width stacked bars (Marimekko placeholder)
-          </p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="relative border-l pl-4">
-            <button
-              onClick={() => setShowPopover(!showPopover)}
-              className="p-2 border rounded hover:bg-gray-50"
-            >
-              <BsThreeDots size={18} />
-            </button>
-
-            {showPopover && (
-              <div className="absolute right-0 top-12 w-48 bg-white border rounded-lg shadow-lg p-2 z-10">
-                <button
-                  onClick={handleCopy}
-                  className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                >
-                  <Copy size={18} /> Copy Data
-                </button>
-
-                <button
-                  onClick={handleDownload}
-                  disabled={isDownloading}
-                  className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                >
-                  <Download size={18} /> Download CSV
-                </button>
-
-                <button className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-red-600">
-                  <Trash2 size={18} /> Delete
-                </button>
-
-                {onToggleWidget && (
-                  <button
-                    onClick={() => {
-                      onToggleWidget();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                  >
-                    <MdOutlineWidgets size={18} /> Widget
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Chart */}
+    <ChartCardWrapper
+      title={widgetTitle}
+      chartId={chartId}
+      menuActions={{
+        onCopy: handleCopy,
+        onDownload: handleDownload,
+        onDelete: onDelete,
+        onToggleWidget: onToggleWidget,
+      }}
+      isDownloading={isDownloading}
+      isPreview={isPreview}
+    >
       <div style={{ height: `${chartHeight}px` }}>
         <AgCharts options={chartOptions} />
       </div>
-    </div>
+    </ChartCardWrapper>
   );
 }

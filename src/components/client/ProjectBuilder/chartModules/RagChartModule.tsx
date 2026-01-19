@@ -18,24 +18,30 @@ const defaultThresholds: RagThresholds = {
   good: 100,
 };
 
-const RagChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+type RagChartModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const RagChartModule = ({ onDelete, isPreview = false }: RagChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Performance Trend");
   const [showWidget, setShowWidget] = useState(false);
   const [data, setData] = useState<RagDataPoint[]>(sampleData);
   const [thresholds, setThresholds] = useState<RagThresholds>(defaultThresholds);
 
   return (
-    <div className="flex gap-3">
-      <div className="flex-1 sticky top-5 h-full min-w-0">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 sticky top-5 h-full min-0">
         <RagChart
           widgetTitle={widgetTitle}
           data={data}
           thresholds={thresholds}
-          onToggleWidget={() => setShowWidget(!showWidget)}
+          onToggleWidget={() => !isPreview && setShowWidget(!showWidget)}
           onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <RagConfiguration
           widgetTitle={widgetTitle}
           setWidgetTitle={setWidgetTitle}

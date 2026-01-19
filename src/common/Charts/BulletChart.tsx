@@ -13,15 +13,12 @@ import {
   ChartValueAxisItem,
   TooltipContext,
 } from "@progress/kendo-react-charts";
-import { Copy, Trash2, Download, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./GetChartData";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*       TYPES       */
 
@@ -59,6 +56,7 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
   isCreationMode?: boolean;
+  isPreview?: boolean;
   allUploadedData?: { [key: string]: { [key: string]: BulletData } };
 };
 
@@ -87,6 +85,7 @@ export default function BulletChart({
   tierLevel = 0,
   chartId,
   isCreationMode = false,
+  isPreview = false,
   allUploadedData,
 }: Props) {
   const [localUploadedData, setLocalUploadedData] = useState<
@@ -103,11 +102,8 @@ export default function BulletChart({
     endingRange,
   });
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
-
-
 
   /*   PLOT BANDS   */
   const plotBands: PlotBand[] = useMemo(() => {
@@ -148,22 +144,26 @@ export default function BulletChart({
     return legendValues
 
       .filter((l: any) => l.label)
-      .reduce((acc, legend) => {
-        const range = endingRange - startingRange;
-        const current =
-          startingRange + Math.floor(Math.random() * range * 0.6);
-        const target = startingRange + Math.floor(Math.random() * range * 0.9);
-        acc[legend.label] = [current, target];
-        return acc;
-      }, {} as { [key: string]: BulletData });
+      .reduce(
+        (acc, legend) => {
+          const range = endingRange - startingRange;
+          const current =
+            startingRange + Math.floor(Math.random() * range * 0.6);
+          const target =
+            startingRange + Math.floor(Math.random() * range * 0.9);
+          acc[legend.label] = [current, target];
+          return acc;
+        },
+        {} as { [key: string]: BulletData },
+      );
   }, [legendValues, startingRange, endingRange]);
 
   const bulletCharts = useMemo(() => {
     const sheetName = (widgetTitle || "Sheet")
-      .replace(/[:\/?*\[\]\\]/g, " ")
+      .replace(/[:/?*[\]\\]/g, " ")
       .trim()
       .substring(0, 31);
-    
+
     // Check if we have specific data for this sheet/title
     const dataToUse =
       localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
@@ -199,8 +199,6 @@ export default function BulletChart({
     generatedData,
   ]);
 
-
-
   /*   ACTIONS   */
 
   const handleCopy = () => {
@@ -219,9 +217,7 @@ export default function BulletChart({
       const usedNames = new Set<string>();
 
       const getUniqueSheetName = (name: string) => {
-        let baseName = (name || "Sheet")
-          .replace(/[:\/?*\[\]\\]/g, " ")
-          .trim();
+        let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
         if (baseName.length > 25) baseName = baseName.substring(0, 25);
         if (!baseName) baseName = "Sheet";
 
@@ -274,16 +270,8 @@ export default function BulletChart({
     }
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleChartClick = () => {
@@ -333,136 +321,35 @@ export default function BulletChart({
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers?.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        <div className="flex justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {bulletCharts.length} metrics
+      <ChartCardWrapper
+        title={widgetTitle}
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+          onUpload: tierLevel === 0 ? handleUpload : undefined,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          <div className="text-sm text-gray-500 font-medium">
+            {bulletCharts.length} metrics
+          </div>
+        }
+        footer={
+          childTiers?.length > 0 ? (
+            <p className="text-sm text-blue-600 font-medium text-center">
+              Click chart to view {childTiers?.length} child tier
+              {childTiers?.length > 1 ? "s" : ""}
             </p>
-          </div>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  {tierLevel === 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload();
-                        setShowPopover(false);
-                      }}
-                      disabled={isDownloading}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <Download size={18} />
-                      <span>Download</span>
-                    </button>
-                  )}
-
-                  {tierLevel === 0 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          document
-                            .getElementById(
-                              `upload-input-${chartId || widgetTitle}`
-                            )
-                            ?.click();
-                          setShowPopover(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                      >
-                        <Upload size={18} />
-                        <span>Upload Data</span>
-                      </button>
-                      <input
-                        id={`upload-input-${chartId || widgetTitle}`}
-                        type="file"
-                        accept=".xlsx, .xls"
-                        className="hidden"
-                        onChange={handleUpload}
-                      />
-                    </>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  {!isCreationMode && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddTierClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <GoPlus size={18} />
-                      <span>Add Tier</span>
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
+          ) : undefined
+        }
+      >
         {/* Bullet Charts */}
         <div className="space-y-2">
           {bulletCharts.map((chart, index) => (
@@ -499,19 +386,10 @@ export default function BulletChart({
 
         {bulletCharts.length === 0 && (
           <div className="h-[400px] flex items-center justify-center text-gray-400">
-            No data available. Please configure metrics in the widget.
+            No data available.
           </div>
         )}
-
-        {childTiers?.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier
-              {childTiers?.length > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-      </div>
+      </ChartCardWrapper>
 
       <AddTierModal
         isOpen={showAddTierModal}
@@ -541,6 +419,8 @@ export default function BulletChart({
                   tierLevel={tierLevel + 1}
                   chartId={tier?.id}
                   allUploadedData={localUploadedData || allUploadedData}
+                  isPreview={isPreview}
+                  onDelete={onDelete}
                 />
               ))}
           </div>

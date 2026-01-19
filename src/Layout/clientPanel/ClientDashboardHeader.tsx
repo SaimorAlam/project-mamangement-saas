@@ -12,6 +12,7 @@ import PrimaryButton from "@/common/PrimaryButton";
 import CreateProgramModal from "@/components/client/AllProgram/CreateProgramModal";
 import SuccessModal from "@/components/client/SuccessModal";
 import NotificationModal from "@/components/client/NotificationModal";
+import { toast } from "sonner";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import NewProjectModal from "@/components/client/NewProjectModal";
 import { Bell, CalendarDays, ChevronDown, Plus, UserPlus } from "lucide-react";
@@ -27,6 +28,9 @@ import { getClientSidebarItems } from "./clientSidebarItems";
 // import CreateProjectModal from "./CreateProjectModal";
 import CreateProject from "./CreateProject";
 import { useGetUser } from "@/hooks/useGetUser";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { setIsPreview, setIsPublished } from "@/store/Slices/ChartSlice/ChartSlice";
+import { Download } from "lucide-react";
 
 interface ClientDashboardHeaderProps {
   name?: string;
@@ -87,8 +91,13 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const isProjectReviewPage = currentPath.includes(
     "/client-panel/project-review",
   );
+  const isProjectBuilderPage = currentPath.includes(
+    "/client-panel/project-builder",
+  );
 
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { isPreview, isPublished } = useAppSelector((state) => state.chartSlice);
 
   useEffect(() => {
     setIsEmployeeModalOpen(false);
@@ -194,6 +203,54 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           type="Primary"
           onClick={() => navigate("/client-panel/help/support/create-tickets")}
         />
+      );
+    }
+
+    if (isProjectBuilderPage) {
+      if (isPreview || isPublished) {
+        return (
+          <div className="flex gap-4">
+            <PrimaryButton
+              title="Download CSV"
+              leftIcon={<Download />}
+              type="Primary"
+              onClick={() => {
+                // Trigger CSV download event
+                window.dispatchEvent(new CustomEvent("download-project-config"));
+              }}
+            />
+            <PrimaryButton
+              title="Back to Editor"
+              type="Outline"
+              onClick={() => {
+                dispatch(setIsPreview(false));
+                dispatch(setIsPublished(false));
+              }}
+            />
+          </div>
+        );
+      }
+      return (
+        <div className="flex gap-3">
+          <PrimaryButton
+            title="Preview"
+            type="Outline"
+            onClick={() => dispatch(setIsPreview(true))}
+          />
+          <PrimaryButton
+            title="Save as Draft"
+            type="Outline"
+            onClick={() => {
+              // Handle save as draft logic if needed
+              toast.success("Project saved as draft");
+            }}
+          />
+          <PrimaryButton
+            title="Publish"
+            type="Primary"
+            onClick={() => dispatch(setIsPublished(true))}
+          />
+        </div>
       );
     }
 

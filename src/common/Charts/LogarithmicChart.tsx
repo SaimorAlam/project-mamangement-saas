@@ -43,6 +43,7 @@ type Props = {
   onDelete?: () => void;
   legendValues?: LegendValue[];
   numOfLegendDataSet?: number;
+  isPreview?: boolean;
 };
 
 /* ---------- COMPONENT ---------- */
@@ -57,6 +58,7 @@ export default function LogarithmicChart({
   legendValues = [],
   chartId = "root",
   onDelete,
+  isPreview = false,
 }: Props) {
   /* ---------- HOOKS ---------- */
   const { isDownloading, handleCopy, handleDownloadWrapper } = useChartTools();
@@ -139,6 +141,7 @@ export default function LogarithmicChart({
           onToggleWidget,
         }}
         isDownloading={isDownloading}
+        isPreview={isPreview}
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">

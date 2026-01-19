@@ -4,7 +4,12 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import TreemapChart from "@/common/Charts/TreemapChart";
 
-const TreemapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+type TreemapChartModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const TreemapChartModule = ({ onDelete, isPreview = false }: TreemapChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Treemap Chart");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -18,11 +23,11 @@ const TreemapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
     { label: "", field: "", color: "#CDD7B6" },
     { label: "", field: "", color: "#C1F666" },
     { label: "", field: "", color: "#D43F97" },
-    { label: "", field: "", color: "#1E5D8C" },
-    { label: "", field: "", color: "#421243" },
-    { label: "", field: "", color: "#7F94B0" },
-    { label: "", field: "", color: "#EF6537" },
-    { label: "", field: "", color: "#C0ADDB" },
+    { label: "", field: "#1E5D8C", color: "#1E5D8C" },
+    { label: "", field: "#421243", color: "#421243" },
+    { label: "", field: "#7F94B0", color: "#7F94B0" },
+    { label: "", field: "#EF6537", color: "#EF6537" },
+    { label: "", field: "#C0ADDB", color: "#C0ADDB" },
   ]);
 
   // Treemap charts don't use X-axis values or Y-axis ranges
@@ -31,18 +36,11 @@ const TreemapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [startingRange] = useState<number>(0);
   const [endingRange] = useState<number>(100);
 
-  // Dummy handlers (not used in Treemap chart)
-  const handleSetNumOfXAxisDataSet = () => {
-    // Not used for Treemap chart
-  };
-
-  const handleXAxisValueChange = () => {
-    // Not used for Treemap chart
-  };
-
   // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   // Close widget
@@ -51,7 +49,7 @@ const TreemapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   return (
-    <div className="flex gap-3 h-full">
+    <div className="flex gap-3 h-full w-full">
       <div className="flex-1 h-full sticky top-5">
         <TreemapChart
           widgetTitle={widgetTitle}
@@ -59,18 +57,19 @@ const TreemapChartModule = ({ onDelete }: { onDelete?: () => void }) => {
           numOfLegendDataSet={numOfLegendDataSet}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Treemap Chart"
           widgetTitle={widgetTitle}
           widgetCategory="TREEMAP"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
+          handleSetNumOfXAxisDataSet={() => {}}
           xAxisValues={xAxisValues}
-          handleXAxisValueChange={handleXAxisValueChange}
+          handleXAxisValueChange={() => {}}
           numOfLegendDataSet={numOfLegendDataSet}
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}

@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
 import ProgressRing from "@/common/Charts/ProgressRing";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const ProgressRingModule = ({ onDelete }: { onDelete?: () => void }) => {
-  const [widgetTitle, setWidgetTitle] = useState("My-CSV");
+const ProgressRingModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
+  const [widgetTitle, setWidgetTitle] = useState("Activity Progress");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] =
-    useState<number>(3);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#13A490" },
@@ -23,46 +31,53 @@ const ProgressRingModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [startingRange] = useState<number>(0);
   const [endingRange] = useState<number>(100);
 
-  // Dummy handler for X-axis (not used in progress ring)
-  const handleSetNumOfXAxisDataSet = () => {
-    // Not used for progress ring
-  };
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "progress-ring",
+        config: {
+          widgetTitle,
+          legendValues,
+          numOfLegendDataSet,
+        },
+      }),
+    );
+  }, [widgetTitle, legendValues, numOfLegendDataSet, dispatch]);
 
-  const handleXAxisValueChange = () => {
-    // Not used for progress ring
-  };
-
-  // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
-  // Close widget (for X button)
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3">
-      <ProgressRing
-        widgetTitle={widgetTitle}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-        onDelete={onDelete}
-      />
-      {showWidget && (
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
+        <ProgressRing
+          widgetTitle={widgetTitle}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isPreview={isPreview}
+        />
+      </div>
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Progress Ring"
           widgetTitle={widgetTitle}
           widgetCategory="PROGRESS_RING"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
+          handleSetNumOfXAxisDataSet={() => {}}
           xAxisValues={xAxisValues}
-          handleXAxisValueChange={handleXAxisValueChange}
+          handleXAxisValueChange={() => {}}
           numOfLegendDataSet={numOfLegendDataSet}
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
