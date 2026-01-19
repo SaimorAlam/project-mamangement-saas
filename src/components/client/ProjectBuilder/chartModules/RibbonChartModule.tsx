@@ -16,8 +16,8 @@ const RibbonChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [series, setSeries] = useState<RibbonSeries[]>(initialSeries);
 
   return (
-    <div className="flex gap-3 w-[calc(100%)]">
-      <div className="flex-1 sticky top-5 h-full min-w-0">
+    <div className="flex gap-3 w-full min-w-0">
+      <div className="flex-1 min-w-0 sticky top-5 h-full">
         <RibbonChart
           widgetTitle={widgetTitle}
           categories={categories}
@@ -27,15 +27,17 @@ const RibbonChartModule = ({ onDelete }: { onDelete?: () => void }) => {
         />
       </div>
       {showWidget && (
-        <RibbonConfiguration
-          widgetTitle={widgetTitle}
-          setWidgetTitle={setWidgetTitle}
-          categories={categories}
-          setCategories={setCategories}
-          series={series}
-          setSeries={setSeries}
-          onClose={() => setShowWidget(false)}
-        />
+        <div className="shrink-0 sticky top-5">
+          <RibbonConfiguration
+            widgetTitle={widgetTitle}
+            setWidgetTitle={setWidgetTitle}
+            categories={categories}
+            setCategories={setCategories}
+            series={series}
+            setSeries={setSeries}
+            onClose={() => setShowWidget(false)}
+          />
+        </div>
       )}
     </div>
   );

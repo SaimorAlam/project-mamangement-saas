@@ -49,7 +49,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
     // Match exact path or any child path
     if (route.children) {
       return route.children.some(
-        (child) => `${route.path}/${child.path}` === currentPath
+        (child) => `${route.path}/${child.path}` === currentPath,
       );
     }
     return route.path === currentPath;
@@ -57,11 +57,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
   // Special case for Program Overview: map to All Program
   const showProgramOverviewBreadcrumb = currentPath.startsWith(
-    "/client-panel/all-program/program-overview/"
+    "/client-panel/all-program/program-overview/",
   );
   if (showProgramOverviewBreadcrumb) {
     currentRoute = allRoutes.find(
-      (r) => r.path === "/client-panel/all-program"
+      (r) => r.path === "/client-panel/all-program",
     );
   }
 
@@ -73,19 +73,19 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   }>({ programName: "", id: "" });
   const [successOpen, setSuccessOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [,setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const isEmployeePage = currentPath.includes("/employee");
   const isHighwayExpansionPage = currentPath.includes(
-    "/highway-expansion/all-highway"
+    "/highway-expansion/all-highway",
   );
   const isAllProgramPage = currentPath.startsWith("/client-panel/all-program");
   const isProgramOverviewPage = currentPath.startsWith(
-    "/client-panel/program-overview/"
+    "/client-panel/program-overview/",
   );
   const isProjectReviewPage = currentPath.includes(
-    "/client-panel/project-review"
+    "/client-panel/project-review",
   );
 
   const navigate = useNavigate();
@@ -199,33 +199,39 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
     return (
       <>
-        <PrimaryButton
+        {/* <PrimaryButton
           title="Quick Action"
           leftIcon={<Plus />}
           rightIcon={<ChevronDown />}
           type="Primary"
           onClick={() => setIsDropdownOpen((prev) => !prev)}
-        />
+        /> */}
         <AnimatePresence>
-          {isDropdownOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-[55px] right-0 w-70 bg-white shadow-lg border border-gray-200 rounded-xl p-3 z-50"
-            >
-              {DROPDOWN_ITEMS.map((item, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleDropdownClick(item)}
-                  className="w-full text-left px-4 py-2 rounded-md hover:bg-gray-800 border border-gray-300 text-gray-700 hover:text-white mb-2 last:mb-0 cursor-pointer duration-300"
-                >
-                  {item}
-                </button>
-              ))}
-            </motion.div>
-          )}
+          {/* {isDropdownOpen && ( */}
+          <motion.div
+            initial={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.2 }}
+            className=""
+          >
+            {DROPDOWN_ITEMS.map((item) => (
+              <PrimaryButton
+                title={item}
+                leftIcon={<Plus />}
+                type="Primary"
+                onClick={() => handleDropdownClick(item)}
+              />
+              // <button
+              //   key={index}
+
+              //   className="w-full text-left px-4 py-4 rounded-md hover:bg-gray-800 border border-gray-300 text-gray-700 hover:text-white mb-2 last:mb-0 cursor-pointer duration-300"
+              // >
+              //   {item}
+              // </button>
+            ))}
+          </motion.div>
+          {/* )} */}
         </AnimatePresence>
       </>
     );
@@ -317,7 +323,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
                         currentRoute.icon as ReactElement<{
                           className?: string;
                         }>,
-                        { className: "w-4 h-4" }
+                        { className: "w-4 h-4" },
                       )}
                     {currentRoute.name}
                   </Link>
