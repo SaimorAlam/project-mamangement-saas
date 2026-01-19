@@ -327,7 +327,7 @@ export default function HorizontalStackedBarChart({
   };
 
   return (
-    <div className="min-w-3xl">
+    <div className="grow">
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
           childTiers?.length > 0
