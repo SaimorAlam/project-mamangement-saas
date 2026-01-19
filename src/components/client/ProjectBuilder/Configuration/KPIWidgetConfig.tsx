@@ -21,8 +21,6 @@ interface KPIWidgetConfigProps {
 const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
   config,
   setConfig,
-//   data,
-//   onUpdateData,
   onClose,
 }) => {
   const handleChange = (key: keyof KPISettings) => {
@@ -31,12 +29,6 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
       [key]: !prev[key],
     }));
   };
-
-//   const handleDataChange = (key: string, value: string) => {
-//     if (onUpdateData && data) {
-//         onUpdateData({ ...data, [key]: value });
-//     }
-//   }
 
   return (
     <div className="w-full bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col h-full">
@@ -53,57 +45,9 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
         </button>
       </div>
 
-      <div className="flex-1 px-4 py-4 space-y-6 overflow-y-auto max-h-[600px]">
-        {/* Widget Details Link */}
-        {/* <div>
-           <a href="#" className="text-blue-500 font-medium text-xs hover:underline">
-               KPI Widget Details
-           </a>
-        </div> */}
-        
-        {/* Data Fields */}
-        {/* {data && (
-            <div className="space-y-3">
-                 <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Title</label>
-                    <input 
-                        type="text" 
-                        value={data.title} 
-                        onChange={(e) => handleDataChange('title', e.target.value)}
-                        className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                    />
-                 </div>
-                 <div className="flex gap-2">
-                    <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Value</label>
-                        <input 
-                            type="text" 
-                            value={data.value} 
-                            onChange={(e) => handleDataChange('value', e.target.value)}
-                            className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                    <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Growth</label>
-                        <input 
-                            type="text" 
-                            value={data.growth} 
-                            onChange={(e) => handleDataChange('growth', e.target.value)}
-                            className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                 </div>
-                 <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
-                    <input 
-                        type="text" 
-                        value={data.description} 
-                        onChange={(e) => handleDataChange('description', e.target.value)}
-                        className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                    />
-                 </div>
-            </div>
-        )}
+      <div className="flex-1 px-4 py-4 space-y-6 overflow-y-auto max-h-[600px] scrollbar-hide">
+        {/* Data Fields Hidden as per user request */}
+        {/* {data && ( ... )} */}
 
         {/* Display Settings */}
         <div>
@@ -134,7 +78,7 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
         </div>
 
         {/* Assigned By */}
-        {/* <div>
+        <div>
            <h3 className="text-gray-800 font-medium text-xs mb-3">Assigned by</h3>
            <div className="flex items-center gap-3">
                <div className="w-8 h-8 rounded-full bg-pink-100 overflow-hidden">
@@ -149,7 +93,7 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
                    <p className="text-xs text-gray-500">Admin</p>
                </div>
            </div>
-        </div> */}
+        </div>
       </div>
 
       {/* Footer Actions */}

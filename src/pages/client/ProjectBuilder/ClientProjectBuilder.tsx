@@ -41,6 +41,7 @@ import CohortAnalysisModule from "@/components/client/ProjectBuilder/chartModule
 import GeographicMapModule from "@/components/client/ProjectBuilder/chartModules/GeographicMapModule";
 import RagChartModule from "@/components/client/ProjectBuilder/chartModules/RagChartModule";
 import RibbonChartModule from "@/components/client/ProjectBuilder/chartModules/RibbonChartModule";
+import KpiModule from "@/components/client/ProjectBuilder/chartModules/KpiModule";
 
 const ClientProjectBuilder = () => {
   const projectId = useAppSelector((state) => state.chartSlice?.projectId);
@@ -51,10 +52,10 @@ const ClientProjectBuilder = () => {
   const projectsChartsData = projectsChart?.data;
 
   const handleWidgetSelect = (widgetId: string) => {
-    if (widgetId === "kpi") {
-      setSelectedWidgets([]);
-      setActiveWidget("KPI widget");
-    } else {
+    if (widgetId) {
+      //   setSelectedWidgets([]);
+      //   setActiveWidget("KPI widget");
+      // } else {
       // Toggle widget selection - add if not present, remove if already selected
       setSelectedWidgets((prev) => {
         if (prev.includes(widgetId)) {
@@ -82,13 +83,12 @@ const ClientProjectBuilder = () => {
         selectedWidgets={selectedWidgets}
       />
       <div className="flex-1 min-w-0 flex flex-col gap-6 border border-gray-200 rounded-lg p-4 h-full mb-10 relative">
-        <ProjectStats activeWidget={activeWidget} />
-
         {projectsChartsData?.length > 0 ? (
           <DefaultChartData projectsChartsData={projectsChartsData} />
         ) : (
           selectedWidgets.length === 0 && (
             <>
+              <ProjectStats activeWidget={activeWidget} />
               {/* <StackedBarChart /> */}
               <div className="flex gap-4">
                 <RadarCharts />
@@ -120,6 +120,9 @@ const ClientProjectBuilder = () => {
               <HeatmapChart />
             </>
           )
+        )}
+        {selectedWidgets.includes("kpi") && (
+          <KpiModule onDelete={() => handleWidgetDelete("kpi")} />
         )}
         {selectedWidgets.includes("bar-chart") && (
           <StackedBarChartModule
