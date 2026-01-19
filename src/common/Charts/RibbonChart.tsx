@@ -32,6 +32,14 @@ const RibbonChart: React.FC<RibbonChartProps> = ({
 }) => {
   const [showPopover, setShowPopover] = useState(false);
   const [hoveredSeries, setHoveredSeries] = useState<string | null>(null);
+  const [tooltip, setTooltip] = useState<{
+    active: boolean;
+    x: number;
+    y: number;
+    content: string;
+    color: string;
+    category?: string;
+  }>({ active: false, x: 0, y: 0, content: "", color: "" });
 
   // Processing data for rendering
   // We need to calculate the layout:
@@ -96,13 +104,18 @@ const RibbonChart: React.FC<RibbonChartProps> = ({
     width: number,
     height: number,
   ) => {
-    // Distribute categories evenly
-    const effectiveWidth = width - padding.left - padding.right;
+    // Distribute categories evenly, but leave space for labels on the left
+    // and half bar widths at both ends to avoid clipping/overlap
+    const labelSpacing = 15; // Extra space after Y labels
+    const effectiveWidth =
+      width - padding.left - padding.right - barWidth - labelSpacing;
     const effectiveHeight = height - padding.top - padding.bottom;
 
     const xStep = effectiveWidth / Math.max(categories.length - 1, 1);
     const x =
       padding.left +
+      labelSpacing +
+      barWidth / 2 +
       (categories.length > 1 ? catIndex * xStep : effectiveWidth / 2);
 
     // Invert Y because SVG y=0 is top
@@ -142,7 +155,7 @@ const RibbonChart: React.FC<RibbonChartProps> = ({
 
   return (
     <div
-      className={`w-full border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow bg-white ${className}`}
+      className={`w-full min-w-0 border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow bg-white ${className}`}
       onClick={() => {
         // if (onToggleWidget) onToggleWidget();
       }}
@@ -226,7 +239,7 @@ const RibbonChart: React.FC<RibbonChartProps> = ({
       </div>
 
       {/* Ribbon Visualization */}
-      <div className="h-[400px] w-full relative">
+      <div className="h-[400px] w-full relative group">
         <ResponsiveContainer width="100%" height="100%">
           {/* We use a custom component wrapper to get width/height from ResponsiveContainer */}
           <ChartRenderer
@@ -238,8 +251,31 @@ const RibbonChart: React.FC<RibbonChartProps> = ({
             getCoordinates={getCoordinates}
             hoveredSeries={hoveredSeries}
             setHoveredSeries={setHoveredSeries}
+            setTooltip={setTooltip}
           />
         </ResponsiveContainer>
+
+        {/* Custom Interactive Tooltip */}
+        {tooltip.active && (
+          <div
+            className="absolute pointer-events-none bg-white border border-gray-200 rounded shadow-md p-2 z-50 transition-all duration-75 text-xs whitespace-nowrap"
+            style={{
+              left: tooltip.x + 10,
+              top: tooltip.y - 40,
+            }}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: tooltip.color }}
+              />
+              <span className="font-bold text-gray-800">{tooltip.content}</span>
+            </div>
+            {tooltip.category && (
+              <div className="text-gray-500">{tooltip.category}</div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Legend */}
@@ -275,6 +311,7 @@ const ChartRenderer = ({
   getCoordinates,
   hoveredSeries,
   setHoveredSeries,
+  setTooltip,
 }: any) => {
   if (!width || !height) return null;
 
@@ -386,10 +423,26 @@ const ChartRenderer = ({
               strokeWidth={1}
               className="transition-all duration-300 ease-in-out cursor-pointer"
               onMouseEnter={() => setHoveredSeries(s.id)}
-              onMouseLeave={() => setHoveredSeries(null)}
-            >
-              <title>{`${s.name}\n${cat.category} -> ${nextCat.category}`}</title>
-            </path>
+              onMouseLeave={() => {
+                setHoveredSeries(null);
+                setTooltip((prev: any) => ({ ...prev, active: false }));
+              }}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget
+                  .closest("svg")
+                  ?.getBoundingClientRect();
+                if (rect) {
+                  setTooltip({
+                    active: true,
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                    content: s.name,
+                    color: s.color,
+                    category: `${cat.category} → ${nextCat.category}`,
+                  });
+                }
+              }}
+            />
           );
         });
       })}
@@ -431,12 +484,28 @@ const ChartRenderer = ({
                   height={Math.max(h, 0)} // Prevent negative height
                   fill={node.color}
                   fillOpacity={isHovered || !isAnyHovered ? 1 : 0.3}
-                  className="transition-opacity duration-300"
+                  className="transition-opacity duration-300 cursor-pointer"
                   onMouseEnter={() => setHoveredSeries(node.id)}
-                  onMouseLeave={() => setHoveredSeries(null)}
-                >
-                  <title>{`${node.name}: ${node.value}`}</title>
-                </rect>
+                  onMouseLeave={() => {
+                    setHoveredSeries(null);
+                    setTooltip((prev: any) => ({ ...prev, active: false }));
+                  }}
+                  onMouseMove={(e) => {
+                    const rect = e.currentTarget
+                      .closest("svg")
+                      ?.getBoundingClientRect();
+                    if (rect) {
+                      setTooltip({
+                        active: true,
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top,
+                        content: `${node.name}: ${node.value}`,
+                        color: node.color,
+                        category: cat.category,
+                      });
+                    }
+                  }}
+                />
               );
             })}
           </g>

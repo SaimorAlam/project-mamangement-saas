@@ -24,9 +24,7 @@ interface ProjectWidgetProps {
   onWidgetSelect: (widgetId: string) => void;
 }
 
-const WidgetLibrary: React.FC<ProjectWidgetProps> = ({
-  onWidgetSelect,
-}) => {
+const WidgetLibrary: React.FC<ProjectWidgetProps> = ({ onWidgetSelect }) => {
   const [selectedProgram, setSelectedProgram] = useState<string>("");
   const [selectedWidget, setSelectedWidget] = useState<string>("kpi");
 
@@ -197,8 +195,8 @@ const WidgetLibrary: React.FC<ProjectWidgetProps> = ({
         {/* Instructions */}
         <div className=" py-6 border-t border-b border-gray-200">
           <p className="text-xs text-gray-600 leading-relaxed">
-            Drag and drop widgets to add them to your dashboard. Click
-            on a placed widget to configure it.
+            Drag and drop widgets to add them to your dashboard. Click on a
+            placed widget to configure it.
           </p>
         </div>
 

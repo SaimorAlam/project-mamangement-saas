@@ -8,7 +8,7 @@ import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
 import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
-import HorizontalBarChartModule from '../../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule';
+import HorizontalBarChartModule from "../../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule";
 import { useAppSelector } from "@/hooks/useRedux";
 import { useGetChartByProjectIdQuery } from "@/store/Api/ChartApi/ChartApi";
 import FunnelChartModule from "@/components/client/ProjectBuilder/chartModules/FunnelChartModule";
@@ -42,15 +42,14 @@ import GeographicMapModule from "@/components/client/ProjectBuilder/chartModules
 import RagChartModule from "@/components/client/ProjectBuilder/chartModules/RagChartModule";
 import RibbonChartModule from "@/components/client/ProjectBuilder/chartModules/RibbonChartModule";
 
-
 const ClientProjectBuilder = () => {
-  const projectId = useAppSelector((state) => state.chartSlice?.projectId)
+  const projectId = useAppSelector((state) => state.chartSlice?.projectId);
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [activeWidget, setActiveWidget] = useState("KPI widget");
 
-  const { data: projectsChart } = useGetChartByProjectIdQuery(projectId)
-  const projectsChartsData = projectsChart?.data
-  
+  const { data: projectsChart } = useGetChartByProjectIdQuery(projectId);
+  const projectsChartsData = projectsChart?.data;
+
   const handleWidgetSelect = (widgetId: string) => {
     if (widgetId === "kpi") {
       setSelectedWidgets([]);
@@ -71,12 +70,9 @@ const ClientProjectBuilder = () => {
   const handleWidgetDelete = (widgetId: string) => {
     const toastId = toast.loading("Deleting widget...");
     setSelectedWidgets((prev) => {
-      return (
-        prev.filter((id) => id !== widgetId)
-      )
+      return prev.filter((id) => id !== widgetId);
     });
-    toast.success("Widget deleted successfully", { id: toastId })
-
+    toast.success("Widget deleted successfully", { id: toastId });
   };
 
   return (
@@ -85,13 +81,13 @@ const ClientProjectBuilder = () => {
         onWidgetSelect={handleWidgetSelect}
         selectedWidgets={selectedWidgets}
       />
-      <div className="flex flex-col gap-6 border border-gray-200 rounded-lg p-4 w-full h-full mb-10 relative">
+      <div className="flex-1 min-w-0 flex flex-col gap-6 border border-gray-200 rounded-lg p-4 h-full mb-10 relative">
         <ProjectStats activeWidget={activeWidget} />
 
-        {
-          projectsChartsData?.length > 0 ? (
-            <DefaultChartData projectsChartsData={projectsChartsData} />
-          ) : selectedWidgets.length === 0 && (
+        {projectsChartsData?.length > 0 ? (
+          <DefaultChartData projectsChartsData={projectsChartsData} />
+        ) : (
+          selectedWidgets.length === 0 && (
             <>
               {/* <StackedBarChart /> */}
               <div className="flex gap-4">
@@ -124,7 +120,7 @@ const ClientProjectBuilder = () => {
               <HeatmapChart />
             </>
           )
-        }
+        )}
         {selectedWidgets.includes("bar-chart") && (
           <StackedBarChartModule
             onDelete={() => handleWidgetDelete("bar-chart")}
@@ -204,7 +200,9 @@ const ClientProjectBuilder = () => {
         )}
 
         {selectedWidgets.includes("gauge-chart") && (
-          <GaugeChartModule onDelete={() => handleWidgetDelete("gauge-chart")} />
+          <GaugeChartModule
+            onDelete={() => handleWidgetDelete("gauge-chart")}
+          />
         )}
 
         {selectedWidgets.includes("histogram-chart") && (
@@ -212,29 +210,77 @@ const ClientProjectBuilder = () => {
         )}
 
         {selectedWidgets.includes("bubble-chart") && <BubbleChartModule />}
-        {selectedWidgets.includes("column-chart") && (
-          <ColumnBarChartModule />
-        )}
+        {selectedWidgets.includes("column-chart") && <ColumnBarChartModule />}
         {selectedWidgets.includes("funnel-chart") && <FunnelChartModule />}
         {selectedWidgets.includes("scatter-chart") && <ScatterChartModule />}
         {selectedWidgets.includes("pareto-chart") && <ParetoChartModule />}
-        {selectedWidgets.includes("waterfall-chart") && <WaterfallChartModule />}
+        {selectedWidgets.includes("waterfall-chart") && (
+          <WaterfallChartModule />
+        )}
         {selectedWidgets.includes("radar-chart") && <RadarChartModule />}
         {selectedWidgets.includes("candle-chart") && <CandleChartModule />}
-        {selectedWidgets.includes("treemap-chart") && <TreemapChartModule  onDelete={() => handleWidgetDelete("treemap-chart")}/>}
-        {selectedWidgets.includes("calendar-heatmap-chart") && <CalendarHeatmapModule  onDelete={() => handleWidgetDelete("calendar-heatmap-chart")}/>}
-        {selectedWidgets.includes("gantt-new-chart") && <GanttChartNewModule onDelete={() => handleWidgetDelete("gantt-new-chart")}/>}
-        {selectedWidgets.includes("matrix-table-chart") && <MatrixTableChartModule onDelete={() => handleWidgetDelete("matrix-table-chart")}/>}
-        {selectedWidgets.includes("combo-chart") && <ComboChartModule onDelete={() => handleWidgetDelete("combo-chart")}/>}
-        {selectedWidgets.includes("horisontal-stacked-bar-chart") && <HorizontalStackedBarChartModule onDelete={() => handleWidgetDelete("horisontal-stacked-bar-chart")}/>}
-        {selectedWidgets.includes("bullet-chart") && <BulletChartModule onDelete={() => handleWidgetDelete("bullet-chart")}/>}
+        {selectedWidgets.includes("treemap-chart") && (
+          <TreemapChartModule
+            onDelete={() => handleWidgetDelete("treemap-chart")}
+          />
+        )}
+        {selectedWidgets.includes("calendar-heatmap-chart") && (
+          <CalendarHeatmapModule
+            onDelete={() => handleWidgetDelete("calendar-heatmap-chart")}
+          />
+        )}
+        {selectedWidgets.includes("gantt-new-chart") && (
+          <GanttChartNewModule
+            onDelete={() => handleWidgetDelete("gantt-new-chart")}
+          />
+        )}
+        {selectedWidgets.includes("matrix-table-chart") && (
+          <MatrixTableChartModule
+            onDelete={() => handleWidgetDelete("matrix-table-chart")}
+          />
+        )}
+        {selectedWidgets.includes("combo-chart") && (
+          <ComboChartModule
+            onDelete={() => handleWidgetDelete("combo-chart")}
+          />
+        )}
+        {selectedWidgets.includes("horisontal-stacked-bar-chart") && (
+          <HorizontalStackedBarChartModule
+            onDelete={() => handleWidgetDelete("horisontal-stacked-bar-chart")}
+          />
+        )}
+        {selectedWidgets.includes("bullet-chart") && (
+          <BulletChartModule
+            onDelete={() => handleWidgetDelete("bullet-chart")}
+          />
+        )}
 
-        {selectedWidgets.includes("marimekko-chart") && <MarimekkoChartModule onDelete={() => handleWidgetDelete("marimekko-chart")} />}
-        {selectedWidgets.includes("box-plot") && <BoxPlotChartModule onDelete={() => handleWidgetDelete("box-plot")} />}
-        {selectedWidgets.includes("cohort-analysis") && <CohortAnalysisModule onDelete={() => handleWidgetDelete("cohort-analysis")} />}
-        {selectedWidgets.includes("geographic-map") && <GeographicMapModule onDelete={() => handleWidgetDelete("geographic-map")} />}
-        {selectedWidgets.includes("rag-chart") && <RagChartModule onDelete={() => handleWidgetDelete("rag-chart")} />}
-        {selectedWidgets.includes("ribbon-chart") && <RibbonChartModule onDelete={() => handleWidgetDelete("ribbon-chart")} />}
+        {selectedWidgets.includes("marimekko-chart") && (
+          <MarimekkoChartModule
+            onDelete={() => handleWidgetDelete("marimekko-chart")}
+          />
+        )}
+        {selectedWidgets.includes("box-plot") && (
+          <BoxPlotChartModule onDelete={() => handleWidgetDelete("box-plot")} />
+        )}
+        {selectedWidgets.includes("cohort-analysis") && (
+          <CohortAnalysisModule
+            onDelete={() => handleWidgetDelete("cohort-analysis")}
+          />
+        )}
+        {selectedWidgets.includes("geographic-map") && (
+          <GeographicMapModule
+            onDelete={() => handleWidgetDelete("geographic-map")}
+          />
+        )}
+        {selectedWidgets.includes("rag-chart") && (
+          <RagChartModule onDelete={() => handleWidgetDelete("rag-chart")} />
+        )}
+        {selectedWidgets.includes("ribbon-chart") && (
+          <RibbonChartModule
+            onDelete={() => handleWidgetDelete("ribbon-chart")}
+          />
+        )}
       </div>
       {/* <ProjectConfiguration /> */}
     </div>

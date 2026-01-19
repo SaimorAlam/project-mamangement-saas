@@ -309,7 +309,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   }, [selectedProgram, selectedProject, dispatch]);
 
   return (
-    <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 flex flex-col sticky top-0">
+    <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 min-w-78 flex flex-col sticky top-0">
       {/* Header */}
       {isLoading ? (
         <SelectSkeleton />
