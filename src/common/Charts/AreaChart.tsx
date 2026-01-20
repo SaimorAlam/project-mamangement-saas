@@ -81,7 +81,7 @@ export default function AreaChart({
       xAxisValues,
       legendValues,
       startingRange,
-      endingRange
+      endingRange,
     );
   }, [xAxisValues, legendValues, startingRange, endingRange]);
 
@@ -90,10 +90,7 @@ export default function AreaChart({
     return chartData.reduce((sum, row) => {
       return (
         sum +
-        legendValues.reduce(
-          (inner, l) => inner + Number(row[l.field] || 0),
-          0
-        )
+        legendValues.reduce((inner, l) => inner + Number(row[l.field] || 0), 0)
       );
     }, 0);
   }, [chartData, legendValues]);
@@ -130,7 +127,7 @@ export default function AreaChart({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -205,9 +202,11 @@ export default function AreaChart({
                         className="w-2.5 h-2.5 rounded-full"
                         style={{ backgroundColor: l.color }}
                       />
-                      <span className="text-xs text-gray-500 font-medium">{l.label}</span>
+                      <span className="text-xs text-gray-500 font-medium">
+                        {l.label}
+                      </span>
                     </div>
-                  )
+                  ),
               )}
             </div>
           </div>
@@ -215,7 +214,8 @@ export default function AreaChart({
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
@@ -223,9 +223,23 @@ export default function AreaChart({
         <div className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ReAreaChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis domain={[startingRange, endingRange]} fontSize={12} tickLine={false} axisLine={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f0f0f0"
+              />
+              <XAxis
+                dataKey="name"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                domain={[startingRange, endingRange]}
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
               <Tooltip content={<CustomTooltip />} />
               {legendValues.map((l) => (
                 <Area
