@@ -81,9 +81,9 @@ const AllProgramProject = () => {
 
   const itemsPerPage = 10;
 
-  const managerId = useSelector((state: any) => state.auth.user.userId);  
+  const managerId = useSelector((state: any) => state.auth.user?.userId);  
 
-  const { data, isLoading } = useGetAllProjectsQuery({
+  const { data, isLoading, error } = useGetAllProjectsQuery({
     managerId,
     page: currentPage,
     limit: itemsPerPage,
@@ -92,6 +92,11 @@ const AllProgramProject = () => {
     sortBy: sortBy,
     sortOrder: sortOrder
   });
+
+  if (isLoading) {
+    return <Loader className="animate-spin" />;
+  }
+
 
   const projects = data?.data?.projects?.data || [];
 
@@ -113,15 +118,12 @@ const AllProgramProject = () => {
     { value: "NORMAL", title: "Default" },
   ];
 
-  if (isLoading) {
-    return <Loader className="animate-spin" />;
-  }
-
+  
   return (
     <div className="pb-6 min-h-[500px]">
       {/* Header  */}
       <div className="flex items-center justify-between pb-6">
-        <h4 className=" text-gray-900">All Program & Project</h4>
+        <h4 className=" text-gray-900 text-xl font-semibold">All Program & Project</h4>
         <div className="flex items-center gap-3">
           {/* View Toggle */}
           <div className="flex items-center  bg-white gap-3">
@@ -255,7 +257,7 @@ const AllProgramProject = () => {
         isLoading && (<div className="text-5xl ">Loading...</div>)
       }
       {viewMode === "table" ? (
-        <>
+        <div className="">
           <StaffManagerProjectTable
             projects={projects as StaffEmployeeProject[]}
           />
@@ -267,9 +269,9 @@ const AllProgramProject = () => {
             totalPages={totalPages}
             filteredDataLength={projects.length}
           />
-        </>
+        </div>
       ) : (
-        <>
+        <div className="border border-gray-100 rounded-md min-h-88 p-2">
           <div className="grid grid-cols-4 gap-5">
             {projects?.map((projectData: StaffEmployeeProject) => {
               return (
@@ -293,7 +295,7 @@ const AllProgramProject = () => {
               </Link>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

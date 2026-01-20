@@ -82,7 +82,8 @@ export default function HorizontalStackedBarChart({
 
   /*   CHART DATA   */
   const chartData: ChartData[] = useMemo(() => {
-    const sheetName = (widgetTitle || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim().substring(0, 31);
+    const sheetName = (widgetTitle || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim().substring(0, 31);
+    // const sheetName = (widgetTitle || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim().substring(0, 31);
     const dataToUse = localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
@@ -204,7 +205,8 @@ export default function HorizontalStackedBarChart({
       const usedNames = new Set<string>();
 
       const getUniqueSheetName = (name: string) => {
-        let baseName = (name || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim();
+        let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
+        // let baseName = (name || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim();
         if (baseName.length > 25) baseName = baseName.substring(0, 25);
         if (!baseName) baseName = "Sheet";
 
@@ -325,7 +327,7 @@ export default function HorizontalStackedBarChart({
   };
 
   return (
-    <div className="min-w-3xl">
+    <div className="grow">
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
           childTiers?.length > 0
@@ -471,7 +473,7 @@ export default function HorizontalStackedBarChart({
             options={options}
             series={series}
             type="bar"
-            height={350}
+            height={450}
           />
         </div>
 

@@ -38,7 +38,7 @@ const LatestSubmission = () => {
     const [sortBy, setSortBy] = useState("date");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-    const { data, isLoading, error } = useGetAllLatestSubmissionsQuery({
+    const { data, isLoading } = useGetAllLatestSubmissionsQuery({
         fromDate: "2024-01-01",
         toDate: "2026-12-12"
     });
@@ -86,13 +86,13 @@ const LatestSubmission = () => {
             </div>
         );
     }
-    if (error) return <div className="text-gray-400 text-center">Something went wrong.</div>;
+    // if (error) return <div className="text-gray-400 text-center">Something went wrong.</div>;
 
 
     return (
         <BoxContainer>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 px-0">
-                <h4 className="font-semibold text-md">Latest Submission</h4>
+                <h4 className="text-xl font-semibold">Latest Submission</h4>
                 {
                     submissionsData.length > 0 && (
                         <DropdownMenu>

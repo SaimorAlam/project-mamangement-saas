@@ -434,7 +434,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       </div>
 
       {/* Widget Library */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide">
+      <div className="flex-1 overflow-y-auto">
         <div className="p-4">
           {/* Widget List */}
           <div className="flex flex-col gap-3">

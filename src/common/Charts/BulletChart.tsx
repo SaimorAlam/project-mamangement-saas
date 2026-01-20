@@ -160,7 +160,7 @@ export default function BulletChart({
 
   const bulletCharts = useMemo(() => {
     const sheetName = (widgetTitle || "Sheet")
-      .replace(/[:\/?*\[\]\\]/g, " ")
+      .replace(/[:/?*[\]\\]/g, " ")
       .trim()
       .substring(0, 31);
     
@@ -220,7 +220,7 @@ export default function BulletChart({
 
       const getUniqueSheetName = (name: string) => {
         let baseName = (name || "Sheet")
-          .replace(/[:\/?*\[\]\\]/g, " ")
+          .replace(/[:/?*[\]\\]/g, " ")
           .trim();
         if (baseName.length > 25) baseName = baseName.substring(0, 25);
         if (!baseName) baseName = "Sheet";

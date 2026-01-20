@@ -97,14 +97,14 @@ const OverDueChart = () => {
     if (err?.data?.message) return err.data.message;
     if (err?.error) return err.error;
     try {
-      return JSON.stringify(err);
+      return "No overdue projects.";
     } catch (e) {
       return "An error occurred while fetching overdue projects";
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4">
+    <div className="bg-white rounded-lg p-4">
       {overdueLoading && (
         <div className="flex items-center justify-center h-40">
           <Spinner />
@@ -112,7 +112,7 @@ const OverDueChart = () => {
       )}
 
       {overdueError && (
-        <div className="text-center text-sm text-red-600 py-6">
+        <div className="text-center text-gray-400 py-6">
           {getErrorMessage(overdueError)}
         </div>
       )}
