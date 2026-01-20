@@ -14,12 +14,14 @@ import { useHeaderContext } from "./StaffEmployeeHeaderContext";
 import { getStaffEmployeeSidebarItems } from "./staffEmployeeSidebarMenuItems";
 import GlobalSearch from "@/components/staffManager/GlobalSearch";
 import NotificationModalNew from '@/components/staffManager/NotificationModalNew';
+import { useGetUser } from "@/hooks/useGetUser";
 
 const StaffEmployeeDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const ClientSidebarGroups = getStaffEmployeeSidebarItems();
-  const { heading, breadcrumb } = useHeaderContext();
+  const { breadcrumb } = useHeaderContext();
+  const { name } = useGetUser();
 
   const location = useLocation();
   const currentPath = location.pathname;
@@ -54,7 +56,7 @@ const StaffEmployeeDashboardHeader = () => {
       <div className="flex items-center py-5 justify-between">
         {/* Greeting */}
         <div>
-          <h1 className="text-[32px] font-semibold">{heading}</h1>
+          <h1 className="text-[32px] font-semibold">{name ? name : "Mr./Mrs. Employee"}</h1>
           <p className="text-base text-gray-500">{breadcrumb}</p>
         </div>
 
