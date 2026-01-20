@@ -33,17 +33,17 @@ const UpcomingDeadline = () => {
   const [showCalendar, setShowCalendar] = useState(false);
 
   // Fetch data for upcoming deadlines
-  const { data, isLoading, error } =
+  const { data, isLoading } =
     useGetStaffEmployeeUpcomingDeadlinesQuery({
       days: selectedDays !== null ? selectedDays : "2025",
     });
 
-  if (error)
-    return (
-      <div className="text-gray-400 text-center">
-        Something went wrong.
-      </div>
-    );
+  // if (error)
+  //   return (
+  //     <div className="text-gray-400 text-center">
+  //       Something went wrong.
+  //     </div>
+  //   );
 
   const deadlineData = data?.data?.projects || [];
 
@@ -71,7 +71,7 @@ const UpcomingDeadline = () => {
         {/* Header */}
         <div className="flex gap-1 items-center justify-center">
           <Clock className="size-8 text-gray-600 w-6 h-6" />
-          <h4 className="text-lg font-semibold">
+          <h4 className="text-xl font-semibold">
             Upcoming Deadlines
           </h4>
         </div>
