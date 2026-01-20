@@ -83,7 +83,7 @@ const AllProgramProject = () => {
 
   const managerId = useSelector((state: any) => state.auth.user?.userId);  
 
-  const { data, isLoading, error } = useGetAllProjectsQuery({
+  const { data, isLoading } = useGetAllProjectsQuery({
     managerId,
     page: currentPage,
     limit: itemsPerPage,

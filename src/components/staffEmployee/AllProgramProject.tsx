@@ -316,7 +316,7 @@ const AllProgramProject = () => {
           />
         </>
       ) : (
-        <>
+        <div className="border border-gray-200 rounded-md min-h-88">
           <div className="grid grid-cols-4 gap-5">
             {projects
               ?.slice(0, showItems)
@@ -349,7 +349,7 @@ const AllProgramProject = () => {
               </Button>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

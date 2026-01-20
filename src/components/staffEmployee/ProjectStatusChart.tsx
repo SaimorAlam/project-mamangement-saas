@@ -138,7 +138,7 @@ export default function ProjectStatusChart() {
   return (
     <Card className="w-full border-[#E2E8F0] shadow-none">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-7">
-        <h4 className="font-semibold">Project Status</h4>
+        <h4 className="font-semibold text-xl">Project Status</h4>
         <DropdownSelect
           placeholderText="Sort By"
           dropdownItem={dropdownItem}
