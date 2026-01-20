@@ -10,10 +10,10 @@ import ChartCardWrapper from "./components/ChartCardWrapper";
 
 import {
   AnimationModule,
-  ContextMenuModule,
+  // ContextMenuModule,  
   CrosshairModule,
   HistogramSeriesModule,
-  LegendModule,
+  // LegendModule,
   ModuleRegistry,
   NumberAxisModule,
 } from "ag-charts-enterprise";
@@ -23,9 +23,9 @@ ModuleRegistry.registerModules([
   AnimationModule,
   CrosshairModule,
   HistogramSeriesModule,
-  LegendModule,
+  // LegendModule,
   NumberAxisModule,
-  ContextMenuModule,
+  // ContextMenuModule,
 ]);
 
 /*       TYPES       */
@@ -130,9 +130,9 @@ const generateCombinedHistogramData = (
   return allData;
 };
 
-const generateId = () =>
-  crypto.randomUUID?.() ??
-  Math.random().toString(36).substring(2, 10);
+// const generateId = () =>
+//   crypto.randomUUID?.() ??
+//   Math.random().toString(36).substring(2, 10);
 
 /*       COMPONENT       */
 
@@ -284,7 +284,7 @@ export default function HistogramChart({
   };
 
   const handleDownload = () => {
-    const csvId = generateId();
+    // const csvId = generateId();
 
     const payload = {
       numberOfDataset: numOfLegendDataSet,

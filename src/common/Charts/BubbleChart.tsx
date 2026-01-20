@@ -86,9 +86,9 @@ const generateBubbleData = (
   return series;
 };
 
-const generateId = () =>
-  crypto.randomUUID?.() ??
-  Math.random().toString(36).substring(2, 10);
+// const generateId = () =>
+//   crypto.randomUUID?.() ??
+//   Math.random().toString(36).substring(2, 10);
 
 /*       COMPONENT       */
 
