@@ -446,16 +446,14 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
                 }}
                 className={`flex items-start p-3 rounded-lg cursor-pointer transition-all border
                   ${
-                    selectedWidgets.includes(widget.id) ||
-                    (widget.id === "kpi" && selectedWidgets.length === 0)
+                    selectedWidgets.includes(widget.id)
                       ? "bg-gray-200 border-transparent"
                       : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
                   }`}
               >
                 <div
                   className={`mt-0.5 ${
-                    selectedWidgets.includes(widget.id) ||
-                    (widget.id === "kpi" && selectedWidgets.length === 0)
+                    selectedWidgets.includes(widget.id)
                       ? "text-website-color-darkGray"
                       : "text-gray-600"
                   }`}
@@ -475,8 +473,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
                   </h3>
                   <p
                     className={`text-xs mt-0.5 ${
-                      selectedWidgets.includes(widget.id) ||
-                      (widget.id === "kpi" && selectedWidgets.length === 0)
+                      selectedWidgets.includes(widget.id)
                         ? "text-website-color-darkGray"
                         : "text-gray-500"
                     }`}
