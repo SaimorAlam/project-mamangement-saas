@@ -67,7 +67,6 @@ const StaffManagerOverview = () => {
   const {
     data: staffData,
     isLoading: staffLoading,
-    error: staffError,
   } = useGetStaffEmpStateCartsQuery("");
 
   const dashboardData = staffData?.data;
@@ -77,7 +76,7 @@ const StaffManagerOverview = () => {
             <FaSpinner className="animate-spin" size={24} />
           </div>
   );
-  if (staffError) return <div>Error during Fetching data</div>;
+  // if (staffError) return <div>Error during Fetching data</div>;
 
   const processedDashboardData = clientData.map((item, index) => {
     const apiKeys = [
@@ -113,7 +112,7 @@ const StaffManagerOverview = () => {
         <div className="space-y-8 col-span-2">
           <div className="flex justify-center gap-3">
             <BoxContainer>
-              <h2 className="text-2xl font-semibold mb-4">
+              <h2 className="text-xl font-semibold my-2">
                 Top Overdue Projects
               </h2>
               <OverDueChart />

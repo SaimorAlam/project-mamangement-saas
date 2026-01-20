@@ -186,11 +186,10 @@ export default function MultiAxisLineChart({
   return (
     <>
       <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0
+        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${childTiers.length > 0
             ? "cursor-pointer hover:shadow-lg transition-shadow"
             : ""
-        }`}
+          }`}
         onClick={handleChartClick}
       >
         <div className="flex justify-between mb-6">
