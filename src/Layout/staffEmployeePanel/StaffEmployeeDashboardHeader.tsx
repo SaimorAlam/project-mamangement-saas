@@ -1,7 +1,6 @@
 import React, { cloneElement, useState } from "react";
-import SearchBar from "@/components/client/SearchBar";
-import { Bell, Eye, FileText, Megaphone } from "lucide-react";
-import { useLocation, Link } from "react-router-dom";
+import { Bell, Eye, FileText, Megaphone, Upload } from "lucide-react";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,17 +12,18 @@ import {
 import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffEmployeeHeaderContext";
 import { getStaffEmployeeSidebarItems } from "./staffEmployeeSidebarMenuItems";
-import UploadSubmission from "@/components/staffManager/overview/UploadSubmission";
-import StaffEmployeeNotificationModal from "./../../components/staffEmployee/StaffEmployeeNotificationModal";
+import GlobalSearch from "@/components/staffManager/GlobalSearch";
+import NotificationModalNew from '@/components/staffManager/NotificationModalNew';
 
 const StaffEmployeeDashboardHeader = () => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
+
   const ClientSidebarGroups = getStaffEmployeeSidebarItems();
-  const { heading, breadcrumb, showButton } = useHeaderContext();
+  const { heading, breadcrumb } = useHeaderContext();
 
   const location = useLocation();
   const currentPath = location.pathname;
+  const navigate = useNavigate();
 
   const allRoutes = ClientSidebarGroups.flatMap(
     (group) => group.items
@@ -31,6 +31,23 @@ const StaffEmployeeDashboardHeader = () => {
   const currentRoute = allRoutes.find(
     (route) => route.path === currentPath
   );
+
+  const previewButtonPaths = [
+      "/staff-employee-panel/upload-submission",
+      "/staff-employee-panel/project-builder",
+    ];
+    const saveDraftButtonPaths = [
+      "/staff-employee-panel/project-builder",
+      
+    ];
+    const publishButtonPaths = [
+      "/staff-employee-panel/upload-submission",
+      "/staff-employee-panel/project-builder",
+    ];
+    const uploadSubmissionButtonPaths = [
+      "/staff-employee-panel/projects",
+      "/staff-employee-panel",
+    ];
 
   return (
     <div>
@@ -42,11 +59,9 @@ const StaffEmployeeDashboardHeader = () => {
         </div>
 
         {/* Search */}
-        <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
+        <GlobalSearch />
 
+        {/* Right Controls */}
         <div className="flex items-center justify-between gap-2 relative">
           {/* Notifications */}
           <PrimaryButton
@@ -54,12 +69,12 @@ const StaffEmployeeDashboardHeader = () => {
             type={"Outline"}
             onClick={() => setIsOpen(true)}
           />
-          <StaffEmployeeNotificationModal
+          <NotificationModalNew
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
           />
 
-          {currentPath === "/staff-employee-panel/projects" && (
+          {previewButtonPaths.includes(currentPath) && (
             <PrimaryButton
               leftIcon={<Eye className="text-2xl" />}
               title="Preview"
@@ -67,7 +82,8 @@ const StaffEmployeeDashboardHeader = () => {
               onClick={() => setIsOpen(true)}
             />
           )}
-          {currentPath === "/staff-employee-panel/projects" && (
+
+          {saveDraftButtonPaths.includes(currentPath) && (
             <PrimaryButton
               leftIcon={<FileText className="text-2xl" />}
               title="Save Draft"
@@ -75,20 +91,22 @@ const StaffEmployeeDashboardHeader = () => {
               onClick={() => setIsOpen(true)}
             />
           )}
-          {currentPath === "/staff-employee-panel/projects" && (
+          {publishButtonPaths.includes(currentPath) && (
             <PrimaryButton
-              leftIcon={<Megaphone className="text-2xl" />}
-              title="Publish"
+              leftIcon={<Upload className="text-2xl" />}
+              title="Submit for Review"
               type={"Primary"}
               onClick={() => setIsOpen(true)}
             />
           )}
 
-          {/* Conditional Quick Action */}
-          {currentPath === "/staff-employee-panel" && (
-            <div className="relative">
-              <>{showButton && <UploadSubmission />}</>
-            </div>
+          {uploadSubmissionButtonPaths.includes(currentPath) && (
+            <PrimaryButton
+              leftIcon={<Upload className="text-2xl" />}
+              title="Upload Submission"
+              type="Primary"
+              onClick={() => navigate("/staff-employee-panel/upload-submission")}
+            />
           )}
         </div>
       </div>
