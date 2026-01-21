@@ -252,7 +252,7 @@ const CreateProject = ({
       const { dataUploadDateDays } = data;
       console.log(selectedStaffs);
       const payload = {
-        // message: data.message || "New Project Created",
+        message: data.message || "New Project Created",
         repeatEvery: data.repeatEvery,
         repeatOnDays: data.repeatOnDays || [],
         repeatOnDates: data.repeatOnDates || [],
