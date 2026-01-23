@@ -45,16 +45,12 @@ const ClientAllProgram = ({
   >("ALL");
   // const navigate = useNavigate();
 
-  const [sortColumn, setSortColumn] = useState<keyof IProgram | null>(
-    null
-  );
+  const [sortColumn, setSortColumn] = useState<keyof IProgram | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const debouncedSearch = useDebounce(search, 500);
 
   // Edit modal
-  const [editProgram, setEditProgram] = useState<IProgram | null>(
-    null
-  );
+  const [editProgram, setEditProgram] = useState<IProgram | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   // API calls
@@ -91,8 +87,7 @@ const ClientAllProgram = ({
     if (!sortColumn) {
       return list.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() -
-          new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     }
 
@@ -156,7 +151,7 @@ const ClientAllProgram = ({
     ...Array.from({ length: emptyRowsCount }).map(() => null),
   ];
   const handleRowClick = (programId: string) => {
-    navigate(`/client-panel/program-overview/${programId}`);
+    navigate(`/client-panel/all-program/program-overview/${programId}`);
   };
 
   return (
@@ -164,9 +159,7 @@ const ClientAllProgram = ({
       <div className="bg-white rounded-lg border border-gray-200">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between px-6 py-4 border-b border-gray-200 gap-3">
-          <h1 className="text-lg font-semibold text-gray-900">
-            {title}
-          </h1>
+          <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
           <div className="flex items-center gap-3">
             <input
               type="text"
@@ -179,70 +172,68 @@ const ClientAllProgram = ({
               className="px-4 py-2 text-sm border border-gray-300 rounded-md w-64"
             />
             {/* Sort By Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="px-4 py-2 pr-8 text-sm border border-gray-300 rounded-lg focus:outline-none appearance-none  bg-white cursor-pointer"
-                  >
-                    <ArrowDownUp className="size-5" />
-                    Sort By
-                    <ChevronDown className="size-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 bg-white border border-[#CAD2DB] p-1"
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="px-4 py-2 pr-8 text-sm border border-gray-300 rounded-lg focus:outline-none appearance-none  bg-white cursor-pointer"
                 >
-                  {/* Field Selection */}
-                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Field
-                  </div>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortBy === 'startDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                    onClick={() => setSortBy("name")}
-                  >
-                    Program Name
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                    onClick={() => setSortBy("submitDate")}
-                  >
-                    Updated At
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortBy === 'endDate' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                    onClick={() => setSortBy("submitDate")}
-                  >
-                    Deadline
-                  </DropdownMenuItem>
+                  <ArrowDownUp className="size-5" />
+                  Sort By
+                  <ChevronDown className="size-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-56 bg-white border border-[#CAD2DB] p-1"
+              >
+                {/* Field Selection */}
+                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Field
+                </div>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${sortBy === "startDate" ? "bg-indigo-50 text-indigo-600" : ""}`}
+                  onClick={() => setSortBy("name")}
+                >
+                  Program Name
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""}`}
+                  onClick={() => setSortBy("submitDate")}
+                >
+                  Updated At
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""}`}
+                  onClick={() => setSortBy("submitDate")}
+                >
+                  Deadline
+                </DropdownMenuItem>
 
-                  <div className="my-1 border-t border-gray-100" />
+                <div className="my-1 border-t border-gray-100" />
 
-                  {/* Order Selection */}
-                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Order
-                  </div>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortOrder === 'asc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                    onClick={() => setSortOrder("asc")}
-                  >
-                    Ascending
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortOrder === 'desc' ? 'bg-indigo-50 text-indigo-600' : ''}`}
-                    onClick={() => setSortOrder("desc")}
-                  >
-                    Descending
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                {/* Order Selection */}
+                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Order
+                </div>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""}`}
+                  onClick={() => setSortOrder("asc")}
+                >
+                  Ascending
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""}`}
+                  onClick={() => setSortOrder("desc")}
+                >
+                  Descending
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger className="px-4 py-2 font-semibold flex items-center gap-2 text-sm border border-gray-300 rounded-md min-w-32">
-                {priorityFilter === "ALL"
-                  ? "All Priorities"
-                  : priorityFilter}
-                  <ChevronDown className="h-5 w-5"/>
+                {priorityFilter === "ALL" ? "All Priorities" : priorityFilter}
+                <ChevronDown className="h-5 w-5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
@@ -292,7 +283,7 @@ const ClientAllProgram = ({
                         {sortColumn === col &&
                           (sortOrder === "asc" ? " ▲" : " ▼")}
                       </th>
-                    )
+                    ),
                 )}
               </tr>
             </thead>
@@ -308,9 +299,7 @@ const ClientAllProgram = ({
                       {program.programName}
                     </td>
                     <td className="px-6 py-4 align-middle">
-                      <PriorityDropdown
-                        defaultPriority={program.priority}
-                      />
+                      <PriorityDropdown defaultPriority={program.priority} />
                     </td>
                     {!hideCreatedOn && (
                       <td className="px-6 py-4 text-sm text-gray-600 align-middle">
@@ -365,15 +354,12 @@ const ClientAllProgram = ({
                     ]
                       .filter(Boolean)
                       .map((_, i) => (
-                        <td
-                          key={i}
-                          className="px-6 py-4 text-sm text-gray-200"
-                        >
+                        <td key={i} className="px-6 py-4 text-sm text-gray-200">
                           &nbsp;
                         </td>
                       ))}
                   </tr>
-                )
+                ),
               )}
             </tbody>
           </table>

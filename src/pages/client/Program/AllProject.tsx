@@ -52,7 +52,7 @@ const AllProject = ({
   const debouncedSearch = useDebounce(search, 500);
 
   const [editProject, setEditProject] = useState<UpdateProjectPayload | null>(
-    null
+    null,
   );
   const [editModalOpen, setEditModalOpen] = useState(false);
 
@@ -111,7 +111,7 @@ const AllProject = ({
     if (!sortColumn) {
       return list.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     }
 
@@ -242,7 +242,7 @@ const AllProject = ({
                     >
                       {col.replace(/([A-Z])/g, " $1")}
                     </th>
-                  )
+                  ),
               )}
             </tr>
           </thead>

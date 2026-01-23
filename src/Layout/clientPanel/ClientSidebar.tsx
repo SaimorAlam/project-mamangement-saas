@@ -71,10 +71,23 @@ const ClientSidebar = () => {
     const fullPath = item.index
       ? parentPath
       : item.path?.startsWith("/")
-      ? item.path
-      : `${parentPath}/${item.path}`;
+        ? item.path
+        : `${parentPath}/${item.path}`;
 
-    if (location.pathname === fullPath) return true;
+    const currentPath = location.pathname;
+
+    // Exact match
+    if (currentPath === fullPath) return true;
+
+    // Nested match: current path starts with item path followed by a slash
+    // We exclude the base root path to prevent it from matching every sub-route
+    if (
+      fullPath !== "/client-panel" &&
+      fullPath !== "" &&
+      currentPath.startsWith(fullPath + "/")
+    ) {
+      return true;
+    }
 
     if (item.children) {
       return item.children.some((child: any) => isRouteActive(child, fullPath));
@@ -86,8 +99,8 @@ const ClientSidebar = () => {
     const fullPath = item.index
       ? parentPath
       : item.path?.startsWith("/")
-      ? item.path
-      : `${parentPath}/${item.path}`;
+        ? item.path
+        : `${parentPath}/${item.path}`;
 
     const active = isRouteActive(item, parentPath);
 

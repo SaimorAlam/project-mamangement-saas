@@ -67,7 +67,6 @@ const DashboardPanelStatsCard = ({
   const currentPathname = location.pathname;
   const isInStaffManager =
     currentPathname === "/staff-manager-panel/project-review/all-projects";
-
   return (
     <div>
       <div
@@ -78,31 +77,33 @@ const DashboardPanelStatsCard = ({
         }  bg-[#EBFFF2] rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102 relative`}
       >
         {/* Menu Button - Absolute Top Right */}
-        <div className="absolute right-2 top-2 z-10">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowPopover(!showPopover);
-            }}
-            className="p-1 hover:bg-gray-100/50 rounded-full text-gray-400 hover:text-gray-600"
-          >
-            <BsThreeDots />
-          </button>
-          {showPopover && (
-            <div className="absolute right-0 top-6 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-20">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onToggleWidget) onToggleWidget();
-                  setShowPopover(false);
-                }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
-              >
-                <MdOutlineWidgets size={16} /> Widget
-              </button>
-            </div>
-          )}
-        </div>
+        {currentPathname.split("/")[2] === "project-builder" && (
+          <div className="absolute right-2 top-2 z-10">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowPopover(!showPopover);
+              }}
+              className="p-1 hover:bg-gray-100/50 rounded-full text-gray-400 hover:text-gray-600"
+            >
+              <BsThreeDots />
+            </button>
+            {showPopover && (
+              <div className="absolute right-0 top-6 w-32 bg-white border border-gray-200 rounded shadow-lg py-1 z-20">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onToggleWidget) onToggleWidget();
+                    setShowPopover(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
+                >
+                  <MdOutlineWidgets size={16} /> Widget
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="bg-white shadow-xs shadow-gray-100 rounded-lg p-5 ">
           {/* Icon & Title */}

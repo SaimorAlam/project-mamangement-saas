@@ -66,7 +66,21 @@ const StaffManagerSidebar = () => {
       ? item.path
       : `${parentPath}/${item.path}`;
 
-    if (location.pathname === fullPath) return true;
+    const currentPath = location.pathname;
+
+    // Exact match
+    if (currentPath === fullPath) return true;
+
+    // Nested match: current path starts with item path followed by a slash
+    // We exclude the base root path to prevent it from matching every sub-route
+    if (
+      fullPath !== "/staff-manager-panel" &&
+      fullPath !== "" &&
+      currentPath.startsWith(fullPath + "/")
+    ) {
+      return true;
+    }
+
     if (item.children) {
       return item.children.some((child: any) => isRouteActive(child, fullPath));
     }

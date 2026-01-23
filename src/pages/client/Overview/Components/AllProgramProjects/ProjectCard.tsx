@@ -13,6 +13,7 @@ import {
   useRemoveFavoriteProjectMutation,
 } from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
 import PrimaryButton from "@/common/PrimaryButton";
+import { useNavigate } from "react-router-dom";
 
 export type ProjectStatus =
   | "LIVE"
@@ -100,6 +101,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     progress,
     status,
   } = project;
+  const navigate = useNavigate();
   const [addFavoriteProject] = useAddFavoriteProjectMutation();
   const [removeFavoriteProject] = useRemoveFavoriteProjectMutation();
   const { data, isLoading } = useGetFavoriteProjectsQuery({});
@@ -149,8 +151,13 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
               <h4 className="font-semibold text-gray-900 leading-tight">
                 {programName || "Program Name"}
               </h4>
-              <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2">
-                <span>{name || "Project Name"}</span>{" "}
+              <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2 cursor-pointer">
+                <span
+                  className="truncate max-w-32"
+                  title={name || "Project Name"}
+                >
+                  {name || "Project Name"}
+                </span>
                 <button onClick={() => handleAddToFavorite(id)}>
                   {isLoading ? (
                     <FaStar className="text-gray-200 animate-pulse" size={18} />
@@ -208,23 +215,19 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         </div>
 
         {/* Progress */}
-        <div className="py-2 px-4">
+        <div className="py-2 space-y-4 px-4">
           <div className="flex justify-between text-sm mb-1">
             <span className="text-gray-600">Overall Progress</span>
             <span className="font-medium">{progress}%</span>
           </div>
           <Progress value={progress} className="h-2" />
+          <PrimaryButton
+            onClick={() => navigate(`/client-panel/project-details/${id}`)}
+            title="View Project Details"
+            type="Primary"
+            className="w-full h-10"
+          />
         </div>
-        <PrimaryButton
-          onClick={() => {}}
-          title="View Project Details"
-          type="Primary"
-          className="w-full h-10"
-        />
-        {/* CTA */}
-        {/* <div className="py-2 px-4">
-          <ProjectDetailsModal project={project} />
-        </div> */}
       </CardContent>
     </Card>
   );

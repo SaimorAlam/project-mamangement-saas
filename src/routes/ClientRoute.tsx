@@ -47,10 +47,11 @@ export function getClientRoutes() {
     {
       path: "all-program",
       element: <ClientAllProgramContainer />,
-      children: [{ index: true, element: <ClientAllProgram /> }],
+      children: [
+        { index: true, element: <ClientAllProgram /> },
+        { path: "program-overview/:id", element: <ProgramOverview /> },
+      ],
     },
-
-    { path: "program-overview/:id", element: <ProgramOverview /> },
     { path: "program-builder", element: <ClientProgramBuilder /> },
     { path: "program-name", element: <ClientProgramName /> },
 

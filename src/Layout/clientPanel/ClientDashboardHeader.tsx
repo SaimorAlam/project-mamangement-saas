@@ -29,7 +29,10 @@ import { getClientSidebarItems } from "./clientSidebarItems";
 import CreateProject from "./CreateProject";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
-import { setIsPreview, setIsPublished } from "@/store/Slices/ChartSlice/ChartSlice";
+import {
+  setIsPreview,
+  setIsPublished,
+} from "@/store/Slices/ChartSlice/ChartSlice";
 import { Download } from "lucide-react";
 
 interface ClientDashboardHeaderProps {
@@ -45,6 +48,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const { id: programId } = useParams();
   const location = useLocation();
   const currentPath = location.pathname;
+  console.log(currentPath);
   const ClientSidebarGroups = getClientSidebarItems();
   const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
 
@@ -77,7 +81,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   }>({ programName: "", id: "" });
   const [successOpen, setSuccessOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [,setIsDropdownOpen] = useState(false);
+  const [, setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const isEmployeePage = currentPath.includes("/employee");
@@ -97,7 +101,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { isPreview, isPublished } = useAppSelector((state) => state.chartSlice);
+  const { isPreview, isPublished } = useAppSelector(
+    (state) => state.chartSlice,
+  );
 
   useEffect(() => {
     setIsEmployeeModalOpen(false);
@@ -216,7 +222,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
               type="Primary"
               onClick={() => {
                 // Trigger CSV download event
-                window.dispatchEvent(new CustomEvent("download-project-config"));
+                window.dispatchEvent(
+                  new CustomEvent("download-project-config"),
+                );
               }}
             />
             <PrimaryButton
@@ -360,12 +368,12 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbItem>
+          {/* <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link to="/client-panel">Client</Link>
             </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
+          </BreadcrumbItem> */}
+          {/* <BreadcrumbSeparator /> */}
           {currentRoute && (
             <>
               <BreadcrumbItem>
