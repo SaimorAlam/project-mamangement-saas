@@ -20,10 +20,13 @@ interface IProps {
   showFooterLabel?: boolean;
   showFooterButton?: boolean;
   onToggleWidget?: () => void;
+  onDelete?: () => void;
+  onCopy?: () => void;
 }
 
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
+import { Copy, Trash2 } from "lucide-react";
 
 const DashboardPanelStatsCard = ({
   item,
@@ -32,9 +35,13 @@ const DashboardPanelStatsCard = ({
   showFooterLabel = true,
   showFooterButton = true,
   onToggleWidget,
+  onDelete,
+  onCopy,
 }: IProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [showPopover, setShowPopover] = useState(false);
+  // ... (keeping other state)
+
   const {
     title,
     value,
@@ -115,6 +122,26 @@ const DashboardPanelStatsCard = ({
                   className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
                 >
                   <MdOutlineWidgets size={16} /> Widget
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onCopy) onCopy();
+                    setShowPopover(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
+                >
+                  <Copy size={16} /> Copy
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onDelete) onDelete();
+                    setShowPopover(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-gray-50 text-left"
+                >
+                  <Trash2 size={16} /> Delete
                 </button>
               </div>
             )}

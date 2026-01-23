@@ -16,7 +16,12 @@ interface TooltipData {
   y: number;
 }
 
-export default function HeatmapChart() {
+interface HeatmapChartProps {
+  onDelete?: () => void;
+  onCopy?: () => void;
+}
+
+export default function HeatmapChart({ onDelete, onCopy }: HeatmapChartProps) {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const [data] = useState<HeatmapData[]>([
     {
@@ -42,6 +47,18 @@ export default function HeatmapChart() {
   ]);
 
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
+
+  const handleCopy = () => {
+    if (onCopy) {
+      onCopy();
+    } else {
+      navigator.clipboard.writeText(JSON.stringify(data));
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) onDelete();
+  };
 
   const getColor = (value: number) => {
     if (value < 500) return "bg-teal-200";
@@ -81,10 +98,16 @@ export default function HeatmapChart() {
           Heat Map Chart
         </h2>
         <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer">
+          <button
+            onClick={handleCopy}
+            className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+          >
             <Copy className="w-4 h-4 text-gray-600" />
           </button>
-          <button className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer">
+          <button
+            onClick={handleDelete}
+            className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+          >
             <Trash2 className="w-4 h-4 text-gray-600" />
           </button>
         </div>
@@ -122,7 +145,7 @@ export default function HeatmapChart() {
         <div className="inline-block min-w-full">
           {/* Days Header */}
           <div className="flex mb-2">
-            <div className="w-28 flex-shrink-0" />
+            <div className="w-28 shrink-0" />
             {days.map((day) => (
               <div
                 key={day}
@@ -136,7 +159,7 @@ export default function HeatmapChart() {
           {/* Heatmap Rows */}
           {data.map((item, rowIndex) => (
             <div key={rowIndex} className="flex items-center mb-2">
-              <div className="w-28 flex-shrink-0 text-sm text-gray-700 pr-4">
+              <div className="w-28 shrink-0 text-sm text-gray-700 pr-4">
                 {item.product}
               </div>
               {item.values.map((value, colIndex) => (

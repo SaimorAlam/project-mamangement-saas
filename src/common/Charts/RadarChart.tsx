@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import {
   Radar,
@@ -7,12 +8,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Copy, Trash2 } from "lucide-react";
 
 interface RadarDataPoint {
@@ -21,7 +17,12 @@ interface RadarDataPoint {
   previousMonth: number;
 }
 
-export default function RadarCharts() {
+interface RadarChartProps {
+  onDelete?: () => void;
+  onCopy?: (data: any) => void;
+}
+
+export default function RadarCharts({ onDelete, onCopy }: RadarChartProps) {
   const [data] = useState<RadarDataPoint[]>([
     { metric: "Bounce Rate", thisMonth: 0.65, previousMonth: 0.55 },
     { metric: "ROI", thisMonth: 0.65, previousMonth: 0.75 },
@@ -42,6 +43,18 @@ export default function RadarCharts() {
     },
   ]);
 
+  const handleCopy = () => {
+    if (onCopy) {
+      onCopy(data);
+    } else {
+      navigator.clipboard.writeText(JSON.stringify(data));
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) onDelete();
+  };
+
   const [centerMetric] = useState({
     label: "Average Session Duration",
     value: "180ms",
@@ -55,10 +68,16 @@ export default function RadarCharts() {
             Radar Chart
           </CardTitle>
           <div className="flex gap-2">
-            <button className="p-2 border border-gray-200 rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
+            <button
+              onClick={handleCopy}
+              className="p-2 border border-gray-200 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
+            >
               <Copy className="w-5 h-5 text-gray-600 " />
             </button>
-            <button className="p-2 border border-gray-200 rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
+            <button
+              onClick={handleDelete}
+              className="p-2 border border-gray-200 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
+            >
               <Trash2 className="w-5 h-5 text-gray-600" />
             </button>
           </div>
@@ -72,9 +91,7 @@ export default function RadarCharts() {
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-            <span className="text-sm text-gray-600">
-              Previous Month
-            </span>
+            <span className="text-sm text-gray-600">Previous Month</span>
           </div>
         </div>
 
@@ -110,9 +127,7 @@ export default function RadarCharts() {
           </ResponsiveContainer>
 
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-            <div className="text-xs text-gray-500">
-              {centerMetric.label}
-            </div>
+            <div className="text-xs text-gray-500">{centerMetric.label}</div>
             <div className="text-lg font-semibold text-gray-800">
               {centerMetric.value}
             </div>

@@ -107,6 +107,18 @@ const ClientProjectBuilder = () => {
       window.removeEventListener("download-project-config", handleDownload);
   }, [selectedWidgets, widgetConfigs]);
 
+  const [hiddenDefaultWidgets, setHiddenDefaultWidgets] = useState<string[]>([]);
+
+  const handleDefaultDelete = (widgetId: string) => {
+    setHiddenDefaultWidgets((prev) => [...prev, widgetId]);
+    toast.success("Widget removed");
+  };
+
+  const handleDefaultCopy = (widgetName: string) => {
+    navigator.clipboard.writeText(`Data for ${widgetName}`);
+    toast.success(`${widgetName} data copied to clipboard`);
+  };
+
   const isPreviewOrPublished = isPreview || isPublished;
 
   return (
@@ -147,37 +159,55 @@ const ClientProjectBuilder = () => {
           ) : (
             selectedWidgets.length === 0 && (
               <div className={isPreviewOrPublished ? "col-span-full" : ""}>
-                <ProjectStats activeWidget={activeWidget} />
-                <div className="flex gap-4 mt-6">
-                  <RadarCharts />
-                  <DoughnutChart
-                    title="Doughnut Pie"
-                    centerLabel="Total Visitor"
-                    data={[
-                      {
-                        name: "Paid traffic",
-                        value: 65,
-                        count: 12,
-                        color: "#19A1E9",
-                      },
-                      {
-                        name: "Social traffic",
-                        value: 21,
-                        count: 30,
-                        color: "#F7AF21",
-                      },
-                      {
-                        name: "Organic traffic",
-                        value: 14,
-                        count: 8,
-                        color: "#10A683",
-                      },
-                    ]}
+                {!hiddenDefaultWidgets.includes("project-stats") && (
+                  <ProjectStats
+                    activeWidget={activeWidget}
                   />
+                )}
+                <div className="flex gap-4 mt-6">
+                  {!hiddenDefaultWidgets.includes("radar-chart") && (
+                    <RadarCharts
+                      onDelete={() => handleDefaultDelete("radar-chart")}
+                      onCopy={() => handleDefaultCopy("Radar Chart")}
+                    />
+                  )}
+                  {!hiddenDefaultWidgets.includes("doughnut-chart") && (
+                    <DoughnutChart
+                      title="Doughnut Pie"
+                      centerLabel="Total Visitor"
+                      onDelete={() => handleDefaultDelete("doughnut-chart")}
+                      onCopy={() => handleDefaultCopy("Doughnut Pie")}
+                      data={[
+                        {
+                          name: "Paid traffic",
+                          value: 65,
+                          count: 12,
+                          color: "#19A1E9",
+                        },
+                        {
+                          name: "Social traffic",
+                          value: 21,
+                          count: 30,
+                          color: "#F7AF21",
+                        },
+                        {
+                          name: "Organic traffic",
+                          value: 14,
+                          count: 8,
+                          color: "#10A683",
+                        },
+                      ]}
+                    />
+                  )}
                 </div>
-                <div className="mt-6">
-                  <HeatmapChart />
-                </div>
+                {!hiddenDefaultWidgets.includes("heat-map-chart") && (
+                  <div className="mt-6">
+                    <HeatmapChart
+                      onDelete={() => handleDefaultDelete("heat-map-chart")}
+                      onCopy={() => handleDefaultCopy("Heat Map Chart")}
+                    />
+                  </div>
+                )}
               </div>
             )
           )}

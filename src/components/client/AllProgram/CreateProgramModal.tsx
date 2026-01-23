@@ -120,9 +120,16 @@ export default function CreateProgramModal({
             </label>
             <Input
               type="datetime-local"
-              {...register("startingDate")}
+              {...register("startingDate", {
+                required: "Starting Date is required",
+              })}
               className="h-10 border border-[#E2E8F0] mt-2"
             />
+            {errors.startingDate && (
+              <p className="text-red-500 text-sm">
+                {errors.startingDate.message}
+              </p>
+            )}
           </div>
 
           {/* Description */}
@@ -131,10 +138,17 @@ export default function CreateProgramModal({
               Program Description
             </label>
             <Textarea
-              {...register("description")}
+              {...register("description", {
+                required: "Description is required",
+              })}
               placeholder="Enter a description..."
               className="min-h-20 resize-none border-[#E2E8F0] mt-2"
             />
+            {errors.description && (
+              <p className="text-red-500 text-sm">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           {/* Priority */}
@@ -167,9 +181,14 @@ export default function CreateProgramModal({
             </label>
             <Input
               type="datetime-local"
-              {...register("deadline")}
+              {...register("deadline", {
+                required: "Deadline is required",
+              })}
               className="h-10 border border-[#E2E8F0] mt-2"
             />
+            {errors.deadline && (
+              <p className="text-red-500 text-sm">{errors.deadline.message}</p>
+            )}
           </div>
 
           {/* Assigned Person */}
