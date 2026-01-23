@@ -29,6 +29,7 @@ import ClientSingleProject from "@/pages/client/ClientSingleProject";
 import ClientSingleProjectCreate from "@/pages/client/ClientSingleProjectCreate";
 import ProgramOverview from "@/pages/client/Program/ProgramOverview";
 import ClientAllProgramContainer from "@/pages/client/ClientAllProgramContainer";
+import ProgramOverviewContainer from "@/pages/client/Program/ProgramOverviewContainer";
 
 export function getClientRoutes() {
   return [
@@ -49,7 +50,14 @@ export function getClientRoutes() {
       element: <ClientAllProgramContainer />,
       children: [
         { index: true, element: <ClientAllProgram /> },
-        { path: "program-overview/:id", element: <ProgramOverview /> },
+        {
+          path: "program-overview/:programId",
+          element: <ProgramOverviewContainer />,
+          children: [
+            { index: true, element: <ProgramOverview /> },
+            { path: "project-details/:projectId", element: <ProjectDetails /> },
+          ],
+        },
       ],
     },
     { path: "program-builder", element: <ClientProgramBuilder /> },

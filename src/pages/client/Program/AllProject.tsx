@@ -20,6 +20,7 @@ import UpdateProjectModal from "./UpdateProjectModal";
 import { UpdateProjectPayload } from "@/types/Projects";
 import Swal from "sweetalert2";
 import { useDeleteProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
+import { useNavigate } from "react-router-dom";
 // import { toast } from "sonner";
 
 // import EditProjectModal from "./EditProjectModal";
@@ -87,10 +88,10 @@ const AllProject = ({
   //     toast.error("Failed to update project");
   //   }
   // };
+  const navigate = useNavigate();
 
   const projects = useMemo(() => data?.data?.data ?? [], [data]);
   const meta = data?.data?.meta;
-
   const totalProjects = meta?.total ?? projects.length;
   const itemsPerPage = meta?.limit ?? limit;
   const totalPages =
@@ -249,7 +250,11 @@ const AllProject = ({
 
           <tbody>
             {sortedProjects.map((project) => (
-              <tr key={project.id} className="hover:bg-gray-50">
+              <tr
+                key={project.id}
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => navigate(`project-details/${project.id}`)}
+              >
                 <td className="px-6 py-4">{project.name}</td>
                 <td className="px-6 py-4">
                   <span className="px-2 py-1 text-xs rounded bg-gray-100">

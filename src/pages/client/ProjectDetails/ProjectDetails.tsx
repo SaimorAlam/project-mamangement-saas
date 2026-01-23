@@ -5,11 +5,8 @@ import GanttTab from "./AllDataTab/GanttTab";
 import DashboardTab from "./AllDataTab/DashboardTab";
 import FileTab from "./AllDataTab/FileTab";
 import RaidLogTab from "./AllDataTab/RaidLogTab";
-import { useParams } from "react-router-dom";
 
 const ProjectDetails: React.FC = () => {
-  const { id } = useParams();
-  console.log(id);
   const [activeTab, setActiveTab] = useState<string>(() => {
     return localStorage.getItem("activeCarlyleTab") || "gantt";
   });
@@ -31,7 +28,7 @@ const ProjectDetails: React.FC = () => {
       {/* Tabs Navigation */}
       <div className="border-gray-200 bg-white px-6 mb-6">
         <div className="flex items-center justify-center gap-1">
-          <div className="flex border border-gray-200 rounded-lg">
+          <div className="flex border border-gray-200 rounded-lg space-x-2 p-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (

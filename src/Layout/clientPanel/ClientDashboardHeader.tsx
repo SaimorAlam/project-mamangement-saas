@@ -34,6 +34,7 @@ import {
   setIsPublished,
 } from "@/store/Slices/ChartSlice/ChartSlice";
 import { Download } from "lucide-react";
+import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
 
 interface ClientDashboardHeaderProps {
   name?: string;
@@ -44,11 +45,22 @@ const DROPDOWN_ITEMS = ["Create Program"];
 const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   name,
 }) => {
+  const [projectName, setProjectName] = useState<string>("");
   const { name: userName } = useGetUser();
-  const { id: programId } = useParams();
+  const { programId, projectId: projectIdFromParams, id } = useParams();
+  const projectId = projectIdFromParams || id;
   const location = useLocation();
   const currentPath = location.pathname;
-  console.log(currentPath);
+
+  const { data: ProjectData, isLoading } = useGetProjectByIdQuery(
+    projectId as string,
+    { skip: !projectId },
+  );
+  useEffect(() => {
+    if (projectId && !isLoading && ProjectData) {
+      setProjectName(ProjectData?.data?.project.name);
+    }
+  }, [projectId, ProjectData, isLoading]);
   const ClientSidebarGroups = getClientSidebarItems();
   const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
 
@@ -84,21 +96,22 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [, setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+
   const isEmployeePage = currentPath.includes("/employee");
   const isHighwayExpansionPage = currentPath.includes(
     "/highway-expansion/all-highway",
   );
-  const isAllProgramPage = currentPath.startsWith("/client-panel/all-program");
-  const isProgramOverviewPage = currentPath.startsWith(
-    "/client-panel/program-overview/",
-  );
+  const isAllProgramPage = currentPath === "/client-panel/all-program";
+  const isProgramOverviewPage =
+    currentPath.includes("/all-program/program-overview/") &&
+    !currentPath.includes("/project-details/");
+  const isProjectDetailsPage = currentPath.includes("/project-details/");
   const isProjectReviewPage = currentPath.includes(
     "/client-panel/project-review",
   );
   const isProjectBuilderPage = currentPath.includes(
     "/client-panel/project-builder",
   );
-
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isPreview, isPublished } = useAppSelector(
@@ -360,7 +373,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       </div>
 
       {/* Breadcrumb */}
-      <Breadcrumb>
+      <Breadcrumb className="my-2 ">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
@@ -399,8 +412,24 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
                 <>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link
+                        to={`/client-panel/all-program/program-overview/${programId}`}
+                        className="text-[#356DF0]"
+                      >
+                        Program Overview
+                      </Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                </>
+              )}
+
+              {isProjectDetailsPage && projectName && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
                     <BreadcrumbPage className="text-[#356DF0]">
-                      Program Overview
+                      {projectName}
                     </BreadcrumbPage>
                   </BreadcrumbItem>
                 </>
