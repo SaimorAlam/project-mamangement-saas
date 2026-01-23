@@ -104,7 +104,7 @@ const HighwayMap: React.FC = () => {
         map.remove();
       }
     };
-  }, []);
+  }, [map, projects]);
 
   return (
     <div className="w-full h-screen bg-white flex flex-col">
@@ -122,14 +122,14 @@ const HighwayMap: React.FC = () => {
       </div>
 
       {/* Map Container */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative z-10">
         <div ref={mapRef} className="w-full h-full"></div>
 
         {/* Info Card - Top Left */}
-        <div className="absolute top-4 left-15 bg-white rounded-lg shadow-lg p-4 w-64 z-[10] pointer-events-auto">
+        <div className="absolute top-4 left-15 bg-white rounded-lg shadow-lg p-4 w-64 z-10 pointer-events-auto">
           {/* Building Name with Red Dot */}
           <div className="flex items-start gap-2 mb-3">
-            <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
+            <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5 shrink-0"></div>
             <h3 className="text-sm font-semibold text-gray-800 leading-tight">
               Carlyle Hall
             </h3>

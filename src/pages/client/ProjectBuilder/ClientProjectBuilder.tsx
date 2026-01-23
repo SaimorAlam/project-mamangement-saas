@@ -43,7 +43,6 @@ import RagChartModule from "@/components/client/ProjectBuilder/chartModules/RagC
 import RibbonChartModule from "@/components/client/ProjectBuilder/chartModules/RibbonChartModule";
 import KpiModule from "@/components/client/ProjectBuilder/chartModules/KpiModule";
 
-
 const ClientProjectBuilder = () => {
   const { projectId, isPreview, isPublished, widgetConfigs } = useAppSelector(
     (state) => state.chartSlice,
@@ -80,9 +79,10 @@ const ClientProjectBuilder = () => {
       const headers = ["Widget ID", "Configuration"];
       const rows = selectedWidgets.map((id) => {
         const config = widgetConfigs[id] || "Default Configuration";
-        const configStr = typeof config === "string" 
-          ? config 
-          : JSON.stringify(config).replace(/\t/g, " ");
+        const configStr =
+          typeof config === "string"
+            ? config
+            : JSON.stringify(config).replace(/\t/g, " ");
         return [id, configStr];
       });
 
@@ -101,7 +101,6 @@ const ClientProjectBuilder = () => {
       document.body.removeChild(link);
       toast.success("Configuration downloaded successfully");
     };
-
 
     window.addEventListener("download-project-config", handleDownload);
     return () =>
@@ -186,7 +185,11 @@ const ClientProjectBuilder = () => {
           {selectedWidgets.includes("kpi") && (
             <div className={isPreviewOrPublished ? "col-span-full" : ""}>
               <KpiModule
-                onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("kpi")}
+                onDelete={
+                  isPreviewOrPublished
+                    ? undefined
+                    : () => handleWidgetDelete("kpi")
+                }
                 isPreview={isPreviewOrPublished}
               />
             </div>
@@ -194,28 +197,44 @@ const ClientProjectBuilder = () => {
 
           {selectedWidgets.includes("bar-chart") && (
             <StackedBarChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("bar-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("bar-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("progress-ring") && (
             <ProgressRingModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("progress-ring")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("progress-ring")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("pie-chart") && (
             <PieChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("pie-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("pie-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("line-chart") && (
             <LineChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("line-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("line-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
@@ -240,7 +259,11 @@ const ClientProjectBuilder = () => {
 
           {selectedWidgets.includes("horizontal-bar-chart") && (
             <HorizontalBarChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("horizontal-bar-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("horizontal-bar-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
@@ -248,7 +271,11 @@ const ClientProjectBuilder = () => {
           {selectedWidgets.includes("heat-map-chart") && (
             <ChartModuleOne
               chartName="heat-map-chart"
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("heat-map-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("heat-map-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
@@ -256,7 +283,11 @@ const ClientProjectBuilder = () => {
           {selectedWidgets.includes("area-chart") && (
             <ChartModuleOne
               chartName="area-chart"
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("area-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("area-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
@@ -264,189 +295,297 @@ const ClientProjectBuilder = () => {
           {selectedWidgets.includes("spline-area-chart") && (
             <ChartModuleOne
               chartName="spline-area-chart"
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("spline-area-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("spline-area-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("sparklines-chart") && (
             <SparkLineChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("sparklines-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("sparklines-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("logarithmic-chart") && (
             <LogarithmicChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("logarithmic-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("logarithmic-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("decomposition-tree") && (
             <DecompositionTreeModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("decomposition-tree")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("decomposition-tree")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("gauge-chart") && (
             <GaugeChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("gauge-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("gauge-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("histogram-chart") && (
             <HistogramChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("histogram-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("histogram-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("bubble-chart") && (
             <BubbleChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("bubble-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("bubble-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("column-chart") && (
             <ColumnBarChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("column-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("column-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("funnel-chart") && (
             <FunnelChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("funnel-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("funnel-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("scatter-chart") && (
             <ScatterChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("scatter-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("scatter-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("pareto-chart") && (
             <ParetoChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("pareto-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("pareto-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("waterfall-chart") && (
             <WaterfallChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("waterfall-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("waterfall-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("radar-chart") && (
             <RadarChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("radar-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("radar-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("candle-chart") && (
             <CandleChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("candle-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("candle-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("treemap-chart") && (
             <TreemapChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("treemap-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("treemap-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("calendar-heatmap-chart") && (
             <CalendarHeatmapModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("calendar-heatmap-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("calendar-heatmap-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("gantt-new-chart") && (
             <GanttChartNewModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("gantt-new-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("gantt-new-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("matrix-table-chart") && (
             <MatrixTableChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("matrix-table-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("matrix-table-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("combo-chart") && (
             <ComboChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("combo-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("combo-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("horisontal-stacked-bar-chart") && (
             <HorizontalStackedBarChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("horisontal-stacked-bar-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("horisontal-stacked-bar-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("bullet-chart") && (
             <BulletChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("bullet-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("bullet-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("marimekko-chart") && (
             <MarimekkoChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("marimekko-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("marimekko-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("box-plot") && (
             <BoxPlotChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("box-plot")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("box-plot")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("cohort-analysis") && (
             <CohortAnalysisModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("cohort-analysis")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("cohort-analysis")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("geographic-map") && (
             <GeographicMapModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("geographic-map")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("geographic-map")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("rag-chart") && (
             <RagChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("rag-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("rag-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
 
           {selectedWidgets.includes("ribbon-chart") && (
             <RibbonChartModule
-              onDelete={isPreviewOrPublished ? undefined : () => handleWidgetDelete("ribbon-chart")}
+              onDelete={
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("ribbon-chart")
+              }
               isPreview={isPreviewOrPublished}
             />
           )}
@@ -456,6 +595,4 @@ const ClientProjectBuilder = () => {
   );
 };
 
-
 export default ClientProjectBuilder;
-

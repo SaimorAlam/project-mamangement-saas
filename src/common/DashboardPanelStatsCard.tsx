@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   CircleCheckBig,
   ClockAlert,
@@ -7,7 +8,7 @@ import {
   Radio,
   TrendingUp,
 } from "lucide-react";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import { FaChartPie, FaUsers } from "react-icons/fa";
 import { IClientPanelStats } from "@/types";
 import { Link, useLocation } from "react-router-dom";
@@ -32,6 +33,7 @@ const DashboardPanelStatsCard = ({
   showFooterButton = true,
   onToggleWidget,
 }: IProps) => {
+  const ref = useRef<HTMLDivElement>(null);
   const [showPopover, setShowPopover] = useState(false);
   const {
     title,
@@ -67,6 +69,19 @@ const DashboardPanelStatsCard = ({
   const currentPathname = location.pathname;
   const isInStaffManager =
     currentPathname === "/staff-manager-panel/project-review/all-projects";
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !(ref.current as any).contains(event.target as Node)) {
+        setShowPopover(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref]);
+
   return (
     <div>
       <div
@@ -77,8 +92,9 @@ const DashboardPanelStatsCard = ({
         }  bg-[#EBFFF2] rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102 relative`}
       >
         {/* Menu Button - Absolute Top Right */}
-        {currentPathname.split("/")[2] === "project-builder" && (
-          <div className="absolute right-2 top-2 z-10">
+        {(currentPathname.split("/").pop() === "project-builder" ||
+          currentPathname.split("/").pop() === "program-builder") && (
+          <div ref={ref as any} className="absolute right-2 top-2 z-10">
             <button
               onClick={(e) => {
                 e.stopPropagation();
