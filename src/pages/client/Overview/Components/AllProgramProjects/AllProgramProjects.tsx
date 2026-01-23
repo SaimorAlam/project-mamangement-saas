@@ -124,7 +124,7 @@ const AllProgramProject = () => {
   const totalPages = Math.ceil(sortedProjects.length / itemsPerPage);
   const paginatedProjects = sortedProjects.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   return (

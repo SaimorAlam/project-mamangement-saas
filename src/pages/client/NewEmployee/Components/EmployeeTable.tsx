@@ -34,7 +34,7 @@ const EmployeeTable = () => {
 
   const users = data?.data?.data || [];
   const meta = data?.data?.meta;
-  console.log(users,"users")
+  console.log(users, "users");
   useEffect(() => {
     if (currentPage !== 1) {
       setPageLoading(true);
@@ -60,7 +60,7 @@ const EmployeeTable = () => {
       filtered = filtered.filter(
         (user: any) =>
           user.name?.toLowerCase().includes(search.toLowerCase()) ||
-          user.email?.toLowerCase().includes(search.toLowerCase())
+          user.email?.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
@@ -72,7 +72,7 @@ const EmployeeTable = () => {
       filtered = filtered.filter(
         (user: any) =>
           (statusFilter === "Active" && user.userStatus === "ACTIVE") ||
-          (statusFilter === "Inactive" && user.userStatus !== "ACTIVE")
+          (statusFilter === "Inactive" && user.userStatus !== "ACTIVE"),
       );
     }
 
@@ -106,10 +106,15 @@ const EmployeeTable = () => {
   const renderSkeleton = () =>
     Array.from({ length: PAGE_SIZE }).map((_, i) => (
       <tr key={i} className="even:bg-gray-50 odd:bg-white animate-pulse h-12">
-        {Array(7)
+        {Array(6)
           .fill(0)
           .map((_, idx) => (
-            <td key={idx} className="px-4 py-3">
+            <td
+              key={idx}
+              className={`${idx === 0 ? "px-6 w-[200px]" : "px-4"} ${
+                idx === 1 ? "w-[300px]" : ""
+              } py-3`}
+            >
               <div className="h-4 bg-gray-200 rounded w-full"></div>
             </td>
           ))}
@@ -141,9 +146,9 @@ const EmployeeTable = () => {
   };
 
   return (
-    <div className="overflow-x-auto border border-gray-200 w-full rounded-xl my-10">
+    <div className="border border-gray-200 w-full rounded-xl my-10 overflow-hidden">
       {/* Header + Filters */}
-      <div className="flex flex-col md:flex-row justify-between items-center py-4 px-6 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-center py-4 px-6 gap-4 bg-white">
         <h2 className="text-2xl font-medium">Employee List</h2>
         <div className="flex gap-2 flex-wrap items-center">
           <input
@@ -175,84 +180,86 @@ const EmployeeTable = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <table className="min-w-full border-separate border-spacing-0">
-        <thead className="bg-gray-50">
-          <tr>
-            <th
-              className="px-6 py-3 text-left text-sm font-semibold w-[200px] cursor-pointer"
-              onClick={() => handleSort("name")}
-            >
-              Profile Name {renderSortIcon("name")}
-            </th>
-            <th
-              className="px-4 py-3 text-left text-sm font-semibold w-[300px] cursor-pointer"
-              onClick={() => handleSort("email")}
-            >
-              Email {renderSortIcon("email")}
-            </th>
-            <th
-              className="px-4 py-3 text-left text-sm font-semibold cursor-pointer"
-              onClick={() => handleSort("role")}
-            >
-              Role {renderSortIcon("role")}
-            </th>
-            {/* <th className="px-4 py-3 text-left text-sm font-semibold">
+      <div className="overflow-x-auto">
+        <table className="min-w-full border-separate border-spacing-0">
+          <thead className="bg-gray-50">
+            <tr>
+              <th
+                className="px-6 py-3 text-left text-sm font-semibold w-[200px] cursor-pointer"
+                onClick={() => handleSort("name")}
+              >
+                Profile Name {renderSortIcon("name")}
+              </th>
+              <th
+                className="px-4 py-3 text-left text-sm font-semibold w-[300px] cursor-pointer"
+                onClick={() => handleSort("email")}
+              >
+                Email {renderSortIcon("email")}
+              </th>
+              <th
+                className="px-4 py-3 text-left text-sm font-semibold cursor-pointer"
+                onClick={() => handleSort("role")}
+              >
+                Role {renderSortIcon("role")}
+              </th>
+              {/* <th className="px-4 py-3 text-left text-sm font-semibold">
               Assign Project
             </th> */}
-            <th
-              className="px-4 py-3 text-left text-sm font-semibold cursor-pointer"
-              onClick={() => handleSort("lastActive")}
-            >
-              Last Active {renderSortIcon("lastActive")}
-            </th>
-            <th className="px-4 py-3 text-left text-sm font-semibold">Level</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold">
-              Action
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {isLoading
-            ? renderSkeleton()
-            : filteredUsers.map((user: any) => {
-              console.log(user)
-              return (
-                <tr
-                  key={user.id}
-                  className="even:bg-gray-50 odd:bg-white hover:bg-gray-100 transition h-12"
-                >
-                  <td className="px-6 py-3 w-[200px] align-middle">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={
-                          user.profileImage ||
-                          "https://randomuser.me/api/portraits/men/19.jpg"
-                        }
-                        alt={user.name}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                      <span className="font-medium">{user.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 w-[300px]">
-                    {user.email}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <Badge
-                      variant="outline"
-                      className={`px-2 py-1 font-medium ${
-                        user.role === "MANAGER"
-                          ? "bg-purple-50 text-purple-700 border-purple-200"
-                          : user.role === "EMPLOYEE"
-                          ? "bg-blue-50 text-blue-700 border-blue-200"
-                          : "bg-gray-50 text-gray-700 border-gray-200"
-                      }`}
+              <th
+                className="px-4 py-3 text-left text-sm font-semibold cursor-pointer"
+                onClick={() => handleSort("lastActive")}
+              >
+                Last Active {renderSortIcon("lastActive")}
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold">
+                Level
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading
+              ? renderSkeleton()
+              : filteredUsers.map((user: any) => {
+                  console.log(user);
+                  return (
+                    <tr
+                      key={user.id}
+                      className="even:bg-gray-50 odd:bg-white hover:bg-gray-100 transition h-12"
                     >
-                      {user.role}
-                    </Badge>
-                  </td>
-                  {/* <td className="px-4 py-3 align-middle">
+                      <td className="px-6 py-3 w-[200px] align-middle">
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={
+                              user.profileImage ||
+                              "https://randomuser.me/api/portraits/men/19.jpg"
+                            }
+                            alt={user.name}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                          <span className="font-medium">{user.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600 w-[300px] align-middle">
+                        {user.email}
+                      </td>
+                      <td className="px-4 py-3 text-sm align-middle">
+                        <Badge
+                          variant="outline"
+                          className={`px-2 py-1 font-medium ${
+                            user.role === "MANAGER"
+                              ? "bg-purple-50 text-purple-700 border-purple-200"
+                              : user.role === "EMPLOYEE"
+                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                : "bg-gray-50 text-gray-700 border-gray-200"
+                          }`}
+                        >
+                          {user.role}
+                        </Badge>
+                      </td>
+                      {/* <td className="px-4 py-3 align-middle">
                     <div className="flex flex-wrap gap-1">
                       {user.assignedProjects?.length
                         ? user.assignedProjects.map((p: any) => (
@@ -267,82 +274,89 @@ const EmployeeTable = () => {
                         : ""}
                     </div>
                   </td> */}
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    {user.lastActive
-                      ? new Date(user.lastActive).toLocaleDateString("en-US")
-                      : "N/A"}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <Badge
-                      variant="outline"
-                      className={`px-2 py-1 font-medium ${
-                        user.userStatus === "ACTIVE"
-                          ? "bg-green-50 text-green-700 border-green-200"
-                          : "bg-red-50 text-red-700 border-red-200"
-                      }`}
-                    >
-                      {user.userStatus === "ACTIVE" ? "Active" : "In Active"}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 align-middle">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsModalOpen(true);
-                        }}
-                      >
-                        <Eye className="w-4 h-4 text-blue-500 cursor-pointer" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsUpdateModalOpen(true);
-                        }}
-                      >
-                        <Edit className="w-4 h-4 text-green-500 cursor-pointer" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="cursor-pointer"
-                        onClick={() => handleDelete(user.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600 cursor-pointer" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            }
-            )}
-
-          {/* Fill remaining rows to maintain table height */}
-          {!loading &&
-            filteredUsers.length < PAGE_SIZE &&
-            Array.from({ length: PAGE_SIZE - filteredUsers.length }).map(
-              (_, i) => (
-                <tr
-                  key={`empty-${i}`}
-                  className="h-12 even:bg-gray-50 odd:bg-white"
-                >
-                  {Array(7)
-                    .fill(0)
-                    .map((_, idx) => (
-                      <td key={idx} className="px-4 py-3">
-                        {idx === 0 ? "" : ""}
+                      <td className="px-4 py-3 text-sm text-gray-500 align-middle">
+                        {user.lastActive
+                          ? new Date(user.lastActive).toLocaleDateString(
+                              "en-US",
+                            )
+                          : "N/A"}
                       </td>
-                    ))}
-                </tr>
-              )
-            )}
-        </tbody>
-      </table>
+                      <td className="px-4 py-3 text-sm align-middle">
+                        <Badge
+                          variant="outline"
+                          className={`px-2 py-1 font-medium ${
+                            user.userStatus === "ACTIVE"
+                              ? "bg-green-50 text-green-700 border-green-200"
+                              : "bg-red-50 text-red-700 border-red-200"
+                          }`}
+                        >
+                          {user.userStatus === "ACTIVE"
+                            ? "Active"
+                            : "In Active"}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 align-middle">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            <Eye className="w-4 h-4 text-blue-500 cursor-pointer" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="cursor-pointer"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsUpdateModalOpen(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4 text-green-500 cursor-pointer" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="cursor-pointer"
+                            onClick={() => handleDelete(user.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600 cursor-pointer" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+
+            {/* Fill remaining rows to maintain table height */}
+            {!loading &&
+              filteredUsers.length < PAGE_SIZE &&
+              Array.from({ length: PAGE_SIZE - filteredUsers.length }).map(
+                (_, i) => (
+                  <tr
+                    key={`empty-${i}`}
+                    className="h-12 even:bg-gray-50 odd:bg-white"
+                  >
+                    {Array(6)
+                      .fill(0)
+                      .map((_, idx) => (
+                        <td
+                          key={idx}
+                          className={`${idx === 0 ? "px-6 w-[200px]" : "px-4"} ${
+                            idx === 1 ? "w-[300px]" : ""
+                          } py-3`}
+                        ></td>
+                      ))}
+                  </tr>
+                ),
+              )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination */}
       <div className="flex justify-between items-center py-4 px-6 border-t border-gray-200">

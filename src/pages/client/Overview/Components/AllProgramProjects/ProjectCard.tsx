@@ -6,12 +6,13 @@ import { Flag, Layers } from "lucide-react";
 import { FaStar } from "react-icons/fa6";
 import { toast } from "sonner";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
-import ProjectDetailsModal from "@/components/staffManager/overview/ProjectDetailsModal";
+// import ProjectDetailsModal from "@/components/staffManager/overview/ProjectDetailsModal";
 import {
   useAddFavoriteProjectMutation,
   useGetFavoriteProjectsQuery,
   useRemoveFavoriteProjectMutation,
 } from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
+import PrimaryButton from "@/common/PrimaryButton";
 
 export type ProjectStatus =
   | "LIVE"
@@ -108,13 +109,13 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     priority === "HIGH"
       ? "text-[#DA4352]"
       : priority === "MEDIUM"
-      ? "text-[#F59E0B]"
-      : "text-[#16A34A]";
+        ? "text-[#F59E0B]"
+        : "text-[#16A34A]";
 
   const handleAddToFavorite = async (projectId: string) => {
     let res: any;
     const toastId = toast.loading(
-      isFavorite ? "Removing from favorites..." : "Adding to favorites..."
+      isFavorite ? "Removing from favorites..." : "Adding to favorites...",
     );
     try {
       if (isFavorite) {
@@ -127,7 +128,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           isFavorite
             ? "Project removed from favorites successfully"
             : "Project added to favorites successfully",
-          { id: toastId }
+          { id: toastId },
         );
       }
     } catch (error: any) {
@@ -214,11 +215,16 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           </div>
           <Progress value={progress} className="h-2" />
         </div>
-
+        <PrimaryButton
+          onClick={() => {}}
+          title="View Project Details"
+          type="Primary"
+          className="w-full h-10"
+        />
         {/* CTA */}
-        <div className="py-2 px-4">
+        {/* <div className="py-2 px-4">
           <ProjectDetailsModal project={project} />
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );
