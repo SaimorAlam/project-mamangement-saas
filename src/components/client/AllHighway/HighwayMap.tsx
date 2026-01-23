@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 
@@ -73,15 +74,12 @@ const HighwayMap: React.FC = () => {
 
         const mapInstance = L.map(mapRef.current).setView(
           [23.7461, 90.3779],
-          15
+          15,
         );
 
-        L.tileLayer(
-          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          {
-            attribution: "© OpenStreetMap contributors",
-          }
-        ).addTo(mapInstance);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+        }).addTo(mapInstance);
 
         const customIcon = L.divIcon({
           className: "custom-marker",
@@ -128,7 +126,7 @@ const HighwayMap: React.FC = () => {
         <div ref={mapRef} className="w-full h-full"></div>
 
         {/* Info Card - Top Left */}
-        <div className="absolute top-4 left-15 bg-white rounded-lg shadow-lg p-4 w-64 z-[9999] pointer-events-auto">
+        <div className="absolute top-4 left-15 bg-white rounded-lg shadow-lg p-4 w-64 z-[10] pointer-events-auto">
           {/* Building Name with Red Dot */}
           <div className="flex items-start gap-2 mb-3">
             <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
@@ -144,9 +142,7 @@ const HighwayMap: React.FC = () => {
           <div className="text-xs text-gray-600 mb-1 pl-4">
             York, NY 10003, USA
           </div>
-          <div className="text-xs text-gray-600 mb-3 pl-4">
-            DC3 Building
-          </div>
+          <div className="text-xs text-gray-600 mb-3 pl-4">DC3 Building</div>
 
           {/* View Report Details Link */}
           <div className="pl-4">
@@ -181,17 +177,13 @@ const HighwayMap: React.FC = () => {
                   strokeWidth="4"
                   fill="none"
                   strokeDasharray={`${2 * Math.PI * 24}`}
-                  strokeDashoffset={`${
-                    2 * Math.PI * 24 * (1 - 0.75)
-                  }`}
+                  strokeDashoffset={`${2 * Math.PI * 24 * (1 - 0.75)}`}
                   strokeLinecap="round"
                 />
               </svg>
               {/* Percentage Text */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-bold text-blue-600">
-                  75%
-                </span>
+                <span className="text-sm font-bold text-blue-600">75%</span>
               </div>
             </div>
           </div>

@@ -275,7 +275,7 @@ const ClientAllProgram = ({
                             ? () => handleSort(col as keyof IProgram)
                             : undefined
                         }
-                        className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 ${
+                        className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 capitalize ${
                           col !== "actions" ? "cursor-pointer" : ""
                         }`}
                       >
@@ -332,6 +332,7 @@ const ClientAllProgram = ({
                             e.stopPropagation();
                             handleEditClick(program);
                           }}
+                          className="cursor-pointer"
                         >
                           <FaEdit className="text-blue-600" />
                         </button>
@@ -354,7 +355,7 @@ const ClientAllProgram = ({
                     ]
                       .filter(Boolean)
                       .map((_, i) => (
-                        <td key={i} className="px-6 py-4 text-sm text-gray-200">
+                        <td key={i} className="px-6 py-4 text-sm text-gray-200 capitalize">
                           &nbsp;
                         </td>
                       ))}

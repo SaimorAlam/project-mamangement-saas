@@ -280,17 +280,21 @@ const AllProject = ({
 
                 <td className="px-6 py-4 space-x-2">
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setEditProject(project);
                       setEditModalOpen(true);
                     }}
+                    className="cursor-pointer"
                   >
                     <FaEdit className="text-blue-600" />
                   </button>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       handleDelete(project);
                     }}
+                    className="cursor-pointer"
                   >
                     <FaTrash className="text-red-600" />
                   </button>
