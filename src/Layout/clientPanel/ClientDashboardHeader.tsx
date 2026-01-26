@@ -46,22 +46,19 @@ const DROPDOWN_ITEMS = ["Create Program"];
 const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   name,
 }) => {
-  const [projectName, setProjectName] = useState<string>("");
+  // const [projectName, setProjectName] = useState<string>("");
   const { name: userName } = useGetUser();
   const { programId, projectId: projectIdFromParams, id } = useParams();
   const projectId = projectIdFromParams || id;
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const { data: ProjectData, isLoading } = useGetProjectByIdQuery(
-    projectId as string,
-    { skip: !projectId },
-  );
-  useEffect(() => {
-    if (projectId && !isLoading && ProjectData) {
-      setProjectName(ProjectData?.data?.project.name);
-    }
-  }, [projectId, ProjectData, isLoading]);
+  const { data: ProjectData } = useGetProjectByIdQuery(projectId as string, {
+    skip: !projectId,
+  });
+
+  const projectName = ProjectData?.data?.project?.name;
+
   const ClientSidebarGroups = getClientSidebarItems();
   const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
 
@@ -97,7 +94,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [, setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-
   const isEmployeePage = currentPath.includes("/employee");
   const isHighwayExpansionPage = currentPath.includes(
     "/highway-expansion/all-highway",
@@ -106,7 +102,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const isProgramOverviewPage =
     currentPath.includes("/all-program/program-overview/") &&
     !currentPath.includes("/project-details/");
-  const isProjectDetailsPage = currentPath.includes("/project-details/");
+  const isProjectDetailsPage = currentPath.includes(
+    "/client-panel/project-details/",
+  );
   const isProjectReviewPage = currentPath.includes(
     "/client-panel/project-review",
   );
@@ -315,7 +313,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       </>
     );
   };
-
+  console.log(isProjectDetailsPage, projectName);
   return (
     <div>
       {/* Header */}
@@ -428,16 +426,25 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
                   </>
                 )}
 
-                {isProjectDetailsPage && projectName && (
+                {/* {isProjectDetailsPage && project && (
                   <>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                       <BreadcrumbPage className="text-[#356DF0]">
-                        {projectName}
+                        {project}
                       </BreadcrumbPage>
                     </BreadcrumbItem>
                   </>
-                )}
+                )} */}
+              </>
+            )}
+            {isProjectDetailsPage && (
+              <>
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-[#356DF0]">
+                    {projectName}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
               </>
             )}
           </BreadcrumbList>

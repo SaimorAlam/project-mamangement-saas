@@ -217,7 +217,7 @@ const ClientSidebar = () => {
           className={`rounded-[10px] flex items-center animate-pulse
           ${isExpanded ? "px-4 py-5 gap-2" : "px-2 py-3 justify-center"}`}
         >
-          <div className="h-6 w-6 bg-slate-200 rounded flex-shrink-0" />
+          <div className="h-6 w-6 bg-slate-200 rounded shrink-0" />
           {isExpanded && <div className="h-4 w-32 bg-slate-200 rounded" />}
         </div>
       </SidebarMenuItem>
@@ -229,8 +229,10 @@ const ClientSidebar = () => {
       className="border border-slate-200 px-2 py-8 space-y-8 bg-white overflow-y-auto"
     >
       <SidebarHeader className="bg-white">
-        <div className="flex items-center justify-between">
-          {isExpanded && (
+        <div
+          className={`flex ${!isExpanded ? "flex-col" : ""} items-center justify-between`}
+        >
+          {
             <Link to="/">
               <img
                 src={Logo}
@@ -238,12 +240,13 @@ const ClientSidebar = () => {
                 className="w-[176px] h-auto hover:scale-110 duration-300"
               />
             </Link>
-          )}
+          }
+
           <SidebarTrigger className={!isExpanded ? "mx-auto" : "ml-auto"} />
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="bg-white">
+      <SidebarContent className="bg-white! grid items-start justify-center ">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
