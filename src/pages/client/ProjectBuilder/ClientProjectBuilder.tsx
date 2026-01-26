@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
-import GanttChart from "@/common/Charts/GanttChart";
+// import GanttChart from "@/common/Charts/GanttChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
 import RadarCharts from "@/common/Charts/RadarChart";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
@@ -275,17 +275,17 @@ const ClientProjectBuilder = () => {
             </div>
           )}
 
-          {selectedWidgets.includes("gantt-chart") && (
+          {/* {selectedWidgets.includes("gantt-chart") && (
             <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
               <GanttChart />
             </div>
-          )}
+          )} */}
 
-          {selectedWidgets.includes("picture-video") && (
+          {/* {selectedWidgets.includes("picture-video") && (
             <div className="p-6 border border-gray-200 rounded-lg text-center text-gray-500">
               Picture/Video coming soon...
             </div>
-          )}
+          )} */}
 
           {selectedWidgets.includes("horizontal-bar-chart") && (
             <HorizontalBarChartModule

@@ -1,7 +1,5 @@
 import { useState } from "react";
-import ProjectConfiguration, {
-  LegendValue,
-} from "../WidgetForChartModuleOne";
+import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
 import TreemapChart from "@/common/Charts/TreemapChart";
 
 type TreemapChartModuleProps = {
@@ -9,7 +7,10 @@ type TreemapChartModuleProps = {
   isPreview?: boolean;
 };
 
-const TreemapChartModule = ({ onDelete, isPreview = false }: TreemapChartModuleProps) => {
+const TreemapChartModule = ({
+  onDelete,
+  isPreview = false,
+}: TreemapChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Treemap Chart");
   const [showWidget, setShowWidget] = useState(false);
 

@@ -24,6 +24,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getClientSidebarItems } from "./clientSidebarItems";
 // import CreateProjectModal from "./CreateProjectModal";
 import CreateProject from "./CreateProject";
@@ -318,37 +319,45 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center py-5 justify-between">
-        {currentPath === "/client-panel" && (
-          <div>
-            <h1 className="text-[32px] font-semibold">
-              Good Morning 👋, {userName || name}
-            </h1>
-            <p className="text-base text-gray-500">
-              This is dashboard overview of Acme Corporation
-            </p>
-          </div>
-        )}
+      <div className="flex flex-wrap items-center py-5 justify-between gap-4 md:gap-6">
+        <div className="flex items-center gap-4 min-w-0">
+          <SidebarTrigger className="md:hidden shrink-0" />
+          {currentPath === "/client-panel" && (
+            <div className="min-w-0">
+              <h1 className="text-2xl md:text-[32px] font-semibold truncate">
+                Good Morning 👋, {userName || name}
+              </h1>
+              <p className="text-sm md:text-base text-gray-500 truncate">
+                This is dashboard overview of Acme Corporation
+              </p>
+            </div>
+          )}
+        </div>
 
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <div className="flex-1 min-w-[200px] order-3 lg:order-2 w-full lg:w-auto">
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        </div>
 
-        <div className="flex items-center justify-between gap-6 relative">
+        <div className="flex items-center justify-end gap-2 md:gap-4 lg:gap-6 relative order-2 lg:order-3 ml-auto lg:ml-0">
           <PrimaryButton
-            leftIcon={<Bell className="text-2xl" />}
+            leftIcon={<Bell className="text-xl md:text-2xl" />}
             type="Outline"
             onClick={() => setIsNotificationOpen(true)}
+            className="p-2 md:p-3"
           />
           <NotificationModal
             isOpen={isNotificationOpen}
             onClose={() => setIsNotificationOpen(false)}
           />
 
-          <PrimaryButton
-            title="Last 1 Week"
-            leftIcon={<CalendarDays />}
-            rightIcon={<ChevronDown />}
-            type="Outline"
-          />
+          <div className="hidden sm:block">
+            <PrimaryButton
+              title="Last 1 Week"
+              leftIcon={<CalendarDays className="size-4 md:size-5" />}
+              rightIcon={<ChevronDown className="size-4 md:size-5" />}
+              type="Outline"
+            />
+          </div>
 
           <div className="relative">{renderQuickActionButton()}</div>
 
@@ -373,71 +382,67 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       </div>
 
       {/* Breadcrumb */}
-      <Breadcrumb className="my-2 ">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/">Home</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          {/* <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/client-panel">Client</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem> */}
-          {/* <BreadcrumbSeparator /> */}
-          {currentRoute && (
-            <>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link
-                    to={currentRoute.path as string}
-                    className="text-[#356DF0] font-semibold flex items-center gap-1"
-                  >
-                    {currentRoute.icon &&
-                      isValidElement(currentRoute.icon) &&
-                      cloneElement(
-                        currentRoute.icon as ReactElement<{
-                          className?: string;
-                        }>,
-                        { className: "w-4 h-4" },
-                      )}
-                    {currentRoute.name}
-                  </Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
+      <div className="overflow-x-auto no-scrollbar py-1">
+        <Breadcrumb className="my-2 min-w-max">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/client-panel">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            {currentRoute && (
+              <>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link
+                      to={currentRoute.path as string}
+                      className="text-[#356DF0] font-semibold flex items-center gap-1"
+                    >
+                      {currentRoute.icon &&
+                        isValidElement(currentRoute.icon) &&
+                        cloneElement(
+                          currentRoute.icon as ReactElement<{
+                            className?: string;
+                          }>,
+                          { className: "w-4 h-4" },
+                        )}
+                      {currentRoute.name}
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
 
-              {showProgramOverviewBreadcrumb && (
-                <>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbLink asChild>
-                      <Link
-                        to={`/client-panel/all-program/program-overview/${programId}`}
-                        className="text-[#356DF0]"
-                      >
-                        Program Overview
-                      </Link>
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                </>
-              )}
+                {showProgramOverviewBreadcrumb && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link
+                          to={`/client-panel/all-program/program-overview/${programId}`}
+                          className="text-[#356DF0]"
+                        >
+                          Program Overview
+                        </Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                  </>
+                )}
 
-              {isProjectDetailsPage && projectName && (
-                <>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage className="text-[#356DF0]">
-                      {projectName}
-                    </BreadcrumbPage>
-                  </BreadcrumbItem>
-                </>
-              )}
-            </>
-          )}
-        </BreadcrumbList>
-      </Breadcrumb>
+                {isProjectDetailsPage && projectName && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-[#356DF0]">
+                        {projectName}
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                )}
+              </>
+            )}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
     </div>
   );
 };

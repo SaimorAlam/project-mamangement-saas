@@ -71,7 +71,7 @@ export default function HeatmapChart({ onDelete, onCopy }: HeatmapChartProps) {
     product: string,
     day: string,
     value: number,
-    event: MouseEvent<HTMLDivElement>
+    event: MouseEvent<HTMLDivElement>,
   ) => {
     const rect = event.currentTarget.getBoundingClientRect();
     setTooltip({
@@ -87,7 +87,7 @@ export default function HeatmapChart({ onDelete, onCopy }: HeatmapChartProps) {
 
   const totalStock = data.reduce(
     (sum, item) => sum + item.values.reduce((a, b) => a + b, 0),
-    0
+    0,
   );
 
   return (
@@ -131,9 +131,7 @@ export default function HeatmapChart({ onDelete, onCopy }: HeatmapChartProps) {
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-1">
                 <div className={`w-4 h-4 rounded ${item.color}`} />
-                <span className="text-xs text-gray-600">
-                  {item.range}
-                </span>
+                <span className="text-xs text-gray-600">{item.range}</span>
               </div>
             ))}
           </div>
@@ -166,15 +164,10 @@ export default function HeatmapChart({ onDelete, onCopy }: HeatmapChartProps) {
                 <div
                   key={colIndex}
                   className={`w-12 h-10 ${getColor(
-                    value
+                    value,
                   )} rounded cursor-pointer transition-all hover:ring-2 hover:ring-teal-400 hover:scale-105 mx-0.5`}
                   onMouseEnter={(e) =>
-                    handleCellHover(
-                      item.product,
-                      days[colIndex],
-                      value,
-                      e
-                    )
+                    handleCellHover(item.product, days[colIndex], value, e)
                   }
                   onMouseLeave={handleCellLeave}
                 />
@@ -196,9 +189,7 @@ export default function HeatmapChart({ onDelete, onCopy }: HeatmapChartProps) {
         >
           <div className="font-semibold">{tooltip.product}</div>
           <div className="text-gray-300">{tooltip.day}</div>
-          <div className="font-bold text-teal-300">
-            {tooltip.value} units
-          </div>
+          <div className="font-bold text-teal-300">{tooltip.value} units</div>
         </div>
       )}
     </div>

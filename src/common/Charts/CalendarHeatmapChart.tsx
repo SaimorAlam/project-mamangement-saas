@@ -50,13 +50,13 @@ const getRandomCount = () => Math.floor(Math.random() * 15);
 
 const generateCalendarData = (
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ): CalendarValue[] => {
   const values: CalendarValue[] = [];
   const currentDate = new Date(startDate);
   // Ensure we don't go into infinite loop if dates are messed up
   const finalDate = new Date(endDate);
-  
+
   // Clone to avoid modifying original
   const iterDate = new Date(currentDate);
 
@@ -73,8 +73,6 @@ const generateCalendarData = (
 
   return values;
 };
-
-
 
 /*       COMPONENT       */
 
@@ -101,17 +99,17 @@ export default function CalendarHeatmapChart({
   /*   DATE RANGE   */
   const { startDate, endDate, customMonthLabels } = useMemo(() => {
     // If specific months are provided
-    if (months && months.length > 0 && months.some(m => m.trim() !== "")) {
+    if (months && months.length > 0 && months.some((m) => m.trim() !== "")) {
       const currentYear = new Date().getFullYear();
-      const validMonths = months.filter(m => m.trim() !== "");
-      
+      const validMonths = months.filter((m) => m.trim() !== "");
+
       // Always start from January if custom labels are provided
       // This ensures our labels align with the displayed months (Jan = index 0)
       const start = new Date(currentYear, 0, 1);
-      
+
       // End date is determined by how many labels we have
       // e.g., 3 labels -> Jan, Feb, Mar -> End date is end of Mar
-      const end = new Date(currentYear, validMonths.length, 0); 
+      const end = new Date(currentYear, validMonths.length, 0);
 
       // Create the 12-element array required by the library
       const labels = new Array(12).fill("");
@@ -119,10 +117,23 @@ export default function CalendarHeatmapChart({
         if (i < 12) labels[i] = m;
       });
 
-      return { 
-        startDate: start, 
-        endDate: end, 
-        customMonthLabels: labels as [string, string, string, string, string, string, string, string, string, string, string, string] 
+      return {
+        startDate: start,
+        endDate: end,
+        customMonthLabels: labels as [
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+        ],
       };
     }
 
@@ -198,7 +209,7 @@ export default function CalendarHeatmapChart({
       getChartTitleId,
       widgetTitle,
       [],
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -251,7 +262,8 @@ export default function CalendarHeatmapChart({
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium text-center">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
@@ -291,7 +303,7 @@ export default function CalendarHeatmapChart({
             startDate={startDate}
             endDate={endDate}
             values={calendarValues}
-            classForValue={(value: any) : any => {
+            classForValue={(value: any): any => {
               if (!value) {
                 return "color-empty";
               }
@@ -300,7 +312,7 @@ export default function CalendarHeatmapChart({
               if (value.count < 10) return "color-scale-3";
               return "color-scale-4";
             }}
-            tooltipDataAttrs={(value: any) : any => {
+            tooltipDataAttrs={(value: any): any => {
               if (!value || !value.date) {
                 return {};
               }
@@ -326,12 +338,12 @@ export default function CalendarHeatmapChart({
                     level === 0
                       ? "#ebedf0"
                       : level === 1
-                      ? `${primaryColor}33`
-                      : level === 2
-                      ? `${primaryColor}66`
-                      : level === 3
-                      ? `${primaryColor}99`
-                      : primaryColor,
+                        ? `${primaryColor}33`
+                        : level === 2
+                          ? `${primaryColor}66`
+                          : level === 3
+                            ? `${primaryColor}99`
+                            : primaryColor,
                 }}
               />
             ))}

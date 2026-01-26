@@ -1,8 +1,7 @@
 import { useState } from "react";
-import ProjectConfiguration, {
-  LegendValue,
-} from "../WidgetForChartModuleOne";
+import { LegendValue } from "../WidgetForChartModuleOne";
 import BulletChart from "@/common/Charts/BulletChart";
+import BulletChartConfiguration from "./BulletChartConfiguration";
 
 type BulletChartModuleProps = {
   onDelete?: () => void;
@@ -13,18 +12,14 @@ const BulletChartModule = ({ onDelete, isPreview = false }: BulletChartModulePro
   const [widgetTitle, setWidgetTitle] = useState("Bullet Performance");
   const [showWidget, setShowWidget] = useState(false);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
-
+  // Initial set of legend values (metrics)
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
-    { label: "", field: "", color: "#e62325" },
-    { label: "", field: "", color: "#0058e9" },
-    { label: "#111", field: "", color: "#111" },
+    { label: "Revenue", field: "revenue", color: "#3b82f6" },
+    { label: "Expansion", field: "expansion", color: "#10b981" },
+    { label: "Support", field: "support", color: "#f59e0b" },
   ]);
 
-  // Bullet charts don't use X-axis values
-  const [numOfXAxisDataSet] = useState<number>(0);
-  const [xAxisValues] = useState<string[]>([]);
-  const [startingRange, setStartingRange] = useState<number>(-10);
+  const [startingRange, setStartingRange] = useState<number>(0);
   const [endingRange, setEndingRange] = useState<number>(100);
 
   // Toggle widget visibility
@@ -45,7 +40,7 @@ const BulletChartModule = ({ onDelete, isPreview = false }: BulletChartModulePro
         <BulletChart
           widgetTitle={widgetTitle}
           legendValues={legendValues}
-          numOfLegendDataSet={numOfLegendDataSet}
+          numOfLegendDataSet={legendValues.length}
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
@@ -54,17 +49,9 @@ const BulletChartModule = ({ onDelete, isPreview = false }: BulletChartModulePro
         />
       </div>
       {!isPreview && showWidget && (
-        <ProjectConfiguration
-          widgedName="Bullet Chart"
+        <BulletChartConfiguration
           widgetTitle={widgetTitle}
-          widgetCategory="BULLET"
           setWidgetTitle={setWidgetTitle}
-          numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={() => {}}
-          xAxisValues={xAxisValues}
-          handleXAxisValueChange={() => {}}
-          numOfLegendDataSet={numOfLegendDataSet}
-          setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
           setLegendValues={setLegendValues}
           startingRange={startingRange}

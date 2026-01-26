@@ -3,7 +3,6 @@ import { useAppSelector } from "@/hooks/useRedux";
 import { useLazyGetProjectTreeQuery } from "@/store/Api/NodeApi/NodeApi";
 import { useMemo, useEffect, useState } from "react";
 
-
 const useChartData = ({
   newData,
   isCreationMode,
@@ -27,10 +26,12 @@ const useChartData = ({
   const { projectId } = useAppSelector((state) => state.chartSlice);
   const [getProjectTree, { data: childNodes }] = useLazyGetProjectTreeQuery();
   useEffect(() => {
-    if (!isCreationMode && (!newData || newData.length === 0)) {
+    const hasData = newData && newData.length > 0;
+    // Only fetch if we are not in creation mode, not a specific sub-chart, and don't have existing data
+    if (!isCreationMode && !chartId && !hasData) {
       getProjectTree(projectId);
     }
-  }, [projectId, newData, isCreationMode]);
+  }, [projectId, newData, isCreationMode, chartId]);
 
   const projectTreeData = useMemo(() => {
     const processData = (items: any[]): any[] =>
@@ -43,7 +44,10 @@ const useChartData = ({
         numOfLegendDataSet,
         startingRange,
         endingRange,
-        children: item.children ? processData(item.children) : [],
+        children:
+          item.children && item.children.length > 0
+            ? processData(item.children)
+            : [],
       }));
 
     return childNodes?.data ? processData(childNodes.data) : [];
@@ -68,27 +72,35 @@ const useChartData = ({
   };
 
   useEffect(() => {
-    if (newData && newData?.length >= 0) {
-      setChildTiers(newData);
+    let nextTiers: any[] = [];
+    if (newData && newData.length >= 0) {
+      nextTiers = newData;
     } else if (isCreationMode) {
-      setChildTiers([]);
+      nextTiers = [];
     } else if (chartId) {
       const node = findNodeById(projectTreeData, chartId);
-      setChildTiers(node?.children || []);
+      nextTiers = node?.children || [];
     } else {
-      setChildTiers(projectTreeData);
+      nextTiers = projectTreeData;
     }
+
+    // Shallow check to avoid unnecessary re-renders
+    setChildTiers((current) => {
+      if (current.length === 0 && nextTiers.length === 0) return current;
+      if (current === nextTiers) return current;
+      return nextTiers;
+    });
   }, [childNodes, newData, projectTreeData, isCreationMode, chartId]);
 
   const refetch = () => {
     if (projectId) {
-        getProjectTree(projectId);
+      getProjectTree(projectId);
     }
-  }
+  };
 
   return {
     childTiers,
-    refetch
+    refetch,
   };
 };
 

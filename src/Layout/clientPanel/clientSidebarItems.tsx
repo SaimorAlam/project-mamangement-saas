@@ -174,11 +174,11 @@ export const getClientSidebarItems = (): SidebarGroup[] => {
           name: "Settings",
           path: "/client-panel/settings",
         },
-        {
-          icon: <IoSettingsOutline className="size-6" />,
-          name: "Create Project",
-          path: "/client-panel/single-project-create",
-        },
+        // {
+        //   icon: <IoSettingsOutline className="size-6" />,
+        //   name: "Create Project",
+        //   path: "/client-panel/single-project-create",
+        // },
       ],
     },
   ];

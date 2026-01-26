@@ -90,7 +90,7 @@ const ChartCardWrapper = ({
               </button>
 
               {showPopover && (
-                <div className="absolute right-0 top-12 w-48 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-50">
+                <div className="absolute right-0 top-12 w-48 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-999">
                   {/* COPY */}
                   {menuActions.onCopy && (
                     <button

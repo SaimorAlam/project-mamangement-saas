@@ -117,7 +117,7 @@ export default function TreemapChart({
         },
       },
     }),
-    [widgetTitle, legendValues]
+    [widgetTitle, legendValues],
   );
 
   const series = useMemo(
@@ -126,7 +126,7 @@ export default function TreemapChart({
         data: treemapData,
       },
     ],
-    [treemapData]
+    [treemapData],
   );
 
   /*   TOTAL VALUE   */
@@ -185,7 +185,7 @@ export default function TreemapChart({
       getChartTitleId,
       widgetTitle,
       [],
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -238,7 +238,8 @@ export default function TreemapChart({
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium text-center">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }

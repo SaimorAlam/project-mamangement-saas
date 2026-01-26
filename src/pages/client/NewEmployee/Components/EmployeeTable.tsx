@@ -156,14 +156,14 @@ const EmployeeTable = () => {
             placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border rounded px-3 py-1 w-64"
+            className="border border-gray-200 rounded px-3 py-1 w-64 focus:outline-none focus:border-gray-500"
           />
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="border rounded px-2 py-1"
+            className="border border-gray-200 rounded px-2 py-1.5"
           >
-            <option>All</option>
+            <option>Search By Role</option>
             <option>MANAGER</option>
             <option>EMPLOYEE</option>
             <option>VIEWER</option>
@@ -171,9 +171,9 @@ const EmployeeTable = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border rounded px-2 py-1"
+            className="border border-gray-200 rounded px-2 py-1.5"
           >
-            <option>All</option>
+            <option>Search By Status</option>
             <option>Active</option>
             <option>Inactive</option>
           </select>
@@ -202,9 +202,9 @@ const EmployeeTable = () => {
               >
                 Role {renderSortIcon("role")}
               </th>
-              {/* <th className="px-4 py-3 text-left text-sm font-semibold">
-              Assign Project
-            </th> */}
+              <th className="px-4 py-3 text-left text-sm font-semibold">
+                Assign Project
+              </th>
               <th
                 className="px-4 py-3 text-left text-sm font-semibold cursor-pointer"
                 onClick={() => handleSort("lastActive")}

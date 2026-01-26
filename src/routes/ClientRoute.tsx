@@ -63,7 +63,7 @@ export function getClientRoutes() {
     { path: "program-builder", element: <ClientProgramBuilder /> },
     { path: "program-name", element: <ClientProgramName /> },
 
-    { path: "project-details/:id", element: <ProjectDetails /> },
+    { path: "project-details/:projectId", element: <ProjectDetails /> },
 
     {
       path: "highway-expansion",
