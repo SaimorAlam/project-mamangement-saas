@@ -106,7 +106,7 @@ const EmployeeTable = () => {
   const renderSkeleton = () =>
     Array.from({ length: PAGE_SIZE }).map((_, i) => (
       <tr key={i} className="even:bg-gray-50 odd:bg-white animate-pulse h-12">
-        {Array(6)
+        {Array(7)
           .fill(0)
           .map((_, idx) => (
             <td
@@ -259,21 +259,21 @@ const EmployeeTable = () => {
                           {user.role}
                         </Badge>
                       </td>
-                      {/* <td className="px-4 py-3 align-middle">
-                    <div className="flex flex-wrap gap-1">
-                      {user.assignedProjects?.length
-                        ? user.assignedProjects.map((p: any) => (
-                            <Badge
-                              key={p.id}
-                              variant="outline"
-                              className="text-sm px-2 py-1 border-gray-200"
-                            >
-                              {p.name}
-                            </Badge>
-                          ))
-                        : ""}
-                    </div>
-                  </td> */}
+                      <td className="px-4 py-3 align-middle">
+                        <div className="flex flex-wrap gap-1">
+                          {user.assignedProjects?.length
+                            ? user.assignedProjects.map((p: any) => (
+                                <Badge
+                                  key={p.id}
+                                  variant="outline"
+                                  className="text-sm px-2 py-1 border-gray-200"
+                                >
+                                  {p.name}
+                                </Badge>
+                              ))
+                            : ""}
+                        </div>
+                      </td>
                       <td className="px-4 py-3 text-sm text-gray-500 align-middle">
                         {user.lastActive
                           ? new Date(user.lastActive).toLocaleDateString(
@@ -341,7 +341,7 @@ const EmployeeTable = () => {
                     key={`empty-${i}`}
                     className="h-12 even:bg-gray-50 odd:bg-white"
                   >
-                    {Array(6)
+                    {Array(7)
                       .fill(0)
                       .map((_, idx) => (
                         <td
