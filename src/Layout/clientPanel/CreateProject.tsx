@@ -13,6 +13,7 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import useGetAllEmployees from "@/utils/useGetAllEmployees";
 import { FaSpinner } from "react-icons/fa";
+import ProjectSuccessModal from "./ProjectSuccessModal";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -102,7 +103,8 @@ const CreateProject = ({
   const [enableDetails, setEnableDetails] = useState(false);
   const [selectedStaffs, setSelectedStaffs] = useState<string[]>([]);
   const [mapPosition, setMapPosition] = useState({ lat: 51.505, lng: -0.09 }); // Default London
-
+  const [openSuccessModal, setOpenSuccessModal] = useState(false);
+  const [projectId, setProjectId] = useState<string>("");
   const { register, handleSubmit, watch, setValue, control } =
     useForm<CreateProjectForm>({
       defaultValues: {
@@ -118,7 +120,7 @@ const CreateProject = ({
         dataUploadDateDays: "3",
       },
     });
-
+  const projectName = watch("name");
   const repeatEvery = watch("repeatEvery");
   const repeatOnDays = watch("repeatOnDays");
   const workingDays = watch("workingDays"); // Watch workingDays state
@@ -143,7 +145,8 @@ const CreateProject = ({
   useEffect(() => {
     if (isSuccess) {
       toast.success("Project created successfully");
-      onClose();
+      setOpenSuccessModal(true);
+      // onClose();
     }
   }, [isSuccess, onClose]);
   if (employeeLoading) {
@@ -274,11 +277,11 @@ const CreateProject = ({
         latitude: Number(data.latitude) || 0,
         longitude: Number(data.longitude) || 0,
       };
-
-      console.log("Create Project Payload:", payload);
       const cleanedPayload = cleanPayload(payload);
-
-      await createProject(cleanedPayload).unwrap();
+      const res = await createProject(cleanedPayload).unwrap();
+      if (res.success) {
+        setProjectId(res.data.id);
+      }
     } catch (error: any) {
       console.error(error);
       toast.error(error?.data?.message || "Failed to create project");
@@ -737,6 +740,12 @@ const CreateProject = ({
           </div>
         </form>
       </div>
+      <ProjectSuccessModal
+        open={openSuccessModal}
+        onOpenChange={setOpenSuccessModal}
+        projectName={projectName}
+        projectId={projectId}
+      />
     </div>
   );
 };

@@ -5,13 +5,7 @@ import React, {
   ReactElement,
   isValidElement,
 } from "react";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-  useResolvedPath,
-} from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
@@ -120,8 +114,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const isProjectReviewDetailsPage = currentPath.includes(
     "/client-panel/project-review/project-details/",
   );
-  const overviewProjectDetails = useResolvedPath("project-details");
-  console.log(overviewProjectDetails);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isPreview, isPublished } = useAppSelector(
