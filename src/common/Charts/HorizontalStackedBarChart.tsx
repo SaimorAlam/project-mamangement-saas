@@ -63,7 +63,9 @@ export default function HorizontalStackedBarChart({
   allUploadedData,
   isPreview = false,
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<{ [key: string]: ChartData[] } | undefined>(allUploadedData);
+  const [localUploadedData, setLocalUploadedData] = useState<
+    { [key: string]: ChartData[] } | undefined
+  >(allUploadedData);
   const { childTiers } = useChartData({
     newData,
     isCreationMode,
@@ -80,8 +82,12 @@ export default function HorizontalStackedBarChart({
 
   /*   CHART DATA   */
   const chartData: ChartData[] = useMemo(() => {
-    const sheetName = (widgetTitle || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim().substring(0, 31);
-    const dataToUse = localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const sheetName = (widgetTitle || "Sheet")
+      .replace(/[:\/?*\[\]\\]/g, " ")
+      .trim()
+      .substring(0, 31);
+    const dataToUse =
+      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
       return dataToUse;
@@ -93,7 +99,7 @@ export default function HorizontalStackedBarChart({
       legendValues,
       numOfLegendDataSet,
       startingRange,
-      endingRange
+      endingRange,
     );
   }, [
     xAxisValues,
@@ -186,7 +192,7 @@ export default function HorizontalStackedBarChart({
       },
       colors: legendValues.map((l) => l.color),
     }),
-    [widgetTitle, categories, startingRange, endingRange, legendValues]
+    [widgetTitle, categories, startingRange, endingRange, legendValues],
   );
 
   /*   ACTIONS   */
@@ -219,7 +225,7 @@ export default function HorizontalStackedBarChart({
       const processNodeData = (
         name: string,
         xAxis: string[],
-        legends: LegendValue[]
+        legends: LegendValue[],
       ) => {
         const headers = ["Label", ...legends.map((l) => l.label)];
         const rows = xAxis.map((label) => [label, ...legends.map(() => "")]);
@@ -239,7 +245,7 @@ export default function HorizontalStackedBarChart({
             processNodeData(
               node.name || node.taskName,
               node.xAxisValues,
-              node.legendValues
+              node.legendValues,
             );
           }
 

@@ -42,9 +42,9 @@ interface AllProgramProjectGridViewProps {
   allProgramProjectData: ProgramCardProps[];
 }
 
-const AllProgramProjectTableView: React.FC<
-  AllProgramProjectGridViewProps
-> = ({ allProgramProjectData: paginatedData }) => {
+const AllProgramProjectTableView: React.FC<AllProgramProjectGridViewProps> = ({
+  allProgramProjectData: paginatedData,
+}) => {
   const priorityColors = {
     High: "text-red-600",
     Medium: "text-orange-600",
@@ -55,39 +55,37 @@ const AllProgramProjectTableView: React.FC<
   const renderPriority = (priority: ProgramCardProps["priority"]) => (
     <div className="flex items-center gap-1">
       <Flag className={`w-4 h-4 ${priorityColors[priority]}`} />
-      <span
-        className={`text-sm font-medium ${priorityColors[priority]}`}
-      >
+      <span className={`text-sm font-medium ${priorityColors[priority]}`}>
         {priority}
       </span>
     </div>
   );
 
   return (
-    <Card className="w-full shadow-none border-none">
+    <Card className="shadow-none border-none w-full">
       <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full min-h-[420px]">
         <Table className="">
           <TableHeader>
-            <TableRow className="border-b border-[#E2E8F0] bg-[#F7F9FA]">
-              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+            <TableRow className="bg-[#F7F9FA] border-[#E2E8F0] border-b">
+              <TableHead className="px-6 py-3.5 font-medium text-[#1D2028] text-base">
                 Program
               </TableHead>
-              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+              <TableHead className="px-6 py-3.5 font-medium text-[#1D2028] text-base">
                 Project
               </TableHead>
-              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+              <TableHead className="px-6 py-3.5 font-medium text-[#1D2028] text-base">
                 Assign Staff
               </TableHead>
-              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+              <TableHead className="px-6 py-3.5 font-medium text-[#1D2028] text-base">
                 Priority
               </TableHead>
-              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+              <TableHead className="px-6 py-3.5 font-medium text-[#1D2028] text-base">
                 Started On
               </TableHead>
-              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+              <TableHead className="px-6 py-3.5 font-medium text-[#1D2028] text-base">
                 Deadline
               </TableHead>
-              <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
+              <TableHead className="px-6 py-3.5 font-medium text-[#1D2028] text-base">
                 Action
               </TableHead>
             </TableRow>
@@ -96,12 +94,12 @@ const AllProgramProjectTableView: React.FC<
             {paginatedData.map((item) => (
               <TableRow
                 key={item.id}
-                className="border-b border-[#E2E8F0] hover:bg-muted/30 transition-colors odd:bg-white even:bg-[#F7F9FA]"
+                className="hover:bg-muted/30 even:bg-[#F7F9FA] odd:bg-white border-[#E2E8F0] border-b transition-colors"
               >
-                <TableCell className="text-base font-medium px-6 py-3.5">
+                <TableCell className="px-6 py-3.5 font-medium text-base">
                   {item.programName}
                 </TableCell>
-                <TableCell className="text-base px-6 py-3.5">
+                <TableCell className="px-6 py-3.5 text-base">
                   {item.projectName}
                 </TableCell>
                 <TableCell className="px-6 py-3.5">
@@ -110,10 +108,10 @@ const AllProgramProjectTableView: React.FC<
                 <TableCell className="px-6 py-3.5">
                   {renderPriority(item.priority)}
                 </TableCell>
-                <TableCell className="px-6 py-3.5 text-base text-muted-foreground">
+                <TableCell className="px-6 py-3.5 text-muted-foreground text-base">
                   {item.startDate}
                 </TableCell>
-                <TableCell className="px-6 py-3.5 text-base text-muted-foreground">
+                <TableCell className="px-6 py-3.5 text-muted-foreground text-base">
                   {item.endDate}
                 </TableCell>
                 <TableCell className="px-6 py-3.5">

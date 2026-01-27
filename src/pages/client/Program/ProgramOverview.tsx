@@ -10,6 +10,7 @@ import AllProject from "./AllProject";
 
 const ProgramOverview = () => {
   const { programId } = useParams();
+  console.log(programId);
   const { data: program } = useGetProgramByIdQuery(programId);
   // const { data: allProjects } = useGetProjectsByProgramIdQuery({
   //   programId: programId,
@@ -27,7 +28,7 @@ const ProgramOverview = () => {
           <ProgramManager />
         </div>
         <div className="z-0!">
-        <HighwayMap />
+          <HighwayMap />
         </div>
       </div>
     </div>

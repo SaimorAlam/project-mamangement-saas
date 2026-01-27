@@ -39,7 +39,6 @@ const ClientAllProgram = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<
     "ALL" | "HIGH" | "MEDIUM" | "LOW"
   >("ALL");
@@ -138,7 +137,7 @@ const ClientAllProgram = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-10 h-[60vh]">
+      <div className="flex justify-center items-center py-10 h-[60vh]">
         <FaSpinner size={24} className="animate-spin" />
       </div>
     );
@@ -155,11 +154,11 @@ const ClientAllProgram = ({
   };
 
   return (
-    <div className="min-h-screen py-6">
-      <div className="bg-white rounded-lg border border-gray-200">
+    <div className="py-6 min-h-screen">
+      <div className="bg-white border border-gray-200 rounded-lg">
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between px-6 py-4 border-b border-gray-200 gap-3">
-          <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
+        <div className="flex md:flex-row flex-col justify-between items-center gap-3 px-6 py-4 border-gray-200 border-b">
+          <h1 className="font-semibold text-gray-900 text-lg">{title}</h1>
           <div className="flex items-center gap-3">
             <input
               type="text"
@@ -169,14 +168,14 @@ const ClientAllProgram = ({
                 setCurrentPage(1);
                 setSearch(e.target.value);
               }}
-              className="px-4 py-2 text-sm border border-gray-300 rounded-md w-64"
+              className="px-4 py-2 border border-gray-300 rounded-md w-64 text-sm"
             />
             {/* Sort By Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="px-4 py-2 pr-8 text-sm border border-gray-300 rounded-lg focus:outline-none appearance-none  bg-white cursor-pointer"
+                  className="bg-white px-4 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none text-sm appearance-none cursor-pointer"
                 >
                   <ArrowDownUp className="size-5" />
                   Sort By
@@ -185,35 +184,35 @@ const ClientAllProgram = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-56 bg-white border border-[#CAD2DB] p-1"
+                className="bg-white p-1 border border-[#CAD2DB] w-56"
               >
                 {/* Field Selection */}
-                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <div className="px-2 py-1.5 font-semibold text-gray-500 text-xs uppercase tracking-wider">
                   Field
                 </div>
                 <DropdownMenuItem
-                  className={`rounded-md cursor-pointer ${sortBy === "startDate" ? "bg-indigo-50 text-indigo-600" : ""}`}
-                  onClick={() => setSortBy("name")}
+                  className={`rounded-md cursor-pointer ${sortColumn === "programName" ? "bg-indigo-50 text-indigo-600" : ""}`}
+                  onClick={() => setSortColumn("programName")}
                 >
                   Program Name
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className={`rounded-md cursor-pointer ${sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""}`}
-                  onClick={() => setSortBy("submitDate")}
+                  className={`rounded-md cursor-pointer ${sortColumn === "updatedAt" ? "bg-indigo-50 text-indigo-600" : ""}`}
+                  onClick={() => setSortColumn("updatedAt")}
                 >
                   Updated At
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className={`rounded-md cursor-pointer ${sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""}`}
-                  onClick={() => setSortBy("submitDate")}
+                  className={`rounded-md cursor-pointer ${sortColumn === "deadline" ? "bg-indigo-50 text-indigo-600" : ""}`}
+                  onClick={() => setSortColumn("deadline")}
                 >
                   Deadline
                 </DropdownMenuItem>
 
-                <div className="my-1 border-t border-gray-100" />
+                <div className="my-1 border-gray-100 border-t" />
 
                 {/* Order Selection */}
-                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <div className="px-2 py-1.5 font-semibold text-gray-500 text-xs uppercase tracking-wider">
                   Order
                 </div>
                 <DropdownMenuItem
@@ -231,9 +230,9 @@ const ClientAllProgram = ({
               </DropdownMenuContent>
             </DropdownMenu>
             <DropdownMenu>
-              <DropdownMenuTrigger className="px-4 py-2 font-semibold flex items-center gap-2 text-sm border border-gray-300 rounded-md min-w-32">
+              <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md min-w-32 font-semibold text-sm">
                 {priorityFilter === "ALL" ? "All Priorities" : priorityFilter}
-                <ChevronDown className="h-5 w-5" />
+                <ChevronDown className="w-5 h-5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
@@ -255,7 +254,7 @@ const ClientAllProgram = ({
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50 border-gray-200 border-b">
               <tr>
                 {[
                   "programName",
@@ -302,25 +301,25 @@ const ClientAllProgram = ({
                       <PriorityDropdown defaultPriority={program.priority} />
                     </td>
                     {!hideCreatedOn && (
-                      <td className="px-6 py-4 text-sm text-gray-600 align-middle">
+                      <td className="px-6 py-4 text-gray-600 text-sm align-middle">
                         {formatDate(program.createdAt)}
                       </td>
                     )}
-                    <td className="px-6 py-4 text-sm text-gray-600 align-middle">
+                    <td className="px-6 py-4 text-gray-600 text-sm align-middle">
                       {formatDate(program.updatedAt)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-gray-600 text-sm">
                       {formatDate(program.deadline)}
                     </td>
                     <td className="px-6 py-4 align-middle">
                       <div className="flex items-center gap-3">
-                        <div className="flex-1 max-w-[120px] h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="flex-1 bg-gray-200 rounded-full max-w-[120px] h-2 overflow-hidden">
                           <div
-                            className="h-full bg-blue-600 transition-all"
+                            className="bg-blue-600 h-full transition-all"
                             style={{ width: `${program.progress}%` }}
                           />
                         </div>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-gray-600 text-sm">
                           {program.progress}%
                         </span>
                       </div>
@@ -355,7 +354,10 @@ const ClientAllProgram = ({
                     ]
                       .filter(Boolean)
                       .map((_, i) => (
-                        <td key={i} className="px-6 py-4 text-sm text-gray-200 capitalize">
+                        <td
+                          key={i}
+                          className="px-6 py-4 text-gray-200 text-sm capitalize"
+                        >
                           &nbsp;
                         </td>
                       ))}
@@ -366,8 +368,8 @@ const ClientAllProgram = ({
           </table>
 
           {sortedPrograms.length === 0 && (
-            <div className="w-full h-[60vh] flex items-center justify-center">
-              <h2 className="text-center text-5xl font-semibold text-gray-200 uppercase">
+            <div className="flex justify-center items-center w-full h-[60vh]">
+              <h2 className="font-semibold text-gray-200 text-5xl text-center uppercase">
                 No Program Data Available
               </h2>
             </div>

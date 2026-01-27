@@ -10,6 +10,15 @@ import { Button } from "@/components/ui/button";
 import ViewUserModal from "./ViewUserModal";
 import UpdateUserModal from "./UpdateUserModal";
 import Swal from "sweetalert2";
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FieldGroup } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
 
 const EmployeeTable = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -34,7 +43,7 @@ const EmployeeTable = () => {
 
   const users = data?.data?.data || [];
   const meta = data?.data?.meta;
-  console.log(users, "users");
+
   useEffect(() => {
     if (currentPage !== 1) {
       setPageLoading(true);
@@ -148,7 +157,7 @@ const EmployeeTable = () => {
   return (
     <div className="border border-gray-200 w-full rounded-xl my-10 overflow-hidden">
       {/* Header + Filters */}
-      <div className="flex flex-col md:flex-row justify-between items-center py-4 px-6 gap-4 bg-white">
+      <div className="flex flex-col lg:flex-row justify-between items-center py-4 px-6 gap-4 bg-white">
         <h2 className="text-2xl font-medium">Employee List</h2>
         <div className="flex gap-2 flex-wrap items-center">
           <input
@@ -156,27 +165,59 @@ const EmployeeTable = () => {
             placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border border-gray-200 rounded px-3 py-1 w-64 focus:outline-none focus:border-gray-500"
+            className="border border-gray-200 rounded px-3 py-1 max-w-64 focus:outline-none focus:border-gray-500"
           />
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="border border-gray-200 rounded px-2 py-1.5"
-          >
-            <option>Search By Role</option>
-            <option>MANAGER</option>
-            <option>EMPLOYEE</option>
-            <option>VIEWER</option>
-          </select>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border border-gray-200 rounded px-2 py-1.5"
-          >
-            <option>Search By Status</option>
-            <option>Active</option>
-            <option>Inactive</option>
-          </select>
+          <Select>
+            <SelectTrigger className="min-w-32">
+              <SelectValue placeholder="Filter" />
+            </SelectTrigger>
+            <SelectContent className="space-y-2">
+              <FieldGroup className="flex flex-col gap-2 p-2 space-y-2">
+                <Label className="text-xs font-medium">By Role</Label>
+                {["MANAGER", "EMPLOYEE", "VIEWER"].map((role) => (
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={roleFilter === role}
+                      onCheckedChange={(checked) => {
+                        setCurrentPage(1);
+                        setRoleFilter(checked ? role : "All");
+                      }}
+                    />
+                    <Label
+                      onClick={() =>
+                        setRoleFilter(roleFilter === role ? "All" : role)
+                      }
+                    >
+                      {role}
+                    </Label>
+                  </div>
+                ))}
+              </FieldGroup>
+              <FieldGroup className="flex flex-col gap-2 p-2 space-y-2">
+                <Label className="text-xs font-medium">By Status</Label>
+                {["Active", "Inactive"].map((status) => (
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={statusFilter === status}
+                      onCheckedChange={(checked) => {
+                        setCurrentPage(1);
+                        setStatusFilter(checked ? status : "All");
+                      }}
+                    />
+                    <Label
+                      onClick={() =>
+                        setStatusFilter(
+                          statusFilter === status ? "All" : status,
+                        )
+                      }
+                    >
+                      {status}
+                    </Label>
+                  </div>
+                ))}
+              </FieldGroup>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

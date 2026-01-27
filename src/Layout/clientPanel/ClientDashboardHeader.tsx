@@ -5,7 +5,13 @@ import React, {
   ReactElement,
   isValidElement,
 } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useResolvedPath,
+} from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
@@ -111,6 +117,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const isProjectBuilderPage = currentPath.includes(
     "/client-panel/project-builder",
   );
+  const isProjectReviewDetailsPage = currentPath.includes(
+    "/client-panel/project-review/project-details/",
+  );
+  const overviewProjectDetails = useResolvedPath("project-details");
+  console.log(overviewProjectDetails);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isPreview, isPublished } = useAppSelector(
@@ -313,7 +324,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       </>
     );
   };
-  console.log(isProjectDetailsPage, projectName);
   return (
     <div>
       {/* Header */}
@@ -373,7 +383,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
               open={successOpen}
               onOpenChange={setSuccessOpen}
               programName={successData.programName}
-              redirectPath={`/client-panel/program-overview/${successData?.id}`}
+              redirectPath={`/client-panel/all-program/program-overview/${successData?.id}`}
             />
           )}
         </div>
@@ -420,6 +430,21 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
                           className="text-[#356DF0]"
                         >
                           Program Overview
+                        </Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                  </>
+                )}
+                {isProjectReviewDetailsPage && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link
+                          to={`/client-panel/project-review/project-details/${projectId}`}
+                          className="text-[#356DF0]"
+                        >
+                          Project Review
                         </Link>
                       </BreadcrumbLink>
                     </BreadcrumbItem>

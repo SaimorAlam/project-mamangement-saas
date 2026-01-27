@@ -69,7 +69,6 @@ export default function CreateProgramModal({
     };
     try {
       const res = await createProgramMutation(payload).unwrap();
-      console.log(res);
       if (res.success) {
         toast.success("Program created successfully");
         onSuccess({
