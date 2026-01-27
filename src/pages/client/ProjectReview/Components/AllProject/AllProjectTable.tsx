@@ -16,6 +16,7 @@ import RenderStaffAvatars from "@/components/ViewerPanel/RenderStaffAvater";
 import { Progress } from "@/components/ui/progress";
 import { Project } from "./AllProject";
 import ProjectModal from "./ProjectModal";
+import { useNavigate } from "react-router-dom";
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -84,7 +85,7 @@ const renderPriority = (priority: Project["priority"]) => (
 const AllProjectTable = ({ projects }: { projects: Project[] }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [openProjectModal, setOpenProjectModal] = useState(false);
-
+  const navigate = useNavigate();
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
@@ -214,8 +215,11 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
                       size="sm"
                       onClick={() => {
                         setSelectedProject(project);
-                        setOpenProjectModal(true);
+                        navigate(
+                          `/client-panel/project-review/project-details/${project.id}`,
+                        );
                       }}
+                      className="cursor-pointer"
                     >
                       <Eye className="w-4 h-4 text-[#1C73E0]" />
                     </Button>

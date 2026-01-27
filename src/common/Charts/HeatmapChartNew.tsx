@@ -45,6 +45,7 @@ type Props = {
   onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
+  isPreview?: boolean;
 };
 
 /*    COMPONENT    */
@@ -60,6 +61,7 @@ export default function HeatmapChartNew({
   onDelete,
   tierLevel = 0,
   chartId = "root",
+  isPreview = false,
 }: Props) {
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const [showPopover, setShowPopover] = useState(false);
@@ -86,7 +88,7 @@ export default function HeatmapChartNew({
           .map(
             () =>
               Math.floor(Math.random() * (endingRange - startingRange + 1)) +
-              startingRange
+              startingRange,
           ),
       }));
   }, [legendValues, xAxisValues, startingRange, endingRange]);
@@ -107,7 +109,7 @@ export default function HeatmapChartNew({
     row: string,
     column: string,
     value: number,
-    e: MouseEvent<HTMLDivElement>
+    e: MouseEvent<HTMLDivElement>,
   ) => {
     const rect = e.currentTarget.getBoundingClientRect();
     setTooltip({
@@ -152,7 +154,7 @@ export default function HeatmapChartNew({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -194,7 +196,9 @@ export default function HeatmapChartNew({
     <>
       <div
         className={`w-full bg-white border border-gray-200 rounded-lg p-6 relative ${
-          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+          childTiers.length > 0
+            ? "cursor-pointer hover:shadow-lg transition-shadow"
+            : ""
         }`}
         onClick={handleChartClick}
       >
@@ -203,18 +207,20 @@ export default function HeatmapChartNew({
           <h2 className="text-xl font-semibold">{widgetTitle}</h2>
 
           <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowPopover(!showPopover);
-              }}
-              className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-            >
-              <BsThreeDots size={18} />
-            </button>
+            {!isPreview && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowPopover(!showPopover);
+                }}
+                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
+              >
+                <BsThreeDots size={18} />
+              </button>
+            )}
 
             {showPopover && (
-              <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
+              <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-999">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -292,7 +298,7 @@ export default function HeatmapChartNew({
               {
                 color: "bg-[#A4C3B2]",
                 range: `${Math.floor(endingRange / 3) + 1}-${Math.floor(
-                  (endingRange * 2) / 3
+                  (endingRange * 2) / 3,
                 )}`,
               },
               {
@@ -321,7 +327,7 @@ export default function HeatmapChartNew({
                   <div
                     key={cIdx}
                     className={`w-28 h-20 rounded mx-1 cursor-pointer transition hover:ring-2 hover:ring-teal-400 ${getColor(
-                      value
+                      value,
                     )}`}
                     onMouseEnter={(e) =>
                       handleHover(row.label, xAxisValues[cIdx], value, e)

@@ -135,7 +135,7 @@ const CreateProject = ({
         },
         () => {
           // If denied, stick to default or previous
-        }
+        },
       );
     }
   }, [setValue]);
@@ -371,14 +371,14 @@ const CreateProject = ({
                       <div className="flex -space-x-2">
                         {selectedStaffs.map((staffId, index) => {
                           const staff = allEmployees.find(
-                            (e: any) => e.id === staffId
+                            (e: any) => e.id === staffId,
                           );
                           return (
                             <div
                               key={index}
                               onClick={() => {
                                 const newStaffs = selectedStaffs.filter(
-                                  (id) => id !== staffId
+                                  (id) => id !== staffId,
                                 );
                                 setSelectedStaffs(newStaffs);
                                 setValue("employeeIds", newStaffs);
@@ -484,7 +484,7 @@ const CreateProject = ({
                           className="rounded text-blue-600 focus:ring-blue-500"
                         />
                       </div>
-                    )
+                    ),
                   )}
                 </div>
 
@@ -545,7 +545,7 @@ const CreateProject = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[100px]"
                   />
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Project Short name (Message)
                   </label>
@@ -555,7 +555,7 @@ const CreateProject = ({
                     placeholder="Jhon Doe"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                   />
-                </div>
+                </div> */}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -647,7 +647,7 @@ const CreateProject = ({
                             className="rounded text-blue-600 focus:ring-blue-500"
                           />
                         </div>
-                      )
+                      ),
                     )}
                   </div>
                 </div>

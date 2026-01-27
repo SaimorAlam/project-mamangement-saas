@@ -69,7 +69,7 @@ const AllProject: React.FC = () => {
   const sortProjects = (
     list: Project[],
     key: keyof Project,
-    order: "asc" | "desc"
+    order: "asc" | "desc",
   ) => {
     return [...list].sort((a, b) => {
       const aVal = a[key];
@@ -164,7 +164,6 @@ const AllProject: React.FC = () => {
                   </DropdownMenuItem>
 
                   <div className="my-1 border-t" />
-
                   <DropdownMenuItem onClick={() => setSortOrder("asc")}>
                     Ascending
                   </DropdownMenuItem>
@@ -176,14 +175,14 @@ const AllProject: React.FC = () => {
             </div>
           </div>
           <div className="">
-          <AllProjectTable projects={paginatedProjects} />
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            itemsPerPage={ITEMS_PER_PAGE}
-            onPageChange={setCurrentPage}
-            totalPrograms={filteredProjects.length}
-          />
+            <AllProjectTable projects={paginatedProjects} />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              itemsPerPage={ITEMS_PER_PAGE}
+              onPageChange={setCurrentPage}
+              totalPrograms={filteredProjects.length}
+            />
           </div>
         </div>
 

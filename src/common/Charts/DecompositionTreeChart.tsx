@@ -24,6 +24,7 @@ type Props = {
   chartId?: string;
   onDelete?: () => void;
   onDataChange?: (data: TreeDataNode) => void;
+  isPreview?: boolean;
 };
 
 /* ---------- DUMMY DATA GENERATOR ---------- */
@@ -167,6 +168,7 @@ export default function DecompositionTreeChart({
   onToggleWidget,
   chartId = "root",
   onDelete,
+  isPreview = false,
   // onDataChange,
 }: Props) {
   /* ---------- HOOKS ---------- */
@@ -281,6 +283,7 @@ export default function DecompositionTreeChart({
         onToggleWidget,
       }}
       isDownloading={isDownloading}
+      isPreview={isPreview}
     >
       <div className="relative w-full h-[500px] bg-gray-50 border border-gray-100 rounded">
         {/* Zoom Controls */}

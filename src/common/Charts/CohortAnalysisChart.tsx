@@ -12,11 +12,9 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Copy, Trash2, Download, BarChart3, LineChart as LineIcon } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-
+import { BarChart3, LineChart as LineIcon } from "lucide-react";
 import { downloadCSVForModuleOne } from "@/utils/DownlaodChartCSV";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*     TYPES     */
 
@@ -34,6 +32,7 @@ type Props = {
   onToggleWidget?: () => void;
   onDelete?: () => void;
   chartType?: "line" | "bar";
+  isPreview?: boolean;
 };
 
 /*     COMPONENT     */
@@ -49,11 +48,10 @@ export default function CohortAnalysisChart({
   onToggleWidget,
   onDelete,
   chartType: initialType = "line",
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const [type, setType] = useState<"line" | "bar">(initialType);
-
 
   /*   DATA GENERATION (Simulation)   */
   const chartData = useMemo(() => {
@@ -61,7 +59,7 @@ export default function CohortAnalysisChart({
       const entry: any = { name: period };
       legendValues.forEach((cohort) => {
         // Survival decay simulation: Starts at 100%, drops over time
-        const decay = Math.max(0, 100 - (pIdx * (10 + Math.random() * 15)));
+        const decay = Math.max(0, 100 - pIdx * (10 + Math.random() * 15));
         entry[cohort.field] = Math.round(decay);
       });
       return entry;
@@ -71,80 +69,90 @@ export default function CohortAnalysisChart({
   /*   ACTIONS   */
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
-    setShowPopover(false);
   };
 
   const handleDownload = () => {
     setIsDownloading(true);
     downloadCSVForModuleOne(widgetTitle, xAxisValues, legendValues);
     setIsDownloading(false);
-    setShowPopover(false);
   };
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-      {/* HEADER */}
-      <div className="flex justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-          <div className="flex gap-4 mt-3">
-             <button 
-                onClick={() => setType("line")}
-                className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors ${type === 'line' ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'text-gray-500 hover:bg-gray-50'}`}
-             >
-                <LineIcon size={14} /> Line
-             </button>
-             <button 
-                onClick={() => setType("bar")}
-                className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors ${type === 'bar' ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'text-gray-500 hover:bg-gray-50'}`}
-             >
-                <BarChart3 size={14} /> Bar
-             </button>
+    <ChartCardWrapper
+      title={widgetTitle}
+      menuActions={{
+        onCopy: handleCopy,
+        onDownload: handleDownload,
+        onDelete: onDelete,
+        onToggleWidget: onToggleWidget,
+      }}
+      isDownloading={isDownloading}
+      isPreview={isPreview}
+      customHeaderContent={
+        <div className="flex gap-4">
+          <button
+            onClick={() => setType("line")}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors ${type === "line" ? "bg-blue-50 text-blue-600 border border-blue-200" : "text-gray-500 hover:bg-gray-50"}`}
+          >
+            <LineIcon size={14} /> Line
+          </button>
+          <button
+            onClick={() => setType("bar")}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors ${type === "bar" ? "bg-blue-50 text-blue-600 border border-blue-200" : "text-gray-500 hover:bg-gray-50"}`}
+          >
+            <BarChart3 size={14} /> Bar
+          </button>
+        </div>
+      }
+      footer={
+        <div className="grid grid-cols-3 gap-4 border-t border-gray-100 pt-6">
+          <div className="text-center">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">
+              Avg. Retention
+            </p>
+            <p className="text-xl font-semibold text-blue-600">74.2%</p>
+          </div>
+          <div className="text-center border-x border-gray-100 px-4">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">
+              Churn Rate
+            </p>
+            <p className="text-xl font-semibold text-red-500">25.8%</p>
+          </div>
+          <div className="text-center">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">
+              LTV Forecast
+            </p>
+            <p className="text-xl font-semibold text-green-600">$1,240</p>
           </div>
         </div>
-
-        {/* ACTION MENU */}
-        <div className="flex items-center gap-4">
-          <div className="flex gap-2 border-l pl-4 relative">
-            <button
-              onClick={() => setShowPopover(!showPopover)}
-              className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-            >
-              <BsThreeDots size={18} />
-            </button>
-
-            {showPopover && (
-              <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                <button onClick={handleCopy} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left">
-                  <Copy size={18} /> <span>Copy Data</span>
-                </button>
-                <button onClick={handleDownload} disabled={isDownloading} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left">
-                  <Download size={18} /> <span>Download</span>
-                </button>
-                <button onClick={() => {onDelete?.(); setShowPopover(false);}} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600">
-                  <Trash2 size={18} /> <span>Delete</span>
-                </button>
-                {onToggleWidget && (
-                  <button onClick={() => {onToggleWidget(); setShowPopover(false);}} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left">
-                    <MdOutlineWidgets size={18} /> <span>Widget</span>
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
+      }
+    >
       {/* CHART */}
       <div className="h-[350px] w-full mt-4">
         <ResponsiveContainer width="100%" height="100%">
           {type === "line" ? (
-            <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
+            <LineChart
+              data={chartData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f0f0f0"
+              />
+              <XAxis
+                dataKey="name"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
               <YAxis fontSize={12} tickLine={false} axisLine={false} unit="%" />
-              <Tooltip 
-                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              <Tooltip
+                contentStyle={{
+                  borderRadius: "8px",
+                  border: "none",
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                }}
               />
               <Legend verticalAlign="top" height={36} iconType="circle" />
               {legendValues.map((l) => (
@@ -155,18 +163,34 @@ export default function CohortAnalysisChart({
                   name={l.label}
                   stroke={l.color}
                   strokeWidth={3}
-                  dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
+                  dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
                   activeDot={{ r: 6 }}
                 />
               ))}
             </LineChart>
           ) : (
-            <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
+            <BarChart
+              data={chartData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f0f0f0"
+              />
+              <XAxis
+                dataKey="name"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
               <YAxis fontSize={12} tickLine={false} axisLine={false} unit="%" />
-              <Tooltip 
-                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              <Tooltip
+                contentStyle={{
+                  borderRadius: "8px",
+                  border: "none",
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                }}
               />
               <Legend verticalAlign="top" height={36} iconType="rect" />
               {legendValues.map((l) => (
@@ -183,21 +207,6 @@ export default function CohortAnalysisChart({
           )}
         </ResponsiveContainer>
       </div>
-      
-      <div className="mt-6 grid grid-cols-3 gap-4 border-t border-gray-100 pt-6">
-          <div className="text-center">
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Avg. Retention</p>
-              <p className="text-xl font-semibold text-blue-600">74.2%</p>
-          </div>
-          <div className="text-center border-x border-gray-100 px-4">
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Churn Rate</p>
-              <p className="text-xl font-semibold text-red-500">25.8%</p>
-          </div>
-          <div className="text-center">
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">LTV Forecast</p>
-              <p className="text-xl font-semibold text-green-600">$1,240</p>
-          </div>
-      </div>
-    </div>
+    </ChartCardWrapper>
   );
 }

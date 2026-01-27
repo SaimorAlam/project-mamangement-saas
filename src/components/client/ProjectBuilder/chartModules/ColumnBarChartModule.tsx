@@ -1,26 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
 import ColumnBarChart from "@/common/Charts/ColumnBarChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const ColumnBarChartModule = () => {
-  const [widgetTitle, setWidgetTitle] = useState("My-CSV");
+const ColumnBarChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
+  const [widgetTitle, setWidgetTitle] = useState("Column Bar Analysis");
+
+  const [startingRange, setStartingRange] = useState<number>(0);
+  const [endingRange, setEndingRange] = useState<number>(100);
+
   const [showWidget, setShowWidget] = useState(false);
-
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
+  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(3);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
-
   const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
-
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#8884d8" },
     { label: "", field: "", color: "#82ca9d" },
     { label: "", field: "", color: "#ffc658" },
   ]);
-  const [startingRange, setStartingRange] = useState<number>(0);
-  const [endingRange, setEndingRange] = useState<number>(100);
+
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "column-bar-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          legendValues,
+          numOfLegendDataSet,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+    dispatch,
+  ]);
 
   const minXaxisField = 1;
-  const maxXaxisField = 7;
+  const maxXaxisField = 10;
 
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -55,7 +87,9 @@ const ColumnBarChartModule = () => {
   };
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -63,8 +97,8 @@ const ColumnBarChartModule = () => {
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
         <ColumnBarChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
@@ -73,9 +107,11 @@ const ColumnBarChartModule = () => {
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Column Bar Chart"
           widgetTitle={widgetTitle}

@@ -2,7 +2,12 @@ import { useState, useMemo } from "react";
 import GeographicMapChart from "@/common/Charts/GeographicMapChart";
 import GeographicMapConfiguration, { MapPoint } from "../chartConfigurations/GeographicMapConfiguration";
 
-const GeographicMapModule = ({ onDelete }: { onDelete?: () => void }) => {
+type GeographicMapModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const GeographicMapModule = ({ onDelete, isPreview = false }: GeographicMapModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Global Footprint");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -22,12 +27,14 @@ const GeographicMapModule = ({ onDelete }: { onDelete?: () => void }) => {
   const defaultCenter = useMemo<[number, number]>(() => [20, 0], []);
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
-    if (showWidget) setPickingId(null);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+      if (showWidget) setPickingId(null);
+    }
   };
 
   const handleMapClick = (lat: number, lng: number) => {
-    if (pickingId) {
+    if (!isPreview && pickingId) {
       setPoints((prev) =>
         prev.map((p) => (p.id === pickingId ? { ...p, lat, lng } : p))
       );
@@ -36,13 +43,15 @@ const GeographicMapModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   const handlePointMove = (id: string, lat: number, lng: number) => {
-    setPoints((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, lat, lng } : p))
-    );
+    if (!isPreview) {
+      setPoints((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, lat, lng } : p))
+      );
+    }
   };
 
   return (
-    <div className="flex gap-3 h-full">
+    <div className="flex gap-3 h-full w-full">
       <div className="flex-1 h-full sticky top-5">
         <GeographicMapChart
           widgetTitle={widgetTitle}
@@ -55,9 +64,10 @@ const GeographicMapModule = ({ onDelete }: { onDelete?: () => void }) => {
           onMapClick={handleMapClick}
           onPointMove={handlePointMove}
           height={400}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <GeographicMapConfiguration
           widgetTitle={widgetTitle}
           setWidgetTitle={setWidgetTitle}

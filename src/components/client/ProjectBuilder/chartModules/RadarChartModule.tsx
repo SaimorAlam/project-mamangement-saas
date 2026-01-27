@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
 import RadarChartNew from "@/common/Charts/RadarChartNew";
 
-const RadarChartModule = () => {
+const RadarChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
   const [widgetTitle, setWidgetTitle] = useState("Radar Chart");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -54,7 +60,9 @@ const RadarChartModule = () => {
   };
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -62,8 +70,8 @@ const RadarChartModule = () => {
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
         <RadarChartNew
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
@@ -72,9 +80,11 @@ const RadarChartModule = () => {
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Radar Chart"
           widgetTitle={widgetTitle}

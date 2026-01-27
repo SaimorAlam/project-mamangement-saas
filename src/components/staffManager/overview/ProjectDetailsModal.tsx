@@ -53,9 +53,7 @@ const getPriorityStyles = (priority: string) => {
   }
 };
 
-const ProjectDetailsModal = ({
-  project,
-}: ProjectDetailsModalProps) => {
+const ProjectDetailsModal = ({ project }: ProjectDetailsModalProps) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -86,14 +84,14 @@ const ProjectDetailsModal = ({
               <div className="flex flex-col gap-2 items-end">
                 <span
                   className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusStyles(
-                    project.status
+                    project.status,
                   )}`}
                 >
                   {project.status}
                 </span>
                 <span
                   className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getPriorityStyles(
-                    project.priority
+                    project.priority,
                   )}`}
                 >
                   {project.priority} Priority
@@ -106,8 +104,7 @@ const ProjectDetailsModal = ({
           <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-100">
             <div className="flex justify-between items-end mb-2">
               <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-primary" />{" "}
-                Project Progress
+                <TrendingUp className="w-4 h-4 text-primary" /> Project Progress
               </span>
               <span className="text-sm font-bold text-primary">
                 {project.progress}%
@@ -195,9 +192,7 @@ const InfoItem = ({
   highlight?: boolean;
 }) => (
   <div className="flex items-center gap-3">
-    <div className="p-2 rounded-lg bg-slate-100 text-slate-600">
-      {icon}
-    </div>
+    <div className="p-2 rounded-lg bg-slate-100 text-slate-600">{icon}</div>
     <div>
       <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">
         {label}

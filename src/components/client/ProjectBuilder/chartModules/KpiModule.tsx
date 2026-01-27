@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import KPIWidgetConfig from "../Configuration/KPIWidgetConfig";
 import { Trash2 } from "lucide-react";
 import { IClientPanelStats } from "@/types";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
 interface KPIItem extends IClientPanelStats {
   id: string;
@@ -14,7 +16,14 @@ interface KPIItem extends IClientPanelStats {
   };
 }
 
-const KpiModule = ({ onDelete }: { onDelete?: () => void }) => {
+const KpiModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [stats, setStats] = useState<KPIItem[]>([
     {
       id: "1",
@@ -84,24 +93,11 @@ const KpiModule = ({ onDelete }: { onDelete?: () => void }) => {
         showFooterButton: true,
       },
     },
-    {
-      id: "5",
-      title: "Submission Overdue",
-      value: "7.8%",
-      growth: "",
-      growth_type: "down",
-      description: "50 Clients left",
-      link_text: "View all",
-      icon: "SubmissionOverdue",
-      icon_bg_color: "#DC2626",
-      config: {
-        showIndex: true,
-        showFooter: true,
-        showFooterLabel: true,
-        showFooterButton: true,
-      },
-    },
   ]);
+
+  useEffect(() => {
+    dispatch(setWidgetConfig({ id: "kpi", config: stats }));
+  }, [stats, dispatch]);
 
   const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
 
@@ -117,24 +113,35 @@ const KpiModule = ({ onDelete }: { onDelete?: () => void }) => {
     setStats(updatedStats);
   };
 
+
   return (
-    <div className="bg-white rounded-xl p-8 border border-gray-200 relative group min-h-[400px]">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">KPI Dashboard</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={onDelete}
-            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-500 transition-colors"
-            title="Remove Module"
-          >
-            <Trash2 size={18} />
-          </button>
+    <div
+      className={`${
+        isPreview ? "" : "bg-white rounded-xl p-8 border border-gray-200"
+      } relative group min-h-fit`}
+    >
+      {!isPreview && (
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-gray-800">KPI Dashboard</h2>
+          <div className="flex gap-2">
+            <button
+              onClick={onDelete}
+              className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-500 transition-colors"
+              title="Remove Module"
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="flex gap-8">
         <div className="flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
+          <div
+            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 ${
+              isPreview ? "xl:grid-cols-4" : "2xl:grid-cols-3"
+            } gap-6`}
+          >
             {stats.map((item, index) => (
               <div key={item.id} className="relative group/card">
                 <DashboardPanelStatsCard
@@ -144,6 +151,7 @@ const KpiModule = ({ onDelete }: { onDelete?: () => void }) => {
                   showFooterLabel={item.config.showFooterLabel}
                   showFooterButton={item.config.showFooterButton}
                   onToggleWidget={() =>
+                    !isPreview &&
                     setActiveCardIndex(activeCardIndex === index ? null : index)
                   }
                 />
@@ -152,7 +160,7 @@ const KpiModule = ({ onDelete }: { onDelete?: () => void }) => {
           </div>
         </div>
 
-        {activeCardIndex !== null && stats[activeCardIndex] && (
+        {!isPreview && activeCardIndex !== null && stats[activeCardIndex] && (
           <div className="w-[340px] shrink-0 sticky top-5 h-fit pb-10">
             <KPIWidgetConfig
               config={stats[activeCardIndex].config}
@@ -179,5 +187,6 @@ const KpiModule = ({ onDelete }: { onDelete?: () => void }) => {
     </div>
   );
 };
+
 
 export default KpiModule;

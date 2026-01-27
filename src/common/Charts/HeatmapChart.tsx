@@ -16,7 +16,12 @@ interface TooltipData {
   y: number;
 }
 
-export default function HeatmapChart() {
+interface HeatmapChartProps {
+  onDelete?: () => void;
+  onCopy?: () => void;
+}
+
+export default function HeatmapChart({ onDelete, onCopy }: HeatmapChartProps) {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const [data] = useState<HeatmapData[]>([
     {
@@ -43,6 +48,18 @@ export default function HeatmapChart() {
 
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
 
+  const handleCopy = () => {
+    if (onCopy) {
+      onCopy();
+    } else {
+      navigator.clipboard.writeText(JSON.stringify(data));
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) onDelete();
+  };
+
   const getColor = (value: number) => {
     if (value < 500) return "bg-teal-200";
     if (value < 1000) return "bg-teal-300";
@@ -54,7 +71,7 @@ export default function HeatmapChart() {
     product: string,
     day: string,
     value: number,
-    event: MouseEvent<HTMLDivElement>
+    event: MouseEvent<HTMLDivElement>,
   ) => {
     const rect = event.currentTarget.getBoundingClientRect();
     setTooltip({
@@ -70,7 +87,7 @@ export default function HeatmapChart() {
 
   const totalStock = data.reduce(
     (sum, item) => sum + item.values.reduce((a, b) => a + b, 0),
-    0
+    0,
   );
 
   return (
@@ -81,10 +98,16 @@ export default function HeatmapChart() {
           Heat Map Chart
         </h2>
         <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer">
+          <button
+            onClick={handleCopy}
+            className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+          >
             <Copy className="w-4 h-4 text-gray-600" />
           </button>
-          <button className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer">
+          <button
+            onClick={handleDelete}
+            className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+          >
             <Trash2 className="w-4 h-4 text-gray-600" />
           </button>
         </div>
@@ -108,9 +131,7 @@ export default function HeatmapChart() {
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-1">
                 <div className={`w-4 h-4 rounded ${item.color}`} />
-                <span className="text-xs text-gray-600">
-                  {item.range}
-                </span>
+                <span className="text-xs text-gray-600">{item.range}</span>
               </div>
             ))}
           </div>
@@ -122,7 +143,7 @@ export default function HeatmapChart() {
         <div className="inline-block min-w-full">
           {/* Days Header */}
           <div className="flex mb-2">
-            <div className="w-28 flex-shrink-0" />
+            <div className="w-28 shrink-0" />
             {days.map((day) => (
               <div
                 key={day}
@@ -136,22 +157,17 @@ export default function HeatmapChart() {
           {/* Heatmap Rows */}
           {data.map((item, rowIndex) => (
             <div key={rowIndex} className="flex items-center mb-2">
-              <div className="w-28 flex-shrink-0 text-sm text-gray-700 pr-4">
+              <div className="w-28 shrink-0 text-sm text-gray-700 pr-4">
                 {item.product}
               </div>
               {item.values.map((value, colIndex) => (
                 <div
                   key={colIndex}
                   className={`w-12 h-10 ${getColor(
-                    value
+                    value,
                   )} rounded cursor-pointer transition-all hover:ring-2 hover:ring-teal-400 hover:scale-105 mx-0.5`}
                   onMouseEnter={(e) =>
-                    handleCellHover(
-                      item.product,
-                      days[colIndex],
-                      value,
-                      e
-                    )
+                    handleCellHover(item.product, days[colIndex], value, e)
                   }
                   onMouseLeave={handleCellLeave}
                 />
@@ -173,9 +189,7 @@ export default function HeatmapChart() {
         >
           <div className="font-semibold">{tooltip.product}</div>
           <div className="text-gray-300">{tooltip.day}</div>
-          <div className="font-bold text-teal-300">
-            {tooltip.value} units
-          </div>
+          <div className="font-bold text-teal-300">{tooltip.value} units</div>
         </div>
       )}
     </div>

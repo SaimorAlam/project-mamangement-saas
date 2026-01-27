@@ -18,7 +18,7 @@ export default function ClientDashboardLayout() {
     >
       <ClientSidebar />
 
-      <main className="flex-1 min-w-0 px-8">
+      <main className="flex-1 min-w-0 px-4 md:px-8">
         <div className="pb-6">
           <ClientDashboardHeader />
         </div>

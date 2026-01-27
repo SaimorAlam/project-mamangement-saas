@@ -1,11 +1,13 @@
 import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
-import { Copy, Trash2, Download } from "lucide-react";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 type Props = {
     widgetTitle?: string;
     legendValues?: LegendValue[];
     startingRange?: number;
     endingRange?: number;
+    onDelete?: () => void;
+    isPreview?: boolean;
 };
 
 const generateId = () =>
@@ -15,7 +17,9 @@ export default function HorizontalBarChartNew({
     widgetTitle = "My CSV",
     legendValues = [],
     startingRange,
-    endingRange
+    endingRange,
+    onDelete,
+    isPreview
 }: Props) {
 
     const isAllLegendFieldEmpty = legendValues.filter((l) => l.field !== "")
@@ -35,10 +39,6 @@ export default function HorizontalBarChartNew({
 
     const handleCopy = () => {
         navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-    };
-
-    const handleDelete = () => {
-        console.log("Reset handled by parent widget");
     };
 
     // CSV export (widget rule)
@@ -62,23 +62,16 @@ export default function HorizontalBarChartNew({
     };
 
     return (
-        <div className="w-full bg-white rounded-lg border border-gray-200 p-6 relative">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold">{widgetTitle}</h2>
-                <div className="flex gap-5">
-                    <button onClick={handleExportCSV} title="Export CSV">
-                        <Download size={18} />
-                    </button>
-                    <button onClick={handleCopy} title="Copy">
-                        <Copy size={18} />
-                    </button>
-                    <button onClick={handleDelete} title="Reset">
-                        <Trash2 size={18} />
-                    </button>
-                </div>
-            </div>
-
+        <ChartCardWrapper
+            title={widgetTitle}
+            chartId={generateId()}
+            menuActions={{
+                onCopy: handleCopy,
+                onDownload: handleExportCSV,
+                onDelete: onDelete,
+            }}
+            isPreview={isPreview}
+        >
             {/* Legend + Total */}
             <div className="flex justify-between mb-6 text-sm xl:text-lg">
                 <div className="flex items-center gap-3">
@@ -144,6 +137,6 @@ export default function HorizontalBarChartNew({
                 )}
 
             </div>
-        </div>
+        </ChartCardWrapper>
     );
 }

@@ -4,7 +4,12 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import CandleChart from "@/common/Charts/CandleChart";
 
-const CandleChartModule = () => {
+type CandleChartModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const CandleChartModule = ({ onDelete, isPreview = false }: CandleChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -57,12 +62,13 @@ const CandleChartModule = () => {
       updated[index] = value;
       return updated;
     });
-    console.log("parant x values: ", xAxisValues);
   };
 
   // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   // Close widget (for X button)
@@ -72,7 +78,7 @@ const CandleChartModule = () => {
 
 
   return (
-    <div className="flex gap-3 h-full">
+    <div className="flex gap-3 h-full w-full">
       <div className="flex-1 h-full sticky top-5">
         <CandleChart
           widgetTitle={widgetTitle}
@@ -82,9 +88,11 @@ const CandleChartModule = () => {
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
+          isPreview={isPreview}
+          onDelete={onDelete}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Candlestick Chart"
           widgetTitle={widgetTitle}

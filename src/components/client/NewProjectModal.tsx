@@ -175,7 +175,7 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
                             {cycle}
                           </span>
                         </label>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -241,7 +241,7 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
                             {days}
                           </span>
                         </label>
-                      )
+                      ),
                     )}
                   </div>
                 </div>

@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import ParetoChart from "@/common/Charts/ParetoChart";
 
-const ParetoChartModule = () => {
+const ParetoChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
   const [widgetTitle, setWidgetTitle] = useState("Customer Complaints");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -47,7 +53,9 @@ const ParetoChartModule = () => {
   };
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -55,16 +63,20 @@ const ParetoChartModule = () => {
   };
 
   return (
-    <div className="flex gap-3">
-      <ParetoChart
-        widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-      />
-      {showWidget && (
-        <div className="w-96 bg-white border border-gray-200 rounded-lg p-6 h-fit">
+    <div className="flex gap-3 h-full w-full">
+       <div className="flex-1 min-w-0 sticky top-5 h-full">
+          <ParetoChart
+            widgetTitle={widgetTitle}
+            xAxisValues={xAxisValues}
+            startingRange={startingRange}
+            endingRange={endingRange}
+            onToggleWidget={handleToggleWidget}
+            onDelete={onDelete}
+            isPreview={isPreview}
+          />
+       </div>
+      {!isPreview && showWidget && (
+        <div className="w-[320px] shrink-0 sticky top-5 bg-white border border-gray-200 rounded-lg p-6 h-fit">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold">Pareto Configuration</h3>

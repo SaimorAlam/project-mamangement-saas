@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const HorizontalBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+const HorizontalBarChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
@@ -22,6 +31,30 @@ const HorizontalBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   ]);
   const [startingRange, setStartingRange] = useState<number>(0); //for y axis
   const [endingRange, setEndingRange] = useState<number>(100); // for y axis
+
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "horizontal-bar-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          legendValues,
+          numOfLegendDataSet,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+    dispatch,
+  ]);
 
   const minXaxisField = 1;
   const maxXaxisField = 7;
@@ -82,9 +115,10 @@ const HorizontalBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Horizontal Bar Chart"
           widgetTitle={widgetTitle}

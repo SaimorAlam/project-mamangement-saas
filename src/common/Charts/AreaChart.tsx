@@ -9,16 +9,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
-
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { generateAreaChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*     TYPES     */
 
@@ -52,12 +48,13 @@ type Props = {
   onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
+  isPreview?: boolean;
 };
 
 /*     COMPONENT     */
 
 export default function AreaChart({
-  widgetTitle = "My CSV",
+  widgetTitle = "Area Chart",
   xAxisValues = [],
   legendValues = [],
   numOfLegendDataSet = 1,
@@ -67,9 +64,9 @@ export default function AreaChart({
   onDelete,
   tierLevel = 0,
   chartId = "root",
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
 
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
@@ -78,27 +75,22 @@ export default function AreaChart({
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
   /*   DATA   */
-
   const chartData: ChartData[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
     return generateAreaChartData(
       xAxisValues,
       legendValues,
       startingRange,
-      endingRange
+      endingRange,
     );
   }, [xAxisValues, legendValues, startingRange, endingRange]);
 
   /*   TOTAL   */
-
   const totalValue = useMemo(() => {
     return chartData.reduce((sum, row) => {
       return (
         sum +
-        legendValues.reduce(
-          (inner, l) => inner + Number(row[l.field] || 0),
-          0
-        )
+        legendValues.reduce((inner, l) => inner + Number(row[l.field] || 0), 0)
       );
     }, 0);
   }, [chartData, legendValues]);
@@ -135,22 +127,14 @@ export default function AreaChart({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleSaveTier = (tierName: string) => {
@@ -172,7 +156,6 @@ export default function AreaChart({
   };
 
   /*   TOOLTIP   */
-
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
     const row = payload[0].payload;
@@ -193,151 +176,87 @@ export default function AreaChart({
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        {/* HEADER */}
-        <div className="flex justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-
-            <div className="flex gap-6 mt-3">
+      <ChartCardWrapper
+        title={widgetTitle}
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-gray-500">Total {totalValue}</p>
+            <div className="flex gap-4">
               {legendValues.map(
                 (l) =>
                   l.label && (
                     <div key={l.field} className="flex items-center gap-2">
                       <div
-                        className="w-3 h-3 rounded-full"
+                        className="w-2.5 h-2.5 rounded-full"
                         style={{ backgroundColor: l.color }}
                       />
-                      <span className="text-sm">{l.label}</span>
+                      <span className="text-xs text-gray-500 font-medium">
+                        {l.label}
+                      </span>
                     </div>
-                  )
+                  ),
               )}
             </div>
           </div>
-
-          {/* ACTION MENU */}
-          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
-            <p className="text-sm text-gray-500">Total {totalValue}</p>
-
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDownload();
-                      setShowPopover(false);
-                    }}
-                    disabled={isDownloading}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Download size={18} />
-                    <span>Download</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                        setShowPopover(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddTierClick();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <GoPlus size={18} />
-                    <span>Add Tier</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* CHART */}
-        <ResponsiveContainer width="100%" height={350}>
-          <ReAreaChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis domain={[startingRange, endingRange]} />
-            <Tooltip content={<CustomTooltip />} />
-
-            {legendValues.map((l) => (
-              <Area
-                key={l.field}
-                dataKey={l.field}
-                type="monotone"
-                stackId="1"
-                stroke={l.color}
-                fill={l.color}
-                fillOpacity={0.3}
-              />
-            ))}
-          </ReAreaChart>
-        </ResponsiveContainer>
-
-        {/* Indicator if chart has children */}
-        {childTiers.length > 0 && (
-          <div className="mt-4 text-center">
+        }
+        footer={
+          childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
-          </div>
-        )}
-      </div>
+          ) : undefined
+        }
+      >
+        <div className="h-[350px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <ReAreaChart data={chartData}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f0f0f0"
+              />
+              <XAxis
+                dataKey="name"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                domain={[startingRange, endingRange]}
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              {legendValues.map((l) => (
+                <Area
+                  key={l.field}
+                  dataKey={l.field}
+                  type="monotone"
+                  stackId="1"
+                  stroke={l.color}
+                  fill={l.color}
+                  fillOpacity={0.3}
+                />
+              ))}
+            </ReAreaChart>
+          </ResponsiveContainer>
+        </div>
+      </ChartCardWrapper>
 
-      {/* Add Tier Modal */}
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
@@ -345,7 +264,6 @@ export default function AreaChart({
         parentChartName={widgetTitle}
       />
 
-      {/* Children Grid Modal */}
       {showChildrenModal && (
         <TierChartModal
           isOpen={showChildrenModal}
@@ -365,6 +283,8 @@ export default function AreaChart({
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
+                isPreview={isPreview}
+                onDelete={onDelete}
               />
             ))}
           </div>

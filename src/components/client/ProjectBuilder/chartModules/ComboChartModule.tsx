@@ -4,8 +4,13 @@ import ProjectConfiguration, {
 } from "../WidgetForChartModuleOne";
 import ComboChart from "@/common/Charts/ComboChart";
 
-const ComboChartModule = ({ onDelete }: { onDelete?: () => void }) => {
-  const [widgetTitle, setWidgetTitle] = useState("Combo Chart");
+type ComboChartModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const ComboChartModule = ({ onDelete, isPreview = false }: ComboChartModuleProps) => {
+  const [widgetTitle, setWidgetTitle] = useState("Combo Analysis");
   const [showWidget, setShowWidget] = useState(false);
 
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
@@ -57,7 +62,9 @@ const ComboChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -65,8 +72,8 @@ const ComboChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
         <ComboChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
@@ -76,10 +83,10 @@ const ComboChartModule = ({ onDelete }: { onDelete?: () => void }) => {
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
-          isCreationMode={true}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Combo Chart"
           widgetTitle={widgetTitle}

@@ -19,6 +19,7 @@ import {
   Search,
 } from "lucide-react";
 import { CiExport } from "react-icons/ci";
+import { toast } from "sonner";
 
 /*   COLOR POOL FOR ROOT PROJECTS   */
 const PROJECT_COLORS = [
@@ -53,9 +54,6 @@ function highlightText(text: any, query: string) {
   return safe.replace(regex, `<span class="gantt-search-hit">$1</span>`);
 }
 
-
-
-
 const GanttChart = () => {
   const ganttContainer = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -71,12 +69,11 @@ const GanttChart = () => {
     return `
       <div class="col-header-wrap" data-column="${name}">
         <span class="col-title">${text}</span>
-        ${isCustom ? `<span class="delete-col-btn" data-col="${name}">✖</span>` : ""}
+        ${isCustom ? `<span class="delete-col-btn" data-col="${name}">x</span>` : ""}
         <div class="column-resizer-handle" data-column="${name}"></div>
       </div>
     `;
   };
-
 
   useEffect(() => {
     gantt.clearAll();
@@ -105,15 +102,14 @@ const GanttChart = () => {
       gantt.render();
     }
 
-
     function deleteColumn(colName: string) {
       if (!colName.startsWith("custom_")) {
-        alert("Only custom columns can be deleted.");
+        toast.info("Only custom columns can be deleted.");
         return;
       }
 
       gantt.config.columns = gantt.config.columns.filter(
-        (c: any) => c.name !== colName
+        (c: any) => c.name !== colName,
       );
 
       gantt.render();
@@ -142,29 +138,29 @@ const GanttChart = () => {
               view: "grid",
               id: "grid",
               scrollX: "gridScroll",
-              scrollY: "verticalScroll"
+              scrollY: "verticalScroll",
             },
             { resizer: true, width: 1 },
             {
               view: "timeline",
               id: "timeline",
               scrollX: "timelineScroll",
-              scrollY: "verticalScroll"
+              scrollY: "verticalScroll",
             },
             {
               view: "scrollbar",
-              id: "verticalScroll"
-            }
-          ]
+              id: "verticalScroll",
+            },
+          ],
         },
         {
           cols: [
             { view: "scrollbar", id: "gridScroll", group: "horizontal" },
             { resizer: true, width: 1 },
-            { view: "scrollbar", id: "timelineScroll", group: "horizontal" }
-          ]
-        }
-      ]
+            { view: "scrollbar", id: "timelineScroll", group: "horizontal" },
+          ],
+        },
+      ],
     };
 
     /*    LIGHTBOX    */
@@ -217,10 +213,14 @@ const GanttChart = () => {
       return false;
     });
 
-
-
     gantt.config.lightbox.sections = [
-      { name: "text", height: 38, map_to: "text", type: "textarea", focus: true },
+      {
+        name: "text",
+        height: 38,
+        map_to: "text",
+        type: "textarea",
+        focus: true,
+      },
       { name: "owner", height: 30, map_to: "owner", type: "textarea" },
       { name: "time", type: "duration", map_to: "auto" },
     ];
@@ -257,12 +257,16 @@ const GanttChart = () => {
         template: (task: any) => {
           let colorBar = "";
           if (task.rootColor !== undefined) {
-             const color = PROJECT_COLORS[task.rootColor % PROJECT_COLORS.length];
-             colorBar = `<div class="row-color-bar" style="background-color: ${color}"></div>`;
+            const color =
+              PROJECT_COLORS[task.rootColor % PROJECT_COLORS.length];
+            colorBar = `<div class="row-color-bar" style="background-color: ${color}"></div>`;
           }
-          const highlighted = highlightText(task.text, searchTextRef.current.trim());
+          const highlighted = highlightText(
+            task.text,
+            searchTextRef.current.trim(),
+          );
           return `<div class="task-name-wrapper">${colorBar}<span class="task-name-text">${highlighted}</span></div>`;
-        }
+        },
       },
       {
         name: "duration",
@@ -276,7 +280,8 @@ const GanttChart = () => {
         label: wrapLabel("Start", "start_date"),
         align: "center",
         width: 90,
-        template: (task: any) => task.start_date ? gantt.templates.date_grid(task.start_date) : "",
+        template: (task: any) =>
+          task.start_date ? gantt.templates.date_grid(task.start_date) : "",
       },
       {
         name: "end_date",
@@ -303,10 +308,10 @@ const GanttChart = () => {
 
     // Format for date columns in grid
     gantt.templates.date_grid = (date: Date) => {
-       const d = date.getDate();
-       const m = date.getMonth() + 1;
-       const y = date.getFullYear().toString().slice(-2);
-       return `${m}/${d}/${y}`;
+      const d = date.getDate();
+      const m = date.getMonth() + 1;
+      const y = date.getFullYear().toString().slice(-2);
+      return `${m}/${d}/${y}`;
     };
 
     /*    ZOOM    */
@@ -373,17 +378,18 @@ const GanttChart = () => {
     });
 
     // Color assignment for parsed data
-    gantt.attachEvent("onParse", function() {
-       gantt.eachTask((task: any) => {
-          if (!task.parent || task.parent === 0) {
-             if (task.rootColor === undefined) {
-                task.rootColor = gantt.getGlobalTaskIndex(task.id) % PROJECT_COLORS.length;
-             }
-          } else {
-             const parent = gantt.getTask(task.parent);
-             task.rootColor = parent.rootColor;
+    gantt.attachEvent("onParse", function () {
+      gantt.eachTask((task: any) => {
+        if (!task.parent || task.parent === 0) {
+          if (task.rootColor === undefined) {
+            task.rootColor =
+              gantt.getGlobalTaskIndex(task.id) % PROJECT_COLORS.length;
           }
-       });
+        } else {
+          const parent = gantt.getTask(task.parent);
+          task.rootColor = parent.rootColor;
+        }
+      });
     });
 
     /*    GRID BUTTONS    */
@@ -399,7 +405,7 @@ const GanttChart = () => {
             duration: 3,
             parent: id,
           },
-          id
+          id,
         );
         return false;
       }
@@ -437,7 +443,6 @@ const GanttChart = () => {
     });
 
     /*    PARENT AUTO SYNC LOGIC    */
-
 
     /*    PARENT EXPAND ONLY LOGIC (NO SHRINK)    */
 
@@ -484,19 +489,17 @@ const GanttChart = () => {
       }
     }
 
-// Highlight normal columns
-gantt.templates.grid_cell = function (task: any, column: any) {
-  const value = task[column.name];
-  return highlightText(value, searchTextRef.current.trim());
-};
+    // Highlight normal columns
+    gantt.templates.grid_cell = function (task: any, column: any) {
+      const value = task[column.name];
+      return highlightText(value, searchTextRef.current.trim());
+    };
 
-// Highlight tree column (task name)
-gantt.templates.tree_cell = function (task: any, column: any) {
-  const value = task[column.name];
-  return highlightText(value, searchTextRef.current.trim());
-};
-
-
+    // Highlight tree column (task name)
+    gantt.templates.tree_cell = function (task: any, column: any) {
+      const value = task[column.name];
+      return highlightText(value, searchTextRef.current.trim());
+    };
 
     /*    INIT    */
 
@@ -508,7 +511,7 @@ gantt.templates.tree_cell = function (task: any, column: any) {
       const onMouseDown = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
         console.log("Gantt: mousedown on", target.className);
-        
+
         // 1. Check for Column Header Resizer
         if (target.classList.contains("column-resizer-handle")) {
           e.preventDefault();
@@ -519,7 +522,7 @@ gantt.templates.tree_cell = function (task: any, column: any) {
             resizingRef.current = {
               name: colName as string,
               startX: e.pageX,
-              startWidth: col.width || 0
+              startWidth: col.width || 0,
             };
             document.body.style.cursor = "col-resize";
             console.log("Gantt: Started resizing column", colName);
@@ -532,9 +535,14 @@ gantt.templates.tree_cell = function (task: any, column: any) {
         if (grid) {
           const rect = grid.getBoundingClientRect();
           const xInGrid = e.clientX - rect.left;
-          
+
           // Debugging info
-          console.log("Gantt: Click X relative to grid:", xInGrid, "Grid Rect Width:", rect.width);
+          console.log(
+            "Gantt: Click X relative to grid:",
+            xInGrid,
+            "Grid Rect Width:",
+            rect.width,
+          );
 
           // If click is within 15px of the right edge of the grid
           if (Math.abs(xInGrid - rect.width) <= 20) {
@@ -543,7 +551,7 @@ gantt.templates.tree_cell = function (task: any, column: any) {
             resizingRef.current = {
               name: "GRID_WIDTH_RESIZE",
               startX: e.pageX,
-              startWidth: gantt.config.grid_width || rect.width
+              startWidth: gantt.config.grid_width || rect.width,
             };
             document.body.style.cursor = "col-resize";
           }
@@ -621,7 +629,8 @@ gantt.templates.tree_cell = function (task: any, column: any) {
 
     return () => {
       gantt.clearAll();
-      if ((container as any)._cleanupResize) (container as any)._cleanupResize();
+      if ((container as any)._cleanupResize)
+        (container as any)._cleanupResize();
     };
   }, []);
 
@@ -691,7 +700,6 @@ gantt.templates.tree_cell = function (task: any, column: any) {
     saveAs(new Blob([csv]), "sheet-to-gantt.csv");
   };
 
-
   const importCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -760,21 +768,21 @@ gantt.templates.tree_cell = function (task: any, column: any) {
 
         <div className="flex gap-3 items-center">
           <div className="relative w-64">
-  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-    <Search className="h-4 w-4 text-gray-400" />
-  </div>
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search className="h-4 w-4 text-gray-400" />
+            </div>
 
-  <input
-    type="text"
-    placeholder="Search..."
-    className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none  focus:border-blue-500 focus:ring-1  focus:ring-blue-500/30 transition-colors
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none  focus:border-blue-500 focus:ring-1  focus:ring-blue-500/30 transition-colors
     "
-    onChange={(e) => {
-      searchTextRef.current = e.target.value;
-      gantt.render();
-    }}
-  />
-</div>
+              onChange={(e) => {
+                searchTextRef.current = e.target.value;
+                gantt.render();
+              }}
+            />
+          </div>
 
           <input type="file" hidden ref={fileInputRef} onChange={importCSV} />
 
@@ -785,7 +793,10 @@ gantt.templates.tree_cell = function (task: any, column: any) {
             <Download size={16} /> Import
           </button>
 
-          <button onClick={exportCSV} className="toolbar-btn bg-blue-500! text-white! hover:bg-blue-600!">
+          <button
+            onClick={exportCSV}
+            className="toolbar-btn bg-blue-500! text-white! hover:bg-blue-600!"
+          >
             <CiExport size={16} /> Export
           </button>
         </div>
@@ -798,13 +809,13 @@ gantt.templates.tree_cell = function (task: any, column: any) {
       <style>
         {`
           ${PROJECT_COLORS.map(
-          (c, i) => `
+            (c, i) => `
               .task-root-${i} .gantt_task_content {
                 background: ${c} !important;
                 border-color: ${c} !important;
               }
-            `
-        ).join("")}
+            `,
+          ).join("")}
 
           .add-child-btn { cursor: pointer; }
 

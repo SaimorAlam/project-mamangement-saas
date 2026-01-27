@@ -1,15 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
-// import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-// import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import { downloadCSVForModuleOne } from "@/utils/DownlaodChartCSV";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /* ---------- TYPES ---------- */
 
@@ -35,6 +30,7 @@ type Props = {
   chartId?: string;
   onDelete?: () => void;
   legendValues?: LegendValue[];
+  isPreview?: boolean;
 };
 
 /* ---------- COMPONENT ---------- */
@@ -46,18 +42,16 @@ export default function SplineAreaChart({
   endingRange,
   onToggleWidget,
   tierLevel = 0,
-  legendValues,
+  legendValues = [],
   chartId = "root",
+  onDelete,
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
-//   const [getChartTitleId] = useGetChartTitleIdMutation();
-  /* ---------- DATA ---------- */
 
-//   const [getChartTitleId] = useGetChartTitleIdMutation();
   /* ---------- DATA ---------- */
 
   const generateData = useMemo(() => (index: number) => {
@@ -87,12 +81,10 @@ export default function SplineAreaChart({
           opacity: 0.15,
         },
       },
-
       stroke: {
         curve: "smooth",
         width: 3,
       },
-
       fill: {
         type: "gradient",
         gradient: {
@@ -102,13 +94,10 @@ export default function SplineAreaChart({
           stops: [0, 90, 100],
         },
       },
-
       dataLabels: {
         enabled: false,
       },
-
-      colors: legendValues?.map(l => l.color) || ["#00E396"],
-
+      colors: legendValues?.length > 0 ? legendValues.map(l => l.color) : ["#00E396"],
       xaxis: {
         categories: xAxisValues?.map((v) => v || ""),
         labels: {
@@ -117,18 +106,15 @@ export default function SplineAreaChart({
           },
         },
       },
-
       yaxis: {
         labels: {
           formatter: (val: number) => Math.round(val).toString(),
         },
       },
-
       tooltip: {
         shared: true,
         intersect: false,
       },
-
       legend: {
         show: true,
         position: 'top',
@@ -155,24 +141,18 @@ export default function SplineAreaChart({
   /* ---------- ACTIONS ---------- */
 
   const handleCopy = () => {
-    // Copy first series data for now
     const dataToCopy = series[0]?.data || [];
     const copyData = xAxisValues.map((label, index) => ({
       label,
       value: dataToCopy[index],
     }));
     navigator.clipboard.writeText(JSON.stringify(copyData, null, 2));
-    setShowPopover(false);
   };
 
   const handleDownload = () => {
     setIsDownloading(true);
-
-    downloadCSVForModuleOne(widgetTitle, xAxisValues, legendValues && legendValues.length > 0 ? legendValues : [{ label: widgetTitle }]);
-
-      setShowPopover(false);
+    downloadCSVForModuleOne(widgetTitle, xAxisValues, legendValues && legendValues.length > 0 ? legendValues : [{ label: widgetTitle, field: 'val', color: '#000' }]);
     setIsDownloading(false);
-  
   };
 
   const handleAddTier = (tierName: string) => {
@@ -198,84 +178,29 @@ export default function SplineAreaChart({
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        <div className="flex justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {xAxisValues.length} points
+      <ChartCardWrapper
+        title={widgetTitle}
+        subtitle={`${xAxisValues.length} points`}
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: () => setShowAddTierModal(true),
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        footer={
+          childTiers.length > 0 ? (
+            <p className="text-sm text-blue-600 font-medium text-center">
+              Click chart to view {childTiers.length} tier{childTiers.length > 1 ? "s" : ""}
             </p>
-          </div>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* <p className="text-sm text-gray-500">Total {totalValue}</p> */}
-
-            <div className="relative border-l pl-4">
-              <button
-                className="p-2 border rounded hover:bg-gray-50"
-                onClick={() => setShowPopover(!showPopover)}
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 w-48 bg-white border rounded-lg shadow-lg p-2 z-10">
-                  <button
-                    onClick={handleCopy}
-                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                  >
-                    <Copy size={18} /> Copy
-                  </button>
-
-                  <button
-                    onClick={handleDownload}
-                    disabled={isDownloading}
-                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                  >
-                    <Download size={18} /> Download
-                  </button>
-
-                  <button className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-red-600">
-                    <Trash2 size={18} /> Delete
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={() => {
-                        onToggleWidget();
-                        setShowPopover(false);
-                      }}
-                      className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                    >
-                      <MdOutlineWidgets size={18} /> Widget
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => {
-                      setShowAddTierModal(true);
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded"
-                  >
-                    <GoPlus size={18} /> Add Tier
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
+          ) : undefined
+        }
+      >
         {xAxisValues?.length ? (
           <ReactApexChart
             options={chartOptions}
@@ -284,18 +209,11 @@ export default function SplineAreaChart({
             height={350}
           />
         ) : (
-          <div className="h-[350px] flex items-center justify-center text-gray-400">
+          <div className="h-[350px] flex items-center justify-center text-gray-400 font-medium">
             No data available
           </div>
         )}
-
-        {childTiers.length > 0 && (
-          <p className="mt-4 text-center text-sm text-blue-600 font-medium">
-            Click chart to view {childTiers.length} tier
-            {childTiers.length > 1 ? "s" : ""}
-          </p>
-        )}
-      </div>
+      </ChartCardWrapper>
 
       <AddTierModal
         isOpen={showAddTierModal}
@@ -321,6 +239,8 @@ export default function SplineAreaChart({
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
+                isPreview={isPreview}
+                onDelete={onDelete}
               />
             ))}
           </div>

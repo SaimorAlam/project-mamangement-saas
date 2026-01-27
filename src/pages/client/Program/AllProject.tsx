@@ -6,12 +6,6 @@ import //   useUpdateProjectMutation,
 "@/store/Api/ProjectApi/ProjectApi";
 import Pagination from "@/common/Pagination";
 // import { IProject } from "@/types/project";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { Progress } from "@/components/ui/progress";
@@ -20,6 +14,16 @@ import UpdateProjectModal from "./UpdateProjectModal";
 import { UpdateProjectPayload } from "@/types/Projects";
 import Swal from "sweetalert2";
 import { useDeleteProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
+import { useNavigate } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 // import { toast } from "sonner";
 
 // import EditProjectModal from "./EditProjectModal";
@@ -43,8 +47,8 @@ const AllProject = ({
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<
-    "ALL" | "HIGH" | "MEDIUM" | "LOW"
-  >("ALL");
+    "All" | "HIGH" | "MEDIUM" | "LOW"
+  >("All");
 
   const [sortColumn, setSortColumn] = useState<any | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -52,7 +56,7 @@ const AllProject = ({
   const debouncedSearch = useDebounce(search, 500);
 
   const [editProject, setEditProject] = useState<UpdateProjectPayload | null>(
-    null
+    null,
   );
   const [editModalOpen, setEditModalOpen] = useState(false);
 
@@ -62,7 +66,7 @@ const AllProject = ({
       page: currentPage,
       limit,
       search: debouncedSearch || undefined,
-      priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
+      priority: priorityFilter !== "All" ? priorityFilter : undefined,
     },
   });
 
@@ -87,10 +91,10 @@ const AllProject = ({
   //     toast.error("Failed to update project");
   //   }
   // };
+  const navigate = useNavigate();
 
   const projects = useMemo(() => data?.data?.data ?? [], [data]);
   const meta = data?.data?.meta;
-
   const totalProjects = meta?.total ?? projects.length;
   const itemsPerPage = meta?.limit ?? limit;
   const totalPages =
@@ -111,7 +115,7 @@ const AllProject = ({
     if (!sortColumn) {
       return list.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     }
 
@@ -182,7 +186,7 @@ const AllProject = ({
         <div className="flex justify-between px-6 py-4 border-b border-gray-200">
           <h1 className="text-lg font-semibold">{title}</h1>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
             <input
               value={search}
               onChange={(e) => {
@@ -193,38 +197,39 @@ const AllProject = ({
               className="border border-gray-200 rounded px-4 py-2 text-sm"
             />
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className="border border-gray-200 px-4 py-2 rounded">
-                {priorityFilter}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
-                  <>
-                    <DropdownMenuItem
-                      key={p}
-                      onClick={() => {
-                        setCurrentPage(1);
-                        setPriorityFilter(p as any);
-                      }}
-                    >
+            <Select
+              value={priorityFilter}
+              onValueChange={(value) => {
+                setCurrentPage(1);
+                setPriorityFilter(value as any);
+              }}
+            >
+              <SelectTrigger className="border border-gray-200 px-4 py-2 rounded min-w-30">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Filter By Priority</SelectLabel>
+                  {["All", "HIGH", "MEDIUM", "LOW"].map((p) => (
+                    <SelectItem key={p} value={p}>
                       {p}
-                    </DropdownMenuItem>
-                  </>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* Table */}
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 h-12">
             <tr>
               {[
-                "name",
-                "status",
+                "project",
+                "Assigned Staff",
                 "priority",
-                "startDate",
+                "updated On",
                 "deadline",
                 "progress",
                 "actions",
@@ -242,25 +247,29 @@ const AllProject = ({
                     >
                       {col.replace(/([A-Z])/g, " $1")}
                     </th>
-                  )
+                  ),
               )}
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="">
             {sortedProjects.map((project) => (
-              <tr key={project.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">{project.name}</td>
+              <tr
+                key={project.id}
+                className="hover:bg-gray-50 cursor-pointer even:bg-gray-100"
+                onClick={() => navigate(`project-details/${project.id}`)}
+              >
+                <td className="px-6 py-4 max-w-42">{project.name}</td>
                 <td className="px-6 py-4">
                   <span className="px-2 py-1 text-xs rounded bg-gray-100">
-                    {project.status}
+                    {project.assignedStaff}
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <PriorityDropdown defaultPriority={project.priority} />
                 </td>
 
-                <td className="px-6 py-4">{formatDate(project.startDate)}</td>
+                <td className="px-6 py-4">{formatDate(project.updatedAt)}</td>
 
                 <td className="px-6 py-4">{formatDate(project.deadline)}</td>
 
@@ -275,17 +284,21 @@ const AllProject = ({
 
                 <td className="px-6 py-4 space-x-2">
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setEditProject(project);
                       setEditModalOpen(true);
                     }}
+                    className="cursor-pointer"
                   >
                     <FaEdit className="text-blue-600" />
                   </button>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       handleDelete(project);
                     }}
+                    className="cursor-pointer"
                   >
                     <FaTrash className="text-red-600" />
                   </button>

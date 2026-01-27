@@ -125,6 +125,14 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
     setStats(newStats);
   };
 
+  const handleDeleteStat = (title: string) => {
+    setStats((prev) => prev.filter((item) => item.title !== title));
+  };
+
+  const handleCopyStat = (item: StatsItem) => {
+    navigator.clipboard.writeText(`${item.title}: ${item.value}`);
+  };
+
   return (
     <div className="flex gap-4 w-full">
       {/* Grid Area */}
@@ -146,6 +154,8 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
             onToggleWidget={() =>
               setActiveCardIndex(activeCardIndex === index ? null : index)
             }
+            onDelete={() => handleDeleteStat(item.title)}
+            onCopy={() => handleCopyStat(item)}
           />
         ))}
       </div>

@@ -2,10 +2,9 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap, useMapEvents, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Copy, Trash2, Download, Maximize2, Layers } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
+import { Maximize2, Layers } from "lucide-react";
 import L from "leaflet";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 // Fix for default marker icons in Leaflet with React
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -41,6 +40,7 @@ type Props = {
   onMapClick?: (lat: number, lng: number) => void;
   onPointMove?: (id: string, lat: number, lng: number) => void;
   height?: number;
+  isPreview?: boolean;
 };
 
 /*     HELPERS     */
@@ -92,9 +92,9 @@ export default function GeographicMapChart({
   onMapClick,
   height = 400,
   onPointMove,
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const [mapType, setMapType] = useState<"light" | "dark" | "satellite">("light");
 
   const tileUrl = useMemo(() => {
@@ -107,13 +107,12 @@ export default function GeographicMapChart({
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(points, null, 2));
-    setShowPopover(false);
   };
 
   const handleDownload = () => {
     setIsDownloading(true);
     const header = "Name,Latitude,Longitude,Value,Color";
-    const rows = points.map(p => `${p.name},"","","", ${p.color}`);
+    const rows = points.map(p => `${p.name},${p.lat},${p.lng},${p.value},${p.color}`);
     const csv = [header,...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -122,62 +121,54 @@ export default function GeographicMapChart({
     a.download = `${widgetTitle}.csv`;
     a.click();
     setIsDownloading(false);
-    setShowPopover(false);
   };
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow overflow-hidden">
-      {/* Header */}
-      <div className="flex justify-between mb-4">
-        <div>
-          <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-          <div className="flex gap-2 mt-2">
-            <button 
-                onClick={() => setMapType("light")}
-                className={`text-[10px] px-2 py-0.5 rounded border ${mapType === 'light' ? 'bg-blue-50 border-blue-200 text-blue-600' : 'border-gray-200 text-gray-500'}`}
-            >Light</button>
-            <button 
-                onClick={() => setMapType("dark")}
-                className={`text-[10px] px-2 py-0.5 rounded border ${mapType === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'border-gray-200 text-gray-500'}`}
-            >Dark</button>
-            <button 
-                onClick={() => setMapType("satellite")}
-                className={`text-[10px] px-2 py-0.5 rounded border ${mapType === 'satellite' ? 'bg-green-50 border-green-200 text-green-600' : 'border-gray-200 text-gray-500'}`}
-            >Satellite</button>
+    <ChartCardWrapper
+      title={widgetTitle}
+      menuActions={{
+        onCopy: handleCopy,
+        onDownload: handleDownload,
+        onDelete: onDelete,
+        onToggleWidget: onToggleWidget,
+      }}
+      isDownloading={isDownloading}
+      isPreview={isPreview}
+      customHeaderContent={
+        <div className="flex gap-2">
+           <button 
+              onClick={() => setMapType("light")}
+              className={`text-[10px] px-2 py-0.5 rounded border ${mapType === 'light' ? 'bg-blue-50 border-blue-200 text-blue-600' : 'border-gray-200 text-gray-500'}`}
+           >Light</button>
+           <button 
+              onClick={() => setMapType("dark")}
+              className={`text-[10px] px-2 py-0.5 rounded border ${mapType === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'border-gray-200 text-gray-500'}`}
+           >Dark</button>
+           <button 
+              onClick={() => setMapType("satellite")}
+              className={`text-[10px] px-2 py-0.5 rounded border ${mapType === 'satellite' ? 'bg-green-50 border-green-200 text-green-600' : 'border-gray-200 text-gray-500'}`}
+           >Satellite</button>
+        </div>
+      }
+      footer={
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3 text-left">
+            <div className="p-2 bg-blue-100 rounded text-blue-600"><Layers size={16}/></div>
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase tracking-tighter font-bold">Total Locations</p>
+              <p className="text-lg font-bold">{points.length}</p>
+            </div>
+          </div>
+          <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3 text-left">
+            <div className="p-2 bg-orange-100 rounded text-orange-600"><Maximize2 size={16}/></div>
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase tracking-tighter font-bold">Avg. Index</p>
+              <p className="text-lg font-bold">{(points.reduce((acc, p) => acc + p.value, 0) / points.length).toFixed(1)}</p>
+            </div>
           </div>
         </div>
-
-        <div className="flex items-center gap-4">
-          <div className="relative border-l pl-4">
-            <button
-              onClick={() => setShowPopover(!showPopover)}
-              className="p-2 border rounded hover:bg-gray-50"
-            >
-              <BsThreeDots size={18} />
-            </button>
-
-            {showPopover && (
-              <div className="absolute right-0 top-12 w-48 bg-white border rounded-lg shadow-lg p-2 z-1000">
-                <button onClick={handleCopy} className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-sm items-center">
-                  <Copy size={16} /> Copy Data
-                </button>
-                <button onClick={handleDownload} disabled={isDownloading} className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-sm items-center">
-                  <Download size={16} /> Download CSV
-                </button>
-                <button onClick={onDelete} className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-sm items-center text-red-600">
-                  <Trash2 size={16} /> Delete
-                </button>
-                {onToggleWidget && (
-                  <button onClick={() => {onToggleWidget(); setShowPopover(false);}} className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-sm items-center">
-                    <MdOutlineWidgets size={16} /> Widget
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
+      }
+    >
       {/* Map Container */}
       <div className="relative rounded-lg overflow-hidden border border-gray-100 shadow-inner group" style={{ height: `${height}px` }}>
         <MapContainer
@@ -213,7 +204,7 @@ export default function GeographicMapChart({
              <Marker 
                 key={point.id} 
                 position={[point.lat, point.lng]}
-                draggable={!!onPointMove}
+                draggable={!!onPointMove && !isPreview}
                 eventHandlers={{
                     dragend: (e) => {
                         const marker = e.target;
@@ -241,24 +232,6 @@ export default function GeographicMapChart({
             <p className="text-gray-500 italic">Visualizing global footprint</p>
         </div>
       </div>
-
-      {/* Stats Summary */}
-      <div className="mt-4 grid grid-cols-2 gap-4">
-        <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded text-blue-600"><Layers size={16}/></div>
-          <div>
-            <p className="text-[10px] text-gray-500 uppercase tracking-tighter">Total Locations</p>
-            <p className="text-lg font-bold">{points.length}</p>
-          </div>
-        </div>
-        <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
-          <div className="p-2 bg-orange-100 rounded text-orange-600"><Maximize2 size={16}/></div>
-          <div>
-            <p className="text-[10px] text-gray-500 uppercase tracking-tighter">Avg. Index</p>
-            <p className="text-lg font-bold">{(points.reduce((acc, p) => acc + p.value, 0) / points.length).toFixed(1)}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    </ChartCardWrapper>
   );
 }

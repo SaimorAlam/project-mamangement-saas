@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   PieChart as RechartsPieChart,
   Pie,
@@ -20,19 +21,32 @@ interface DoughnutChartProps {
   title: string;
   data: ChartData[];
   centerLabel: string;
+  onDelete?: () => void;
+  onCopy?: (data: any) => void;
 }
 
 export default function DoughnutChart({
   title,
   data,
   centerLabel,
+  onDelete,
+  onCopy,
 }: DoughnutChartProps) {
   const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(data));
+    if (onCopy) {
+      onCopy(data);
+    } else {
+      navigator.clipboard.writeText(JSON.stringify(data));
+      // toast could be added here if imported
+    }
   };
 
   const handleDelete = () => {
-    console.log("Delete action");
+    if (onDelete) {
+      onDelete();
+    } else {
+      console.log("Delete action");
+    }
   };
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -41,9 +55,7 @@ export default function DoughnutChart({
     <Card className="w-full max-w-2xl bg-white p-6 shadow-sm border border-gray-200">
       {/* Header with title and actions */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">
-          {title}
-        </h2>
+        <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
         <div className="flex gap-2">
           <button
             onClick={handleCopy}
@@ -71,9 +83,7 @@ export default function DoughnutChart({
               style={{ backgroundColor: item.color }}
             />
             <div>
-              <p className="text-sm font-medium text-gray-600">
-                {item.name}
-              </p>
+              <p className="text-sm font-medium text-gray-600">{item.name}</p>
               <p className="text-lg font-semibold text-gray-900">
                 {item.value}%
               </p>
@@ -118,9 +128,7 @@ export default function DoughnutChart({
 
         {/* Center Content */}
         <div className="absolute flex flex-col items-center justify-center">
-          <p className="text-sm font-medium text-gray-600">
-            {centerLabel}
-          </p>
+          <p className="text-sm font-medium text-gray-600">{centerLabel}</p>
           <p className="text-4xl font-bold text-gray-900">{total}</p>
         </div>
       </div>
