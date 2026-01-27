@@ -330,7 +330,10 @@ const CreateProject = ({
                     type="radio"
                     name="shareWith"
                     checked={shareWith === "onlyMe"}
-                    onChange={() => setShareWith("onlyMe")}
+                    onChange={() => {
+                      setShareWith("onlyMe");
+                      setSelectedStaffs([]);
+                    }}
                     className="text-blue-600"
                   />
                   Only Me
@@ -350,7 +353,10 @@ const CreateProject = ({
                     type="radio"
                     name="shareWith"
                     checked={shareWith === "followTemplate"}
-                    onChange={() => setShareWith("followTemplate")}
+                    onChange={() => {
+                      setShareWith("followTemplate");
+                      setSelectedStaffs([]);
+                    }}
                     className="text-blue-600"
                   />
                   Follow Template Settings
