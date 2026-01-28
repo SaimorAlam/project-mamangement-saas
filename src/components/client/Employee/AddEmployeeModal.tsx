@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { X, Mail, Calendar, HelpCircle } from "lucide-react";
+import { X, Mail, Calendar, HelpCircle, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { IAddEmployeePayload } from "@/types";
 import {
@@ -23,7 +23,6 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
     register,
     handleSubmit,
     watch,
-    setValue,
     control,
     reset,
     formState: { errors },
@@ -41,12 +40,9 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
 
   const selectedRole = watch("role");
 
-  const skills = watch("skills");
-  const projects = watch("projects");
-
   const [skillInput, setSkillInput] = useState("");
   // const [projectInput, setProjectInput] = useState("");
-
+  const joinedDateRef = useRef<HTMLInputElement>(null);
   const [addEmployee, { isLoading: employeeLoading }] =
     useAddEmployeeMutation();
   const [addManager, { isLoading: managerloading }] = useAddManagerMutation();
@@ -56,7 +52,7 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
     (project: { name: string; id: string }) => ({
       name: project.name,
       id: project.id,
-    })
+    }),
   );
   const PROJECT_OPTIONS = projectsData?.map((project: any) => ({
     label: project.name,
@@ -79,58 +75,6 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
     }
   }, [open, reset]);
 
-  const addSkillTag = () => {
-    const value = skillInput.trim();
-    if (!value) return;
-    if (skills.includes(value)) return;
-    setValue("skills", [...skills, value]);
-    setSkillInput("");
-  };
-
-  const removeSkillTag = (skillToRemove: string) => {
-    setValue(
-      "skills",
-      skills.filter((skill) => skill !== skillToRemove)
-    );
-  };
-
-  /* const addProjectTag = () => {
-    const value = projectInput.trim();
-    if (!value) return;
-    if (projects.includes(value)) return;
-    setValue("projects", [...projects, value]);
-    setProjectInput("");
-  }; */
-
-  /* const removeProjectTag = (projectToRemove: string) => {
-    setValue(
-      "projects",
-      projects.filter((project) => project !== projectToRemove)
-    );
-  }; */
-
-  const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addSkillTag();
-    }
-    if (e.key === "Backspace" && !skillInput && skills.length) {
-      removeSkillTag(skills[skills.length - 1]);
-    }
-  };
-
-  const addProject = (projectId: string) => {
-    if (projects.includes(projectId)) return;
-    setValue("projects", [...projects, projectId]);
-  };
-
-  const removeProject = (project: string) => {
-    setValue(
-      "projects",
-      projects.filter((p) => p !== project)
-    );
-  };
-
   const cleanObject = (obj: Record<string, any>) => {
     const newObj: Record<string, any> = {};
     Object.keys(obj).forEach((key) => {
@@ -148,13 +92,6 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
   };
 
   const onSubmit = async (data: IAddEmployeePayload) => {
-    if (selectedRole !== "Viewer") {
-      if (!skills.length || !projects.length) {
-        toast.error("Please add at least one skill and one project");
-        return;
-      }
-    }
-
     try {
       let payload: any = {};
       let mutation: any;
@@ -207,7 +144,7 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
         const errorData = (err as { data?: { message?: string } }).data;
         toast.error(
           errorData?.message ||
-            `Failed to add ${selectedRole}. Please try again.`
+            `Failed to add ${selectedRole}. Please try again.`,
         );
       } else {
         toast.error("Something went wrong. Please try again.");
@@ -218,8 +155,8 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 ">
+      <div className="bg-white rounded-lg shadow-xl w-full min-w-xl max-w-2xl max-h-[90vh]">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">
             Add New Employee
@@ -234,7 +171,7 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="px-6 py-5 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5"
+          className="px-6 py-5 max-h-[calc(90vh-140px)] space-y-5 overflow-y-auto scrollbar-hide"
         >
           {/* Role Selection */}
           <div>
@@ -330,7 +267,7 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
                 Employee Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <Mail
+                <HelpCircle
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   size={16}
                 />
@@ -363,10 +300,9 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
                 control={control}
                 rules={{ required: "Joined date is required" }}
                 render={({ field }) => {
-                  const inputRef = useRef<HTMLInputElement>(null);
                   const openPicker = () => {
-                    inputRef.current?.showPicker?.();
-                    inputRef.current?.focus();
+                    joinedDateRef.current?.showPicker?.();
+                    joinedDateRef.current?.focus();
                   };
                   return (
                     <div>
@@ -379,7 +315,7 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
                           {...field}
                           ref={(e) => {
                             field.ref(e);
-                            inputRef.current = e;
+                            joinedDateRef.current = e;
                           }}
                           onClick={openPicker}
                           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none pr-16 cursor-pointer no-date-icon"
@@ -407,90 +343,155 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
           {/* Skills & Projects */}
           {selectedRole !== "Viewer" && (
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Skill <span className="text-red-500">*</span>
-                </label>
-                <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
-                  {skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
-                    >
-                      {skill}
-                      <button
-                        type="button"
-                        onClick={() => removeSkillTag(skill)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <X size={12} />
-                      </button>
-                    </span>
-                  ))}
-                  <input
-                    value={skillInput}
-                    onChange={(e) => setSkillInput(e.target.value)}
-                    onKeyDown={handleSkillKeyDown}
-                    placeholder="Type a skill and press Enter"
-                    className="flex-1 min-w-[120px] text-sm outline-none border-none bg-transparent"
-                  />
-                </div>
-                {!skills.length && (
-                  <p className="text-red-500 text-xs mt-1">
-                    At least one skill is required
-                  </p>
+              <Controller
+                name="skills"
+                control={control}
+                rules={{
+                  required: "At least one skill is required",
+                  validate: (val) =>
+                    !val || val.length > 0 || "At least one skill is required",
+                }}
+                render={({ field }) => (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Skill <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
+                      {field.value.map((skill) => (
+                        <span
+                          key={skill}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
+                        >
+                          {skill}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newVal = field.value.filter(
+                                (s) => s !== skill,
+                              );
+                              field.onChange(newVal);
+                            }}
+                            className="text-gray-500 hover:text-gray-700"
+                          >
+                            <X size={12} />
+                          </button>
+                        </span>
+                      ))}
+                      <div className="flex-1 flex items-center min-w-[120px]">
+                        <input
+                          value={skillInput}
+                          onChange={(e) => setSkillInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              const val = skillInput.trim();
+                              if (val && !field.value.includes(val)) {
+                                field.onChange([...field.value, val]);
+                                setSkillInput("");
+                              }
+                            }
+                          }}
+                          placeholder="Type a skill..."
+                          className="w-full text-sm outline-none border-none bg-transparent"
+                        />
+                        {skillInput.trim() && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const val = skillInput.trim();
+                              if (val && !field.value.includes(val)) {
+                                field.onChange([...field.value, val]);
+                                setSkillInput("");
+                              }
+                            }}
+                            className="p-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
+                          >
+                            <Plus size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {errors.skills && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.skills.message}
+                      </p>
+                    )}
+                  </div>
                 )}
-              </div>
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Project <span className="text-red-500">*</span>
-                </label>
+              <Controller
+                name="projects"
+                control={control}
+                rules={{
+                  required: "At least one project is required",
+                  validate: (val) =>
+                    !val ||
+                    val.length > 0 ||
+                    "At least one project is required",
+                }}
+                render={({ field }) => (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Project <span className="text-red-500">*</span>
+                    </label>
 
-                <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
-                  {projects.map((projectId: string) => (
-                    <span
-                      key={projectId}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
-                    >
-                      {PROJECT_OPTIONS?.find((p: any) => p.value === projectId)
-                        ?.label || projectId}
-                      <button
-                        type="button"
-                        onClick={() => removeProject(projectId)}
-                        className="text-gray-500 hover:text-gray-700"
+                    <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
+                      {field.value.map((projectId: string) => (
+                        <span
+                          key={projectId}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
+                        >
+                          {PROJECT_OPTIONS?.find(
+                            (p: any) => p.value === projectId,
+                          )?.label || projectId}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newVal = field.value.filter(
+                                (p) => p !== projectId,
+                              );
+                              field.onChange(newVal);
+                            }}
+                            className="text-gray-500 hover:text-gray-700"
+                          >
+                            <X size={12} />
+                          </button>
+                        </span>
+                      ))}
+
+                      <select
+                        value=""
+                        onChange={(e) => {
+                          if (
+                            e.target.value &&
+                            !field.value.includes(e.target.value)
+                          ) {
+                            field.onChange([...field.value, e.target.value]);
+                          }
+                        }}
+                        className="flex-1 min-w-[140px] text-sm outline-none border-none bg-transparent text-gray-600 cursor-pointer"
                       >
-                        <X size={12} />
-                      </button>
-                    </span>
-                  ))}
-
-                  <select
-                    value=""
-                    onChange={(e) => {
-                      if (e.target.value) addProject(e.target.value);
-                    }}
-                    className="flex-1 min-w-[140px] text-sm outline-none border-none bg-transparent text-gray-600 cursor-pointer"
-                  >
-                    <option value="" disabled>
-                      Select project
-                    </option>
-                    {PROJECT_OPTIONS.filter(
-                      (p: any) => !projects.includes(p.value)
-                    ).map((project: any) => (
-                      <option key={project.value} value={project.value}>
-                        {project.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {!projects.length && (
-                  <p className="text-red-500 text-xs mt-1">
-                    At least one project is required
-                  </p>
+                        <option value="" disabled>
+                          Select project
+                        </option>
+                        {PROJECT_OPTIONS.filter(
+                          (p: any) => !field.value.includes(p.value),
+                        ).map((project: any) => (
+                          <option key={project.value} value={project.value}>
+                            {project.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {errors.projects && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.projects.message}
+                      </p>
+                    )}
+                  </div>
                 )}
-              </div>
+              />
             </div>
           )}
 
