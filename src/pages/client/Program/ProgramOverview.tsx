@@ -10,7 +10,6 @@ import AllProject from "./AllProject";
 
 const ProgramOverview = () => {
   const { programId } = useParams();
-  console.log(programId);
   const { data: program } = useGetProgramByIdQuery(programId);
   // const { data: allProjects } = useGetProjectsByProgramIdQuery({
   //   programId: programId,

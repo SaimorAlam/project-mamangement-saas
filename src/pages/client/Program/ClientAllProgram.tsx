@@ -20,6 +20,7 @@ import EditProgramModal from "./EditProgramModal";
 import { useNavigate } from "react-router-dom";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 
 interface IProgramTableProps {
   title?: string;
@@ -258,9 +259,11 @@ const ClientAllProgram = ({
               <tr>
                 {[
                   "programName",
+                  "projects",
+                  "assigned Manager",
                   "priority",
-                  !hideCreatedOn && "createdAt",
-                  "updatedAt",
+                  !hideCreatedOn && "created On",
+                  "updated On",
                   "deadline",
                   "progress",
                   "actions",
@@ -296,6 +299,19 @@ const ClientAllProgram = ({
                   >
                     <td className="px-6 py-4 text-sm align-middle">
                       {program.programName}
+                    </td>
+                    <td className="px-6 py-4 align-middle">
+                      {program.projects?.length} Projects
+                    </td>
+                    <td className="px-6 py-4 align-middle">
+                      <RenderStaffAvatars
+                        staff={Array.from({ length: 5 }, (_, i) => ({
+                          id: i.toString(),
+                          name: `Staff ${i + 1}`,
+                          avatar:
+                            "https://randomuser.me/api/portraits/men/19.jpg",
+                        }))}
+                      />
                     </td>
                     <td className="px-6 py-4 align-middle">
                       <PriorityDropdown defaultPriority={program.priority} />
@@ -345,6 +361,7 @@ const ClientAllProgram = ({
                   <tr key={`empty-${idx}`} className="h-[60px]">
                     {[
                       "programName",
+                      "projects",
                       "priority",
                       !hideCreatedOn && "createdAt",
                       "updatedAt",
