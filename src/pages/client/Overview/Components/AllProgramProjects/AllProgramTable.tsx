@@ -41,7 +41,9 @@ export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 export interface StaffEmployeeProject {
   id: string;
   programId: string;
-  programName?: string;
+  program?: {
+    programName?: string;
+  };
   name: string;
   description: string;
   status: ProjectStatus;
@@ -116,7 +118,7 @@ const ProjectModal = ({
 }) => (
   <Dialog open={open} onOpenChange={setOpen}>
     <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-2xl">
-      <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-white">
+      <div className="px-6 py-5 border-b border-gray-200 bg-linear-to-r from-slate-50 to-white">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900">
             {project.name}
@@ -199,6 +201,7 @@ const AllProgramTable = ({
   projects,
   isLoading = false,
 }: AllProgramTableProps) => {
+  console.log(projects);
   const [selectedProject, setSelectedProject] =
     useState<StaffEmployeeProject | null>(null);
   const [open, setOpen] = useState(false);
@@ -220,8 +223,8 @@ const AllProgramTable = ({
 
       switch (sortBy) {
         case "programName":
-          aValue = a.programName || "";
-          bValue = b.programName || "";
+          aValue = a.program?.programName || "";
+          bValue = b.program?.programName || "";
           break;
         case "name":
           aValue = a.name;
@@ -340,7 +343,7 @@ const AllProgramTable = ({
                       className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
                     >
                       <TableCell className="px-6 py-3.5 font-medium">
-                        {project.programName || "Program Name"}
+                        {project?.program?.programName || "Program Name"}
                       </TableCell>
                       <TableCell className="px-6 py-3.5 font-medium">
                         {project.name}

@@ -29,8 +29,10 @@ export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 export interface Project {
   id: string;
   programId: string;
-
   programName?: string;
+  program?: {
+    programName?: string;
+  };
   name: string;
   description: string;
 
@@ -91,16 +93,8 @@ const renderStatusBadge = (status: ProjectStatus) => (
 );
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
-  const {
-    id,
-    name,
-    programName,
-    priority,
-    deadline,
-    startDate,
-    progress,
-    status,
-  } = project;
+  const { id, name, program, priority, deadline, startDate, progress, status } =
+    project;
   const navigate = useNavigate();
   const [addFavoriteProject] = useAddFavoriteProjectMutation();
   const [removeFavoriteProject] = useRemoveFavoriteProjectMutation();
@@ -149,7 +143,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
             <div>
               <h4 className="font-semibold text-gray-900 leading-tight">
-                {programName || "Program Name"}
+                {program?.programName || "Program Name"}
               </h4>
               <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2 cursor-pointer">
                 <span
