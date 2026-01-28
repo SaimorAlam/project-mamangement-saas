@@ -108,7 +108,6 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["MANAGER"]}>
             <StaffManagerDashboardLayout />
-            //{" "}
           </ProtectedRoute>
         ),
         children: getStaffManagerRoutes(),
@@ -120,7 +119,6 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
             <StaffEmployeeDashboardLayout />
-            //{" "}
           </ProtectedRoute>
         ),
         children: getStaffEmployeeRoutes(),
@@ -132,7 +130,6 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["VIEWER"]}>
             <ViewerPanelDashboardLayout />
-            //{" "}
           </ProtectedRoute>
         ),
         children: getViewerPanelRoutes(),

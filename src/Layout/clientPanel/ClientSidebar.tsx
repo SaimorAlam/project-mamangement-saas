@@ -25,7 +25,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { ChevronRight, Star } from "lucide-react";
 import { getClientSidebarItems } from "./clientSidebarItems";
 import { useGetFavoriteProjectsQuery } from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
@@ -36,35 +35,39 @@ const ClientSidebar = () => {
   const { state, isMobile } = useSidebar();
 
   const { data, isLoading } = useGetFavoriteProjectsQuery({});
-
   const isExpanded = state === "expanded" || isMobile;
 
   /**
    * 01. Build favorite items
    */
   const favoriteItems = useMemo(() => {
-    return (
-      data?.data?.map((item: any) => ({
-        icon: <Star className="size-6" />,
-        name: item.project.name,
-        path: `/client-panel/project-details/${item.project.id}`,
-      })) || []
-    );
+    const projects = data?.data || [];
+    return projects.map((item: any) => ({
+      icon: <Star className="size-6" />,
+      name: item.project.name,
+      path: `/client-panel/project-details/${item.project.id}`,
+    }));
   }, [data]);
 
   /**
    * 02. Inject favorites immutably
    */
   const groups = useMemo(() => {
-    return getClientSidebarItems().map((group) => {
-      if (group.label !== "Favorites") return group;
-
-      return {
-        ...group,
-        items: favoriteItems,
-      };
-    });
-  }, [favoriteItems]);
+    return getClientSidebarItems()
+      .map((group) => {
+        if (group.label !== "Favorites") return group;
+        return {
+          ...group,
+          items: favoriteItems,
+        };
+      })
+      .filter((group) => {
+        if (group.label === "Favorites") {
+          return isLoading || favoriteItems.length > 0;
+        }
+        return true;
+      });
+  }, [favoriteItems, isLoading]);
 
   /**
    * Active route logic
@@ -207,9 +210,6 @@ const ClientSidebar = () => {
     );
   };
 
-  /**
-   * Favorites skeleton rows
-   */
   const renderFavoritesSkeleton = () =>
     Array.from({ length: 3 }).map((_, idx) => (
       <SidebarMenuItem key={`fav-skeleton-${idx}`}>
@@ -246,12 +246,12 @@ const ClientSidebar = () => {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="bg-white! grid items-start justify-center ">
+      <SidebarContent className="bg-white! grid items-start justify-center scrollbar-hide">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {groups.map((group) => (
-                <div key={group.label}>
+                <SidebarMenuItem key={group.label}>
                   {isExpanded && (
                     <SidebarGroupLabel className="text-[#64748B] text-sm font-medium">
                       {group.label}
@@ -265,13 +265,12 @@ const ClientSidebar = () => {
                   </SidebarMenu>
 
                   {isExpanded && <hr className="w-56 text-slate-300 my-5" />}
-                </div>
+                </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter className="bg-white">
         <UserProfile state={isExpanded ? "expanded" : "collapsed"} />
       </SidebarFooter>

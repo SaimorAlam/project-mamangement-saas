@@ -31,6 +31,7 @@ const EmployeeTable = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [deleteUser] = useDeleteUserMutation();
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [pageLoading, setPageLoading] = useState(false);
 
   const PAGE_SIZE = 10;
@@ -60,6 +61,11 @@ const EmployeeTable = () => {
   const totalPages = meta?.totalPages || 1;
   const startUser = (currentPage - 1) * PAGE_SIZE + 1;
   const endUser = Math.min(currentPage * PAGE_SIZE, totalUsers);
+
+  // Clear selection on page/data change
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [data, currentPage]);
 
   // Filtered & searched data
   const filteredUsers = useMemo(() => {
@@ -112,16 +118,32 @@ const EmployeeTable = () => {
     return sortOrder === "asc" ? " ▲" : " ▼";
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(filteredUsers.map((user: any) => user.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectRow = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds((prev) => [...prev, id]);
+    } else {
+      setSelectedIds((prev) => prev.filter((userId) => userId !== id));
+    }
+  };
+
   const renderSkeleton = () =>
     Array.from({ length: PAGE_SIZE }).map((_, i) => (
       <tr key={i} className="even:bg-gray-50 odd:bg-white animate-pulse h-12">
-        {Array(7)
+        {Array(8)
           .fill(0)
           .map((_, idx) => (
             <td
               key={idx}
-              className={`${idx === 0 ? "px-6 w-[200px]" : "px-4"} ${
-                idx === 1 ? "w-[300px]" : ""
+              className={`${idx === 1 ? "px-6 w-[200px]" : "px-4"} ${
+                idx === 2 ? "w-[300px]" : ""
               } py-3`}
             >
               <div className="h-4 bg-gray-200 rounded w-full"></div>
@@ -148,6 +170,25 @@ const EmployeeTable = () => {
       Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
     }
   };
+  const handleBulkDelete = async (ids: string[]) => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+      });
+
+      if (result.isConfirmed) {
+        console.log(ids);
+        // await deleteUser(id).unwrap();
+        Swal.fire("Deleted!", "Employee removed.", "success");
+      }
+    } catch (err: any) {
+      Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
+    }
+  };
 
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -158,7 +199,22 @@ const EmployeeTable = () => {
     <div className="border border-gray-200 w-full rounded-xl my-10 overflow-hidden">
       {/* Header + Filters */}
       <div className="flex flex-col lg:flex-row justify-between items-center py-4 px-6 gap-4 bg-white">
-        <h2 className="text-2xl font-medium">Employee List</h2>
+        {selectedIds.length > 0 ? (
+          <div className="flex items-center gap-2 border border-gray-200 rounded-xl overflow-hidden">
+            <span className="text-sm text-blue-400 font-medium bg-[#CAD2DB]/10 border-r border-gray-200 p-3 ">
+              {selectedIds.length} selected
+            </span>
+            <Button
+              variant="ghost"
+              onClick={() => handleBulkDelete(selectedIds)}
+              className="text-sm"
+            >
+              <Trash2 className=" h-4 w-4 text-red-500" /> Delete
+            </Button>
+          </div>
+        ) : (
+          <h2 className="text-2xl font-medium">Employee List</h2>
+        )}
         <div className="flex gap-2 flex-wrap items-center">
           <input
             type="text"
@@ -225,6 +281,18 @@ const EmployeeTable = () => {
         <table className="min-w-full border-separate border-spacing-0">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left w-[50px]">
+                <Checkbox
+                  checked={
+                    filteredUsers.length > 0 &&
+                    selectedIds.length === filteredUsers.length
+                  }
+                  className="size-[18px]"
+                  onCheckedChange={(checked) =>
+                    handleSelectAll(checked as boolean)
+                  }
+                />
+              </th>
               <th
                 className="px-6 py-3 text-left text-sm font-semibold w-[200px] cursor-pointer"
                 onClick={() => handleSort("name")}
@@ -264,12 +332,22 @@ const EmployeeTable = () => {
             {isLoading
               ? renderSkeleton()
               : filteredUsers.map((user: any) => {
-                  console.log(user);
                   return (
                     <tr
                       key={user.id}
-                      className="even:bg-gray-50 odd:bg-white hover:bg-gray-100 transition h-12"
+                      className={`even:bg-gray-50 odd:bg-white hover:bg-gray-100 transition h-12 ${
+                        selectedIds.includes(user.id) ? "bg-blue-50" : ""
+                      }`}
                     >
+                      <td className="px-6 py-3 w-[50px] align-middle">
+                        <Checkbox
+                          className="size-[18px]"
+                          checked={selectedIds.includes(user.id)}
+                          onCheckedChange={(checked) =>
+                            handleSelectRow(user.id, checked as boolean)
+                          }
+                        />
+                      </td>
                       <td className="px-6 py-3 w-[200px] align-middle">
                         <div className="flex items-center gap-2">
                           <img
@@ -382,14 +460,14 @@ const EmployeeTable = () => {
                     key={`empty-${i}`}
                     className="h-12 even:bg-gray-50 odd:bg-white"
                   >
-                    {Array(7)
+                    {Array(8)
                       .fill(0)
                       .map((_, idx) => (
                         <td
                           key={idx}
-                          className={`${idx === 0 ? "px-6 w-[200px]" : "px-4"} ${
-                            idx === 1 ? "w-[300px]" : ""
-                          } py-3`}
+                          className={`${
+                            idx === 1 ? "px-6 w-[200px]" : "px-4"
+                          } ${idx === 2 ? "w-[300px]" : ""} py-3`}
                         ></td>
                       ))}
                   </tr>
