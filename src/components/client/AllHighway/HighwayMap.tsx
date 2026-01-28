@@ -124,9 +124,9 @@ const HighwayMap: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-screen bg-white flex flex-col">
+    <div className="w-full h-[450px] rounded-xl bg-white flex flex-col mb-10">
       {/* Header */}
-      <div className="bg-white  z-10  py-4">
+      <div className="bg-white  z-22  py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div>
@@ -139,11 +139,11 @@ const HighwayMap: React.FC = () => {
       </div>
 
       {/* Map Container */}
-      <div className="flex-1 relative z-10">
-        <div ref={mapRef} className="w-full h-full"></div>
+      <div className="flex-1 relative rounded-xl">
+        <div ref={mapRef} className="w-full h-full z-20"></div>
 
         {/* Info Card - Top Left */}
-        <div className="absolute top-4 left-15 bg-white rounded-lg shadow-lg p-4 w-64 z-10 pointer-events-auto">
+        <div className="absolute top-4 left-15 bg-white rounded-lg shadow-lg p-4 w-64 z-20 pointer-events-auto">
           {/* Building Name with Red Dot */}
           <div className="flex items-start gap-2 mb-3">
             <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5 shrink-0"></div>
@@ -173,7 +173,7 @@ const HighwayMap: React.FC = () => {
           </div>
 
           {/* Circular Progress - Top Right Corner */}
-          <div className="absolute -top-3 -right-3 w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center z-100">
+          <div className="absolute -top-3 -right-3 w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center z-10">
             <div className="relative w-14 h-14">
               {/* Background Circle */}
               <svg className="w-full h-full transform -rotate-90">
@@ -204,11 +204,6 @@ const HighwayMap: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Google Maps Attribution */}
-        <div className="absolute bottom-4 right-4 bg-white px-3 py-1 rounded shadow-md text-xs text-gray-600">
-          © Google
         </div>
       </div>
     </div>

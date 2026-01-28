@@ -41,7 +41,7 @@ interface ClientDashboardHeaderProps {
   name?: string;
 }
 
-const DROPDOWN_ITEMS = ["Create Program"];
+const DROPDOWN_ITEMS = ["Add Program"];
 
 const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   name,
@@ -126,7 +126,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   }, [currentPath]);
 
   const handleDropdownClick = (item: string) => {
-    if (item === "Create Program") setActiveModal(item);
+    if (item === "Add Program") setActiveModal(item);
     setIsDropdownOpen(false);
   };
 
@@ -165,7 +165,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           title="Add Program"
           leftIcon={<Plus />}
           type="Primary"
-          onClick={() => setActiveModal("Create Program")}
+          onClick={() => setActiveModal("Add Program")}
         />
       );
 
@@ -361,12 +361,12 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
           <div className="relative">{renderQuickActionButton()}</div>
 
-          {activeModal === "Create Program" && (
+          {activeModal === "Add Program" && (
             <CreateProgramModal
               open
               onOpenChange={(open) => !open && setActiveModal(null)}
               onSuccess={handleProgramSuccess}
-              title="Create Program"
+              title="Add Program"
             />
           )}
 
@@ -375,7 +375,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
               open={successOpen}
               onOpenChange={setSuccessOpen}
               programName={successData.programName}
-              redirectPath={`/client-panel/all-program/program-overview/${successData?.id}`}
+              redirectPath={`/client-panel/program-builder`}
             />
           )}
         </div>
