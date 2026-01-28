@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DonutChartSkeleton } from "@/common/Skeleton/DonutChartSkeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useGetStatusQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 import { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
@@ -93,17 +100,21 @@ const ProjectStatusDonutChart = () => {
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-2xl">Project Status</h3>
 
-            <select
+            <Select
               value={period}
-              onChange={(e) => handlePeriodChange(e.target.value as Period)}
-              className="border rounded px-3 py-1 text-sm capitalize"
+              onValueChange={(p) => handlePeriodChange(p as Period)}
             >
-              {PERIOD_OPTIONS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="capitalize min-w-[120px]">
+                <SelectValue placeholder="Select Period" />
+              </SelectTrigger>
+              <SelectContent>
+                {PERIOD_OPTIONS.map((p) => (
+                  <SelectItem key={p} value={p} className="capitalize">
+                    {p}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Chart */}

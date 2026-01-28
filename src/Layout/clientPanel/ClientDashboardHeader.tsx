@@ -325,7 +325,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           {currentPath === "/client-panel" && (
             <div className="min-w-0">
               <h1 className="text-2xl md:text-[32px] font-semibold truncate">
-                Good Morning 👋, {userName || name}
+                Good Morning {userName || name}, 👋
               </h1>
               <p className="text-sm md:text-base text-gray-500 truncate">
                 This is dashboard overview of Acme Corporation

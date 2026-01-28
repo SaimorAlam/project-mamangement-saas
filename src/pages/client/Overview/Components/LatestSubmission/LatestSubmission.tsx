@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  Select,
+  SelectValue,
+  SelectLabel,
+  SelectGroup,
+} from "@/components/ui/select";
 import {
   TableBody,
   TableCell,
@@ -14,7 +17,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Filter, ArrowDownUp } from "lucide-react";
@@ -35,16 +37,16 @@ const statusStyles: Record<string, string> = {
 const TABLE_SKELETON_ROWS = 6;
 
 const LatestSubmission = () => {
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  // const [startDate, setStartDate] = useState<string>("");
+  // const [endDate, setEndDate] = useState<string>("");
   const [status, setStatus] = useState<StatusFilter>("ALL");
 
   const [sortBy, setSortBy] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
   const { data, isLoading } = useGetAllSubmissionQuery({
-    startDate: startDate || undefined,
-    endDate: endDate || undefined,
+    // startDate: startDate || undefined,
+    // endDate: endDate || undefined,
     status: status !== "ALL" ? status : undefined,
   });
 
@@ -111,7 +113,7 @@ const LatestSubmission = () => {
             <h4 className="text-2xl font-medium">Latest Submission</h4>
             {/* Filters */}
             <div className="flex flex-wrap gap-3">
-              <input
+              {/* <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
@@ -122,29 +124,27 @@ const LatestSubmission = () => {
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="h-10 border border-gray-200 rounded-md px-3 text-sm"
-              />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 h-10"
-                  >
-                    <Filter className="w-4 h-4" />
-                    Status
-                  </Button>
-                </DropdownMenuTrigger>
+              /> */}
+              <Select
+                onValueChange={(s) => setStatus(s as StatusFilter)}
+                value={status}
+              >
+                <SelectTrigger>
+                  <Filter className="w-4 h-4" />
+                  <SelectValue placeholder="Sort By" />
+                </SelectTrigger>
 
-                <DropdownMenuContent>
-                  {["ALL", "APPROVED", "PENDING", "RETURNED"].map((s) => (
-                    <DropdownMenuItem
-                      key={s}
-                      onClick={() => setStatus(s as StatusFilter)}
-                    >
-                      {s}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Sort By</SelectLabel>
+                    {["ALL", "APPROVED", "PENDING", "RETURNED"].map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardHeader>
