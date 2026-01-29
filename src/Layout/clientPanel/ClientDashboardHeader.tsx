@@ -5,8 +5,7 @@ import React, {
   ReactElement,
   isValidElement,
 } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { Link, useLocation, useParams } from "react-router-dom";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
 import CreateProgramModal from "@/components/client/AllProgram/CreateProgramModal";
@@ -41,8 +40,6 @@ interface ClientDashboardHeaderProps {
   name?: string;
 }
 
-const DROPDOWN_ITEMS = ["Add Program"];
-
 const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   name,
 }) => {
@@ -74,7 +71,8 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const isProjectReviewDetailsPage = currentPath.startsWith(
     "/client-panel/project-review/project-details/",
   );
-
+  const isActivityLogPage = currentPath.includes("/client-panel/activity-log");
+  const isSupportPage = currentPath.includes("/client-panel/help");
   const { data: ProjectData } = useGetProjectByIdQuery(projectId as string, {
     skip: !projectId,
   });
@@ -124,7 +122,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isPreview, isPublished } = useAppSelector(
     (state) => state.chartSlice,
@@ -134,11 +132,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
     setIsEmployeeModalOpen(false);
     setIsDropdownOpen(false);
   }, [currentPath]);
-
-  const handleDropdownClick = (item: string) => {
-    if (item === "Add Program") setActiveModal(item);
-    setIsDropdownOpen(false);
-  };
 
   const handleProgramSuccess = ({
     programName,
@@ -226,17 +219,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
         </>
       );
 
-    if (isProjectReviewPage) {
-      return (
-        <PrimaryButton
-          title="Create Support Ticket"
-          leftIcon={<Plus />}
-          type="Primary"
-          onClick={() => navigate("/client-panel/help/support/create-tickets")}
-        />
-      );
-    }
-
     if (isProjectBuilderPage) {
       if (isPreview || isPublished) {
         return (
@@ -296,33 +278,18 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           type="Primary"
           onClick={() => setIsDropdownOpen((prev) => !prev)}
         /> */}
-        <AnimatePresence>
-          {/* {isDropdownOpen && ( */}
-          <motion.div
-            initial={{ opacity: 0, y: -15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.2 }}
-            className=""
-          >
-            {DROPDOWN_ITEMS.map((item) => (
-              <PrimaryButton
-                title={item}
-                leftIcon={<Plus />}
-                type="Primary"
-                onClick={() => handleDropdownClick(item)}
-              />
-              // <button
-              //   key={index}
 
-              //   className="w-full text-left px-4 py-4 rounded-md hover:bg-gray-800 border border-gray-300 text-gray-700 hover:text-white mb-2 last:mb-0 cursor-pointer duration-300"
-              // >
-              //   {item}
-              // </button>
-            ))}
-          </motion.div>
-          {/* )} */}
-        </AnimatePresence>
+        {/* {isDropdownOpen && ( */}
+        <div>
+          {!isProjectReviewPage && !isActivityLogPage && !isSupportPage && (
+            <PrimaryButton
+              title="Add Program"
+              leftIcon={<Plus />}
+              type="Primary"
+              onClick={() => setActiveModal("Add Program")}
+            />
+          )}
+        </div>
       </>
     );
   };
@@ -332,7 +299,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       <div className="flex flex-wrap items-center py-5 justify-between">
         <div className="flex items-center gap-4 min-w-0">
           <SidebarTrigger className="md:hidden shrink-0" />
-          {currentPath.includes("/client-panel/") && (
+          {currentPath.includes("/client-panel") && (
             <div className="min-w-0">
               <h1 className="text-2xl md:text-[32px] font-semibold truncate">
                 Good Morning {userName || name}, 👋
