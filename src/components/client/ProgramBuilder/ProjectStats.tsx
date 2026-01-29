@@ -30,7 +30,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
   activeWidget,
   config: globalConfig, // Rename to avoid confusion
 }) => {
-  const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
+  const [activeCardTitle, setActiveCardTitle] = useState<string | null>(null);
   const [stats, setStats] = useState<StatsItem[]>([
     {
       title: "Total Project",
@@ -119,14 +119,15 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
       ? stats
       : stats.filter((item) => item.title !== "Submission Overdue");
 
-  const handleUpdateStat = (index: number, updatedStat: StatsItem) => {
-    const newStats = [...stats];
-    newStats[index] = updatedStat;
-    setStats(newStats);
+  const handleUpdateStat = (title: string, updatedStat: StatsItem) => {
+    setStats((prev) =>
+      prev.map((item) => (item.title === title ? updatedStat : item)),
+    );
   };
 
   const handleDeleteStat = (title: string) => {
     setStats((prev) => prev.filter((item) => item.title !== title));
+    if (activeCardTitle === title) setActiveCardTitle(null);
   };
 
   const handleCopyStat = (item: StatsItem) => {
@@ -137,7 +138,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
     <div className="flex gap-4 w-full">
       {/* Grid Area */}
       <div
-        className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 cursor-pointer flex-1 transition-all`}
+        className={`grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 cursor-pointer flex-1 transition-all`}
       >
         {visibleStats.map((item, index) => (
           <DashboardPanelStatsCard
@@ -152,7 +153,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
               item.config?.showFooterButton ?? globalConfig?.showFooterButton
             }
             onToggleWidget={() =>
-              setActiveCardIndex(activeCardIndex === index ? null : index)
+              setActiveCardTitle(activeCardTitle === item.title ? null : item.title)
             }
             onDelete={() => handleDeleteStat(item.title)}
             onCopy={() => handleCopyStat(item)}
@@ -161,44 +162,49 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
       </div>
 
       {/* Configuration Panel - Rendered Inline */}
-      {activeCardIndex !== null && stats[activeCardIndex] && (
+      {activeCardTitle !== null && (
         <div className="min-w-[320px] max-w-[320px]">
-          <KPIWidgetConfig
-            // Pass the specific stat config and a setter that updates the main state
-            config={
-              stats[activeCardIndex].config || {
-                showIndex: true,
-                showFooter: true,
-                showFooterLabel: true,
-                showFooterButton: true,
-              }
-            }
-            setConfig={(newConfig) => {
-              const currentConfig = stats[activeCardIndex].config || {
-                showIndex: true,
-                showFooter: true,
-                showFooterLabel: true,
-                showFooterButton: true,
-              };
-              const updatedFn =
-                typeof newConfig === "function"
-                  ? newConfig(currentConfig)
-                  : newConfig;
-              handleUpdateStat(activeCardIndex, {
-                ...stats[activeCardIndex],
-                config: updatedFn,
-              });
-            }}
-            // Passing full data for editing fields (Title, Value, etc)
-            data={stats[activeCardIndex]}
-            onUpdateData={(newData) =>
-              handleUpdateStat(activeCardIndex, {
-                ...stats[activeCardIndex],
-                ...newData,
-              })
-            }
-            onClose={() => setActiveCardIndex(null)}
-          />
+          {(() => {
+            const activeItem = stats.find((s) => s.title === activeCardTitle);
+            if (!activeItem) return null;
+
+            return (
+              <KPIWidgetConfig
+                config={
+                  activeItem.config || {
+                    showIndex: true,
+                    showFooter: true,
+                    showFooterLabel: true,
+                    showFooterButton: true,
+                  }
+                }
+                setConfig={(newConfig) => {
+                  const currentConfig = activeItem.config || {
+                    showIndex: true,
+                    showFooter: true,
+                    showFooterLabel: true,
+                    showFooterButton: true,
+                  };
+                  const updatedFn =
+                    typeof newConfig === "function"
+                      ? newConfig(currentConfig)
+                      : newConfig;
+                  handleUpdateStat(activeItem.title, {
+                    ...activeItem,
+                    config: updatedFn,
+                  });
+                }}
+                data={activeItem}
+                onUpdateData={(newData) =>
+                  handleUpdateStat(activeItem.title, {
+                    ...activeItem,
+                    ...newData,
+                  })
+                }
+                onClose={() => setActiveCardTitle(null)}
+              />
+            );
+          })()}
         </div>
       )}
     </div>

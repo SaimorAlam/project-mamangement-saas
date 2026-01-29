@@ -21,22 +21,46 @@ interface KPIWidgetConfigProps {
 const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
   config,
   setConfig,
+  data,
   onClose,
 }) => {
   const handleChange = (key: keyof KPISettings) => {
-    setConfig((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
+    setConfig((prev) => {
+      const newState = { ...prev, [key]: !prev[key] };
+
+      // Logic: if the show footer is false then footer label and button will be false
+      if (key === "showFooter" && !newState.showFooter) {
+        newState.showFooterLabel = false;
+        newState.showFooterButton = false;
+      }
+
+      // Logic: if the footer label and button are false then footer will be false too
+      if ((key === "showFooterLabel" || key === "showFooterButton") && newState[key]) {
+        newState.showFooter = true;
+      }
+
+      if (!newState.showFooterLabel && !newState.showFooterButton) {
+        newState.showFooter = false;
+      }
+
+      return newState;
+    });
   };
 
   return (
     <div className="w-full bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col h-full">
       {/* Header */}
       <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Widget Configuration
-        </h2>
+        <div>
+          <h2 className="text-lg font-semibold text-gray-800">
+            Widget Configuration
+          </h2>
+          {data?.title && (
+            <p className="text-xs text-gray-500 font-medium">
+              Configuring: {data.title}
+            </p>
+          )}
+        </div>
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100"

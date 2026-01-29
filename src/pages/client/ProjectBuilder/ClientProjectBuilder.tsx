@@ -107,7 +107,9 @@ const ClientProjectBuilder = () => {
       window.removeEventListener("download-project-config", handleDownload);
   }, [selectedWidgets, widgetConfigs]);
 
-  const [hiddenDefaultWidgets, setHiddenDefaultWidgets] = useState<string[]>([]);
+  const [hiddenDefaultWidgets, setHiddenDefaultWidgets] = useState<string[]>(
+    [],
+  );
 
   const handleDefaultDelete = (widgetId: string) => {
     setHiddenDefaultWidgets((prev) => [...prev, widgetId]);
@@ -160,9 +162,7 @@ const ClientProjectBuilder = () => {
             selectedWidgets.length === 0 && (
               <div className={isPreviewOrPublished ? "col-span-full" : ""}>
                 {!hiddenDefaultWidgets.includes("project-stats") && (
-                  <ProjectStats
-                    activeWidget={activeWidget}
-                  />
+                  <ProjectStats activeWidget={activeWidget} />
                 )}
                 <div className="flex gap-4 mt-6">
                   {!hiddenDefaultWidgets.includes("radar-chart") && (
