@@ -47,23 +47,34 @@ const Login = () => {
     const toastId = toast.loading("Logging in...");
     try {
       const res = await login(data).unwrap();
-      const resAdmin = await adminLogin(data).unwrap();
-      console.log(resAdmin, "Res Admin")
-      if (res.success) {
-        const data ={
-          ...res.data,
-          adminData: resAdmin.data
-        }
-        dispatch(setUser(data));
+      if (!res.success) throw new Error(res.message);
+      if (res.data.specialToken) {
+        dispatch(setUser(res?.data));
+        navigate("/verification");
+        toast.success("Verification code sent to your email", { id: toastId });
+        return true;
+      }
+      const { role } = jwtDecode<{ role: keyof typeof Role }>(
+        res.data.accessToken,
+      );
+      const route = Role[role] ? `/${Role[role]}` : null;
+
+      if (role !== "CLIENT" && route) {
+        dispatch(setUser(res?.data));
+        navigate(route);
         toast.success("Logged in successfully", { id: toastId });
-        if (res.data.specialToken) {
-          navigate("/verification");
-        } else {
-          const { role } = jwtDecode<{ role: keyof typeof Role }>(
-            res.data.accessToken
-          );
-          if (Role[role]) {
-            navigate(`/${Role[role]}`);
+        return true;
+      } else if (role === "CLIENT") {
+        const resAdmin = await adminLogin(data).unwrap();
+        if (resAdmin.success) {
+          const data = {
+            ...res.data,
+            adminData: resAdmin.data,
+          };
+          dispatch(setUser(data));
+          toast.success("Logged in successfully", { id: toastId });
+          if (route) {
+            navigate(route);
           }
         }
       }

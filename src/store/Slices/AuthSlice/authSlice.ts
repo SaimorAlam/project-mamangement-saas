@@ -27,21 +27,17 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      console.log(action.payload, "Admin Payload")
       const token = action.payload.accessToken
         ? action.payload.accessToken
         : action.payload.specialToken;
-      const adminToken = action.payload.adminData?.accessToken
-      const adminDecode = jwtDecode(adminToken as string) as User;
-      console.log(adminDecode, "Admin decode")
       const decode = jwtDecode(token as string) as User;
       if (action?.payload?.accessToken) {
         state.user = {
           ...state.user,
-          userEmail: decode.userEmail,
-          userId: decode.userId,
-          clientId: decode.clientId,
-          role: decode.role,
+          userEmail: decode?.userEmail,
+          userId: decode?.userId,
+          clientId: decode?.clientId,
+          role: decode?.role,
           accessToken: action.payload.accessToken,
           refreshToken: action.payload.refreshToken,
           adminAccessToken: action.payload.adminData?.accessToken,
