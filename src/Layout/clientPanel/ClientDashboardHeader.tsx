@@ -53,6 +53,28 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const location = useLocation();
   const currentPath = location.pathname;
 
+  // Path detection
+  const isEmployeePage = currentPath.includes("/employee");
+  const isHighwayExpansionPage = currentPath.includes(
+    "/highway-expansion/all-highway",
+  );
+  const isAllProgramPage = currentPath === "/client-panel/all-program";
+  const isProgramOverviewPage =
+    currentPath.includes("/all-program/program-overview/") &&
+    !currentPath.includes("/project-details/");
+  const isProjectDetailsPage = currentPath.includes(
+    "/client-panel/project-details/",
+  );
+  const isProjectReviewPage = currentPath.includes(
+    "/client-panel/project-review",
+  );
+  const isProjectBuilderPage = currentPath.includes(
+    "/client-panel/project-builder",
+  );
+  const isProjectReviewDetailsPage = currentPath.startsWith(
+    "/client-panel/project-review/project-details/",
+  );
+
   const { data: ProjectData } = useGetProjectByIdQuery(projectId as string, {
     skip: !projectId,
   });
@@ -82,6 +104,14 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       (r) => r.path === "/client-panel/all-program",
     );
   }
+
+  // Special case for Project Review Details: map to Project Review
+  if (isProjectReviewDetailsPage) {
+    currentRoute = allRoutes.find(
+      (r) => r.path === "/client-panel/project-review",
+    );
+  }
+
   const [searchTerm, setSearchTerm] = useState("");
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{
@@ -93,26 +123,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [, setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const isEmployeePage = currentPath.includes("/employee");
-  const isHighwayExpansionPage = currentPath.includes(
-    "/highway-expansion/all-highway",
-  );
-  const isAllProgramPage = currentPath === "/client-panel/all-program";
-  const isProgramOverviewPage =
-    currentPath.includes("/all-program/program-overview/") &&
-    !currentPath.includes("/project-details/");
-  const isProjectDetailsPage = currentPath.includes(
-    "/client-panel/project-details/",
-  );
-  const isProjectReviewPage = currentPath.includes(
-    "/client-panel/project-review",
-  );
-  const isProjectBuilderPage = currentPath.includes(
-    "/client-panel/project-builder",
-  );
-  const isProjectReviewDetailsPage = currentPath.includes(
-    "/client-panel/project-review/project-details/",
-  );
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isPreview, isPublished } = useAppSelector(
@@ -318,7 +329,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-wrap items-center py-5 justify-between gap-4 md:gap-6">
+      <div className="flex flex-wrap items-center py-5 justify-between">
         <div className="flex items-center gap-4 min-w-0">
           <SidebarTrigger className="md:hidden shrink-0" />
           {currentPath.includes("/client-panel/") && (
@@ -333,7 +344,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           )}
         </div>
 
-        <div className="flex-1 min-w-[200px] order-3 lg:order-2 w-full lg:w-auto">
+        <div className="flex-1 min-w-[200px] grid place-content-center order-3 lg:order-2 w-full lg:w-auto">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </div>
 
@@ -430,14 +441,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
                   <>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                      <BreadcrumbLink asChild>
-                        <Link
-                          to={`/client-panel/project-review/project-details/${projectId}`}
-                          className="text-[#356DF0]"
-                        >
-                          Project Review
-                        </Link>
-                      </BreadcrumbLink>
+                      <BreadcrumbPage className="text-[#356DF0]">
+                        {projectName || "Project Details"}
+                      </BreadcrumbPage>
                     </BreadcrumbItem>
                   </>
                 )}

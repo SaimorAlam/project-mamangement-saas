@@ -150,7 +150,9 @@ const AllProject: React.FC = () => {
         "Project Name": p.name,
         Status: p.status,
         Priority: p.priority,
-        "Start Date": p.startDate ? new Date(p.startDate).toLocaleDateString() : "-",
+        "Start Date": p.startDate
+          ? new Date(p.startDate).toLocaleDateString()
+          : "-",
         Deadline: p.deadline ? new Date(p.deadline).toLocaleDateString() : "-",
         Progress: `${p.progress}%`,
         Budget: p.budget || "-",
@@ -158,14 +160,17 @@ const AllProject: React.FC = () => {
 
       // Create worksheet
       const ws = XLSX.utils.json_to_sheet(exportData);
-      
+
       // Create workbook
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Projects");
 
       // Generate file and trigger download
-      XLSX.writeFile(wb, `Project_Review_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
-      
+      XLSX.writeFile(
+        wb,
+        `Project_Review_Export_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+
       toast.success("Spreadsheet exported successfully");
     } catch (error) {
       console.error("Export failed:", error);
@@ -321,8 +326,8 @@ const AllProject: React.FC = () => {
               </div>
 
               {/* Export */}
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="h-10 border-gray-200"
                 onClick={handleExport}
               >

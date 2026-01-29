@@ -195,6 +195,7 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
             <TableBody>
               {sortedProjects.map((project) => (
                 <TableRow
+                  onClick={() => navigate(`project-details/${project.id}`)}
                   key={project.id}
                   className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
                 >
