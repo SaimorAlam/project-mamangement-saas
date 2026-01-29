@@ -199,7 +199,10 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
                   key={project.id}
                   className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
                 >
-                  <TableCell className="px-4 py-3.5">
+                  <TableCell
+                    className="px-4 py-3.5"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Checkbox
                       checked={selectedIds.includes(project.id)}
                       onCheckedChange={(checked) =>
@@ -238,16 +241,17 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
                     {formatDate(project.startDate)}
                   </TableCell>
 
-                  <TableCell className="px-4 py-3.5 text-right">
+                  <TableCell
+                    className="px-4 py-3.5 text-right"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="flex items-center justify-end gap-2">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => {
                           setSelectedProject(project);
-                          navigate(
-                            `/client-panel/project-review/project-details/${project.id}`,
-                          );
+                          navigate(`project-details/${project.id}`);
                         }}
                         className="h-8 w-8 p-0"
                       >

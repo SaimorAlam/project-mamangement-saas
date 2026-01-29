@@ -44,16 +44,19 @@ type Props = {
 const generateId = () =>
   crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
 
-const generateRandomDateRange = (baseDate: Date, index: number): [number, number] => {
+const generateRandomDateRange = (
+  baseDate: Date,
+  index: number,
+): [number, number] => {
   const startDaysOffset = index * 3; // Each task starts 3 days after previous
   const durationDays = Math.floor(Math.random() * 5) + 2; // 2-6 days duration
-  
+
   const startDate = new Date(baseDate);
   startDate.setDate(startDate.getDate() + startDaysOffset);
-  
+
   const endDate = new Date(startDate);
   endDate.setDate(endDate.getDate() + durationDays);
-  
+
   return [startDate.getTime(), endDate.getTime()];
 };
 
@@ -86,10 +89,10 @@ export default function GanttChartNew({
   /*   DATA GENERATION   */
   const ganttData: GanttDataPoint[] = useMemo(() => {
     if (!legendValues.length) return [];
-    
+
     const baseDate = new Date();
     baseDate.setHours(0, 0, 0, 0);
-    
+
     return legendValues
       .filter((l) => l.label)
       .map((l, index) => {
@@ -148,7 +151,7 @@ export default function GanttChartNew({
         show: false,
       },
     }),
-    []
+    [],
   );
 
   const series = useMemo(
@@ -157,7 +160,7 @@ export default function GanttChartNew({
         data: ganttData,
       },
     ],
-    [ganttData]
+    [ganttData],
   );
 
   /*   ACTIONS   */
@@ -216,7 +219,7 @@ export default function GanttChartNew({
       getChartTitleId,
       widgetTitle,
       [],
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -264,7 +267,8 @@ export default function GanttChartNew({
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium text-center">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
