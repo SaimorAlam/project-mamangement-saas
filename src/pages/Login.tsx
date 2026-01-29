@@ -13,7 +13,7 @@ import { useAdminLoginMutation } from "@/store/Api/AuthApi/AdminApi";
 
 const Role = {
   VIEWER: "viewer-panel",
-  EMPLOYEE: "staff-employee-panel", // todo: change to employee-panel when ready
+  EMPLOYEE: "staff-employee-panel",
   SUPPORTER: "supporter",
   MANAGER: "staff-manager-panel",
   CLIENT: "client-panel",
