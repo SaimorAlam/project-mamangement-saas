@@ -29,7 +29,6 @@ const ProjectDueDate = () => {
     if (days <= 4) return "bg-orange-50 text-orange-600";
     return "bg-green-50 text-green-600";
   };
-
   return (
     <div>
       {/* Due Date Section */}
@@ -62,7 +61,6 @@ const ProjectDueDate = () => {
                 }}
               />
             </div>
-
             <div className="space-y-3">
               {projects?.map((card: any, idx: number) => {
                 const {
@@ -86,7 +84,7 @@ const ProjectDueDate = () => {
                       </div>
                       <span
                         className={`text-xs font-semibold px-2 py-1 rounded ${getDaysLeftColor(
-                          daysLeft
+                          daysLeft,
                         )}`}
                       >
                         {daysLeft} Days left

@@ -82,7 +82,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       (r) => r.path === "/client-panel/all-program",
     );
   }
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{
@@ -322,7 +321,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       <div className="flex flex-wrap items-center py-5 justify-between gap-4 md:gap-6">
         <div className="flex items-center gap-4 min-w-0">
           <SidebarTrigger className="md:hidden shrink-0" />
-          {currentPath === "/client-panel" && (
+          {currentPath.includes("/client-panel/") && (
             <div className="min-w-0">
               <h1 className="text-2xl md:text-[32px] font-semibold truncate">
                 Good Morning {userName || name}, 👋

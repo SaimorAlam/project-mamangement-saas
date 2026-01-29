@@ -13,10 +13,10 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import RenderStaffAvatars from "@/components/ViewerPanel/RenderStaffAvater";
-import { Progress } from "@/components/ui/progress";
 import { Project } from "./AllProject";
 import ProjectModal from "./ProjectModal";
 import { useNavigate } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -88,6 +88,7 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
   const navigate = useNavigate();
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -119,6 +120,22 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
     });
   }, [projects, sortKey, sortOrder]);
 
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(projects.map((p) => p.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelectIndividual = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds((prev) => [...prev, id]);
+    } else {
+      setSelectedIds((prev) => prev.filter((pId) => pId !== id));
+    }
+  };
+
   const SortIcon = ({ column }: { column: SortKey }) => (
     <ArrowUpDown
       className={`w-4 h-4 ${
@@ -136,9 +153,9 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
   }) => (
     <TableHead
       onClick={() => handleSort(column)}
-      className="px-6 py-3.5 cursor-pointer"
+      className="px-4 py-3.5 cursor-pointer"
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 text-sm">
         <SortIcon column={column} />
         <span>{label}</span>
       </div>
@@ -147,96 +164,109 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
 
   return (
     <Card className="shadow-none border-none">
-      <CardContent className="p-0 border border-[#E2E8F0] rounded-lg min-h-[420px]">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b border-gray-200 bg-[#F7F9FA]">
-              {/* <SortableHead column="programName" label="Program" /> */}
-              <SortableHead column="name" label="Project" />
-              <SortableHead column="status" label="Status" />
-              <TableHead className="px-6 py-3.5">Assigned People</TableHead>
-              <SortableHead column="priority" label="Priority" />
-              <SortableHead column="startDate" label="Started On" />
-              <SortableHead column="deadline" label="Deadline" />
-              <SortableHead column="progress" label="Progress" />
-              <TableHead className="px-6 py-3.5">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {sortedProjects.map((project) => (
-              <TableRow
-                key={project.id}
-                className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
-              >
-                {/* <TableCell className="px-6 py-3.5 font-medium">
-                  {project.programName || "Program Name"}
-                </TableCell> */}
-
-                <TableCell className="px-6 py-3.5 font-medium">
-                  {project.name}
-                </TableCell>
-
-                <TableCell className=" py-3.5">
-                  {renderStatusBadge(project.status)}
-                </TableCell>
-
-                <TableCell className=" py-3.5">
-                  <RenderStaffAvatars
-                    staff={Array.from({ length: 3 }, (_, i) => ({
-                      id: i.toString(),
-                      name: `Staff ${i + 1}`,
-                      avatar: "https://randomuser.me/api/portraits/men/19.jpg",
-                    }))}
+      <CardContent className="p-0 border border-[#E2E8F0] rounded-lg min-h-[420px] overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="min-w-[800px] md:min-w-full">
+            <TableHeader>
+              <TableRow className="border-b border-gray-200 bg-[#F7F9FA]">
+                <TableHead className="w-[50px] px-4 py-3.5">
+                  <Checkbox
+                    checked={
+                      projects.length > 0 &&
+                      selectedIds.length === projects.length
+                    }
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Select all"
                   />
-                </TableCell>
-
-                <TableCell className=" py-3.5">
-                  {renderPriority(project.priority)}
-                </TableCell>
-
-                <TableCell className=" py-3.5 text-muted-foreground">
-                  {formatDate(project.startDate)}
-                </TableCell>
-
-                <TableCell className=" py-3.5 text-muted-foreground">
-                  {formatDate(project.deadline)}
-                </TableCell>
-
-                <TableCell className=" py-3.5 flex items-center gap-2">
-                  <Progress value={project.progress} className="h-2" />
-                  <span className="font-medium">{project.progress}%</span>
-                </TableCell>
-
-                <TableCell className=" py-3.5">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedProject(project);
-                        navigate(
-                          `/client-panel/project-review/project-details/${project.id}`,
-                        );
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <Eye className="w-4 h-4 text-[#1C73E0]" />
-                    </Button>
-
-                    <Button variant="ghost" size="sm">
-                      <Edit className="w-4 h-4 text-[#169E7B]" />
-                    </Button>
-
-                    <Button variant="ghost" size="sm">
-                      <Trash2 className="w-4 h-4 text-[#B00020]" />
-                    </Button>
-                  </div>
-                </TableCell>
+                </TableHead>
+                <SortableHead column="name" label="Submitted Project Name" />
+                <TableHead className="px-4 py-3.5 text-sm font-medium text-gray-600">
+                  Assign Staff
+                </TableHead>
+                <SortableHead column="status" label="Status" />
+                <SortableHead column="priority" label="Priority" />
+                <SortableHead column="startDate" label="Submit Date" />
+                <TableHead className="px-4 py-3.5 text-sm font-medium text-gray-600">
+                  Action
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+
+            <TableBody>
+              {sortedProjects.map((project) => (
+                <TableRow
+                  key={project.id}
+                  className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
+                >
+                  <TableCell className="px-4 py-3.5">
+                    <Checkbox
+                      checked={selectedIds.includes(project.id)}
+                      onCheckedChange={(checked) =>
+                        toggleSelectIndividual(project.id, checked as boolean)
+                      }
+                      aria-label={`Select ${project.name}`}
+                    />
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3.5 font-medium text-gray-700">
+                    <span className="block truncate max-w-[180px] md:max-w-none">
+                      {project.name}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3.5">
+                    <RenderStaffAvatars
+                      staff={Array.from({ length: 3 }, (_, i) => ({
+                        id: i.toString(),
+                        name: `Staff ${i + 1}`,
+                        avatar:
+                          "https://randomuser.me/api/portraits/men/19.jpg",
+                      }))}
+                    />
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3.5">
+                    {renderStatusBadge(project.status)}
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3.5">
+                    {renderPriority(project.priority)}
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3.5 text-sm text-gray-600 whitespace-nowrap">
+                    {formatDate(project.startDate)}
+                  </TableCell>
+
+                  <TableCell className="px-4 py-3.5 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedProject(project);
+                          navigate(
+                            `/client-panel/project-review/project-details/${project.id}`,
+                          );
+                        }}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Eye className="w-4 h-4 text-[#3B82F6]" />
+                      </Button>
+
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Edit className="w-4 h-4 text-[#10B981]" />
+                      </Button>
+
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Trash2 className="w-4 h-4 text-[#EF4444]" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
 
       {openProjectModal && (
