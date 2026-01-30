@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Copy, Trash2 } from "lucide-react"
+import { useState } from "react";
+import { Copy, Trash2 } from "lucide-react";
 
 interface ProgressTask {
-  id: string
-  name: string
-  progress: number
+  id: string;
+  name: string;
+  progress: number;
 }
 
 const initialData: ProgressTask[] = [
@@ -17,32 +17,40 @@ const initialData: ProgressTask[] = [
   { id: "5", name: "3rd floor slab", progress: 50 },
   { id: "6", name: "Terrace floor slab", progress: 30 },
   { id: "7", name: "Handoff", progress: 30 },
-]
+];
 
 export default function ProgressChart() {
-  const [tasks, setTasks] = useState<ProgressTask[]>(initialData)
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [tasks, setTasks] = useState<ProgressTask[]>(initialData);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const handleCopy = () => {
-    const data = tasks.map((t) => `${t.name}: ${t.progress}%`).join("\n")
-    navigator.clipboard.writeText(data)
-  }
+    const data = tasks.map((t) => `${t.name}: ${t.progress}%`).join("\n");
+    navigator.clipboard.writeText(data);
+  };
 
   const handleReset = () => {
-    setTasks(initialData)
-  }
+    setTasks(initialData);
+  };
 
   const handleProgressChange = (id: string, newProgress: number) => {
-    setTasks(tasks.map((t) => (t.id === id ? { ...t, progress: Math.min(100, Math.max(0, newProgress)) } : t)))
-  }
+    setTasks(
+      tasks.map((t) =>
+        t.id === id
+          ? { ...t, progress: Math.min(100, Math.max(0, newProgress)) }
+          : t,
+      ),
+    );
+  };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 w-[60%]">
+    <div className="bg-white rounded-lg border border-gray-200 p-6 w-full h-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-800">Progress</h2>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">Total Task {tasks.length}</span>
+          <span className="text-sm text-gray-600">
+            Total Task {tasks.length}
+          </span>
           <div className="flex gap-2">
             <button
               onClick={handleCopy}
@@ -70,7 +78,9 @@ export default function ProgressChart() {
             {tasks.map((task) => (
               <div key={task.id} className="flex items-center gap-4">
                 {/* Task name */}
-                <div className="w-32 text-sm text-gray-600 font-medium">{task.name}</div>
+                <div className="w-32 text-sm text-gray-600 font-medium">
+                  {task.name}
+                </div>
 
                 {/* Progress bar container */}
                 <div className="flex-1 flex items-center gap-3">
@@ -95,16 +105,24 @@ export default function ProgressChart() {
                       onMouseEnter={() => setHoveredId(task.id)}
                       onMouseLeave={() => setHoveredId(null)}
                       onClick={() => {
-                        const newProgress = prompt(`Enter progress for ${task.name} (0-100):`, task.progress.toString())
+                        const newProgress = prompt(
+                          `Enter progress for ${task.name} (0-100):`,
+                          task.progress.toString(),
+                        );
                         if (newProgress !== null) {
-                          handleProgressChange(task.id, Number.parseInt(newProgress))
+                          handleProgressChange(
+                            task.id,
+                            Number.parseInt(newProgress),
+                          );
                         }
                       }}
                     />
                   </div>
 
                   {/* Percentage text */}
-                  <span className="w-12 text-sm font-semibold text-gray-800">{task.progress}%</span>
+                  <span className="w-12 text-sm font-semibold text-gray-800">
+                    {task.progress}%
+                  </span>
                 </div>
               </div>
             ))}
@@ -125,5 +143,5 @@ export default function ProgressChart() {
         </div>
       </div>
     </div>
-  )
+  );
 }

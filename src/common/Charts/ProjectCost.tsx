@@ -1,12 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface CostData {
-  phase: string
-  actual: number
-  planned: number
-  budget: number
+  phase: string;
+  actual: number;
+  planned: number;
+  budget: number;
 }
 
 const initialData: CostData[] = [
@@ -18,35 +26,37 @@ const initialData: CostData[] = [
   { phase: "Phase 6", actual: 25000, planned: 20000, budget: 15000 },
   { phase: "Phase 7", actual: 15000, planned: 20000, budget: 30000 },
   { phase: "Phase 8", actual: 15000, planned: 25000, budget: 25000 },
-]
+];
 
 export default function ProjectCostChart() {
-  const [data, ] = useState<CostData[]>(initialData)
-  const [hoveredBar, setHoveredBar] = useState<string | null>(null)
+  const [data] = useState<CostData[]>(initialData);
+  const [hoveredBar, setHoveredBar] = useState<string | null>(null);
 
   const calculateTotal = (key: keyof Omit<CostData, "phase">) => {
-    return data.reduce((sum, item) => sum + item[key], 0)
-  }
+    return data.reduce((sum, item) => sum + item[key], 0);
+  };
 
-  const totalActual = calculateTotal("actual")
-  const totalPlanned = calculateTotal("planned")
-  const totalBudget = calculateTotal("budget")
+  const totalActual = calculateTotal("actual");
+  const totalPlanned = calculateTotal("planned");
+  const totalBudget = calculateTotal("budget");
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded shadow-lg">
-          <p className="text-sm font-semibold text-gray-800">{payload[0].payload.phase}</p>
+        <div className="bg-white p-3 border border-gray-200 rounded shadow-lg w-full h-full">
+          <p className="text-sm font-semibold text-gray-800">
+            {payload[0].payload.phase}
+          </p>
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {entry.name}: ${(entry.value / 1000).toFixed(0)}k
             </p>
           ))}
         </div>
-      )
+      );
     }
-    return null
-  }
+    return null;
+  };
 
   return (
     <div className="w-full bg-white rounded-lg border border-gray-200 p-6">
@@ -70,20 +80,37 @@ export default function ProjectCostChart() {
           <div className="text-right">
             <p className="text-sm text-gray-600">Total:</p>
             <p className="text-sm font-semibold">
-              <span className="text-cyan-500">{(totalActual / 1000).toFixed(0)}k</span>
+              <span className="text-cyan-500">
+                {(totalActual / 1000).toFixed(0)}k
+              </span>
               <span className="text-gray-400 mx-1">,</span>
-              <span className="text-orange-500">{(totalPlanned / 1000).toFixed(0)}k</span>
+              <span className="text-orange-500">
+                {(totalPlanned / 1000).toFixed(0)}k
+              </span>
               <span className="text-gray-400 mx-1">,</span>
-              <span className="text-blue-500">{(totalBudget / 1000).toFixed(0)}k</span>
+              <span className="text-blue-500">
+                {(totalBudget / 1000).toFixed(0)}k
+              </span>
             </p>
           </div>
         </div>
       </div>
 
       <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-          <XAxis dataKey="phase" tick={{ fill: "#6b7280", fontSize: 12 }} axisLine={{ stroke: "#e5e7eb" }} />
+        <BarChart
+          data={data}
+          margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#e5e7eb"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="phase"
+            tick={{ fill: "#6b7280", fontSize: 12 }}
+            axisLine={{ stroke: "#e5e7eb" }}
+          />
           <YAxis
             tick={{ fill: "#6b7280", fontSize: 12 }}
             axisLine={{ stroke: "#e5e7eb" }}
@@ -118,5 +145,5 @@ export default function ProjectCostChart() {
         </BarChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

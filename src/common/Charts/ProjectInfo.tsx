@@ -11,38 +11,61 @@ export const formatDate = (dateString?: string | null) => {
   }).format(date);
 };
 
-interface ProjectInfo {
-  label: string;
-  value: string | number;
-}
+// interface ProjectInfo {
+//   label: string;
+//   value: string | number;
+// }
+// export const formatDate = (dateString?: string | null) => {
+//   if (!dateString) return "N/A";
+//   const date = new Date(dateString);
+//   return new Intl.DateTimeFormat("en-GB", {
+//     day: "numeric",
+//     month: "long",
+//     year: "numeric",
+//   }).format(date);
+// };
 
+const calculateDuration = (start?: string, end?: string) => {
+  if (!start || !end) return "N/A";
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const diffTime = endDate.getTime() - startDate.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays > 0 ? `${diffDays} Days` : "0 Days";
+};
+
+const formatCurrency = (value: string | number) => {
+  const num = Number(value);
+  if (isNaN(num)) return "N/A";
+  if (num >= 1000) return `$${(num / 1000).toFixed(0)}k`;
+  return `$${num}`;
+};
 const ProjectInformation = ({ projectData }: { projectData?: any }) => {
-  const projectDataInfo: ProjectInfo[] = [
-    { label: "Project Name", value: projectData?.name },
-    { label: "Status", value: projectData?.status },
-    { label: "Priority", value: projectData?.priority },
+  const projectDataInfo = [
     { label: "Start Date", value: formatDate(projectData?.startDate) },
-    { label: "Deadline", value: formatDate(projectData?.deadline) },
     {
-      label: "Estimated Completion",
-      value: formatDate(projectData?.estimatedCompletedDate),
+      label: "Contract Duration",
+      value: calculateDuration(projectData?.startDate, projectData?.deadline),
     },
     {
-      label: "Project Complete Date",
-      value: formatDate(projectData?.projectCompleteDate),
+      label: "Completion Date",
+      value: formatDate(projectData?.deadline),
     },
-    { label: "Progress", value: `${projectData?.progress}%` },
-    { label: "Budget", value: projectData?.budget || "N/A" },
-    { label: "Current Rate", value: projectData?.currentRate || "N/A" },
     {
-      label: "Location",
-      value: `Lat: ${projectData?.latitude}, Lng: ${projectData?.longitude}`,
+      label: "Contract Value",
+      value: formatCurrency(projectData?.budget),
     },
+    {
+      label: "Progress",
+      value: `${projectData?.progress || 0}% Completed`,
+    },
+    { label: "Duration Difference", value: "0 days Delay/Early" },
+    { label: "Workload", value: "0 Task Overdue" },
   ];
 
   return (
-    <div className="w-full">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full p-6">
+    <div className="w-full h-full">
+      <div className="bg-white h-full rounded-lg shadow-sm border border-gray-200 w-full  p-6">
         {/* Title */}
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
           Project Information

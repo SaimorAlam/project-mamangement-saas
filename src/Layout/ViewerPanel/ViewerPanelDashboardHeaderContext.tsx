@@ -21,7 +21,7 @@ const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
 export const HeaderProvider = ({ children }: { children: ReactNode }) => {
   const { name } = useGetUser();
 
-  const [heading, setHeading] = useState(`${name || "Viewer"} 👋`);
+  const [heading, setHeading] = useState(`${name || "Viewer"}`);
 
   // const [breadcrumb, setBreadcrumb] = useState<ReactElement>();
   // <div className="flex items-center">
