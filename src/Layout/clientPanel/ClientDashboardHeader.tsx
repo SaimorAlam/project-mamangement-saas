@@ -59,9 +59,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const isProgramOverviewPage =
     currentPath.includes("/all-program/program-overview/") &&
     !currentPath.includes("/project-details/");
-  const isProjectDetailsPage = currentPath.includes(
-    "/client-panel/project-details/",
-  );
+  const isProjectDetailsPage = currentPath.includes("/project-details/");
   const isProjectReviewPage = currentPath.includes(
     "/client-panel/project-review",
   );
@@ -268,20 +266,23 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
         </div>
       );
     }
-
+    const shouldHideAddProgram =
+      isProjectReviewPage ||
+      isActivityLogPage ||
+      isProjectDetailsPage ||
+      isSupportPage;
     return (
       <>
         {/* <PrimaryButton
-          title="Quick Action"
-          leftIcon={<Plus />}
-          rightIcon={<ChevronDown />}
-          type="Primary"
-          onClick={() => setIsDropdownOpen((prev) => !prev)}
-        /> */}
-
+            title="Quick Action"
+            leftIcon={<Plus />}
+            rightIcon={<ChevronDown />}
+            type="Primary"
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+          /> */}
         {/* {isDropdownOpen && ( */}
         <div>
-          {!isProjectReviewPage && !isActivityLogPage && !isSupportPage && (
+          {!shouldHideAddProgram && (
             <PrimaryButton
               title="Add Program"
               leftIcon={<Plus />}

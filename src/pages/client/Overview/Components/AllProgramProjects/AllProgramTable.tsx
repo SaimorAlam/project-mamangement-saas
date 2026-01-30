@@ -201,7 +201,6 @@ const AllProgramTable = ({
   projects,
   isLoading = false,
 }: AllProgramTableProps) => {
-  console.log(projects);
   const [selectedProject, setSelectedProject] =
     useState<StaffEmployeeProject | null>(null);
   const [open, setOpen] = useState(false);

@@ -73,7 +73,6 @@ const NewProjectModal: React.FC<AddEmployeeModalProps> = ({
   };
 
   const handleSubmit = () => {
-    console.log("Project Data:", formData);
     if (onSuccess) onSuccess(formData.projectName);
     onClose();
   };
