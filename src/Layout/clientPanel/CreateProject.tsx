@@ -13,6 +13,20 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import useGetAllEmployees from "@/utils/useGetAllEmployees";
 import { FaSpinner } from "react-icons/fa";
+import {
+  X,
+  Clock,
+  Calendar,
+  HelpCircle,
+  Flag,
+  ChevronDown,
+  Lock,
+  Users,
+  LayoutTemplate,
+  Plus,
+} from "lucide-react";
+import ProjectSuccessModal from "./ProjectSuccessModal";
+import { cn } from "@/lib/utils";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -102,6 +116,11 @@ const CreateProject = ({
   const [enableDetails, setEnableDetails] = useState(false);
   const [selectedStaffs, setSelectedStaffs] = useState<string[]>([]);
   const [mapPosition, setMapPosition] = useState({ lat: 51.505, lng: -0.09 }); // Default London
+  const [openSuccessModal, setOpenSuccessModal] = useState(false);
+  const [projectId, setProjectId] = useState<string>("");
+  const [statuses, setStatuses] = useState(["Pending", "Active", "Completed"]);
+  const [isAddingStatus, setIsAddingStatus] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
 
   const { register, handleSubmit, watch, setValue, control } =
     useForm<CreateProjectForm>({
@@ -118,10 +137,10 @@ const CreateProject = ({
         dataUploadDateDays: "3",
       },
     });
-
+  const projectName = watch("name");
   const repeatEvery = watch("repeatEvery");
   const repeatOnDays = watch("repeatOnDays");
-  const workingDays = watch("workingDays"); // Watch workingDays state
+  const workingDays = watch("workingDays");
 
   useEffect(() => {
     // Get user's current location on mount
@@ -135,7 +154,7 @@ const CreateProject = ({
         },
         () => {
           // If denied, stick to default or previous
-        }
+        },
       );
     }
   }, [setValue]);
@@ -143,6 +162,7 @@ const CreateProject = ({
   useEffect(() => {
     if (isSuccess) {
       toast.success("Project created successfully");
+      setOpenSuccessModal(true);
       onClose();
     }
   }, [isSuccess, onClose]);
@@ -160,7 +180,6 @@ const CreateProject = ({
       Sun: "SUNDAY",
     };
     const apiDay = map[day] || day.toUpperCase();
-
     const current = repeatOnDays || [];
     const updated = current.includes(apiDay)
       ? current.filter((d) => d !== apiDay)
@@ -181,7 +200,6 @@ const CreateProject = ({
     return (repeatOnDays || []).includes(map[shortDay]);
   };
 
-  // Logic for Working Days
   const toggleWorkingDay = (day: string) => {
     const map: Record<string, string> = {
       Mon: "MONDAY",
@@ -193,7 +211,6 @@ const CreateProject = ({
       Sun: "SUNDAY",
     };
     const apiDay = map[day] || day.toUpperCase();
-
     const current = workingDays || [];
     const updated = current.includes(apiDay)
       ? current.filter((d) => d !== apiDay)
@@ -220,6 +237,16 @@ const CreateProject = ({
       const newStaffs = [...selectedStaffs, value];
       setSelectedStaffs(newStaffs);
       setValue("employeeIds", newStaffs);
+    }
+  };
+
+  const handleAddStatus = () => {
+    const trimmed = newStatus.trim();
+    if (trimmed && !statuses.includes(trimmed)) {
+      setStatuses([...statuses, trimmed]);
+      setValue("status", trimmed);
+      setNewStatus("");
+      setIsAddingStatus(false);
     }
   };
 
@@ -266,6 +293,7 @@ const CreateProject = ({
         managerId: data.managerId || null,
         employeeIds: selectedStaffs,
         startDate: toISO(data.startDate),
+        status: data.status,
         computedProgress: 0,
         chartList: [],
         estimatedCompletedDate: toISO(data.estimatedCompletedDate),
@@ -274,11 +302,11 @@ const CreateProject = ({
         latitude: Number(data.latitude) || 0,
         longitude: Number(data.longitude) || 0,
       };
-
-      console.log("Create Project Payload:", payload);
       const cleanedPayload = cleanPayload(payload);
-
-      await createProject(cleanedPayload).unwrap();
+      const res = await createProject(cleanedPayload).unwrap();
+      if (res.success) {
+        setProjectId(res.data.id);
+      }
     } catch (error: any) {
       console.error(error);
       toast.error(error?.data?.message || "Failed to create project");
@@ -289,404 +317,589 @@ const CreateProject = ({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold">Create New Project</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all"
           >
-            ×
+            <X size={20} />
           </button>
         </div>
 
-        {/* Form */}
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]"
+          className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] scrollbar-hide space-y-8"
         >
-          {/* Top Section */}
-          <div className="flex flex-col md:flex-row gap-6 mb-6">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Project Name *
-              </label>
-              <input
-                type="text"
-                {...register("name", { required: true })}
-                placeholder="Enter project name"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Share With
-              </label>
-              <div className="flex gap-4 mt-2">
-                <label className="flex items-center gap-1 text-sm">
-                  <input
-                    type="radio"
-                    name="shareWith"
-                    checked={shareWith === "onlyMe"}
-                    onChange={() => setShareWith("onlyMe")}
-                    className="text-blue-600"
-                  />
-                  Only Me
-                </label>
-                <label className="flex items-center gap-1 text-sm">
-                  <input
-                    type="radio"
-                    name="shareWith"
-                    checked={shareWith === "inviteStaff"}
-                    onChange={() => setShareWith("inviteStaff")}
-                    className="text-blue-600"
-                  />
-                  Invite Staff
-                </label>
-                <label className="flex items-center gap-1 text-sm">
-                  <input
-                    type="radio"
-                    name="shareWith"
-                    checked={shareWith === "followTemplate"}
-                    onChange={() => setShareWith("followTemplate")}
-                    className="text-blue-600"
-                  />
-                  Follow Template Settings
-                </label>
-              </div>
-              {shareWith === "inviteStaff" && (
-                <div className="mt-2">
-                  <select
-                    onChange={handleStaffSelect}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                  >
-                    <option value="">Select staff</option>
-                    {allEmployees?.map((emp: any) => (
-                      <option key={emp.id} value={emp.id}>
-                        {emp?.name} ({emp?.role})
-                      </option>
-                    ))}
-                  </select>
-                  {selectedStaffs.length > 0 && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <div className="flex -space-x-2">
-                        {selectedStaffs.map((staffId, index) => {
-                          const staff = allEmployees.find(
-                            (e: any) => e.id === staffId
-                          );
-                          return (
-                            <div
-                              key={index}
-                              onClick={() => {
-                                const newStaffs = selectedStaffs.filter(
-                                  (id) => id !== staffId
-                                );
-                                setSelectedStaffs(newStaffs);
-                                setValue("employeeIds", newStaffs);
-                              }}
-                              className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs font-medium text-blue-600 overflow-hidden cursor-pointer hover:border-red-500 hover:z-10 transition-all"
-                              title={`Click to remove ${staff?.name}`}
-                            >
-                              {staff?.profileImage ? (
-                                <img
-                                  src={staff.profileImage}
-                                  alt=""
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                staff?.name.charAt(0)
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <span className="text-sm text-gray-600">
-                        Staffs Preview
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Data Date
-            </label>
-            <input
-              type="date"
-              {...register("startDate")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50"
-            />
-          </div>
-
-          {/* Cycle Settings */}
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Data Date Uploading Cycle
+          {/* Project Details Section */}
+          <section className="space-y-6">
+            <h3 className="text-base font-medium text-slate-800 tracking-tight">
+              Project details
             </h3>
-            <Controller
-              control={control}
-              name="repeatEvery"
-              render={({ field }) => (
-                <div className="flex gap-6 mb-4">
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      {...field}
-                      value="WEEKLY"
-                      checked={field.value === "WEEKLY"}
-                      className="text-blue-600"
-                    />
-                    Weekly
-                  </label>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      {...field}
-                      value="BI_WEEKLY"
-                      checked={field.value === "BI_WEEKLY"}
-                      className="text-blue-600"
-                    />
-                    Bi Weekly
-                  </label>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      {...field}
-                      value="MONTHLY"
-                      checked={field.value === "MONTHLY"}
-                      className="text-blue-600"
-                    />
-                    Monthly
-                  </label>
-                </div>
-              )}
-            />
 
-            {repeatEvery !== "MONTHLY" && (
-              <>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select days
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              {/* Project Name */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-700">
+                  Project Name <span className="text-red-500">*</span>
                 </label>
-                <div className="flex gap-4 mb-4">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                    (day) => (
-                      <div
-                        key={day}
-                        className="flex flex-col items-center gap-1"
-                      >
-                        <span className="text-xs text-gray-500">{day}</span>
-                        <input
-                          type="checkbox"
-                          checked={isDaySelected(day)}
-                          onChange={() => toggleDay(day)}
-                          className="rounded text-blue-600 focus:ring-blue-500"
-                        />
-                      </div>
-                    )
-                  )}
+                <div className="relative group">
+                  <input
+                    type="text"
+                    {...register("name", { required: true })}
+                    placeholder="Enter project name"
+                    className="w-full h-12 px-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
+                  />
                 </div>
+              </div>
 
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Data Upload Date
+              {/* Share With */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-500">
+                  Share With
                 </label>
-                <div className="flex gap-6">
-                  {["3", "4", "5"].map((days) => (
+                <div className="flex flex-wrap gap-4 pt-1">
+                  {[
+                    { id: "onlyMe", label: "Only Me", icon: Lock },
+                    { id: "inviteStaff", label: "Invite Staff", icon: Users },
+                    {
+                      id: "followTemplate",
+                      label: "Follow Template Settings",
+                      icon: LayoutTemplate,
+                    },
+                  ].map((option) => (
                     <label
-                      key={days}
-                      className="flex items-center gap-2 text-sm"
+                      key={option.id}
+                      className="flex items-center gap-2 cursor-pointer group"
                     >
-                      <input
-                        type="radio"
-                        {...register("dataUploadDateDays")}
-                        value={days}
-                        className="text-blue-600"
-                      />
-                      {days} Days
+                      <div className="relative flex items-center justify-center">
+                        <input
+                          type="radio"
+                          name="shareWith"
+                          checked={shareWith === option.id}
+                          onChange={() => {
+                            setShareWith(option.id as any);
+                            if (option.id !== "inviteStaff")
+                              setSelectedStaffs([]);
+                          }}
+                          className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all cursor-pointer"
+                        />
+                        <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
+                      </div>
+                      <span
+                        className={cn(
+                          "text-xs font-medium transition-colors",
+                          shareWith === option.id
+                            ? "text-slate-900"
+                            : "text-slate-500",
+                        )}
+                      >
+                        {option.label}
+                      </span>
+                      {option.id === "onlyMe" && (
+                        <option.icon size={12} className="text-slate-400" />
+                      )}
                     </label>
                   ))}
                 </div>
-              </>
-            )}
-          </div>
 
-          {/* Enable Details Switch */}
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-sm font-medium text-gray-900">
-              Enable Project Details settings
-            </span>
-            <button
-              type="button"
-              onClick={() => setEnableDetails(!enableDetails)}
-              className={`w-10 h-5 rounded-full transition-colors relative ${
-                enableDetails ? "bg-blue-600" : "bg-gray-300"
-              }`}
-            >
-              <div
-                className={`w-4 h-4 rounded-full bg-white absolute top-0.5 left-0.5 transition-transform ${
-                  enableDetails ? "translate-x-5" : ""
-                }`}
-              />
-            </button>
-          </div>
+                {shareWith === "inviteStaff" && (
+                  <div className="mt-3 relative">
+                    <select
+                      onChange={handleStaffSelect}
+                      className="w-full h-11 pl-4 pr-10 appearance-none bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm text-slate-700"
+                    >
+                      <option value="">Select staff members</option>
+                      {allEmployees?.map((emp: any) => (
+                        <option key={emp.id} value={emp.id}>
+                          {emp?.name} ({emp?.role})
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size={16}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                    />
+
+                    {selectedStaffs.length > 0 && (
+                      <div className="mt-3 flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
+                        <div className="flex -space-x-3 overflow-hidden">
+                          {selectedStaffs.map((staffId) => {
+                            const staff = allEmployees.find(
+                              (e: any) => e.id === staffId,
+                            );
+                            return (
+                              <button
+                                key={staffId}
+                                type="button"
+                                onClick={() => {
+                                  const newStaffs = selectedStaffs.filter(
+                                    (id) => id !== staffId,
+                                  );
+                                  setSelectedStaffs(newStaffs);
+                                  setValue("employeeIds", newStaffs);
+                                }}
+                                className="inline-block h-8 w-8 rounded-full border-2 border-white bg-slate-100 overflow-hidden hover:scale-110 hover:z-10 transition-transform group"
+                                title={`Click to remove ${staff?.name}`}
+                              >
+                                {staff?.profileImage ? (
+                                  <img
+                                    src={staff.profileImage}
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-600">
+                                    {staff?.name.charAt(0)}
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                          Staffs Preview
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Data Date */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-slate-700">
+                Data Date
+              </label>
+              <div className="relative max-w-[400px] group">
+                <input
+                  type="date"
+                  {...register("startDate")}
+                  className="w-full h-12 px-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 appearance-none"
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
+                  <Clock size={16} className="text-slate-400" />
+                  <Calendar size={16} className="text-slate-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <h4 className="text-sm font-bold text-blue-600/70 tracking-tight uppercase text-[11px]">
+                  Data Date Uploading Cycle
+                </h4>
+                <Controller
+                  control={control}
+                  name="repeatEvery"
+                  render={({ field }) => (
+                    <div className="flex flex-wrap gap-x-8 gap-y-4">
+                      {["Daily", "Weekly", "Bi Weekly", "Monthly"].map(
+                        (label) => {
+                          const value = label.toUpperCase().replace(" ", "_");
+                          return (
+                            <label
+                              key={label}
+                              className="flex items-center gap-2.5 cursor-pointer group"
+                            >
+                              <div className="relative flex items-center justify-center">
+                                <input
+                                  type="radio"
+                                  {...field}
+                                  value={value}
+                                  checked={field.value === value}
+                                  className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all"
+                                />
+                                <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
+                              </div>
+                              <span
+                                className={cn(
+                                  "text-xs font-semibold transition-colors",
+                                  field.value === value
+                                    ? "text-slate-900"
+                                    : "text-slate-500",
+                                )}
+                              >
+                                {label}
+                              </span>
+                            </label>
+                          );
+                        },
+                      )}
+                    </div>
+                  )}
+                />
+              </div>
+
+              {repeatEvery !== "MONTHLY" && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="space-y-3">
+                    <label className="block text-sm font-semibold text-slate-700">
+                      Select days
+                    </label>
+                    <div className="flex gap-2">
+                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => {
+                        const isSelected = isDaySelected(day);
+                        return (
+                          <div key={day} className="flex flex-col items-center gap-2 min-w-[42px]">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">
+                              {day}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => toggleDay(day)}
+                              className={cn(
+                                "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
+                                isSelected
+                                  ? "bg-blue-600 border-blue-600 text-white"
+                                  : "bg-white border-slate-200 hover:border-slate-300",
+                              )}
+                            >
+                              {isSelected && (
+                                <svg
+                                  width="10"
+                                  height="8"
+                                  viewBox="0 0 10 8"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M1 4L3.5 6.5L8.5 1.5"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="block text-sm font-semibold text-slate-700">
+                      Data Upload Date
+                    </label>
+                    <div className="flex gap-8">
+                      {["3", "4", "5"].map((days) => (
+                        <label
+                          key={days}
+                          className="flex items-center gap-2.5 cursor-pointer group"
+                        >
+                          <div className="relative flex items-center justify-center">
+                            <input
+                              type="radio"
+                              {...register("dataUploadDateDays")}
+                              value={days}
+                              className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all cursor-pointer"
+                            />
+                            <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
+                          </div>
+                          <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">
+                            {days} Days
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Toggle */}
+            <div className="flex items-center gap-4 py-2 border-t border-slate-100 pt-6">
+              <span className="text-sm font-bold text-slate-800">
+                Enable Project Details settings
+              </span>
+              <button
+                type="button"
+                onClick={() => setEnableDetails(!enableDetails)}
+                className={cn(
+                  "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                  enableDetails ? "bg-blue-600" : "bg-slate-200",
+                )}
+              >
+                <span
+                  className={cn(
+                    "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                    enableDetails ? "translate-x-5" : "translate-x-0",
+                  )}
+                />
+              </button>
+            </div>
+          </section>
 
           {enableDetails && (
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Left Column */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Project Description <span className="text-gray-400">?</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
+              {/* Column 1 */}
+              <div className="space-y-8">
+                {/* Description */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
+                    Project Description{" "}
+                    <HelpCircle size={14} className="text-slate-400" />
                   </label>
                   <textarea
                     {...register("description")}
                     placeholder="Write a short description..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[100px]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Project Short name (Message)
-                  </label>
-                  <input
-                    type="text"
-                    {...register("message")}
-                    placeholder="Jhon Doe"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                    className="w-full h-[140px] px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 resize-none"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Assign Project Manager
+                {/* Location */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Project Location
                   </label>
-                  <select
-                    {...register("managerId")}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 text-sm"
-                  >
-                    <option value="">Select Manager</option>
-                    {allManagers.map((m: any) => (
-                      <option key={m.id} value={m.id}>
-                        {m.user.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </label>
-                  <div className="flex gap-2">
-                    <select
-                      {...register("status")}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 text-sm"
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Active">Active</option>
-                      <option value="Completed">Completed</option>
-                    </select>
-                    <button
-                      type="button"
-                      className="p-2 border border-gray-300 rounded-md text-gray-500 hover:bg-gray-50"
-                    >
-                      +
-                    </button>
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      {...register("latitude")} // Bound as placeholder for address logic if implemented
+                      placeholder="Enter Location here"
+                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
+                    />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Current Rate
+                {/* Manager Select */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Assign Project Manager
                   </label>
-                  <input
-                    type="text"
-                    {...register("currentRate")}
-                    placeholder="Enter hourly rate"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 text-sm"
-                  />
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Starting Date
-                  </label>
-                  <input
-                    type="date"
-                    {...register("startDate")} // Re-using startDate here as per design showing it again? Or strictly "Starting Date".
-                    // Actually design shows "Data Date" at top and "Starting Date" here.
-                    // They might be distinct. If `createProject` API only has one `startDate`, I'll bind both to same or pick one.
-                    // I'll bind this to `startDate` and the top one also to `startDate`?
-                    // Or use `projectStartDate` if I add field.
-                    // For now keeping both bound to `startDate` effectively syncs them or I should ignore one.
-                    // I'll assume they map to the same field for MVP.
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50"
-                  />
+                  <div className="relative">
+                    <select
+                      {...register("managerId")}
+                      className="w-full h-12 pl-4 pr-10 appearance-none bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm text-slate-700"
+                    >
+                      <option value="">Select Manager</option>
+                      {allManagers.map((m: any) => (
+                        <option key={m.id} value={m.id}>
+                          {m.user.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size={18}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Working Days
+                {/* Status Select */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Status
                   </label>
-                  <div className="flex gap-4">
-                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                      (day) => (
-                        <div
-                          key={day}
-                          className="flex flex-col items-center gap-1"
+                  <div className="flex gap-3">
+                    {isAddingStatus ? (
+                      <div className="flex-1 flex gap-2">
+                        <input
+                          type="text"
+                          value={newStatus}
+                          onChange={(e) => setNewStatus(e.target.value)}
+                          placeholder="New status name"
+                          className="flex-1 h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleAddStatus();
+                            }
+                            if (e.key === "Escape") setIsAddingStatus(false);
+                          }}
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddStatus}
+                          className="px-4 h-12 bg-blue-600 text-white rounded-xl text-xs font-bold whitespace-nowrap"
                         >
-                          <span className="text-xs text-gray-500">{day}</span>
-                          <input
-                            type="checkbox"
-                            checked={isWorkingDaySelected(day)}
-                            onChange={() => toggleWorkingDay(day)}
-                            className="rounded text-blue-600 focus:ring-blue-500"
+                          Add
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsAddingStatus(false)}
+                          className="px-4 h-12 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="relative flex-1">
+                          <select
+                            {...register("status")}
+                            className="w-full h-12 pl-4 pr-10 appearance-none bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm text-slate-700"
+                          >
+                            {statuses.map((s) => (
+                              <option key={s} value={s}>
+                                {s === "Pending" ? "Planning" : s}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown
+                            size={18}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
                           />
                         </div>
-                      )
+                        <button
+                          type="button"
+                          onClick={() => setIsAddingStatus(true)}
+                          className="w-12 h-12 shrink-0 flex items-center justify-center border border-slate-200 rounded-full bg-white text-slate-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm"
+                        >
+                          <Plus size={20} />
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                {/* Rate */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Current Rate
+                  </label>
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      {...register("currentRate")}
+                      placeholder="Enter hourly rate"
+                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 2 */}
+              <div className="space-y-8">
+                {/* Starting Date */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Starting Date
+                  </label>
+                  <div className="relative group">
+                    <input
+                      type="date"
+                      {...register("startDate")}
+                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 appearance-none"
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
+                      <HelpCircle size={16} className="text-slate-400" />
+                      <Calendar size={18} className="text-slate-600" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Working Days */}
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Working Days
+                  </label>
+                  <div className="flex gap-2">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                      (day) => {
+                        const isSelected = isWorkingDaySelected(day);
+                        return (
+                          <div
+                            key={day}
+                            className="flex flex-col items-center gap-2 min-w-[42px]"
+                          >
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">
+                              {day}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => toggleWorkingDay(day)}
+                              className={cn(
+                                "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
+                                isSelected
+                                  ? "bg-blue-600 border-blue-600 text-white"
+                                  : "bg-white border-slate-200 hover:border-slate-300",
+                              )}
+                            >
+                              {isSelected && (
+                                <svg
+                                  width="10"
+                                  height="8"
+                                  viewBox="0 0 10 8"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M1 4L3.5 6.5L8.5 1.5"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
+                        );
+                      },
+                    )}
+                  </div>
+                </div>
+
+                {/* Completion Date */}
+                <div className="space-y-2 pt-1">
+                  <label className="block text-sm font-semibold text-slate-700">
                     Estimated Completion Date
                   </label>
-                  <input
-                    type="date"
-                    {...register("estimatedCompletedDate")}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50"
-                  />
+                  <div className="relative group">
+                    <input
+                      type="date"
+                      {...register("estimatedCompletedDate")}
+                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 appearance-none"
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
+                      <HelpCircle size={16} className="text-slate-400" />
+                      <Calendar size={18} className="text-slate-600" />
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                {/* Priority Select */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
                     Priority
                   </label>
-                  <select
-                    {...register("priority")}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 text-sm"
-                  >
-                    <option value="LOW">Default (Low)</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="HIGH">High</option>
-                  </select>
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+                      <Flag size={18} />
+                    </div>
+                    <select
+                      {...register("priority")}
+                      className="w-full h-12 pl-12 pr-10 appearance-none bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm text-slate-700"
+                    >
+                      <option value="LOW">Default</option>
+                      <option value="MEDIUM">Medium</option>
+                      <option value="HIGH">High</option>
+                    </select>
+                    <ChevronDown
+                      size={18}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                {/* Budget */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
                     Budget
                   </label>
-                  <input
-                    type="text"
-                    {...register("budget")}
-                    placeholder="Total budget for this project"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 text-sm"
-                  />
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      {...register("budget")}
+                      placeholder="Total budget for this project"
+                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -718,25 +931,31 @@ const CreateProject = ({
             <input type="hidden" {...register("longitude")} />
           </div>
 
-          {/* Footer Actions */}
-          <div className="flex justify-between items-center mt-6 pt-4 border-t">
+          {/* Modal Footer Actions */}
+          <div className="flex justify-between items-center mt-12 pt-8 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+              className="px-8 py-3.5 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 font-bold transition-all text-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+              className="px-10 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all text-sm disabled:opacity-50 disabled:active:scale-100"
             >
               {isLoading ? "Creating..." : "Create Project"}
             </button>
           </div>
         </form>
       </div>
+      <ProjectSuccessModal
+        open={openSuccessModal}
+        onOpenChange={setOpenSuccessModal}
+        projectName={projectName}
+        projectId={projectId}
+      />
     </div>
   );
 };

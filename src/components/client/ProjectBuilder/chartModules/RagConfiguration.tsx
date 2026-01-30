@@ -53,7 +53,7 @@ const RagConfiguration: React.FC<RagConfigurationProps> = ({
 
   return (
     <div className="max-w-78 min-w-78 h-fit max-h-[calc(100vh-100px)] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col shrink-0 transition-all duration-300">
-      <div className="flex justify-between items-center p-4 border-b bg-gray-50">
+      <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
         <h3 className="text-lg font-semibold text-gray-800">Configuration</h3>
         <button
           onClick={onClose}

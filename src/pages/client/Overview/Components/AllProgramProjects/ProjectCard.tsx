@@ -6,12 +6,14 @@ import { Flag, Layers } from "lucide-react";
 import { FaStar } from "react-icons/fa6";
 import { toast } from "sonner";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
-import ProjectDetailsModal from "@/components/staffManager/overview/ProjectDetailsModal";
+// import ProjectDetailsModal from "@/components/staffManager/overview/ProjectDetailsModal";
 import {
   useAddFavoriteProjectMutation,
   useGetFavoriteProjectsQuery,
   useRemoveFavoriteProjectMutation,
 } from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
+import PrimaryButton from "@/common/PrimaryButton";
+import { useNavigate } from "react-router-dom";
 
 export type ProjectStatus =
   | "LIVE"
@@ -27,8 +29,10 @@ export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 export interface Project {
   id: string;
   programId: string;
-
   programName?: string;
+  program?: {
+    programName?: string;
+  };
   name: string;
   description: string;
 
@@ -89,16 +93,9 @@ const renderStatusBadge = (status: ProjectStatus) => (
 );
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
-  const {
-    id,
-    name,
-    programName,
-    priority,
-    deadline,
-    startDate,
-    progress,
-    status,
-  } = project;
+  const { id, name, program, priority, deadline, startDate, progress, status } =
+    project;
+  const navigate = useNavigate();
   const [addFavoriteProject] = useAddFavoriteProjectMutation();
   const [removeFavoriteProject] = useRemoveFavoriteProjectMutation();
   const { data, isLoading } = useGetFavoriteProjectsQuery({});
@@ -108,13 +105,13 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
     priority === "HIGH"
       ? "text-[#DA4352]"
       : priority === "MEDIUM"
-      ? "text-[#F59E0B]"
-      : "text-[#16A34A]";
+        ? "text-[#F59E0B]"
+        : "text-[#16A34A]";
 
   const handleAddToFavorite = async (projectId: string) => {
     let res: any;
     const toastId = toast.loading(
-      isFavorite ? "Removing from favorites..." : "Adding to favorites..."
+      isFavorite ? "Removing from favorites..." : "Adding to favorites...",
     );
     try {
       if (isFavorite) {
@@ -127,7 +124,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           isFavorite
             ? "Project removed from favorites successfully"
             : "Project added to favorites successfully",
-          { id: toastId }
+          { id: toastId },
         );
       }
     } catch (error: any) {
@@ -146,10 +143,15 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
             <div>
               <h4 className="font-semibold text-gray-900 leading-tight">
-                {programName || "Program Name"}
+                {program?.programName || "Program Name"}
               </h4>
-              <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2">
-                <span>{name || "Project Name"}</span>{" "}
+              <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2 cursor-pointer">
+                <span
+                  className="truncate max-w-32"
+                  title={name || "Project Name"}
+                >
+                  {name || "Project Name"}
+                </span>
                 <button onClick={() => handleAddToFavorite(id)}>
                   {isLoading ? (
                     <FaStar className="text-gray-200 animate-pulse" size={18} />
@@ -207,17 +209,18 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         </div>
 
         {/* Progress */}
-        <div className="py-2 px-4">
+        <div className="py-2 space-y-4 px-4">
           <div className="flex justify-between text-sm mb-1">
             <span className="text-gray-600">Overall Progress</span>
             <span className="font-medium">{progress}%</span>
           </div>
           <Progress value={progress} className="h-2" />
-        </div>
-
-        {/* CTA */}
-        <div className="py-2 px-4">
-          <ProjectDetailsModal project={project} />
+          <PrimaryButton
+            onClick={() => navigate(`/client-panel/project-details/${id}`)}
+            title="View Project Details"
+            type="Primary"
+            className="w-full h-10"
+          />
         </div>
       </CardContent>
     </Card>

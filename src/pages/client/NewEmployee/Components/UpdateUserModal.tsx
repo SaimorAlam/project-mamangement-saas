@@ -74,7 +74,7 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
               type="text"
               value={formData.name}
               onChange={(e) => handleChange("name", e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border border-gray-200 rounded px-3 py-2"
             />
           </div>
 
@@ -84,7 +84,7 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
               type="email"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border border-gray-200 rounded px-3 py-2"
             />
           </div>
 
@@ -93,7 +93,7 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
             <select
               value={formData.role}
               onChange={(e) => handleChange("role", e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border border-gray-200 rounded px-3 py-2"
             >
               <option value="MANAGER">Manager</option>
               <option value="EMPLOYEE">Employee</option>
@@ -106,7 +106,7 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
             <select
               value={formData.userStatus}
               onChange={(e) => handleChange("userStatus", e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border border-gray-200 rounded px-3 py-2"
             >
               <option value="ACTIVE">Active</option>
               <option value="INACTIVE">Inactive</option>
@@ -125,7 +125,7 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
                   onClick={() =>
                     handleChange(
                       "assignedProjects",
-                      formData.assignedProjects.filter((_, i) => i !== idx)
+                      formData.assignedProjects.filter((_, i) => i !== idx),
                     )
                   }
                 >
@@ -151,7 +151,7 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
                   }
                 }}
               >
-                <SelectTrigger className="w-full border rounded px-3 py-2">
+                <SelectTrigger className="w-full border border-gray-200 rounded px-3 py-2">
                   <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
                 <SelectContent>

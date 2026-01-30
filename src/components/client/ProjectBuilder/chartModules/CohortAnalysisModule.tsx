@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import CohortAnalysisChart from "@/common/Charts/CohortAnalysisChart";
 import CohortAnalysisConfiguration, { LegendValue } from "../chartConfigurations/CohortAnalysisConfiguration";
 
-const CohortAnalysisModule = ({ onDelete }: { onDelete?: () => void }) => {
+type CohortAnalysisModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const CohortAnalysisModule = ({ onDelete, isPreview = false }: CohortAnalysisModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Retention Cohort Survival");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -36,11 +41,13 @@ const CohortAnalysisModule = ({ onDelete }: { onDelete?: () => void }) => {
   };
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   return (
-    <div className="flex gap-3 h-full">
+    <div className="flex gap-3 h-full w-full">
       <div className="flex-1 h-full sticky top-5">
         <CohortAnalysisChart
           widgetTitle={widgetTitle}
@@ -49,9 +56,10 @@ const CohortAnalysisModule = ({ onDelete }: { onDelete?: () => void }) => {
           numOfLegendDataSet={numOfLegendDataSet}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <CohortAnalysisConfiguration
           widgetTitle={widgetTitle}
           setWidgetTitle={setWidgetTitle}

@@ -1,18 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
 import HorizontalStackedBarChart from "@/common/Charts/HorizontalStackedBarChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const HorizontalStackedBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
-    console.log("page mounted");
-    
-  const [widgetTitle, setWidgetTitle] = useState("Horizontal Stacked Bar");
+const HorizontalStackedBarChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
+  const [widgetTitle, setWidgetTitle] = useState("Horizontal Stacked Analysis");
   const [showWidget, setShowWidget] = useState(false);
 
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
-
   const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(5);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
@@ -26,8 +32,32 @@ const HorizontalStackedBarChartModule = ({ onDelete }: { onDelete?: () => void }
   const [startingRange, setStartingRange] = useState<number>(0);
   const [endingRange, setEndingRange] = useState<number>(100);
 
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "horizontal-stacked-bar-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          legendValues,
+          numOfLegendDataSet,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+    dispatch,
+  ]);
+
   const minXaxisField = 1;
-  const maxXaxisField = 7;
+  const maxXaxisField = 10;
 
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -62,7 +92,9 @@ const HorizontalStackedBarChartModule = ({ onDelete }: { onDelete?: () => void }
   };
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -70,8 +102,8 @@ const HorizontalStackedBarChartModule = ({ onDelete }: { onDelete?: () => void }
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
         <HorizontalStackedBarChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
@@ -81,10 +113,11 @@ const HorizontalStackedBarChartModule = ({ onDelete }: { onDelete?: () => void }
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
+          isPreview={isPreview}
           isCreationMode={true}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Horizontal Stacked Bar"
           widgetTitle={widgetTitle}

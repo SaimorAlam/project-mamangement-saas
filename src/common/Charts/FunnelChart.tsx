@@ -1,16 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 
 /*       TYPES       */
+
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 export type TierChart = {
   id: string;
@@ -27,6 +25,8 @@ type Props = {
   onToggleWidget?: () => void;
   tierLevel?: number;
   chartId?: string;
+  onDelete?: () => void;
+  isPreview?: boolean;
 };
 
 /*       COMPONENT       */
@@ -39,9 +39,10 @@ export default function FunnelChart({
   onToggleWidget,
   tierLevel = 0,
   chartId = "root",
+  onDelete,
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
 
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
@@ -111,6 +112,8 @@ export default function FunnelChart({
     return chartData.reduce((sum, val) => sum + val, 0);
   }, [chartData]);
 
+  /*   ACTIONS   */
+
   const handleCopy = () => {
     const copyData = xAxisValues.map((label, index) => ({
       label,
@@ -119,7 +122,7 @@ export default function FunnelChart({
     navigator.clipboard.writeText(JSON.stringify(copyData, null, 2));
   };
 
-const handleDownload = () => {
+  const handleDownload = () => {
     const payload = {
       numberOfDataset: xAxisValues.length,
       firstFiledDataset: 0,
@@ -139,7 +142,6 @@ const handleDownload = () => {
     };
     setIsDownloading(true);
 
-    // Also save to backend
     DownloadAndSaveCSVforModuleTwoWidget(
       payload,
       getChartTitleId,
@@ -150,16 +152,8 @@ const handleDownload = () => {
     setIsDownloading(false);
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleSaveTier = (tierName: string) => {
@@ -183,101 +177,33 @@ const handleDownload = () => {
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0 ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        <div className="flex justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {xAxisValues.length} stages
+      <ChartCardWrapper
+        title={widgetTitle}
+        subtitle={`${xAxisValues.length} stages`}
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          <p className="text-sm text-gray-500">Total {totalValue}</p>
+        }
+        footer={
+          childTiers.length > 0 ? (
+            <p className="text-sm text-blue-600 font-medium">
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
-          </div>
-
-          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
-            <p className="text-sm text-gray-500">Total {totalValue}</p>
-
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDownload();
-                      setShowPopover(false);
-                    }}
-                    disabled={isDownloading}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Download size={18} />
-                    <span>Download</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddTierClick();
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <GoPlus size={18} />
-                    <span>Add Tier</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
+          ) : undefined
+        }
+      >
         {xAxisValues.filter(Boolean).length > 0 ? (
           <ReactApexChart
             options={chartOptions}
@@ -287,19 +213,11 @@ const handleDownload = () => {
           />
         ) : (
           <div className="h-[350px] flex items-center justify-center text-gray-400">
-            No data available. Please add funnel stages in the widget configuration.
+            No data available. Please add funnel stages in the widget
+            configuration.
           </div>
         )}
-
-        {/* Indicator if chart has children */}
-        {childTiers.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-      </div>
+      </ChartCardWrapper>
 
       {/* Add Tier Modal */}
       <AddTierModal
@@ -310,7 +228,6 @@ const handleDownload = () => {
       />
 
       {/* Children Grid Modal */}
-      {showChildrenModal && (
         <TierChartModal
           isOpen={showChildrenModal}
           onClose={() => setShowChildrenModal(false)}
@@ -327,11 +244,12 @@ const handleDownload = () => {
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
+                isPreview={isPreview}
+                onDelete={onDelete}
               />
             ))}
           </div>
         </TierChartModal>
-      )}
     </>
   );
 }

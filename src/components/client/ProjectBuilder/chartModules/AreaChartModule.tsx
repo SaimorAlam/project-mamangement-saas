@@ -1,8 +1,19 @@
-import React, { useState } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
+import React, { useState, useEffect } from "react";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../WidgetForChartModuleOne";
 import AreaChart from "@/common/Charts/AreaChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const AreaChartModule = () => {
+const AreaChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -19,11 +30,35 @@ const AreaChartModule = () => {
   const [startingRange, setStartingRange] = useState<number>(0);
   const [endingRange, setEndingRange] = useState<number>(100);
 
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "area-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          legendValues,
+          numOfLegendDataSet,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+    dispatch,
+  ]);
+
   const minXaxisField = 1;
   const maxXaxisField = 7;
 
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -33,7 +68,7 @@ const AreaChartModule = () => {
     } else {
       setNumOfXAxisDataSet(1);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 
@@ -55,6 +90,7 @@ const AreaChartModule = () => {
   };
 
   const handleToggleWidget = () => {
+    if (isPreview) return;
     setShowWidget(!showWidget);
   };
 
@@ -72,8 +108,10 @@ const AreaChartModule = () => {
         startingRange={startingRange}
         endingRange={endingRange}
         onToggleWidget={handleToggleWidget}
+        onDelete={onDelete}
+        isPreview={isPreview}
       />
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Area Chart"
           widgetTitle={widgetTitle}

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { List } from "lucide-react";
+import { Filter, List } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import BoxContainer from "../../../common/BoxContainer";
 import { useGetAllActivityLogsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
@@ -38,6 +38,11 @@ const ActivityLog = () => {
               Activity Log
             </h4>
           </div>
+          {activityData?.length > 0 && (
+            <div className="border border-gray-200 p-2 rounded-lg">
+              <Filter size={24} color="#CBD5E1" />
+            </div>
+          )}
         </div>
 
         {/* Activity Items */}

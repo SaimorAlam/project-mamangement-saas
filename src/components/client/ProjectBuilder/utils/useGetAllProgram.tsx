@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 
 

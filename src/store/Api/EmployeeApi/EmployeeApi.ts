@@ -26,8 +26,7 @@ const employeeApi = baseApi.injectEndpoints({
 
         if (search) params.append("search", search);
         if (status) params.append("status", status);
-        if (joinedDateFrom)
-          params.append("joinedDateFrom", joinedDateFrom);
+        if (joinedDateFrom) params.append("joinedDateFrom", joinedDateFrom);
         if (joinedDateTo) params.append("joinedDateTo", joinedDateTo);
         if (sortBy) params.append("sortBy", sortBy);
         if (sortOrder) params.append("sortOrder", sortOrder);
@@ -50,7 +49,13 @@ const employeeApi = baseApi.injectEndpoints({
     }),
 
     getSingleEmployee: builder.query({
-      query: (id) => `/employees/${id}`,
+      query: (id) => {
+        return {
+          url: `/employees/${id}`,
+          method: "GET",
+        };
+      },
+      providesTags: [{ type: "Employees", id: "LIST" }],
     }),
 
     addEmployee: builder.mutation({
@@ -59,7 +64,7 @@ const employeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: [{ type: "Employees", id: "LIST" }],
+      invalidatesTags: ["Users"],
     }),
     addManager: builder.mutation({
       query: (data) => ({
@@ -67,6 +72,7 @@ const employeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Users"],
     }),
     addViewer: builder.mutation({
       query: (data) => ({
@@ -74,6 +80,7 @@ const employeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Users"],
     }),
     updateEmployee: builder.mutation({
       query: ({ id, ...employeeData }) => ({
@@ -81,7 +88,7 @@ const employeeApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: employeeData,
       }),
-      invalidatesTags: [{ type: "Employees", id: "LIST" }],
+      invalidatesTags: [{ type: "Employees", id: "LIST" },"Users"],
     }),
 
     deleteEmployee: builder.mutation({
@@ -89,7 +96,7 @@ const employeeApi = baseApi.injectEndpoints({
         url: `/employees/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Employees", id: "LIST" }],
+      invalidatesTags: [{ type: "Employees", id: "LIST" },"Users"],
     }),
 
     bulkDeleteEmployee: builder.mutation({
@@ -98,7 +105,7 @@ const employeeApi = baseApi.injectEndpoints({
         method: "DELETE",
         body: data,
       }),
-      invalidatesTags: [{ type: "Employees", id: "LIST" }],
+      invalidatesTags: [{ type: "Employees", id: "LIST" },"Users"],
     }),
     getEmployeeTaskStatistics: builder.query({
       query: (id) => `/employees/${id}/statistics`,

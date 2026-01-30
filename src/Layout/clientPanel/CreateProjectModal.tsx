@@ -105,7 +105,7 @@ export default function CreateProjectModal({
       "repeatOnDays",
       repeatOnDays.includes(day)
         ? repeatOnDays.filter((d) => d !== day)
-        : [...repeatOnDays, day]
+        : [...repeatOnDays, day],
     );
   };
 

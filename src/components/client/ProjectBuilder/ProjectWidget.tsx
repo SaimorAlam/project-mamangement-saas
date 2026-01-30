@@ -4,8 +4,8 @@ import {
   PieChart as PieChartIcon,
   Table,
   Circle,
-  GanttChartSquare,
-  Image,
+  // GanttChartSquare,
+  // Image,
   CircleGauge,
   ChartBarIncreasing,
   Flame,
@@ -127,18 +127,18 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Display progress or completion percentage",
       icon: <Circle className="w-5 h-5" />,
     },
-    {
-      id: "gantt-chart",
-      name: "Gantt Chart",
-      description: "Visualize project timelines",
-      icon: <GanttChartSquare className="w-5 h-5" />,
-    },
-    {
-      id: "picture-video",
-      name: "Picture/Video",
-      description: "Add image or video",
-      icon: <Image className="w-5 h-5" />,
-    },
+    // {
+    //   id: "gantt-chart",
+    //   name: "Gantt Chart",
+    //   description: "Visualize project timelines",
+    //   icon: <GanttChartSquare className="w-5 h-5" />,
+    // },
+    // {
+    //   id: "picture-video",
+    //   name: "Picture/Video",
+    //   description: "Add image or video",
+    //   icon: <Image className="w-5 h-5" />,
+    // },
     {
       id: "gauge-chart",
       name: "Gauge Chart",
@@ -309,7 +309,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   }, [selectedProgram, selectedProject, dispatch]);
 
   return (
-    <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 flex flex-col sticky top-0">
+    <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 min-w-78 flex flex-col sticky top-0">
       {/* Header */}
       {isLoading ? (
         <SelectSkeleton />
@@ -446,16 +446,14 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
                 }}
                 className={`flex items-start p-3 rounded-lg cursor-pointer transition-all border
                   ${
-                    selectedWidgets.includes(widget.id) ||
-                    (widget.id === "kpi" && selectedWidgets.length === 0)
+                    selectedWidgets.includes(widget.id)
                       ? "bg-gray-200 border-transparent"
                       : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
                   }`}
               >
                 <div
                   className={`mt-0.5 ${
-                    selectedWidgets.includes(widget.id) ||
-                    (widget.id === "kpi" && selectedWidgets.length === 0)
+                    selectedWidgets.includes(widget.id)
                       ? "text-website-color-darkGray"
                       : "text-gray-600"
                   }`}
@@ -475,8 +473,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
                   </h3>
                   <p
                     className={`text-xs mt-0.5 ${
-                      selectedWidgets.includes(widget.id) ||
-                      (widget.id === "kpi" && selectedWidgets.length === 0)
+                      selectedWidgets.includes(widget.id)
                         ? "text-website-color-darkGray"
                         : "text-gray-500"
                     }`}

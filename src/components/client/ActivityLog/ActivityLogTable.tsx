@@ -58,7 +58,6 @@ const ActivityLogTable = ({
   paginatedData,
   tableHeaders,
 }: ActivityLogTableProps) => {
-  console.log(paginatedData);
   return (
     <div className="overflow-x-auto pb-6 rounded-lg">
       <Table className="rounded-lg">

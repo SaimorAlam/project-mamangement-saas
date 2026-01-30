@@ -1,19 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../WidgetForChartModuleOne";
 import MultiAxisLineChart from "@/common/Charts/LineChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const LineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+const LineChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
-    useState<number>(1);
+  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] =
-    useState<number>(3);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#13A490" },
@@ -23,10 +30,34 @@ const LineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   const [startingRange, setStartingRange] = useState<number>(0); //for y axis
   const [endingRange, setEndingRange] = useState<number>(100); // for y axis
 
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "line-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          legendValues,
+          numOfLegendDataSet,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+    dispatch,
+  ]);
+
   const minXaxisField = 1;
   const maxXaxisField = 7;
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -36,17 +67,15 @@ const LineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
     } else {
       setNumOfXAxisDataSet(1);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 
     setXAxisValues((prev) => {
       const updated = [...prev];
-      // Adding empty values if increased
       while (updated.length < value) {
         updated.push("");
       }
-      // Removing extra values if decreased
       return updated.slice(0, value);
     });
   };
@@ -57,22 +86,21 @@ const LineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
       updated[index] = value;
       return updated;
     });
-    console.log("parant x values: ", xAxisValues);
   };
 
-  // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
-  // Close widget (for X button)
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-0 min-w-0 sticky top-5 h-full">
         <MultiAxisLineChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
@@ -82,9 +110,10 @@ const LineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Multi Axis Line Chart"
           widgetTitle={widgetTitle}
@@ -98,7 +127,7 @@ const LineChartModule = ({ onDelete }: { onDelete?: () => void }) => {
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
           setLegendValues={setLegendValues}
-          startingRange={startingRange} 
+          startingRange={startingRange}
           setStartingRange={setStartingRange}
           endingRange={endingRange}
           setEndingRange={setEndingRange}

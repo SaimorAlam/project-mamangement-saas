@@ -18,12 +18,12 @@ const StaffEmployeeOverview = () => {
         <AllProgramProject />
       </div>
 
-      <div className="grid grid-cols-3 gap-8 ">
+      <div className="grid grid-cols-3 gap-3 ">
         <div className="space-y-8 col-span-2">
-          <div className="flex items-start justify-center gap-8">
+          <div className="flex items-start justify-center gap-3">
             <div className="flex items-start justify-center gap-8">
               <BoxContainer>
-                <h2 className="text-2xl font-semibold mb-4">
+                <h2 className="text-xl font-semibold mb-4">
                   Top Overdue Projects
                 </h2>
                 <OverDueChart />
@@ -31,11 +31,14 @@ const StaffEmployeeOverview = () => {
             </div>
             <ProjectStatusChart />
           </div>
-          <LatestSubmission />
         </div>
         <div className="space-y-8">
           <UpcomingDeadline />
         </div>
+      </div>
+      <div className="my-10">
+
+          <LatestSubmission />
       </div>
     </div>
   );

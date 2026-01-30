@@ -1,7 +1,16 @@
 import FunnelChart from "@/common/Charts/FunnelChart";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const FunnelChartModule = () => {
+const FunnelChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("Recruitment Funnel");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -13,6 +22,20 @@ const FunnelChartModule = () => {
 
   const minXaxisField = 1;
   const maxXaxisField = 10;
+
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "funnel-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [widgetTitle, xAxisValues, startingRange, endingRange, dispatch]);
 
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -47,7 +70,9 @@ const FunnelChartModule = () => {
   };
 
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -55,18 +80,20 @@ const FunnelChartModule = () => {
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 h-full sticky top-5">
         <FunnelChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
-        <div className="w-96 bg-white border border-gray-200 rounded-lg p-6 h-fit">
+      {!isPreview && showWidget && (
+        <div className="w-[320px] shrink-0 sticky top-5 bg-white border border-gray-200 rounded-lg p-6 h-fit">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold">Funnel Configuration</h3>

@@ -94,11 +94,11 @@ const WidgetForChartModuleOne = ({
   const handleLegendLabelChange = (index: number, value: string) => {
     setLegendValues((prev) => {
       const updated = [...prev];
-      updated[index].label = value;
-
-      // auto-generate field (camelCase)
-      updated[index].field = value.toLowerCase().replace(/\s+/g, "");
-
+      updated[index] = {
+        ...updated[index],
+        label: value,
+        field: value.toLowerCase().replace(/\s+/g, ""),
+      };
       return updated;
     });
   };
@@ -106,7 +106,10 @@ const WidgetForChartModuleOne = ({
   const handleLegendColorChange = (index: number, color: string) => {
     setLegendValues((prev) => {
       const updated = [...prev];
-      updated[index].color = color;
+      updated[index] = {
+        ...updated[index],
+        color: color,
+      };
       return updated;
     });
   };
@@ -116,8 +119,8 @@ const WidgetForChartModuleOne = ({
   const downloadCSV = async () => {
     const toastId = toast.loading("Creating chart...")
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
-    for (let i = 0; i < legendValues.length; i++) {
-      if (!legendValues[i].label) {
+    for (let i = 0; i < numOfLegendDataSet; i++) {
+      if (!legendValues[i]?.label) {
         alert(`Please fill in the label for legend ${i + 1}`);
         return;
       }
@@ -338,9 +341,9 @@ const WidgetForChartModuleOne = ({
             </label>
             <input
               type="number"
-              min={3}
-              max={5}
-              defaultValue={numOfLegendDataSet}
+              min={minLegend}
+              max={maxLegend}
+              value={numOfLegendDataSet}
               onChange={handleSetNumOfLegendDataSet}
               className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />

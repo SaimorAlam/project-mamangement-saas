@@ -66,7 +66,21 @@ const StaffManagerSidebar = () => {
       ? item.path
       : `${parentPath}/${item.path}`;
 
-    if (location.pathname === fullPath) return true;
+    const currentPath = location.pathname;
+
+    // Exact match
+    if (currentPath === fullPath) return true;
+
+    // Nested match: current path starts with item path followed by a slash
+    // We exclude the base root path to prevent it from matching every sub-route
+    if (
+      fullPath !== "/staff-manager-panel" &&
+      fullPath !== "" &&
+      currentPath.startsWith(fullPath + "/")
+    ) {
+      return true;
+    }
+
     if (item.children) {
       return item.children.some((child: any) => isRouteActive(child, fullPath));
     }
@@ -87,7 +101,7 @@ const StaffManagerSidebar = () => {
       return (
         <SidebarMenuItem key={fullPath}>
           <DropdownMenu onOpenChange={(v) => setOpen(v)}>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="border-none">
               <button
                 className={`self-stretch rounded-[10px] inline-flex items-center w-full
                   ${state === "expanded" ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}

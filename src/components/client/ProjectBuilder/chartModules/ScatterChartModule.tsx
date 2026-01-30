@@ -1,9 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LegendValue } from "../WidgetForChartModuleOne";
 import ScatterChart from "@/common/Charts/ScatterChart";
 import WidgetForChartModuleTwo from "../WidgetForChartModuleTwo";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const ScatterChartModule = () => {
+const ScatterChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("3D Scatter Chart");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -17,8 +26,32 @@ const ScatterChartModule = () => {
   const [startingRange, setStartingRange] = useState<number>(100);
   const [endingRange, setEndingRange] = useState<number>(400);
 
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "scatter-chart",
+        config: {
+          widgetTitle,
+          legendValues,
+          numOfLegendDataSet,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+    dispatch,
+  ]);
+
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -26,8 +59,8 @@ const ScatterChartModule = () => {
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 sticky top-5 h-full">
         <ScatterChart
           widgetTitle={widgetTitle}
           legendValues={legendValues}
@@ -35,9 +68,11 @@ const ScatterChartModule = () => {
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <WidgetForChartModuleTwo
           widgedName="Scatter Chart"
           widgetTitle={widgetTitle}

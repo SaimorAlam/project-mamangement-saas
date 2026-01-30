@@ -97,6 +97,7 @@ export const {
   useLazyGetAllProjectsQuery,
   useSearchProjectsQuery,
   useGetProjectByIdQuery,
+  useLazyGetProjectByIdQuery,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
   useGetProjectSheetsQuery,

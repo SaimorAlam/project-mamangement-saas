@@ -1,8 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
 import StackedBarChart from "@/common/Charts/StackedBarChart";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const StackedBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+const StackedBarChartModule = ({
+  onDelete,
+  isPreview = false,
+}: {
+  onDelete?: () => void;
+  isPreview?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
@@ -15,8 +24,34 @@ const StackedBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
   ]);
   const [startingRange, setStartingRange] = useState<number>(0);
   const [endingRange, setEndingRange] = useState<number>(100);
+
+  useEffect(() => {
+    dispatch(
+      setWidgetConfig({
+        id: "bar-chart",
+        config: {
+          widgetTitle,
+          xAxisValues,
+          legendValues,
+          numOfLegendDataSet,
+          startingRange,
+          endingRange,
+        },
+      }),
+    );
+  }, [
+    widgetTitle,
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+    dispatch,
+  ]);
+
   const minXaxisField = 1;
-  const maxXaxisField = 7;
+  const maxXaxisField = 10;
+  
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -34,11 +69,9 @@ const StackedBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
 
     setXAxisValues((prev) => {
       const updated = [...prev];
-      // Adding empty values if increased
       while (updated.length < value) {
         updated.push("");
       }
-      // Removing extra values if decreased
       return updated.slice(0, value);
     });
   };
@@ -49,22 +82,21 @@ const StackedBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
       updated[index] = value;
       return updated;
     });
-    console.log("parant x values: ", xAxisValues);
   };
 
-  // Toggle widget visibility
   const handleToggleWidget = () => {
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
-  // Close widget (for X button)
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
+    <div className="flex gap-3 h-full w-full">
+      <div className="flex-1 min-w-0 sticky top-5 h-full">
         <StackedBarChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
@@ -75,9 +107,10 @@ const StackedBarChartModule = ({ onDelete }: { onDelete?: () => void }) => {
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
           isCreationMode={true}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
+      {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Stack Bar Chart"
           widgetTitle={widgetTitle}

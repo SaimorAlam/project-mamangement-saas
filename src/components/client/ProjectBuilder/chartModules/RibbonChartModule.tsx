@@ -9,33 +9,41 @@ const initialSeries: RibbonSeries[] = [
   { id: "s3", name: "Product C", color: "#ffc658", data: [200, 150, 450, 300] },
 ];
 
-const RibbonChartModule = ({ onDelete }: { onDelete?: () => void }) => {
+type RibbonChartModuleProps = {
+  onDelete?: () => void;
+  isPreview?: boolean;
+};
+
+const RibbonChartModule = ({ onDelete, isPreview = false }: RibbonChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Sales Ranking by Year");
   const [showWidget, setShowWidget] = useState(false);
   const [categories, setCategories] = useState<string[]>(initialCategories);
   const [series, setSeries] = useState<RibbonSeries[]>(initialSeries);
 
   return (
-    <div className="flex gap-3 w-[calc(100%)]">
-      <div className="flex-1 sticky top-5 h-full min-w-0">
+    <div className="flex gap-3 w-full h-full min-w-0">
+      <div className="flex-1 min-w-0 sticky top-5 h-full">
         <RibbonChart
           widgetTitle={widgetTitle}
           categories={categories}
           series={series}
-          onToggleWidget={() => setShowWidget(!showWidget)}
+          onToggleWidget={() => !isPreview && setShowWidget(!showWidget)}
           onDelete={onDelete}
+          isPreview={isPreview}
         />
       </div>
-      {showWidget && (
-        <RibbonConfiguration
-          widgetTitle={widgetTitle}
-          setWidgetTitle={setWidgetTitle}
-          categories={categories}
-          setCategories={setCategories}
-          series={series}
-          setSeries={setSeries}
-          onClose={() => setShowWidget(false)}
-        />
+      {!isPreview && showWidget && (
+        <div className="shrink-0 sticky top-5">
+          <RibbonConfiguration
+            widgetTitle={widgetTitle}
+            setWidgetTitle={setWidgetTitle}
+            categories={categories}
+            setCategories={setCategories}
+            series={series}
+            setSeries={setSeries}
+            onClose={() => setShowWidget(false)}
+          />
+        </div>
       )}
     </div>
   );

@@ -147,8 +147,6 @@ const StaffManagerDashboardHeader = () => {
               onClick={() => navigate("/staff-manager-panel/projects/upload-submission")}
             />
           )}
-
-
         </div>
       </div>
 

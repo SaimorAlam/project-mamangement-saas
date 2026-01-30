@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*       TYPES       */
 
@@ -40,28 +37,27 @@ type Props = {
   onToggleWidget?: () => void;
   tierLevel?: number;
   chartId?: string;
+  onDelete?: () => void;
+  isPreview?: boolean;
 };
 
 /*       HELPER FUNCTIONS       */
 
-// Deterministic hash function for consistent values
 const simpleHash = (str: string): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
+    hash = hash & hash;
   }
   return Math.abs(hash);
 };
 
-// Deterministic pseudo-random number generator
 const deterministicRandom = (
   seed: number,
   min: number,
   max: number
 ): number => {
-  // Simple deterministic pseudo-random based on seed
   const x = Math.sin(seed) * 10000;
   const random = x - Math.floor(x);
   return Math.floor(random * (max - min + 1)) + min;
@@ -72,33 +68,27 @@ const generateBubbleData = (
   yrange: { min: number; max: number },
   minBubbleSize: number,
   maxBubbleSize: number,
-  legendIndex: number // Added to differentiate between legends
+  legendIndex: number
 ) => {
   const series = [];
   for (let i = 0; i < xAxisValues.length; i++) {
-    // Try to parse X as number, otherwise use index
     const xValue = xAxisValues[i];
     const x = !isNaN(Number(xValue)) ? Number(xValue) : i + 1;
-
-    // Create a unique seed for each data point
     const seed = simpleHash(`${xValue}-${i}-${legendIndex}`);
-
-    // Use deterministic random based on seed
     const y = deterministicRandom(seed + 1, yrange.min, yrange.max);
     const z = deterministicRandom(
       seed + 2,
       minBubbleSize,
       maxBubbleSize
     );
-
     series.push([x, y, z]);
   }
   return series;
 };
 
-const generateId = () =>
-  crypto.randomUUID?.() ??
-  Math.random().toString(36).substring(2, 10);
+// const generateId = () =>
+//   crypto.randomUUID?.() ??
+//   Math.random().toString(36).substring(2, 10);
 
 /*       COMPONENT       */
 
@@ -114,13 +104,13 @@ export default function BubbleChart({
   opacity = 0.8,
   chartHeight = 350,
   onToggleWidget,
+  onDelete,
   tierLevel = 0,
   chartId = "root",
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
 
-  // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
@@ -135,7 +125,6 @@ export default function BubbleChart({
 
     const yrange = { min: startingRange, max: endingRange };
 
-    // Generate series for each legend
     const series = legendValues
       .filter((l) => l.label)
       .map((l, legendIndex) => ({
@@ -185,8 +174,7 @@ export default function BubbleChart({
           },
         },
         legend: {
-          position: "top",
-          horizontalAlign: "left",
+          show: false,
         },
         colors: colors,
       },
@@ -211,8 +199,6 @@ export default function BubbleChart({
   };
 
   const handleDownload = () => {
-    const csvId = generateId();
-
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -238,28 +224,6 @@ export default function BubbleChart({
     };
     setIsDownloading(true);
 
-    // For CSV export
-    const header = "Series,X,Y,Size";
-    const rows: string[] = [];
-    chartData.series.forEach((s: any) => {
-      s.data.forEach((point: any) => {
-        rows.push(`${s.name},${point[0]},${point[1]},${point[2]}`);
-      });
-    });
-    const csv = [header, ...rows].join("\n");
-
-    const blob = new Blob([csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${widgetTitle}-${csvId}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    // Also save to backend
     DownloadAndSaveCSVforModuleOneWidget(
       payload,
       getChartTitleId,
@@ -271,16 +235,8 @@ export default function BubbleChart({
     setIsDownloading(false);
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleSaveTier = (tierName: string) => {
@@ -305,129 +261,60 @@ export default function BubbleChart({
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        {/* Header */}
-        <div className="flex justify-between mb-4">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-          </div>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDownload();
-                      setShowPopover(false);
-                    }}
-                    disabled={isDownloading}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Download size={18} />
-                    <span>Download</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddTierClick();
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <GoPlus size={18} />
-                    <span>Add Tier</span>
-                  </button>
+      <ChartCardWrapper
+        title={widgetTitle}
+        subtitle="Bubble Distribution Analysis"
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          <div className="flex gap-4">
+            {legendValues.slice(0, 3).map((l, index) =>
+              l.label ? (
+                <div key={index} className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: l.color }} />
+                  <span className="text-xs text-gray-500 font-medium">{l.label}</span>
                 </div>
-              )}
-            </div>
+              ) : null
+            )}
+            {legendValues.length > 3 && (
+              <span className="text-xs text-gray-400">+{legendValues.length - 3} more</span>
+            )}
           </div>
-        </div>
-
-        {/* Bubble Chart */}
-        {chartData.series.length > 0 ? (
-          <Chart
-            options={chartData.options}
-            series={chartData.series}
-            type="bubble"
-            height={chartHeight}
-          />
-        ) : (
-          <div className="h-96 flex items-center justify-center text-gray-400">
-            No data available, Please fill the input field to generate
-            the chart and then download the csv.
-          </div>
-        )}
-
-        {/* Indicator if chart has children */}
-        {childTiers.length > 0 && (
-          <div className="mt-4 text-center">
+        }
+        footer={
+          childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier
-              {childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
             </p>
-          </div>
-        )}
-      </div>
+          ) : undefined
+        }
+      >
+        <div className="relative">
+          {chartData.series.length > 0 ? (
+            <Chart
+              options={chartData.options}
+              series={chartData.series}
+              type="bubble"
+              height={chartHeight}
+            />
+          ) : (
+            <div className="h-96 flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
+              No data available. Please configure the widget.
+            </div>
+          )}
+        </div>
+      </ChartCardWrapper>
 
-      {/* Add Tier Modal */}
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
@@ -435,7 +322,6 @@ export default function BubbleChart({
         parentChartName={widgetTitle}
       />
 
-      {/* Children Grid Modal */}
       {showChildrenModal && (
         <TierChartModal
           isOpen={showChildrenModal}
@@ -458,7 +344,8 @@ export default function BubbleChart({
                 opacity={opacity}
                 chartHeight={chartHeight}
                 tierLevel={tierLevel + 1}
-                chartId={tier.id}
+                isPreview={isPreview}
+                onDelete={onDelete}
               />
             ))}
           </div>

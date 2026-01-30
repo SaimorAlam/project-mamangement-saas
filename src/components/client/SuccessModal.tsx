@@ -58,7 +58,7 @@ export default function SuccessModal({
               navigate(redirectPath);
             }}
           >
-            Open Program <ArrowRight className="w-4 h-4" />
+            Open Program Builder <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </DialogPrimitive.Content>

@@ -1,13 +1,10 @@
 import { useMemo, useState } from "react";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*       TYPES       */
 
@@ -41,6 +38,7 @@ type Props = {
   onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
+  isPreview?: boolean;
 };
 
 /*       COMPONENT       */
@@ -56,9 +54,9 @@ export default function HorizontalBarChart({
   onDelete,
   tierLevel = 0,
   chartId = "root",
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
 
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
@@ -140,16 +138,8 @@ export default function HorizontalBarChart({
     setIsDownloading(false);
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleSaveTier = (tierName: string) => {
@@ -183,123 +173,42 @@ export default function HorizontalBarChart({
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {widgetTitle}
-          </h2>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDownload();
-                      setShowPopover(false);
-                    }}
-                    disabled={isDownloading}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Download size={18} />
-                    <span>Download</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddTierClick();
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <GoPlus size={18} />
-                    <span>Add Tier</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Legend and Total */}
-        {legendValues.length > 0 && legendValues[0].label && (
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: legendValues[0].color }}
-              />
-              <span className="text-sm text-gray-600">
-                {legendValues[0].label}
-              </span>
-            </div>
+      <ChartCardWrapper
+        title={widgetTitle}
+        subtitle={
+          legendValues.length > 0 && legendValues[0].label
+            ? legendValues[0].label
+            : "Data Distribution"
+        }
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          legendValues.length > 0 &&
+          legendValues[0].label && (
             <div className="text-sm text-gray-600">
-              Total{" "}
-              <span className="font-semibold text-gray-900">
-                {totalValue}
-              </span>
+              Total <span className="font-semibold text-gray-900">{totalValue}</span>
             </div>
-          </div>
-        )}
+          )
+        }
+        footer={
+          childTiers.length > 0 ? (
+            <p className="text-sm text-blue-600 font-medium">
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
+            </p>
+          ) : undefined
+        }
+      >
 
         {/* Bar Chart */}
         {barData.length > 0 ? (
@@ -352,16 +261,7 @@ export default function HorizontalBarChart({
           </div>
         )}
 
-        {/* Indicator if chart has children */}
-        {childTiers.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier
-              {childTiers.length > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-      </div>
+      </ChartCardWrapper>
 
       {/* Add Tier Modal */}
       <AddTierModal
@@ -391,6 +291,7 @@ export default function HorizontalBarChart({
                 endingRange={endingRange}
                 tierLevel={tierLevel + 1}
                 chartId={tier.id}
+                isPreview={isPreview}
               />
             ))}
           </div>

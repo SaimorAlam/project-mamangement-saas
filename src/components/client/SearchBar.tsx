@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Command } from "lucide-react";
 
 export default function SearchBar({
   searchTerm,
@@ -9,21 +9,18 @@ export default function SearchBar({
   setSearchTerm: (value: string) => void;
 }) {
   return (
-    <>
-      {/*<!-- Component: Rounded basic search input --> */}
-      <div className="relative ">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 2xl:h-5 2xl:w-5" />
-        <Input
-          placeholder="Search anything here..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 w-100 border px-10 py-6 border-[#E2E8F0]"
-        />
-        {/* <div className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white rounded-lg shadow-md p-1.5">
-          <Command className=" text-gray-800 h-4 w-4" />
-        </div> */}
+    <div className="relative flex items-center w-full xl:w-[300px] 2xl:w-[450px]">
+      <Search className="absolute left-4 text-[#64748B] h-5 w-5 pointer-events-none" />
+      <Input
+        id="global-search"
+        placeholder="Search anything here..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="h-12 pl-12 pr-14 w-full bg-white border border-[#E2E8F0] rounded-xl text-[15px] placeholder:text-[#64748B] focus-visible:ring-1 focus-visible:ring-[#2563EB]/20 focus-visible:border-[#2563EB] transition-all shadow-xs"
+      />
+      <div className="absolute right-3 p-1.5 flex items-center justify-center bg-white border border-[#F1F5F9] rounded-lg shadow-[0_2px_4px_rgba(0,0,0,0.05)] pointer-events-none">
+        <Command className="h-4 w-4 text-[#0F172A]" />
       </div>
-      {/*<!-- End Rounded search input --> */}
-    </>
+    </div>
   );
 }

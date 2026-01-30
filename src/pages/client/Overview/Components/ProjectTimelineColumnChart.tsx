@@ -24,7 +24,7 @@ const ProgramSelectSkeleton = () => {
 const ProjectTimelineColumnChart = () => {
   const [selectedProgramId, setSelectedProgramId] = useState<string>("");
   const { data: programRes, isLoading: programLoading } = useGetAllProgramQuery(
-    {}
+    {},
   );
 
   const [getTimeline, { data: timelineRes, isFetching }] =

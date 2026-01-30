@@ -21,30 +21,46 @@ interface KPIWidgetConfigProps {
 const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
   config,
   setConfig,
-//   data,
-//   onUpdateData,
+  data,
   onClose,
 }) => {
   const handleChange = (key: keyof KPISettings) => {
-    setConfig((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
+    setConfig((prev) => {
+      const newState = { ...prev, [key]: !prev[key] };
 
-//   const handleDataChange = (key: string, value: string) => {
-//     if (onUpdateData && data) {
-//         onUpdateData({ ...data, [key]: value });
-//     }
-//   }
+      // Logic: if the show footer is false then footer label and button will be false
+      if (key === "showFooter" && !newState.showFooter) {
+        newState.showFooterLabel = false;
+        newState.showFooterButton = false;
+      }
+
+      // Logic: if the footer label and button are false then footer will be false too
+      if ((key === "showFooterLabel" || key === "showFooterButton") && newState[key]) {
+        newState.showFooter = true;
+      }
+
+      if (!newState.showFooterLabel && !newState.showFooterButton) {
+        newState.showFooter = false;
+      }
+
+      return newState;
+    });
+  };
 
   return (
     <div className="w-full bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col h-full">
       {/* Header */}
       <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Widget Configuration
-        </h2>
+        <div>
+          <h2 className="text-lg font-semibold text-gray-800">
+            Widget Configuration
+          </h2>
+          {data?.title && (
+            <p className="text-xs text-gray-500 font-medium">
+              Configuring: {data.title}
+            </p>
+          )}
+        </div>
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100"
@@ -53,57 +69,9 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
         </button>
       </div>
 
-      <div className="flex-1 px-4 py-4 space-y-6 overflow-y-auto max-h-[600px]">
-        {/* Widget Details Link */}
-        {/* <div>
-           <a href="#" className="text-blue-500 font-medium text-xs hover:underline">
-               KPI Widget Details
-           </a>
-        </div> */}
-        
-        {/* Data Fields */}
-        {/* {data && (
-            <div className="space-y-3">
-                 <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Title</label>
-                    <input 
-                        type="text" 
-                        value={data.title} 
-                        onChange={(e) => handleDataChange('title', e.target.value)}
-                        className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                    />
-                 </div>
-                 <div className="flex gap-2">
-                    <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Value</label>
-                        <input 
-                            type="text" 
-                            value={data.value} 
-                            onChange={(e) => handleDataChange('value', e.target.value)}
-                            className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                    <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Growth</label>
-                        <input 
-                            type="text" 
-                            value={data.growth} 
-                            onChange={(e) => handleDataChange('growth', e.target.value)}
-                            className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-                 </div>
-                 <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
-                    <input 
-                        type="text" 
-                        value={data.description} 
-                        onChange={(e) => handleDataChange('description', e.target.value)}
-                        className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                    />
-                 </div>
-            </div>
-        )}
+      <div className="flex-1 px-4 py-4 space-y-6 overflow-y-auto max-h-[600px] scrollbar-hide">
+        {/* Data Fields Hidden as per user request */}
+        {/* {data && ( ... )} */}
 
         {/* Display Settings */}
         <div>
@@ -134,7 +102,7 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
         </div>
 
         {/* Assigned By */}
-        {/* <div>
+        <div>
            <h3 className="text-gray-800 font-medium text-xs mb-3">Assigned by</h3>
            <div className="flex items-center gap-3">
                <div className="w-8 h-8 rounded-full bg-pink-100 overflow-hidden">
@@ -149,7 +117,7 @@ const KPIWidgetConfig: React.FC<KPIWidgetConfigProps> = ({
                    <p className="text-xs text-gray-500">Admin</p>
                </div>
            </div>
-        </div> */}
+        </div>
       </div>
 
       {/* Footer Actions */}

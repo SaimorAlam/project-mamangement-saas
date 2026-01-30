@@ -2,21 +2,18 @@
 import { useMemo, useState } from "react";
 import { AgCharts } from "ag-charts-react";
 import type { AgChartOptions } from "ag-charts-community";
-import { Copy, Trash2, Download } from "lucide-react";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 import {
   AnimationModule,
-  ContextMenuModule,
+  // ContextMenuModule,  
   CrosshairModule,
   HistogramSeriesModule,
-  LegendModule,
+  // LegendModule,
   ModuleRegistry,
   NumberAxisModule,
 } from "ag-charts-enterprise";
@@ -26,9 +23,9 @@ ModuleRegistry.registerModules([
   AnimationModule,
   CrosshairModule,
   HistogramSeriesModule,
-  LegendModule,
+  // LegendModule,
   NumberAxisModule,
-  ContextMenuModule,
+  // ContextMenuModule,
 ]);
 
 /*       TYPES       */
@@ -54,36 +51,35 @@ type Props = {
   numOfLegendDataSet?: number;
   startingRange: number;
   endingRange: number;
-  chartHeight?: number; // NEW
-  strokeWidth?: number; // NEW
-  dataPointsPerSeries?: number; // NEW
-  fillOpacity?: number; // NEW
-  binCount?: number; // NEW
+  chartHeight?: number;
+  strokeWidth?: number;
+  dataPointsPerSeries?: number;
+  fillOpacity?: number;
+  binCount?: number;
   onToggleWidget?: () => void;
   tierLevel?: number;
   chartId?: string;
+  onDelete?: () => void;
+  isPreview?: boolean;
 };
 
 /*       HELPER FUNCTIONS       */
 
-// Deterministic hash function for consistent values
 const simpleHash = (str: string): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
+    hash = hash & hash;
   }
   return Math.abs(hash);
 };
 
-// Deterministic pseudo-random number generator
 const deterministicRandom = (
   seed: number,
   min: number,
   max: number
 ): number => {
-  // Simple deterministic pseudo-random based on seed
   const x = Math.sin(seed) * 10000;
   const random = x - Math.floor(x);
   return Math.floor(random * (max - min + 1)) + min;
@@ -95,16 +91,11 @@ const generateHistogramDataForLegend = (
   dataPointsPerSeries: number,
   legendIndex: number = 0
 ) => {
-  // Generate deterministic data points for histogram
   const dataPoints: { value: number; series: string }[] = [];
-
   for (let i = 0; i < dataPointsPerSeries; i++) {
-    // Create a unique seed for each data point
     const seed = simpleHash(
       `${legendIndex}-${i}-${startingRange}-${endingRange}`
     );
-
-    // Use deterministic random based on seed with slight variation per legend
     const variation = legendIndex * 10;
     const baseValue = deterministicRandom(
       seed,
@@ -117,7 +108,6 @@ const generateHistogramDataForLegend = (
     );
     dataPoints.push({ value, series: `series_${legendIndex}` });
   }
-
   return dataPoints;
 };
 
@@ -127,9 +117,7 @@ const generateCombinedHistogramData = (
   legendCount: number,
   dataPointsPerSeries: number
 ) => {
-  // Generate combined data for all legends
   const allData: { value: number; series: string }[] = [];
-
   for (let i = 0; i < legendCount; i++) {
     const seriesData = generateHistogramDataForLegend(
       startingRange,
@@ -139,13 +127,12 @@ const generateCombinedHistogramData = (
     );
     allData.push(...seriesData);
   }
-
   return allData;
 };
 
-const generateId = () =>
-  crypto.randomUUID?.() ??
-  Math.random().toString(36).substring(2, 10);
+// const generateId = () =>
+//   crypto.randomUUID?.() ??
+//   Math.random().toString(36).substring(2, 10);
 
 /*       COMPONENT       */
 
@@ -156,19 +143,19 @@ export default function HistogramChart({
   numOfLegendDataSet = 1,
   startingRange,
   endingRange,
-  chartHeight = 400, // NEW DEFAULT
-  strokeWidth = 2, // NEW DEFAULT
-  dataPointsPerSeries = 50, // NEW DEFAULT
-  fillOpacity = 0.7, // NEW DEFAULT
-  binCount = 10, // NEW DEFAULT
+  chartHeight = 400,
+  strokeWidth = 2,
+  dataPointsPerSeries = 50,
+  fillOpacity = 0.7,
+  binCount = 10,
   onToggleWidget,
+  onDelete,
   tierLevel = 0,
   chartId = "root",
+  isPreview = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
 
-  // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
@@ -194,7 +181,6 @@ export default function HistogramChart({
   const chartOptions = useMemo((): AgChartOptions | null => {
     if (!histogramData.length) return null;
 
-    // Create multiple series if we have multiple legends
     const series = legendValues.map((legend, index) => ({
       type: "histogram" as const,
       xKey: "value",
@@ -202,7 +188,7 @@ export default function HistogramChart({
       xName: legend.label || `Series ${index + 1}`,
       fill: legend.color || "#8D79F6",
       stroke: legend.color || "#8D79F6",
-      fillOpacity: fillOpacity - index * 0.1, // Slight opacity variation for overlapping histograms
+      fillOpacity: fillOpacity - index * 0.1,
       strokeWidth: strokeWidth,
       title: legend.label || `Series ${index + 1}`,
       data: histogramData.filter(
@@ -210,7 +196,6 @@ export default function HistogramChart({
       ),
     }));
 
-    // If no legends configured, use default
     if (series.length === 0) {
       series.push({
         type: "histogram",
@@ -226,7 +211,6 @@ export default function HistogramChart({
       });
     }
 
-    // Calculate bin interval based on bin count
     const range = endingRange - startingRange;
     const binInterval = range / binCount;
 
@@ -300,7 +284,7 @@ export default function HistogramChart({
   };
 
   const handleDownload = () => {
-    const csvId = generateId();
+    // const csvId = generateId();
 
     const payload = {
       numberOfDataset: numOfLegendDataSet,
@@ -328,27 +312,6 @@ export default function HistogramChart({
     };
     setIsDownloading(true);
 
-    // For CSV export - include series if multiple legends
-    const header = legendValues.length > 1 ? "Series,Value" : "Value";
-    const rows = histogramData.map((item) =>
-      legendValues.length > 1
-        ? `${item.series || "default"},${item.value}`
-        : `${item.value}`
-    );
-    const csv = [header, ...rows].join("\n");
-
-    const blob = new Blob([csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${widgetTitle}-${csvId}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    // Also save to backend
     DownloadAndSaveCSVforModuleOneWidget(
       payload,
       getChartTitleId,
@@ -360,16 +323,8 @@ export default function HistogramChart({
     setIsDownloading(false);
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleSaveTier = (tierName: string) => {
@@ -394,156 +349,61 @@ export default function HistogramChart({
 
   return (
     <>
-      <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
-          childTiers.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        {/* Header */}
-        <div className="flex justify-between mb-4">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            {legendValues.length > 0 && (
-              <div className="flex flex-wrap gap-3 mt-3">
-                {legendValues.map(
-                  (legend, index) =>
-                    legend.label && (
-                      <div
-                        key={index}
-                        className="flex items-center gap-2"
-                      >
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: legend.color }}
-                        />
-                        <span className="text-sm">
-                          {legend.label}
-                        </span>
-                      </div>
-                    )
-                )}
-              </div>
+      <ChartCardWrapper
+        title={widgetTitle}
+        subtitle="Frequency Distribution"
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          <div className="flex gap-4">
+            {legendValues.slice(0, 3).map((l, index) =>
+              l.label ? (
+                <div key={index} className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: l.color }} />
+                  <span className="text-xs text-gray-500 font-medium">{l.label}</span>
+                </div>
+              ) : null
+            )}
+            {legendValues.length > 3 && (
+              <span className="text-xs text-gray-400">+{legendValues.length - 3} more</span>
             )}
           </div>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDownload();
-                      setShowPopover(false);
-                    }}
-                    disabled={isDownloading}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Download size={18} />
-                    <span>Download</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddTierClick();
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <GoPlus size={18} />
-                    <span>Add Tier</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Histogram Chart */}
-        {chartOptions && hasValidData ? (
-          <div style={{ height: `${chartHeight}px` }}>
-            <AgCharts options={chartOptions} />
-          </div>
-        ) : (
-          <div className="h-[400px] flex items-center justify-center text-gray-400">
-            No data available. Please configure legends and ensure
-            field names are provided.
-          </div>
-        )}
-
-        {/* Configuration Info */}
-        <div className="mt-4 text-sm text-gray-500">
-          <p>
-            Data Range: {startingRange} - {endingRange} | Legends:{" "}
-            {legendValues.length} | X-Axis:{" "}
-            {xAxisValues[0] || "Not set"} | Bins: {binCount}
-          </p>
-        </div>
-
-        {/* Indicator if chart has children */}
-        {childTiers.length > 0 && (
-          <div className="mt-4 text-center">
+        }
+        footer={
+          childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier
-              {childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
             </p>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="text-xs text-gray-500">
+              Data points: {dataPointsPerSeries} | Bins: {binCount}
+            </div>
+          )
+        }
+      >
+        <div className="relative">
+          {chartOptions && hasValidData ? (
+            <div style={{ height: `${chartHeight}px` }}>
+              <AgCharts options={chartOptions} />
+            </div>
+          ) : (
+            <div className="h-[400px] flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
+              No data available. Please configure the widget.
+            </div>
+          )}
+        </div>
+      </ChartCardWrapper>
 
-      {/* Add Tier Modal */}
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
@@ -551,7 +411,6 @@ export default function HistogramChart({
         parentChartName={widgetTitle}
       />
 
-      {/* Children Grid Modal */}
       {showChildrenModal && (
         <TierChartModal
           isOpen={showChildrenModal}
@@ -575,7 +434,8 @@ export default function HistogramChart({
                 fillOpacity={fillOpacity}
                 binCount={binCount}
                 tierLevel={tierLevel + 1}
-                chartId={tier.id}
+                isPreview={isPreview}
+                onDelete={onDelete}
               />
             ))}
           </div>

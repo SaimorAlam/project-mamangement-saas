@@ -1,7 +1,7 @@
 import {
   // Backpack,
   BriefcaseBusiness,
-  Building2,
+  // Building2,
   ChartPie,
   Clipboard,
   FileChartColumnIncreasing,
@@ -10,10 +10,10 @@ import {
   Headphones,
   Info,
   LayoutGrid,
-  Megaphone,
+  // Megaphone,
   Milestone,
   Phone,
-  Store,
+  // Store,
   Users,
   UserStar,
   // Ticket,
@@ -54,23 +54,24 @@ export const getClientSidebarItems = (): SidebarGroup[] => {
     },
     {
       label: "Favorites",
-      items: [
-        {
-          icon: <Megaphone />,
-          name: "Marketing Strategy",
-          path: "/client-panel/marketing-strategy",
-        },
-        {
-          icon: <Building2 />,
-          name: "Alfala Building",
-          path: "/client-panel/alfala-building",
-        },
-        {
-          icon: <Store />,
-          name: "Timo's Super Shop",
-          path: "/client-panel/timos-super-shop",
-        },
-      ],
+      items: [],
+      // items: [
+      //   {
+      //     icon: <Megaphone />,
+      //     name: "Marketing Strategy",
+      //     path: "/client-panel/marketing-strategy",
+      //   },
+      //   {
+      //     icon: <Building2 />,
+      //     name: "Alfala Building",
+      //     path: "/client-panel/alfala-building",
+      //   },
+      //   {
+      //     icon: <Store />,
+      //     name: "Timo's Super Shop",
+      //     path: "/client-panel/timos-super-shop",
+      //   },
+      // ],
     },
     {
       label: "Programs & Projects",
@@ -174,11 +175,11 @@ export const getClientSidebarItems = (): SidebarGroup[] => {
           name: "Settings",
           path: "/client-panel/settings",
         },
-        {
-          icon: <IoSettingsOutline className="size-6" />,
-          name: "Create Project",
-          path: "/client-panel/single-project-create",
-        },
+        // {
+        //   icon: <IoSettingsOutline className="size-6" />,
+        //   name: "Create Project",
+        //   path: "/client-panel/single-project-create",
+        // },
       ],
     },
   ];

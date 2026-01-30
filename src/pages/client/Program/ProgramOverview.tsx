@@ -9,11 +9,10 @@ import {
 import AllProject from "./AllProject";
 
 const ProgramOverview = () => {
-  const { id } = useParams();
-  const { data: program } = useGetProgramByIdQuery(id);
-  console.log(program)
+  const { programId } = useParams();
+  const { data: program } = useGetProgramByIdQuery(programId);
   // const { data: allProjects } = useGetProjectsByProgramIdQuery({
-  //   programId: id,
+  //   programId: programId,
   // });
   // console.log(allProjects?.data);
   return (
@@ -24,10 +23,12 @@ const ProgramOverview = () => {
       <div>
         <HighwayStats />
         <div className="flex items-baseline gap-6">
-          <AllProject title="All Project" programId={id as string} />
+          <AllProject title="All Project" programId={programId as string} />
           <ProgramManager />
         </div>
-        <HighwayMap />
+        <div className="z-0!">
+          <HighwayMap />
+        </div>
       </div>
     </div>
   );

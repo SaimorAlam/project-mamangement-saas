@@ -54,7 +54,7 @@ const UpcomingDeadline = () => {
           <h4 className="text-lg font-semibold">Upcoming Deadline</h4>
         </div>
 
-        {deadlineData.length > 0 && (
+        {deadlineData?.length > 0 && (
           <ViewCalender
             showCalendar={showCalendar}
             setShowCalendar={setShowCalendar}
@@ -68,8 +68,8 @@ const UpcomingDeadline = () => {
       <div className="w-full">
         {isLoading ? (
           <UpcomingDeadlineSkeleton />
-        ) : deadlineData.length > 0 ? (
-          deadlineData.map((project) => (
+        ) : deadlineData?.length > 0 ? (
+          deadlineData?.map((project) => (
             <div key={project.projectId} className="pb-6">
               <UpcomingDeadlineCard deadlineData={project} />
             </div>

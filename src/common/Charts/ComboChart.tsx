@@ -2,16 +2,13 @@
 import { useMemo, useState, useRef } from "react";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
 import { Chart } from "react-chartjs-2";
-import { Copy, Trash2, Download, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineWidgets } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./GetChartData";
+import ChartCardWrapper from "./components/ChartCardWrapper";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
@@ -51,6 +48,7 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
   isCreationMode?: boolean;
+  isPreview?: boolean;
   allUploadedData?: { [key: string]: ChartData[] };
 };
 
@@ -67,6 +65,7 @@ export default function ComboChart({
   tierLevel = 0,
   chartId,
   isCreationMode = false,
+  isPreview = false,
   allUploadedData,
 }: Props) {
   const [localUploadedData, setLocalUploadedData] = useState<{ [key: string]: ChartData[] } | undefined>(allUploadedData);
@@ -81,7 +80,6 @@ export default function ComboChart({
     endingRange,
   });
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPopover, setShowPopover] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
@@ -89,7 +87,7 @@ export default function ComboChart({
 
   /*   CHART DATA   */
   const chartData: ChartData[] = useMemo(() => {
-    const sheetName = (widgetTitle || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim().substring(0, 31);
+    const sheetName = (widgetTitle || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim().substring(0, 31);
     const dataToUse = localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
@@ -191,7 +189,7 @@ export default function ComboChart({
       const usedNames = new Set<string>();
 
       const getUniqueSheetName = (name: string) => {
-        let baseName = (name || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim();
+        let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
         if (baseName.length > 25) baseName = baseName.substring(0, 25);
         if (!baseName) baseName = "Sheet";
 
@@ -252,16 +250,8 @@ export default function ComboChart({
     }
   };
 
-  const handleWidgetClick = () => {
-    if (onToggleWidget) {
-      onToggleWidget();
-    }
-    setShowPopover(false);
-  };
-
   const handleAddTierClick = () => {
     setShowAddTierModal(true);
-    setShowPopover(false);
   };
 
   const handleChartClick = () => {
@@ -312,162 +302,51 @@ export default function ComboChart({
   };
 
   return (
-    <div className="min-w-3xl">
-      <div
-        className={`bg-white border border-gray-200 rounded-lg p-6 relative ${
-          childTiers.length > 0
-            ? "cursor-pointer hover:shadow-lg transition-shadow"
-            : ""
-        }`}
-        onClick={handleChartClick}
-      >
-        <div className="flex justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">{widgetTitle}</h2>
-            <div className="flex gap-6 mt-3">
-              {legendValues.map((l) =>
-                l.label ? (
-                  <div key={l.field} className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-sm"
-                      style={{ backgroundColor: l.color }}
-                    />
-                    <span className="text-sm">
-                      {l.label} ({l.type || "bar"})
-                    </span>
-                  </div>
-                ) : null
-              )}
-            </div>
-          </div>
-
-          <div
-            className="flex items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex gap-2 border-l pl-4 relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowPopover(!showPopover);
-                }}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <BsThreeDots size={18} />
-              </button>
-
-              {showPopover && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-300 rounded-lg shadow-lg p-2 w-48 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                  >
-                    <Copy size={18} />
-                    <span>Copy</span>
-                  </button>
-
-                  {tierLevel === 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload();
-                        setShowPopover(false);
-                      }}
-                      disabled={isDownloading}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <Download size={18} />
-                      <span>Download</span>
-                    </button>
-                  )}
-
-                  {tierLevel === 0 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          document
-                            .getElementById(
-                              `upload-input-${chartId || widgetTitle}`
-                            )
-                            ?.click();
-                          setShowPopover(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                      >
-                        <Upload size={18} />
-                        <span>Upload Data</span>
-                      </button>
-                      <input
-                        id={`upload-input-${chartId || widgetTitle}`}
-                        type="file"
-                        accept=".xlsx, .xls"
-                        className="hidden"
-                        onChange={handleUpload}
-                      />
-                    </>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete();
-                      setShowPopover(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left text-red-600"
-                  >
-                    <Trash2 size={18} />
-                    <span>Delete</span>
-                  </button>
-
-                  {onToggleWidget && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWidgetClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <MdOutlineWidgets size={18} />
-                      <span>Widget</span>
-                    </button>
-                  )}
-
-                  {!isCreationMode && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddTierClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                    >
-                      <GoPlus size={18} />
-                      <span>Add Tier</span>
-                    </button>
-                  )}
+    <>
+      <ChartCardWrapper
+        title={widgetTitle}
+        chartId={chartId}
+        tierLevel={tierLevel}
+        onHeaderClick={handleChartClick}
+        menuActions={{
+          onCopy: handleCopy,
+          onDownload: handleDownload,
+          onDelete: onDelete,
+          onAddTier: handleAddTierClick,
+          onToggleWidget: onToggleWidget,
+          onUpload: tierLevel === 0 ? handleUpload : undefined,
+        }}
+        isDownloading={isDownloading}
+        isPreview={isPreview}
+        customHeaderContent={
+          <div className="flex gap-6 mt-3">
+            {legendValues.map((l) =>
+              l.label ? (
+                <div key={l.field} className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-sm"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-sm">
+                    {l.label} ({l.type || "bar"})
+                  </span>
                 </div>
-              )}
-            </div>
+              ) : null
+            )}
           </div>
-        </div>
-
+        }
+        footer={
+          childTiers?.length > 0 ? (
+            <p className="text-sm text-blue-600 font-medium text-center">
+              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
+            </p>
+          ) : undefined
+        }
+      >
         <div style={{ height: "400px", width: "100%" }}>
           <Chart ref={chartRef} type="bar" data={data} options={options} />
         </div>
-
-        {childTiers?.length > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier
-              {childTiers?.length > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-      </div>
+      </ChartCardWrapper>
 
       <AddTierModal
         isOpen={showAddTierModal}
@@ -498,11 +377,13 @@ export default function ComboChart({
                   tierLevel={tierLevel + 1}
                   chartId={tier?.id}
                   allUploadedData={localUploadedData || allUploadedData}
+                  isPreview={isPreview}
+                  onDelete={onDelete}
                 />
               ))}
           </div>
         </TierChartModal>
       )}
-    </div>
+    </>
   );
 }
