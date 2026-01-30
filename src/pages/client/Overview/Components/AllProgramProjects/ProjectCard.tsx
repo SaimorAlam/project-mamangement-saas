@@ -216,7 +216,9 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           </div>
           <Progress value={progress} className="h-2" />
           <PrimaryButton
-            onClick={() => navigate(`/client-panel/project-details/${id}`)}
+            onClick={() =>
+              navigate(`/client-panel/overview/project-details/${id}`)
+            }
             title="View Project Details"
             type="Primary"
             className="w-full h-10"

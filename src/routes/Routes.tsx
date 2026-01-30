@@ -1,5 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-// Application route imports
 import App from "../App";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
@@ -13,13 +12,8 @@ import EmailCode from "@/pages/EmailCode";
 import TwoStepVerification from "@/pages/TwoStepVerification";
 import Form from "@/pages/Form";
 import Services from "@/pages/Services";
-// Layout imports
-// import AdminDashboardLayout from "@/Layout/adminPanel/AdminDashboardLayout";
 import ClientDashboardLayout from "@/Layout/clientPanel/ClientDashboardLayout";
 import StaffManagerDashboardLayout from "@/Layout/staffManagerPanel/StaffManagerDashboardLayout";
-// import PlatformAnalyticsOverview from "@/pages/Admin/PlatformAnalyticsOverview";
-// Route list imports
-// import { getAdminRoutes } from "./AdminRoutes";
 import { getClientRoutes } from "./ClientRoute";
 import { getStaffManagerRoutes } from "./StaffManagerRoute";
 import ViewerPanelDashboardLayout from "./../Layout/ViewerPanel/ViewerPanelDashboardLayout";
@@ -38,7 +32,6 @@ const routes = createBrowserRouter([
         path: "/",
         element: <Home />,
       },
-
       {
         path: "/about",
         element: <About />,
@@ -79,19 +72,6 @@ const routes = createBrowserRouter([
         path: "/emailcode",
         element: <EmailCode />,
       },
-      // Super Admin routes
-      // {
-      //   path: "/admin",
-      //   element: (
-      //     // <ProtectedRoute allowedRoles={["ADMIN"]}>
-      //     <AdminDashboardLayout />
-      //     // </ProtectedRoute>
-      //   ),
-
-      //   children: getAdminRoutes(),
-      // },
-
-      // Client Route
       {
         path: "/client-panel",
         element: (
@@ -101,8 +81,6 @@ const routes = createBrowserRouter([
         ),
         children: getClientRoutes(),
       },
-
-      // Staff manager routes
       {
         path: "/staff-manager-panel",
         element: (
@@ -112,8 +90,6 @@ const routes = createBrowserRouter([
         ),
         children: getStaffManagerRoutes(),
       },
-
-      // Staff employee routes
       {
         path: "/staff-employee-panel",
         element: (
@@ -123,8 +99,6 @@ const routes = createBrowserRouter([
         ),
         children: getStaffEmployeeRoutes(),
       },
-
-      // Viewer Panel routes
       {
         path: "/viewer-panel",
         element: (

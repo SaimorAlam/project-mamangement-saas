@@ -77,36 +77,53 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
   const projectName = ProjectData?.data?.project?.name;
 
-  const ClientSidebarGroups = getClientSidebarItems();
-  const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
+  const allRoutes = React.useMemo(() => {
+    return getClientSidebarItems().flatMap((group) => group.items);
+  }, []);
 
-  // Determine current route
-  let currentRoute = allRoutes.find((route) => {
-    // Match exact path or any child path
-    if (route.children) {
-      return route.children.some(
-        (child) => `${route.path}/${child.path}` === currentPath,
-      );
-    }
-    return route.path === currentPath;
-  });
+  const isOverviewProjectDetailsPage = currentPath.includes(
+    "/client-panel/overview/project-details/",
+  );
 
-  // Special case for Program Overview: map to All Program
   const showProgramOverviewBreadcrumb = currentPath.startsWith(
     "/client-panel/all-program/program-overview/",
   );
-  if (showProgramOverviewBreadcrumb) {
-    currentRoute = allRoutes.find(
-      (r) => r.path === "/client-panel/all-program",
-    );
-  }
 
-  // Special case for Project Review Details: map to Project Review
-  if (isProjectReviewDetailsPage) {
-    currentRoute = allRoutes.find(
-      (r) => r.path === "/client-panel/project-review",
-    );
-  }
+  // Determine current route
+  const currentRoute = React.useMemo(() => {
+    let route = allRoutes.find((r) => {
+      // Match exact path or any child path
+      if (r.children) {
+        return r.children.some(
+          (child) => `${r.path}/${child.path}` === currentPath,
+        );
+      }
+      return r.path === currentPath;
+    });
+
+    // Special case for Program Overview: map to All Program
+    if (showProgramOverviewBreadcrumb) {
+      route = allRoutes.find((r) => r.path === "/client-panel/all-program");
+    }
+
+    // Special case for Project Review Details: map to Project Review
+    if (isProjectReviewDetailsPage) {
+      route = allRoutes.find((r) => r.path === "/client-panel/project-review");
+    }
+
+    // Special case for Overview Project Details: map to Overview
+    if (isOverviewProjectDetailsPage) {
+      route = allRoutes.find((r) => r.path === "/client-panel");
+    }
+
+    return route;
+  }, [
+    allRoutes,
+    currentPath,
+    showProgramOverviewBreadcrumb,
+    isProjectReviewDetailsPage,
+    isOverviewProjectDetailsPage,
+  ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -146,18 +163,12 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const renderQuickActionButton = () => {
     if (isEmployeePage)
       return (
-        <>
-          <PrimaryButton
-            title="Add Employee"
-            leftIcon={<UserPlus />}
-            type="Primary"
-            onClick={() => setIsEmployeeModalOpen(true)}
-          />
-          <AddEmployeeModal
-            open={isEmployeeModalOpen}
-            onClose={() => setIsEmployeeModalOpen(false)}
-          />
-        </>
+        <PrimaryButton
+          title="Add Employee"
+          leftIcon={<UserPlus />}
+          type="Primary"
+          onClick={() => setIsEmployeeModalOpen(true)}
+        />
       );
 
     if (isAllProgramPage)
@@ -172,49 +183,22 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
     if (isProgramOverviewPage)
       return (
-        <>
-          <PrimaryButton
-            title="Add Project"
-            leftIcon={<Plus />}
-            type="Primary"
-            onClick={() => setIsProjectModalOpen(true)}
-          />
-          {/* <CreateProjectModal
-            open={isProjectModalOpen}
-            programId={programId as string}
-            onClose={() => setIsProjectModalOpen(false)}
-          /> */}
-          {isProjectModalOpen && (
-            <CreateProject
-              programId={programId as string}
-              onClose={() => setIsProjectModalOpen(false)}
-            />
-          )}
-        </>
+        <PrimaryButton
+          title="Add Project"
+          leftIcon={<Plus />}
+          type="Primary"
+          onClick={() => setIsProjectModalOpen(true)}
+        />
       );
 
     if (isHighwayExpansionPage)
       return (
-        <>
-          <PrimaryButton
-            title="Add Project"
-            leftIcon={<Plus />}
-            type="Primary"
-            onClick={() => setIsProjectModalOpen(true)}
-          />
-          <NewProjectModal
-            open={isProjectModalOpen}
-            onClose={() => setIsProjectModalOpen(false)}
-            onSuccess={(projectName: string) => {
-              setIsProjectModalOpen(false);
-              setSuccessData({
-                programName: projectName || "New Project",
-                id: "",
-              });
-              setSuccessOpen(true);
-            }}
-          />
-        </>
+        <PrimaryButton
+          title="Add Project"
+          leftIcon={<Plus />}
+          type="Primary"
+          onClick={() => setIsProjectModalOpen(true)}
+        />
       );
 
     if (isProjectBuilderPage) {
@@ -254,7 +238,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             title="Save as Draft"
             type="Outline"
             onClick={() => {
-              // Handle save as draft logic if needed
               toast.success("Project saved as draft");
             }}
           />
@@ -273,14 +256,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
       isSupportPage;
     return (
       <>
-        {/* <PrimaryButton
-            title="Quick Action"
-            leftIcon={<Plus />}
-            rightIcon={<ChevronDown />}
-            type="Primary"
-            onClick={() => setIsDropdownOpen((prev) => !prev)}
-          /> */}
-        {/* {isDropdownOpen && ( */}
         <div>
           {!shouldHideAddProgram && (
             <PrimaryButton
@@ -338,6 +313,36 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           </div>
 
           <div className="relative">{renderQuickActionButton()}</div>
+
+          {/* Activity Modals */}
+          {isEmployeeModalOpen && (
+            <AddEmployeeModal
+              open={isEmployeeModalOpen}
+              onClose={() => setIsEmployeeModalOpen(false)}
+            />
+          )}
+
+          {isProjectModalOpen && isProgramOverviewPage && (
+            <CreateProject
+              programId={programId as string}
+              onClose={() => setIsProjectModalOpen(false)}
+            />
+          )}
+
+          {isProjectModalOpen && isHighwayExpansionPage && (
+            <NewProjectModal
+              open={isProjectModalOpen}
+              onClose={() => setIsProjectModalOpen(false)}
+              onSuccess={(projectName: string) => {
+                setIsProjectModalOpen(false);
+                setSuccessData({
+                  programName: projectName || "New Project",
+                  id: "",
+                });
+                setSuccessOpen(true);
+              }}
+            />
+          )}
 
           {activeModal === "Add Program" && (
             <CreateProgramModal
@@ -415,20 +420,19 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
                     </BreadcrumbItem>
                   </>
                 )}
-
-                {/* {isProjectDetailsPage && project && (
+                {isOverviewProjectDetailsPage && (
                   <>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                       <BreadcrumbPage className="text-[#356DF0]">
-                        {project}
+                        {projectName || "Project Details"}
                       </BreadcrumbPage>
                     </BreadcrumbItem>
                   </>
-                )} */}
+                )}
               </>
             )}
-            {isProjectDetailsPage && (
+            {isProjectDetailsPage && !isOverviewProjectDetailsPage && (
               <>
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-[#356DF0]">
