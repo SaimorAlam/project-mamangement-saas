@@ -1,10 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface IUpcomingDeadlineFromBackend {
   programName: string;
@@ -37,25 +33,22 @@ const UpcomingDeadlineCard = ({ deadlineData }: IProps) => {
   }
 
   // 🔹 Format ISO deadline → same UI text
-  const formattedDueDate = new Date(deadline).toLocaleDateString(
-    "en-US",
-    {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-    }
-  );
+  const formattedDueDate = new Date(deadline).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
 
   return (
     <div>
-      <Card className="w-full border border-[#E2E8F0] rounded-lg p-4">
+      <Card className="w-full border border-[#E2E8F0] rounded-lg ">
         <CardContent className="space-y-6">
           <div className="flex items-start justify-between">
             <div>
-              <h5 className="font-medium text-[#1D2028]">
+              <h5 className="font-medium text-sm text-[#1D2028]">
                 {programName}
               </h5>
-              <p className="text-sm text-[#475569]">{projectName}</p>
+              <p className="text-xs text-[#475569]">{projectName}</p>
             </div>
 
             <Badge
@@ -68,36 +61,40 @@ const UpcomingDeadlineCard = ({ deadlineData }: IProps) => {
 
           <div className="flex items-center justify-between">
             <div className="space-y-2 w-full">
-              <p className="text-sm font-normal text-[#475569]">
-                Assigned to
-              </p>
+              <p className="text-xs  font-normal text-[#475569]">Assigned to</p>
 
-              <div className="flex items-center justify-between">
-                <div className="flex -space-x-2">
-                  {employees.map((employee) => (
-                    <Avatar
-                      key={employee.id}
-                      className="size-10 border-2 border-[#4881FF] -space-x-4"
-                    >
-                      <AvatarImage
-                        src={
-                          employee.profileImage ||
-                          "https://randomuser.me/api/portraits/men/40.jpg"
-                        }
-                        alt={employee.name}
-                      />
-                      <AvatarFallback className="text-xs">
-                        {employee.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                  ))}
+              <div className="flex items-end justify-between">
+                <div className="flex justify-between -space-x-2">
+                  {employees.length === 0 ? (
+                    <div className="size-10 border border-gray-400 rounded-full bg-gray-50 flex items-center justify-center text-xs text-gray-400">
+                      None
+                    </div>
+                  ) : (
+                    employees.map((employee) => (
+                      <Avatar
+                        key={employee.id}
+                        className="size-10 border-2 border-[#4881FF] -space-x-4"
+                      >
+                        <AvatarImage
+                          src={
+                            employee.profileImage ||
+                            "https://randomuser.me/api/portraits/men/40.jpg"
+                          }
+                          alt={employee.name}
+                        />
+                        <AvatarFallback className="text-xs">
+                          {employee.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                    ))
+                  )}
                 </div>
 
                 <div className="text-right">
-                  <p className="text-sm font-normal text-[#475569]">
+                  <p className="text-xs font-normal text-[#475569]">
                     Due Date: {formattedDueDate}
                   </p>
                 </div>

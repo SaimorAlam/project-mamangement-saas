@@ -31,7 +31,10 @@ const projectApi = baseApi.injectEndpoints({
           params,
         };
       },
-      providesTags: [{ type: "Project", id: "LIST" }],
+      providesTags: [
+        { type: "Project", id: "LIST" },
+        { type: "Manager", id: "LIST" },
+      ],
     }),
 
     searchProjects: builder.query({
@@ -61,6 +64,7 @@ const projectApi = baseApi.injectEndpoints({
       invalidatesTags: (_res, _err, { id }) => [
         { type: "Project", id },
         { type: "Project", id: "LIST" },
+        { type: "Manager", id: "LIST" },
       ],
     }),
 
@@ -86,7 +90,10 @@ const projectApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: [{ type: "Project", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Project", id: "LIST" },
+        { type: "Manager", id: "LIST" },
+      ],
     }),
   }),
 });

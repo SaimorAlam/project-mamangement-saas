@@ -26,13 +26,20 @@ export const DownloadAndSaveCSVforModuleOneWidget = async (
   legendValues: any,
   xAxisValues: any
 ) => {
+  // Attempt to create/get an ID from the backend, but always proceed
+  // to generate and download the CSV even if the backend call fails
+  let uniqueId: string | undefined;
   try {
     const result = await getChartTitleId(payload).unwrap();
+    uniqueId = result?.data?.id;
+  } catch (err) {
+    console.warn("Could not get widget id from server, continuing without id:", err);
+  }
 
-    const uniqueId = result.data.id; // backend generated id
-
+  try {
     const csvTemplate = buildCsvTemplate(legendValues, xAxisValues);
-    downloadCsvFile(csvTemplate, `${widgetTitle}_${uniqueId}.csv`);
+    const fileName = uniqueId ? `${widgetTitle}_${uniqueId}.csv` : `${widgetTitle}.csv`;
+    downloadCsvFile(csvTemplate, fileName);
   } catch (error) {
     console.error("Download failed", error);
     alert("Failed to download CSV");
@@ -56,19 +63,19 @@ export const DownloadAndSaveCSVforModuleTwoWidget = async (
   widgetTitle: string,
   legendValues: any[]
 ) => {
+  // Try to get an ID but still download even if server doesn't return one
+  let uniqueId: string | undefined;
   try {
-
     const result = await getChartTitleId(payload).unwrap();
+    uniqueId = result?.data?.id;
+  } catch (err) {
+    console.warn("Module Two: could not get widget id, continuing without id:", err);
+  }
 
-    const uniqueId = result?.data?.id;
-
-    if (!uniqueId) {
-      throw new Error("Widget ID not returned from server");
-    }
-
+  try {
     const csvTemplate = buildCsvTemplateForModuleTwo(legendValues);
-
-    downloadCsvFile(csvTemplate, `${widgetTitle}_${uniqueId}.csv`);
+    const fileName = uniqueId ? `${widgetTitle}_${uniqueId}.csv` : `${widgetTitle}.csv`;
+    downloadCsvFile(csvTemplate, fileName);
   } catch (error) {
     console.error("Module Two CSV download failed:", error);
     alert("Failed to download CSV");

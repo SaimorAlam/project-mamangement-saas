@@ -1,5 +1,4 @@
-import { ArrowRight, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Clock } from "lucide-react";
 import BoxContainer from "../../../common/BoxContainer";
 import { useState } from "react";
 import "react-calendar/dist/Calendar.css"; // important!
@@ -8,6 +7,7 @@ import { Loader2 } from "lucide-react";
 
 import UpcomingDeadlineCard from "./UpcomingDeadlineCard";
 import { useGetUpcomingDeadlinesQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -56,51 +56,60 @@ const SmUpcomingDeadline = () => {
   };
 
   return (
-    <BoxContainer >
+    <BoxContainer>
       <div className="flex items-center justify-between gap-2 pb-8 relative">
         {/* Header */}
         <div className="flex gap-1 items-center justify-center">
           <Clock className="size-8 text-gray-600 w-6 h-6" />
-          <h4 className="text-xl font-semibold">Upcoming Deadline</h4>
+          <h4 className="text-md font-semibold">Upcoming Deadline</h4>
         </div>
 
         {/* View Calendar Button */}
         {/* {deadlineData.length !== 0 && ( */}
-          <ViewCalender
-            showCalendar={showCalendar}
-            setShowCalendar={setShowCalendar}
-            onChange={handleDateChange} // Pass the handleDateChange to get the selected range
-            value={value}
-          />
+        <ViewCalender
+          showCalendar={showCalendar}
+          setShowCalendar={setShowCalendar}
+          onChange={handleDateChange} // Pass the handleDateChange to get the selected range
+          value={value}
+        />
         {/* )} */}
       </div>
 
       {/* Display Selected Range Days */}
       {selectedDays !== null && (
-        <div className="text-center text-sm text-gray-400 mb-4">
-          You have selected the date range for : {selectedDays} days
+        <div className="text-sm text-gray-400 mb-4">
+          Showing result for : {selectedDays} days
         </div>
       )}
 
       {/* Deadline Cards */}
       <div className="w-full">
         {isLoading ? (
-          <div className="flex justify-center items-center h-32">
-            <Loader2 className="animate-spin h-6 w-6 text-gray-600" />
-          </div>
+          <SkeletonLoading />
         ) : (
-          deadlineData?.map((project: IUpcomingDeadlineFromBackend, i: number) => (
-            <div key={i} className="pb-6">
-              <UpcomingDeadlineCard deadlineData={project} />
-            </div>
-          ))
+          deadlineData?.map(
+            (project: IUpcomingDeadlineFromBackend, i: number) => (
+              <div key={i} className="pb-6">
+                <UpcomingDeadlineCard deadlineData={project} />
+              </div>
+            ),
+          )
         )}
       </div>
 
       {/* View All Button */}
       <div>
+        {deadlineData.length === 0 && (
+          <div className="py-6 text-center text-gray-400">
+            Nothing is in upcoming.
+          </div>
+        )}
+      </div>
+      {/* <div>
         {deadlineData.length === 0 ? (
-          <div className="py-6 text-center text-gray-400">Nothing is in upcoming.</div>
+          <div className="py-6 text-center text-gray-400">
+            Nothing is in upcoming.
+          </div>
         ) : (
           <Button
             variant="ghost"
@@ -110,7 +119,7 @@ const SmUpcomingDeadline = () => {
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         )}
-      </div>
+      </div> */}
     </BoxContainer>
   );
 };

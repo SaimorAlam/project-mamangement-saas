@@ -108,19 +108,19 @@ const StaffEmployeeSidebar = () => {
       return (
         <SidebarMenuItem key={fullPath}>
           <DropdownMenu onOpenChange={(v) => setOpen(v)}>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="border-none">
               <button
                 className={`self-stretch rounded-[10px] inline-flex items-center w-full
                   ${state === "expanded" ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
                   ${
                     active
-                      ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                      ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                       : "text-gray-900 hover:bg-slate-100"
                   }`}
               >
                 <div className={`flex items-center ${state === "expanded" ? "justify-between w-full" : "justify-center"}`}>
                   <span className={`flex items-center ${state === "expanded" ? "gap-2" : ""}`}>
-                    <span className="size-6 flex-shrink-0">{item.icon}</span>
+                    <span className="size-6 shrink-0">{item.icon}</span>
                     {state === "expanded" && (
                       <span className="text-base font-normal">{item.name}</span>
                     )}
@@ -128,7 +128,7 @@ const StaffEmployeeSidebar = () => {
 
                   {state === "expanded" && (
                     <ChevronRight
-                      className={`flex-shrink-0 ${open ? "rotate-90 duration-200" : ""}`}
+                      className={`shrink-0 ${open ? "rotate-90 duration-200" : ""}`}
                     />
                   )}
                 </div>
@@ -167,12 +167,12 @@ const StaffEmployeeSidebar = () => {
               ${state === "expanded" ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
               ${
                 active
-                  ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                  ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                   : "text-gray-900"
               }`}
           >
             <div className={`flex items-center ${state === "expanded" ? "gap-2" : ""}`}>
-              <span className="size-6 flex-shrink-0">{item.icon}</span>
+              <span className="size-6 shrink-0">{item.icon}</span>
               {state === "expanded" && (
                 <span className="text-base font-normal">{item.name}</span>
               )}

@@ -1,4 +1,4 @@
-import { Edit, Eye, Flag } from "lucide-react";
+import { Eye, Flag } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import { Progress } from "@/components/ui/progress";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import DeleteModal from "@/common/Modal/DeleteModal";
 import { useDeleteManagerProjectMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import EditProjectModal from "./EditProjectModal";
 
 export type ProjectStatus =
   | "LIVE"
@@ -113,9 +114,7 @@ const priorityColors: Record<ProjectPriority, string> = {
 const renderPriority = (priority: ProjectPriority) => (
   <div className="flex items-center gap-1">
     <Flag className={`w-4 h-4 ${priorityColors[priority]}`} />
-    <span
-      className={`text-sm font-medium ${priorityColors[priority]}`}
-    >
+    <span className={`text-sm font-medium ${priorityColors[priority]}`}>
       {priority}
     </span>
   </div>
@@ -178,9 +177,7 @@ const ProjectModal = ({
               style={{ width: `${project.progress}%` }}
             />
           </div>
-          <p className="mt-1 text-sm font-medium">
-            {project.progress}%
-          </p>
+          <p className="mt-1 text-sm font-medium">{project.progress}%</p>
         </div>
 
         <div className="text-sm">
@@ -200,8 +197,6 @@ const ProjectModal = ({
   </Dialog>
 );
 
-
-
 const StaffManagerProjectTable = ({
   projects,
 }: StaffEmployeeProjectTableProps) => {
@@ -216,10 +211,10 @@ const StaffManagerProjectTable = ({
 
   const [deleteProject] = useDeleteManagerProjectMutation();
 
-  const handleDelete = (id: string)=>{
-    deleteProject({id})
-    setOpen(false)
-  }
+  const handleDelete = (id: string) => {
+    deleteProject({ id });
+    setOpen(false);
+  };
 
   return (
     <Card className="w-full shadow-none border-none">
@@ -230,13 +225,9 @@ const StaffManagerProjectTable = ({
               <TableHead className="px-6 py-3.5">Program</TableHead>
               <TableHead className="px-6 py-3.5">Project</TableHead>
               <TableHead className="px-6 py-3.5">Status</TableHead>
-              <TableHead className="px-6 py-3.5">
-                Assigned People
-              </TableHead>
+              <TableHead className="px-6 py-3.5">Assigned People</TableHead>
               <TableHead className="px-6 py-3.5">Priority</TableHead>
-              <TableHead className="px-6 py-3.5">
-                Started On
-              </TableHead>
+              <TableHead className="px-6 py-3.5">Started On</TableHead>
               <TableHead className="px-6 py-3.5">Deadline</TableHead>
               <TableHead className="px-6 py-3.5">Progress</TableHead>
               <TableHead className="px-6 py-3.5">Action</TableHead>
@@ -266,8 +257,7 @@ const StaffManagerProjectTable = ({
                     staff={Array.from({ length: 3 }, (_, i) => ({
                       id: i.toString(),
                       name: `Staff ${i + 1}`,
-                      avatar:
-                        "https://randomuser.me/api/portraits/men/19.jpg",
+                      avatar: "https://randomuser.me/api/portraits/men/19.jpg",
                     }))}
                   />
                 </TableCell>
@@ -285,13 +275,8 @@ const StaffManagerProjectTable = ({
                 </TableCell>
 
                 <TableCell className="px-6 py-3.5 text-muted-foreground flex items-center gap-2">
-                  <Progress
-                    value={project.progress}
-                    className="h-2"
-                  />
-                  <span className="font-medium">
-                    {project.progress}%
-                  </span>
+                  <Progress value={project.progress} className="h-2" />
+                  <span className="font-medium">{project.progress}%</span>
                 </TableCell>
 
                 <TableCell className="px-6 py-3.5">
@@ -304,14 +289,12 @@ const StaffManagerProjectTable = ({
                       <Eye className="w-4 h-4 text-[#1C73E0]" />
                     </Button>
 
-                    <Button variant="ghost" size="sm">
-                      <Edit className="w-4 h-4 text-[#169E7B]" />
-                    </Button>
+                    <EditProjectModal id={project.id} />
 
                     <DeleteModal
-                        deletingItemTitle={project.name}
-                        deletingItemId={project.id}
-                        onDelete={handleDelete}
+                      deletingItemTitle={project.name}
+                      deletingItemId={project.id}
+                      onDelete={handleDelete}
                     />
                   </div>
                 </TableCell>
@@ -322,11 +305,7 @@ const StaffManagerProjectTable = ({
       </CardContent>
 
       {selectedProject && (
-        <ProjectModal
-          project={selectedProject}
-          open={open}
-          setOpen={setOpen}
-        />
+        <ProjectModal project={selectedProject} open={open} setOpen={setOpen} />
       )}
     </Card>
   );
