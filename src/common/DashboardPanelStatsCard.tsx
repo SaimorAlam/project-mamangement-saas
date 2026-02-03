@@ -49,6 +49,7 @@ const DashboardPanelStatsCard = ({
     description,
     growth_type,
     link_text,
+    link,
     icon,
     icon_bg_color,
   } = item;
@@ -192,7 +193,7 @@ const DashboardPanelStatsCard = ({
                   <span className="">{description && description}</span>
                 )}
                 {showFooterButton && (
-                  <Link to={`#`} className="text-blue-500 hover:underline">
+                  <Link to={link} className="text-blue-500 hover:underline">
                     {link_text} &rarr;
                   </Link>
                 )}
