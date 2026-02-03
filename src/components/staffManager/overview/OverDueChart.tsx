@@ -21,18 +21,15 @@ const OverDueChart = () => {
   } = useGetTopOverdueProjectsQuery({});
 
   useEffect(() => {
-    if (!overdueData?.data || overdueData.data.length === 0) {
+    const projects = overdueData?.data?.projects;
+    if (!projects || projects.length === 0) {
       setOverDueChartData({ series: [], options: {} });
       return;
     }
 
-    const categories = overdueData.data.map(
-      (item: any) => item.projectName
-    );
-    const values = overdueData.data.map(
-      (item: any) => item.overdueDays
-    );
-    const colors = overdueData.data.map((item: any) => {
+    const categories = projects.map((item: any) => item.name);
+    const values = projects.map((item: any) => item.overdueDays);
+    const colors = projects.map((item: any) => {
       if (item.priority === "High") return "#DA4352";
       if (item.priority === "Medium") return "#FF974B";
       if (item.priority === "Low") return "#F5B31A";

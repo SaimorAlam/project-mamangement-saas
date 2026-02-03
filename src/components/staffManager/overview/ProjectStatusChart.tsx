@@ -27,10 +27,10 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 };
 
 export default function ProjectStatusChart() {
-  const [, setSortBy] = useState("");
+  const [sortBy, setSortBy] = useState(1);
 
   const { data: submissionData, isLoading: submissionLoading } =
-    useGetSubmissionStatusQuery({});
+    useGetSubmissionStatusQuery({ month: sortBy });
 
   const submissionChartData = useMemo(() => {
     if (!submissionData?.data) {
@@ -41,15 +41,14 @@ export default function ProjectStatusChart() {
     }
 
     const { total, counts, percentages } = submissionData.data;
+    const orderedKeys = ["submitted", "live", "returned", "overdue"];
 
-    const statuses: ProjectStatus[] = Object.keys(counts).map(
-      (key) => ({
-        name: STATUS_LABEL_MAP[key],
-        value: counts[key as keyof typeof counts],
-        percentage: percentages[key as keyof typeof percentages],
-        color: STATUS_COLOR_MAP[key],
-      })
-    );
+    const statuses: ProjectStatus[] = orderedKeys.map((key) => ({
+      name: STATUS_LABEL_MAP[key],
+      value: counts[key as keyof typeof counts] || 0,
+      percentage: percentages[key as keyof typeof percentages] || 0,
+      color: STATUS_COLOR_MAP[key],
+    }));
 
     return {
       total,
@@ -63,9 +62,7 @@ export default function ProjectStatusChart() {
       height: 280,
       toolbar: { show: false },
     },
-    colors: submissionChartData.statuses.map(
-      (status) => status.color
-    ),
+    colors: submissionChartData.statuses.map((status) => status.color),
     labels: submissionChartData.statuses.map((status) => status.name),
     dataLabels: { enabled: false },
     legend: { show: false },
@@ -102,7 +99,7 @@ export default function ProjectStatusChart() {
       y: {
         formatter: (
           value: number,
-          { seriesIndex }: { seriesIndex: number }
+          { seriesIndex }: { seriesIndex: number },
         ) => {
           const status = submissionChartData.statuses[seriesIndex];
           return `${value} (${status?.percentage ?? 0}%)`;
@@ -111,19 +108,16 @@ export default function ProjectStatusChart() {
     },
   };
 
-  const series = submissionChartData.statuses.map(
-    (status) => status.value
-  );
+  const series = submissionChartData.statuses.map((status) => status.value);
 
   const dropdownItem = [
-    { value: "this-week", title: "This Week" },
-    { value: "this-month", title: "This Month" },
-    { value: "this-quarter", title: "This Quarter" },
-    { value: "this-year", title: "This Year" },
+    { value: "1", title: "This Month" },
+    { value: "3", title: "This Quarter" },
+    { value: "12", title: "This Year" },
   ];
 
   const handleChange = (e: string) => {
-    setSortBy(e);
+    setSortBy(Number(e));
   };
 
   return (
@@ -142,22 +136,19 @@ export default function ProjectStatusChart() {
           {/* Legend */}
           <div className="grid grid-cols-2 gap-3 text-sm">
             {submissionChartData.statuses.map((status, index) => (
-              <div
-                key={index}
-                className="flex items-center space-x-2"
-              >
+              <div key={index} className="flex items-center space-x-2">
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{
                     backgroundColor: status.color,
                   }}
                 />
-                <span className="text-muted-foreground">
-                  {status.name}
-                </span>
-                <span className="font-medium ml-auto">
-                  {status.percentage}%
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-muted-foreground">{status.name}</span>
+                  <span className="font-medium text-lg">
+                    {status.percentage}%
+                  </span>
+                </div>
               </div>
             ))}
           </div>

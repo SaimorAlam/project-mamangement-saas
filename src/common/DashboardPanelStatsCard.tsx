@@ -90,7 +90,7 @@ const DashboardPanelStatsCard = ({
   }, [ref]);
 
   return (
-    <div>
+    <div className=" min-w-[200px]">
       <div
         className={`${
           growth_type === "up"
