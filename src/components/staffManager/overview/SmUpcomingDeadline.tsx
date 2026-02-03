@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 
 import UpcomingDeadlineCard from "./UpcomingDeadlineCard";
 import { useGetUpcomingDeadlinesQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -84,9 +85,7 @@ const SmUpcomingDeadline = () => {
       {/* Deadline Cards */}
       <div className="w-full">
         {isLoading ? (
-          <div className="flex justify-center items-center h-32">
-            <Loader2 className="animate-spin h-6 w-6 text-gray-600" />
-          </div>
+          <SkeletonLoading />
         ) : (
           deadlineData?.map(
             (project: IUpcomingDeadlineFromBackend, i: number) => (

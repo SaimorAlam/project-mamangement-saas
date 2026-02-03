@@ -4,6 +4,7 @@ import { useGetSubmissionStatusQuery } from "@/store/Api/staffManagerApi/StaffMa
 import Chart from "react-apexcharts";
 
 import { useMemo, useState } from "react";
+import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 
 export interface ProjectStatus {
   name: string;
@@ -155,7 +156,9 @@ export default function ProjectStatusChart() {
 
           {/* Chart */}
           <div className="relative">
-            {!submissionLoading && (
+            {submissionLoading ? (
+              <SkeletonLoading />
+            ) : (
               <Chart
                 options={chartOptions}
                 series={series}

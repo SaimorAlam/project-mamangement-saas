@@ -4,6 +4,7 @@ import Chart from "react-apexcharts";
 import { useState, useEffect } from "react";
 import { useGetTopOverdueProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import { Spinner } from "@/components/ui/spinner";
+import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 
 const OverDueChart = () => {
   const [overDueChartData, setOverDueChartData] = useState<{
@@ -102,11 +103,7 @@ const OverDueChart = () => {
 
   return (
     <div className="bg-white rounded-lg p-4">
-      {overdueLoading && (
-        <div className="flex items-center justify-center h-40">
-          <Spinner />
-        </div>
-      )}
+      {overdueLoading && <SkeletonLoading />}
 
       {overdueError && (
         <div className="text-center text-gray-400 py-6">
