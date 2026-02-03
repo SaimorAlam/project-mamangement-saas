@@ -48,8 +48,8 @@ export const getStaffManagerSidebarItems = (): SidebarGroup[] => {
         },
         {
           icon: <Grid2x2 />,
-          name: "Project Builder",
-          path: "/staff-manager-panel/project-builder",
+          name: "All Program",
+          path: "/staff-manager-panel/all-program",
         },
         // {
         //   icon: <FileChartColumnIncreasing />,
@@ -60,18 +60,6 @@ export const getStaffManagerSidebarItems = (): SidebarGroup[] => {
           icon: <FileChartColumnIncreasing />,
           name: "Project Review",
           path: "/staff-manager-panel/project-review",
-          children: [
-            {
-              icon: <FileChartColumnIncreasing />,
-              name: "Project Review",
-              path: "all-projects",
-            },
-            {
-              icon: <FolderClosed />,
-              name: "Carlyle Hall",
-              path: "carlyle-hall",
-            },
-          ],
         },
       ],
     },

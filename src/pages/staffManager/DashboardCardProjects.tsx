@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import StaffManagerProjectCard, {
   StaffEmployeeProject,
