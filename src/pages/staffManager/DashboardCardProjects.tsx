@@ -4,6 +4,7 @@ import StaffManagerProjectCard, {
   StaffEmployeeProject,
 } from "@/components/staffManager/StaffManagerProjectCard";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import { ChevronLeft, Undo2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 
@@ -60,9 +61,18 @@ const DashboardCardProjects = () => {
   }
   return (
     <>
-      <h4 className="mb-3 text-gray-900 text-xl font-semibold">
-        All Program & Project
-      </h4>
+      <div className="flex items-center justify-between mb-5">
+        <h4 className="mb-3 text-gray-900 text-xl font-semibold">
+          All Program & Project
+        </h4>
+        <Link
+          to="/staff-manager-panel/projects"
+          className="flex items-center gap-2 text-primary border border-gray-300 rounded-lg px-4 py-2"
+        >
+          <ChevronLeft />
+          Go back
+        </Link>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-3 gap-5">
         {projects?.map((projectData: StaffEmployeeProject) => {
           return (

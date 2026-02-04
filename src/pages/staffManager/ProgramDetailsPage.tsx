@@ -1,157 +1,183 @@
-import { useParams } from "react-router-dom";
-import { Progress } from "@/components/ui/progress";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Calendar,
   Clock,
   AlertCircle,
-  TrendingUp,
-  Loader2,
+  MapPin,
+  ArrowLeft,
+  User,
+  Layers,
+  Database,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { FaSpinner } from "react-icons/fa";
 import { useGetProgramByIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import ErrorPage from "@/common/ErrorPage";
+
+const formatDate = (date: string | null) => {
+  if (!date) return "Not Set";
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+const getPriorityStyles = (priority: string) => {
+  switch (priority?.toUpperCase()) {
+    case "HIGH":
+      return "bg-rose-50 text-rose-700 border-rose-200";
+    case "MEDIUM":
+      return "bg-orange-50 text-orange-700 border-orange-200";
+    default:
+      return "bg-slate-50 text-slate-700 border-slate-200";
+  }
+};
 
 export default function ProgramDetailsPage() {
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading, isError } = useGetProgramByIdQuery(id!, { skip: !id });
+  const navigate = useNavigate();
+  const { data, isLoading, isError } = useGetProgramByIdQuery(id!, {
+    skip: !id,
+  });
+
   const program = data?.data;
 
   if (isLoading) {
     return (
-      <div className="flex flex-col justify-center items-center h-[80vh] gap-4">
-        <Loader2 className="animate-spin text-indigo-600 h-12 w-12" />
-        <p className="text-gray-600 font-medium text-lg">Loading program details...</p>
+      <div className="flex items-center justify-center h-screen">
+        <FaSpinner className="animate-spin text-primary" size={24} />
       </div>
     );
   }
 
   if (isError || !program) {
-    return (
-      <div className="flex flex-col justify-center items-center h-[70vh] text-center px-4">
-        <div className="bg-red-100 p-6 rounded-full mb-6">
-          <AlertCircle className="text-red-600 h-12 w-12" />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Unable to Load Program</h2>
-        <p className="text-gray-600 max-w-md">
-          We encountered an issue retrieving the program details. Please check your connection and try again.
-        </p>
-      </div>
-    );
+    return <ErrorPage />;
   }
 
-  const getPriorityColor = (prio: string) => {
-    switch (prio?.toLowerCase()) {
-      case "high": return "bg-red-100 text-red-800 border-red-200";
-      case "medium": return "bg-amber-100 text-amber-800 border-amber-200";
-      default: return "bg-emerald-100 text-emerald-800 border-emerald-200";
-    }
-  };
-
-  const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
   return (
-    <div className="">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        {/* Header Section */}
-        <div className="bg-white rounded-3xl p-8 lg:p-10 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-            <div className="flex-1">
-              <div className="flex items-center gap-4 mb-4">
-                <Badge
-                  variant="outline"
-                  className={`${getPriorityColor(program.priority)} px-4 py-1.5 text-xs font-semibold uppercase tracking-wider`}
-                >
-                  {program.priority} Priority
-                </Badge>
-                
-              </div>
-              <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
-                {program.programName}
-              </h1>
-              <span className="text-sm text-gray-500 font-mono">ID: {id}</span>
-              <p className="text-lg text-gray-600 leading-relaxed max-w-3xl">
-                {program.programDescription}
-              </p>
-            </div>
+    <div className="container mx-auto px-4 py-6 max-w-6xl">
+      {/* Header Actions */}
+      <div className="flex items-center justify-between mb-6">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+      </div>
 
-            {/* Progress Card */}
-            <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-6 rounded-2xl shadow-xl min-w-[280px] transform hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="h-6 w-6" />
-                  <span className="font-semibold text-indigo-100">Progress</span>
-                </div>
-                <span className="text-3xl font-black">{program.progress}%</span>
-              </div>
-              <Progress value={program.progress} className="h-3 bg-white/20">
-                <div className="bg-white h-full rounded-full" />
-              </Progress>
-            </div>
+      {/* Title & Progress Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2">
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">
+            {program.programName}
+          </h1>
+          <p className="text-slate-500 mb-4">{program.programDescription}</p>
+          <div className="flex gap-2">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold border ${getPriorityStyles(program.priority)}`}
+            >
+              {program.priority} Priority
+            </span>
           </div>
         </div>
 
-        <div className="">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8 w-full">
-            {/* Timeline Card */}
-            <div className="bg-white rounded-3xl  border border-gray-200/50 overflow-hidden hover:shadow-xl transition-shadow duration-300">
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-5 border-b border-gray-200 flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-indigo-600" />
-                <h2 className="font-bold text-gray-800 uppercase tracking-wider text-sm">
-                  Timeline & Schedule
-                </h2>
-              </div>
-              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <DetailItem
-                  label="Start Date"
-                  value={formatDate(program.datetime)}
-                  icon={<Clock className="h-5 w-5 text-indigo-600" />}
-                />
-                <DetailItem
-                  label="Deadline"
-                  value={formatDate(program.deadline)}
-                  icon={<AlertCircle className="h-5 w-5 text-orange-500" />}
-                />
-                <DetailItem label="Last Updated" value={formatDate(program.updatedAt)} />
-                <DetailItem label="Created On" value={formatDate(program.createdAt)} />
-              </div>
-            </div>
-
+        <div className="p-5 rounded-xl border border-slate-100 bg-slate-50/50">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-bold text-slate-400 uppercase">
+              Progress
+            </span>
+            <span className="text-sm font-bold text-primary">
+              {program.progress}%
+            </span>
           </div>
-
+          <Progress value={program.progress} className="h-2" />
         </div>
+      </div>
+
+      {/* Info Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Timeline Section */}
+        <section className="p-5 rounded-xl border border-slate-100">
+          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2 mb-4">
+            <Calendar className="w-4 h-4" /> Timeline
+          </h4>
+          <div className="space-y-4">
+            <InfoItem
+              icon={<Clock className="w-4 h-4" />}
+              label="Start Date"
+              value={formatDate(program.datetime)}
+            />
+            <InfoItem
+              icon={<AlertCircle className="w-4 h-4" />}
+              label="Deadline"
+              value={formatDate(program.deadline)}
+              highlight
+            />
+            <InfoItem
+              icon={<Calendar className="w-4 h-4" />}
+              label="Created At"
+              value={formatDate(program.createdAt)}
+            />
+          </div>
+        </section>
+
+        {/* Details Section */}
+        <section className="p-5 rounded-xl border border-slate-100">
+          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2 mb-4">
+            <Layers className="w-4 h-4" /> Program Metadata
+          </h4>
+          <div className="space-y-4">
+            <InfoItem
+              icon={<MapPin className="w-4 h-4" />}
+              label="Location"
+              value={`${program.latitude}, ${program.longitude}`}
+            />
+            <InfoItem
+              icon={<User className="w-4 h-4" />}
+              label="Manager ID"
+              value={program.managerId}
+            />
+            <InfoItem
+              icon={<Database className="w-4 h-4" />}
+              label="Client ID"
+              value={program.clientId}
+            />
+          </div>
+        </section>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-8 pt-4 border-t border-slate-100 text-right text-xs text-slate-400">
+        Last updated {formatDate(program.updatedAt)}
       </div>
     </div>
   );
 }
 
-function DetailItem({
+const InfoItem = ({
   label,
   value,
   icon,
+  highlight = false,
 }: {
   label: string;
   value: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <div className="group hover:bg-gray-50/50 p-6 rounded-2xl transition-colors duration-200">
-      <div className="flex items-center gap-3 mb-3">
-        {icon || ""}
-        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-          {label}
-        </span>
-      </div>
-      <p className="text-lg font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors">
+  icon: React.ReactNode;
+  highlight?: boolean;
+}) => (
+  <div className="flex items-center gap-3">
+    <div className="p-2 rounded-lg bg-slate-100 text-slate-600">{icon}</div>
+    <div>
+      <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+        {label}
+      </p>
+      <p
+        className={`text-sm font-semibold truncate max-w-[200px] sm:max-w-none ${highlight ? "text-rose-600" : "text-slate-700"}`}
+      >
         {value}
       </p>
     </div>
-  );
-}
+  </div>
+);

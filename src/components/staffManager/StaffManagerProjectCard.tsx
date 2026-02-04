@@ -195,13 +195,14 @@ const StaffManagerProjectCard = ({
             <div>
               <h3 className="mb-1">Assigned People</h3>
               {/* Kept intentionally even if data is not available */}
-              <RenderStaffAvatars
+              {/* <RenderStaffAvatars
                 staff={Array.from({ length: 3 }, (_, i) => ({
                   id: i.toString(),
                   name: `Staff ${i + 1}`,
                   avatar: "https://randomuser.me/api/portraits/men/19.jpg",
                 }))}
-              />
+              /> */}
+              --
             </div>
 
             <div className="flex flex-col gap-y-4 text-sm py-2 px-4">
