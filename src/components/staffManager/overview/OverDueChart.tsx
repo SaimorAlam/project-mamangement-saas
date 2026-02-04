@@ -3,7 +3,6 @@
 import Chart from "react-apexcharts";
 import { useState, useEffect } from "react";
 import { useGetTopOverdueProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import { Spinner } from "@/components/ui/spinner";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 
 const OverDueChart = () => {

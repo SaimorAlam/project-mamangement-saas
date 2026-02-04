@@ -21,27 +21,13 @@ const ViewCalender = ({
   onChange,
   value,
 }: ViewCalenderProps) => {
-  const formatShortDate = (date: Date) => {
-    return date.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "2-digit",
-    });
-  };
-
   return (
     <div className="relative">
       {/* View Calendar Button */}
       <PrimaryButton
-        title={
-          value
-            ? Array.isArray(value)
-              ? `${value[0] ? formatShortDate(value[0]) : ""} - ${value[1] ? formatShortDate(value[1]) : ""}`
-              : formatShortDate(value)
-            : "View Calendar"
-        }
+        title={"View Calendar"}
         type="Primary"
-        rightIcon={!value && <CalendarDays />}
+        rightIcon={<CalendarDays />}
         className="text-sm px-3"
         onClick={() => setShowCalendar(!showCalendar)}
       />

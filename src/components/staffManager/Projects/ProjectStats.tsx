@@ -1,6 +1,6 @@
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
+import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import { useGetProjectPageStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import { FaSpinner } from "react-icons/fa";
 
 const ProjectStats = () => {
   const stats = [
@@ -10,6 +10,7 @@ const ProjectStats = () => {
       growth: "",
       growth_type: "up",
       description: "",
+      link: "/staff-manager-panel/projects/",
       link_text: "",
       icon: "FolderIcon",
       icon_bg_color: "#5500f1",
@@ -20,6 +21,7 @@ const ProjectStats = () => {
       growth: "",
       growth_type: "",
       description: "",
+      link: "/staff-manager-panel/projects",
       link_text: "",
       icon: "SubmissionOverdue",
       icon_bg_color: "#4881FF",
@@ -30,6 +32,7 @@ const ProjectStats = () => {
       growth: "",
       growth_type: "",
       description: "",
+      link: "/staff-manager-panel/projects/status/COMPLETED",
       link_text: "",
       icon: "Check",
       icon_bg_color: "#00FF00",
@@ -40,6 +43,8 @@ const ProjectStats = () => {
       growth: "",
       growth_type: "",
       description: "",
+      link: "/staff-manager-panel/projects/status/PENDING",
+      link_text: "",
       icon: "PendingReview",
       icon_bg_color: "#aeb100",
     },
@@ -53,12 +58,7 @@ const ProjectStats = () => {
 
   const dashboardData = staffData?.data;
 
-  if (isLoading)
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <FaSpinner className="animate-spin" size={24} />
-      </div>
-    );
+  if (isLoading) return <SkeletonLoading count={4} height="h-44" />;
 
   if (error) return <div>Error during Fetching data</div>;
 

@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaSpinner } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
-import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import { useGetAllManagerProgramsForProgramPageQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import Pagination from "@/common/Pagination";
 import { IProgram } from "@/types";
 import {
@@ -12,6 +11,11 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useNavigate } from "react-router-dom";
+import { ArrowDownUp, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+// import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
+import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 
 interface IProgramTableProps {
   title?: string;
@@ -39,7 +43,8 @@ const StaffManagerAllProgram = ({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading } = useGetAllProgramQuery({
+  // API calls
+  const { data, isLoading } = useGetAllManagerProgramsForProgramPageQuery({
     page: currentPage,
     limit,
     programName: debouncedSearch || undefined,
@@ -48,6 +53,7 @@ const StaffManagerAllProgram = ({
 
   const programs = useMemo(() => data?.data?.data ?? [], [data]);
   const meta = data?.data?.meta;
+  const navigate = useNavigate();
 
   const totalPrograms = meta?.total ?? programs.length;
   const itemsPerPage = meta?.limit ?? limit;
@@ -67,14 +73,13 @@ const StaffManagerAllProgram = ({
     const list = [...programs];
 
     if (!sortColumn) {
-      // Default: sort by createdAt descending
       return list.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a: IProgram, b: IProgram) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     }
 
-    return list.sort((a, b) => {
+    return list.sort((a: any, b: any) => {
       const valA = a[sortColumn];
       const valB = b[sortColumn];
 
@@ -108,31 +113,24 @@ const StaffManagerAllProgram = ({
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-10 h-[60vh]">
-        <FaSpinner size={24} className="animate-spin" />
-      </div>
-    );
-  }
-
-  // Ensure always 10 rows
-  const totalRows = 10;
+  const totalRows = 1;
   const emptyRowsCount = totalRows - sortedPrograms.length;
   const tableRows = [
     ...sortedPrograms,
     ...Array.from({ length: emptyRowsCount }).map(() => null),
   ];
 
-  return (
-    <div className="min-h-screen py-6">
-      <div className="bg-white rounded-lg border border-gray-200">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between px-6 py-4 border-b border-gray-200 gap-3">
-          <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
+  const handleRowClick = (programId: string) => {
+    navigate(`/staff-manager-panel/program/${programId}`);
+  };
 
+  return (
+    <div className="py-6 min-h-screen">
+      <div className="bg-white border border-gray-200 rounded-lg">
+        {/* Header */}
+        <div className="flex md:flex-row flex-col justify-between items-center gap-3 px-6 py-4 border-gray-200 border-b">
+          <h1 className="font-semibold text-gray-900 text-lg">{title}</h1>
           <div className="flex items-center gap-3">
-            {/* Search */}
             <input
               type="text"
               placeholder="Search by program name..."
@@ -141,13 +139,87 @@ const StaffManagerAllProgram = ({
                 setCurrentPage(1);
                 setSearch(e.target.value);
               }}
-              className="px-4 py-2 text-sm border border-gray-300 rounded-md w-64"
+              className="px-4 py-2 border border-gray-300 rounded-md w-64 text-sm"
             />
-
-            {/* Priority Filter */}
+            {/* Sort By Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="px-4 py-2 text-sm border border-gray-300 rounded-md min-w-32">
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="bg-white px-4 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none text-sm appearance-none cursor-pointer"
+                >
+                  <ArrowDownUp className="size-5" />
+                  Sort By
+                  <ChevronDown className="size-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-white p-1 border border-[#CAD2DB] w-56"
+              >
+                {/* Field Selection */}
+                <div className="px-2 py-1.5 font-semibold text-gray-500 text-xs uppercase tracking-wider">
+                  Field
+                </div>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${
+                    sortColumn === "programName"
+                      ? "bg-indigo-50 text-indigo-600"
+                      : ""
+                  }`}
+                  onClick={() => setSortColumn("programName")}
+                >
+                  Program Name
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${
+                    sortColumn === "updatedAt"
+                      ? "bg-indigo-50 text-indigo-600"
+                      : ""
+                  }`}
+                  onClick={() => setSortColumn("updatedAt")}
+                >
+                  Updated At
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${
+                    sortColumn === "deadline"
+                      ? "bg-indigo-50 text-indigo-600"
+                      : ""
+                  }`}
+                  onClick={() => setSortColumn("deadline")}
+                >
+                  Deadline
+                </DropdownMenuItem>
+
+                <div className="my-1 border-gray-100 border-t" />
+
+                {/* Order Selection */}
+                <div className="px-2 py-1.5 font-semibold text-gray-500 text-xs uppercase tracking-wider">
+                  Order
+                </div>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${
+                    sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
+                  }`}
+                  onClick={() => setSortOrder("asc")}
+                >
+                  Ascending
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`rounded-md cursor-pointer ${
+                    sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
+                  }`}
+                  onClick={() => setSortOrder("desc")}
+                >
+                  Descending
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md min-w-32 font-semibold text-sm">
                 {priorityFilter === "ALL" ? "All Priorities" : priorityFilter}
+                <ChevronDown className="w-5 h-5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
@@ -167,105 +239,147 @@ const StaffManagerAllProgram = ({
         </div>
 
         {/* Table */}
+
         <div className="overflow-x-auto">
-          <table className="w-full table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                {[
-                  "programName",
-                  "priority",
-                  !hideCreatedOn && "createdAt",
-                  "updatedAt",
-                  "deadline",
-                  "progress",
-                ].map(
-                  (col) =>
-                    col && (
-                      <th
-                        key={col}
-                        onClick={() => handleSort(col as keyof IProgram)}
-                        className="px-6 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer"
-                      >
-                        {col.toString().replace(/([A-Z])/g, " $1")}
-                        {sortColumn === col &&
-                          (sortOrder === "asc" ? " ▲" : " ▼")}
-                      </th>
-                    )
-                )}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {tableRows.map((program, idx) =>
-                program ? (
-                  <tr key={program.id} className="hover:bg-gray-50 h-[60px]">
-                    <td className="px-6 py-4 text-sm">{program.programName}</td>
-
-                    <td className="px-6 py-4">
-                      <PriorityDropdown defaultPriority={program.priority} />
-                    </td>
-
-                    {!hideCreatedOn && (
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {formatDate(program.createdAt)}
-                      </td>
-                    )}
-
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {formatDate(program.updatedAt)}
-                    </td>
-
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {formatDate(program.deadline)}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1 max-w-[120px] h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-blue-600 transition-all"
-                            style={{
-                              width: `${program.progress}%`,
-                            }}
-                          />
-                        </div>
-                        <span className="text-sm text-gray-600">
-                          {program.progress}%
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  <tr key={`empty-${idx}`} className="h-[60px]">
+          {isLoading ? (
+            <SkeletonLoading count={10} height="h-10" direction="vertical" />
+          ) : (
+            <>
+              <table className="w-full table-fixed">
+                <thead className="bg-gray-50 border-gray-200 border-b">
+                  <tr>
                     {[
                       "programName",
+                      "projects",
+                      "assigned Manager",
                       "priority",
-                      !hideCreatedOn && "createdAt",
-                      "updatedAt",
+                      !hideCreatedOn && "created On",
+                      "updated On",
                       "deadline",
                       "progress",
+                      // "actions", // Removed Actions column for manager view as per typical permissioning, but can add back if needed
                     ].map(
-                      (col, i) =>
+                      (col) =>
                         col && (
-                          <td
-                            key={i}
-                            className="px-6 py-4 text-sm text-gray-200"
+                          <th
+                            key={col}
+                            onClick={() => handleSort(col as keyof IProgram)}
+                            className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 capitalize cursor-pointer`}
                           >
-                            &nbsp;
-                          </td>
-                        )
+                            {col.toString().replace(/([A-Z])/g, " $1")}
+                            {sortColumn === col &&
+                              (sortOrder === "asc" ? " ▲" : " ▼")}
+                          </th>
+                        ),
                     )}
                   </tr>
-                )
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {tableRows.map((program, idx) =>
+                    program ? (
+                      <tr
+                        key={program.id}
+                        onClick={() => handleRowClick(program.id)}
+                        className="hover:bg-gray-50 h-[60px] cursor-pointer"
+                      >
+                        <td className="px-6 py-4 text-sm align-middle">
+                          {program.programName}
+                        </td>
+                        <td className="px-6 py-4 align-middle">
+                          {program?.projects.length}{" "}
+                          <span className="text-xs text-gray-500">
+                            Projects
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 align-middle">
+                          {/* <RenderStaffAvatars
+                          staff={Array.from({ length: 5 }, (_, i) => ({
+                            id: i.toString(),
+                            name: `Staff ${i + 1}`,
+                            avatar:
+                              "https://randomuser.me/api/portraits/men/19.jpg",
+                          }))}
+                        /> */}
+                          <div>no img</div>
+                        </td>
+                        <td className="px-6 py-4 align-middle">
+                          <PriorityDropdown
+                            defaultPriority={program.priority}
+                          />
+                        </td>
+                        {!hideCreatedOn && (
+                          <td className="px-6 py-4 text-gray-600 text-sm align-middle">
+                            {formatDate(program.createdAt)}
+                          </td>
+                        )}
+                        <td className="px-6 py-4 text-gray-600 text-sm align-middle">
+                          {formatDate(program.updatedAt)}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 text-sm">
+                          {formatDate(program.deadline)}
+                        </td>
+                        <td className="px-6 py-4 align-middle">
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 bg-gray-200 rounded-full max-w-[120px] h-2 overflow-hidden">
+                              <div
+                                className="bg-blue-600 h-full transition-all"
+                                style={{ width: `${program.progress}%` }}
+                              />
+                            </div>
+                            <span className="text-gray-600 text-sm">
+                              {program.progress}%
+                            </span>
+                          </div>
+                        </td>
+                        {/* <td className="px-6 py-4 align-middle">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // handleEditClick(program);
+                          }}
+                          className="cursor-pointer"
+                        >
+                           <FaEdit className="text-blue-600" />
+                        </button>
+                      </div>
+                    </td> */}
+                      </tr>
+                    ) : (
+                      <tr key={`empty-${idx}`} className="h-[60px]">
+                        {[
+                          "programName",
+                          "projects",
+                          "assigned Manager",
+                          "priority",
+                          !hideCreatedOn && "created On",
+                          "updated At",
+                          "deadline",
+                          "progress",
+                          // "actions",
+                        ]
+                          .filter(Boolean)
+                          .map((_, i) => (
+                            <td
+                              key={i}
+                              className="px-6 py-4 text-gray-200 text-sm capitalize"
+                            >
+                              &nbsp;
+                            </td>
+                          ))}
+                      </tr>
+                    ),
+                  )}
+                </tbody>
+              </table>
+              {sortedPrograms.length === 0 && (
+                <div className="flex justify-center items-center w-full h-[60vh]">
+                  <h2 className="font-semibold text-gray-200 text-5xl text-center uppercase">
+                    No Program Data Available
+                  </h2>
+                </div>
               )}
-            </tbody>
-          </table>
-
-          {sortedPrograms.length === 0 && (
-            <div className="w-full h-[60vh] flex items-center justify-center">
-              <h2 className="text-center text-5xl font-semibold text-gray-200 uppercase">
-                No Program Data Available
-              </h2>
-            </div>
+            </>
           )}
         </div>
 
@@ -283,252 +397,3 @@ const StaffManagerAllProgram = ({
 };
 
 export default StaffManagerAllProgram;
-
-// import { useState } from "react";
-// import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
-
-// import { IProgram } from "@/types";
-// import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
-
-// interface IProgramTableProps {
-//   title?: string;
-//   programs?: IProgram[] | undefined;
-//   hideCreatedOn?: boolean;
-// }
-
-// // === AllProgramTable Component ===
-// const StaffManagerAllProgram = ({
-//   title = "All Program",
-//   programs: propPrograms,
-//   hideCreatedOn = false,
-// }: IProgramTableProps) => {
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const totalPrograms = 300;
-//   const itemsPerPage = 11;
-
-//   const programs =
-//     propPrograms ||
-//     Array.from({ length: 13 }, (_, i) => ({
-//       id: i + 1,
-//       name: "Program Name",
-//       projects: [20, 1, 0, 15, 12, 25, 12, 15, 0, 25, 20, 1][i % 12],
-//       assignManager: ["user1", "user2", "user3"],
-//       priority: "High" as const,
-//       createdOn: "15-6-2024",
-//       updatedOn: "15-6-2024",
-//       deadline: "24-7-2024",
-//       progress: [35, 50, 0, 60, 80, 80, 80, 0, 80, 80, 35, 50][
-//         i % 12
-//       ],
-//     }));
-
-//   const totalPages = Math.ceil(totalPrograms / itemsPerPage);
-
-//   return (
-//     <div className="min-h-screen py-6">
-//       <div className="bg-white rounded-lg border border-gray-200">
-//         {/* Header */}
-//         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-//           <h1 className="text-lg font-semibold text-gray-900">
-//             {title}
-//           </h1>
-//           <button className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
-//             <Filter size={16} />
-//             Filter By
-//           </button>
-//         </div>
-
-//         {/* Table */}
-//         <div className="overflow-x-auto">
-//           <table className="w-full">
-//             <thead className="bg-gray-50 border-b border-gray-200">
-//               <tr>
-//                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">
-//                   Program
-//                 </th>
-//                 {!hideCreatedOn && (
-//                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">
-//                     Projects
-//                   </th>
-//                 )}
-//                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">
-//                   Assign Manager
-//                 </th>
-//                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">
-//                   Priority
-//                 </th>
-//                 {!hideCreatedOn && (
-//                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">
-//                     Created On
-//                   </th>
-//                 )}
-//                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">
-//                   Updated On
-//                 </th>
-//                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">
-//                   Deadline
-//                 </th>
-//                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">
-//                   Progress
-//                 </th>
-//               </tr>
-//             </thead>
-//             <tbody className="divide-y divide-gray-200">
-//               {programs.map((program) => (
-//                 <tr key={program.id} className="hover:bg-gray-50">
-//                   <td className="px-6 py-4 text-sm text-gray-900">
-//                     {program.name}
-//                   </td>
-//                   {!hideCreatedOn && (
-//                     <td className="px-6 py-4 text-sm text-gray-600">
-//                       {program.projects}{" "}
-//                       {program.projects === 1
-//                         ? "Project"
-//                         : "Projects"}
-//                     </td>
-//                   )}
-//                   <td className="px-6 py-4">
-//                     <div className="flex items-center">
-//                       <div className="flex -space-x-2">
-//                         {program.assignManager
-//                           .slice(0, 3)
-//                           .map((_, idx) => (
-//                             <img
-//                               key={idx}
-//                               src={`https://i.pravatar.cc/150?img=${
-//                                 program.id * 3 + idx
-//                               }`}
-//                               alt="Manager"
-//                               className="w-8 h-8 rounded-full border-2 border-white"
-//                             />
-//                           ))}
-//                         <div className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs font-medium text-blue-700">
-//                           +3
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </td>
-
-//                   {/* Priority dropdown with dynamic color */}
-//                   <td className="px-6 py-4">
-//                     <PriorityDropdown
-//                       defaultPriority={program.priority}
-//                     />
-//                   </td>
-
-//                   {!hideCreatedOn && (
-//                     <td className="px-6 py-4 text-sm text-gray-600">
-//                       {program.createdOn}
-//                     </td>
-//                   )}
-//                   <td className="px-6 py-4 text-sm text-gray-600">
-//                     {program.updatedOn}
-//                   </td>
-//                   <td className="px-6 py-4 text-sm text-gray-600">
-//                     {program.deadline}
-//                   </td>
-//                   <td className="px-6 py-4">
-//                     <div className="flex items-center gap-3">
-//                       <div className="flex-1 max-w-[120px]">
-//                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-//                           <div
-//                             className="h-full bg-blue-600 rounded-full transition-all duration-300"
-//                             style={{ width: `${program.progress}%` }}
-//                           />
-//                         </div>
-//                       </div>
-//                       <span className="text-sm text-gray-600 min-w-[35px]">
-//                         {program.progress}%
-//                       </span>
-//                     </div>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-
-//         {/* Footer Pagination */}
-//         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-//           <div className="text-sm text-gray-600">
-//             Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-//             {Math.min(currentPage * itemsPerPage, totalPrograms)} of{" "}
-//             <span className="font-semibold">{totalPrograms}</span>{" "}
-//             Programs
-//           </div>
-//           <div className="flex items-center gap-2">
-//             <button
-//               onClick={() =>
-//                 setCurrentPage(Math.max(1, currentPage - 1))
-//               }
-//               disabled={currentPage === 1}
-//               className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-//             >
-//               <ChevronLeft size={16} />
-//               Prev
-//             </button>
-
-//             <button
-//               onClick={() => setCurrentPage(1)}
-//               className={`px-3 py-2 text-sm rounded-md ${
-//                 currentPage === 1
-//                   ? "bg-blue-600 text-white"
-//                   : "border border-gray-300 hover:bg-gray-50"
-//               }`}
-//             >
-//               1
-//             </button>
-
-//             <button
-//               onClick={() => setCurrentPage(2)}
-//               className={`px-3 py-2 text-sm rounded-md ${
-//                 currentPage === 2
-//                   ? "bg-blue-600 text-white"
-//                   : "border border-gray-300 hover:bg-gray-50"
-//               }`}
-//             >
-//               2
-//             </button>
-
-//             <button
-//               onClick={() => setCurrentPage(3)}
-//               className={`px-3 py-2 text-sm rounded-md ${
-//                 currentPage === 3
-//                   ? "bg-blue-600 text-white"
-//                   : "border border-gray-300 hover:bg-gray-50"
-//               }`}
-//             >
-//               3
-//             </button>
-
-//             <span className="px-2 text-gray-500">...</span>
-
-//             <button
-//               onClick={() => setCurrentPage(30)}
-//               className={`px-3 py-2 text-sm rounded-md ${
-//                 currentPage === 30
-//                   ? "bg-blue-600 text-white"
-//                   : "border border-gray-300 hover:bg-gray-50"
-//               }`}
-//             >
-//               30
-//             </button>
-
-//             <button
-//               onClick={() =>
-//                 setCurrentPage(Math.min(totalPages, currentPage + 1))
-//               }
-//               disabled={currentPage === totalPages}
-//               className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-//             >
-//               Next
-//               <ChevronRight size={16} />
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default StaffManagerAllProgram;

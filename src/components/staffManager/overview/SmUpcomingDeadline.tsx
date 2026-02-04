@@ -3,7 +3,6 @@ import BoxContainer from "../../../common/BoxContainer";
 import { useState } from "react";
 import "react-calendar/dist/Calendar.css"; // important!
 import ViewCalender from "@/common/ViewCalender";
-import { Loader2 } from "lucide-react";
 
 import UpcomingDeadlineCard from "./UpcomingDeadlineCard";
 import { useGetUpcomingDeadlinesQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
@@ -65,14 +64,12 @@ const SmUpcomingDeadline = () => {
         </div>
 
         {/* View Calendar Button */}
-        {/* {deadlineData.length !== 0 && ( */}
         <ViewCalender
           showCalendar={showCalendar}
           setShowCalendar={setShowCalendar}
-          onChange={handleDateChange} // Pass the handleDateChange to get the selected range
+          onChange={handleDateChange}
           value={value}
         />
-        {/* )} */}
       </div>
 
       {/* Display Selected Range Days */}
