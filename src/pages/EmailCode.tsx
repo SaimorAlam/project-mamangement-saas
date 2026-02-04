@@ -94,7 +94,7 @@ const EmailCode = () => {
       if (res.success) {
         dispatch(setUser(res?.data));
         const { role } = jwtDecode<{ role: keyof typeof Role }>(
-          res.data.accessToken
+          res.data.accessToken,
         );
         if (Role[role]) {
           navigate(`/${Role[role]}`);

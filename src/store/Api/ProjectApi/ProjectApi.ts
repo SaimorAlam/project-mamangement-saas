@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import baseApi from "../BaseApi/BaseApi";
@@ -5,11 +6,10 @@ import baseApi from "../BaseApi/BaseApi";
 const projectApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createProject: builder.mutation({
-      query: ({ ...data }) => ({
-        url: "/project",
-        method: "POST",
-        body: data,
-      }),
+      query: ({ message, ...data }) => {
+        console.log(data, "data");
+        return { url: "/project", method: "POST", body: data };
+      },
       invalidatesTags: (_res, _err, { programId }) => [
         { type: "Program", id: programId },
         { type: "Project", id: "LIST" },
