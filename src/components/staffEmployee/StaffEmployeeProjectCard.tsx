@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -101,8 +102,8 @@ const StaffEmployeeProjectCard = ({
     priority === "HIGH"
       ? "text-[#DA4352]"
       : priority === "MEDIUM"
-      ? "text-[#F59E0B]"
-      : "text-[#16A34A]";
+        ? "text-[#F59E0B]"
+        : "text-[#16A34A]";
 
   const [addToFavouriteProject] = useAddToFavouriteProjectMutation();
 
@@ -128,8 +129,7 @@ const StaffEmployeeProjectCard = ({
 
         if (successData?.success === false) {
           const errorMessage =
-            successData?.message ||
-            "Failed to add project to favorites";
+            successData?.message || "Failed to add project to favorites";
           toast.error(errorMessage);
           return;
         }
@@ -182,8 +182,7 @@ const StaffEmployeeProjectCard = ({
                 staff={Array.from({ length: 3 }, (_, i) => ({
                   id: i.toString(),
                   name: `Staff ${i + 1}`,
-                  avatar:
-                    "https://randomuser.me/api/portraits/men/19.jpg",
+                  avatar: "https://randomuser.me/api/portraits/men/19.jpg",
                 }))}
               />
             </div>

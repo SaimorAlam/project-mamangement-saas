@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { useCreateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { useGetAllManagersQuery } from "@/store/Api/UserApi/UserApi";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+// import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 // Fix Leaflet marker icon issue
@@ -15,7 +15,6 @@ import useGetAllEmployees from "@/utils/useGetAllEmployees";
 import { FaSpinner } from "react-icons/fa";
 import {
   X,
-  Clock,
   Calendar,
   HelpCircle,
   Flag,
@@ -64,29 +63,30 @@ interface CreateProjectForm {
   employeeIds: string[];
   currentRate: string;
   budget: string;
-  latitude: number;
-  longitude: number;
+  // latitude: number;
+  shortName: string;
+  // longitude: number;
   status: string;
   dataUploadDateDays: string;
   workingDays: string[]; // Added workingDays
 }
 
 // Location Picker Component
-const LocationMarker = ({
-  setPos,
-  pos,
-}: {
-  setPos: (lat: number, lng: number) => void;
-  pos: { lat: number; lng: number };
-}) => {
-  useMapEvents({
-    click(e) {
-      setPos(e.latlng.lat, e.latlng.lng);
-    },
-  });
+// const LocationMarker = ({
+//   setPos,
+//   pos,
+// }: {
+//   setPos: (lat: number, lng: number) => void;
+//   pos: { lat: number; lng: number };
+// }) => {
+//   useMapEvents({
+//     click(e) {
+//       setPos(e.latlng.lat, e.latlng.lng);
+//     },
+//   });
 
-  return pos.lat !== 0 ? <Marker position={[pos.lat, pos.lng]} /> : null;
-};
+//   return pos.lat !== 0 ? <Marker position={[pos.lat, pos.lng]} /> : null;
+// };
 
 const CreateProject = ({
   programId,
@@ -115,7 +115,7 @@ const CreateProject = ({
 
   const [enableDetails, setEnableDetails] = useState(false);
   const [selectedStaffs, setSelectedStaffs] = useState<string[]>([]);
-  const [mapPosition, setMapPosition] = useState({ lat: 51.505, lng: -0.09 }); // Default London
+  // const [mapPosition, setMapPosition] = useState({ lat: 51.505, lng: -0.09 });
   const [openSuccessModal, setOpenSuccessModal] = useState(false);
   const [projectId, setProjectId] = useState<string>("");
   const [statuses, setStatuses] = useState(["Pending", "Active", "Completed"]);
@@ -130,8 +130,7 @@ const CreateProject = ({
         repeatEvery: "WEEKLY",
         repeatOnDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], // Start empty
         workingDays: [], // Initialize workingDays
-        latitude: 0,
-        longitude: 0,
+        shortName: "",
         remindBefore: 30,
         startDate: new Date().toISOString().split("T")[0],
         dataUploadDateDays: "3",
@@ -142,22 +141,22 @@ const CreateProject = ({
   const repeatOnDays = watch("repeatOnDays");
   const workingDays = watch("workingDays");
 
-  useEffect(() => {
-    // Get user's current location on mount
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setMapPosition({ lat: latitude, lng: longitude });
-          setValue("latitude", latitude);
-          setValue("longitude", longitude);
-        },
-        () => {
-          // If denied, stick to default or previous
-        },
-      );
-    }
-  }, [setValue]);
+  // useEffect(() => {
+  //   // Get user's current location on mount
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         const { latitude, longitude } = position.coords;
+  //         // setMapPosition({ lat: latitude, lng: longitude });
+  //         setValue("latitude", latitude);
+  //         setValue("longitude", longitude);
+  //       },
+  //       () => {
+  //         // If denied, stick to default or previous
+  //       },
+  //     );
+  //   }
+  // }, [setValue]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -250,11 +249,11 @@ const CreateProject = ({
     }
   };
 
-  const handleLocationSelect = (lat: number, lng: number) => {
-    setValue("latitude", lat);
-    setValue("longitude", lng);
-    setMapPosition({ lat, lng });
-  };
+  // const handleLocationSelect = (lat: number, lng: number) => {
+  //   setValue("latitude", lat);
+  //   setValue("longitude", lng);
+  //   setMapPosition({ lat, lng });
+  // };
 
   const toISO = (date: string) => (date ? new Date(date).toISOString() : null);
 
@@ -281,26 +280,35 @@ const CreateProject = ({
       const payload = {
         message: data.message || "New Project Created",
         repeatEvery: data.repeatEvery,
-        repeatOnDays: data.repeatOnDays || [],
-        repeatOnDates: data.repeatOnDates || [],
-        remindBefore: parseInt(dataUploadDateDays) * 24 * 60,
-        isActive: true,
+        managerId: data.managerId || null,
+        startDate: toISO(data.startDate),
+        ...(repeatEvery === "MONTHLY"
+          ? {
+              repeatOnDates: data.repeatOnDates || [],
+            }
+          : {
+              repeatOnDays: data.repeatOnDays || [],
+              repeatOnDates: data.repeatOnDates || [],
+              remindBefore: parseInt(dataUploadDateDays) * 24 * 60,
+            }),
+        ...(enableDetails && {
+          description: data.description || "",
+          priority: data.priority,
+          status: data.status,
+          computedProgress: 0,
+          chartList: [],
+          estimatedCompletedDate: toISO(data.estimatedCompletedDate),
+          currentRate: data.currentRate || "0",
+          budget: data.budget || "0",
+          deadline: toISO(data.deadline || data.estimatedCompletedDate),
+        }),
+        ...(shareWith === "onlyMe"
+          ? { shareWith: "Only_Me" }
+          : shareWith === "inviteStaff"
+            ? { employeeIds: selectedStaffs }
+            : { templateId: "550e8400-e29b-41d4-a716-446655440000" }),
         name: data.name,
         programId: programId,
-        description: data.description || "",
-        priority: data.priority,
-        deadline: toISO(data.deadline || data.estimatedCompletedDate),
-        managerId: data.managerId || null,
-        employeeIds: selectedStaffs,
-        startDate: toISO(data.startDate),
-        status: data.status,
-        computedProgress: 0,
-        chartList: [],
-        estimatedCompletedDate: toISO(data.estimatedCompletedDate),
-        currentRate: data.currentRate || "0",
-        budget: data.budget || "0",
-        latitude: Number(data.latitude) || 0,
-        longitude: Number(data.longitude) || 0,
       };
       const cleanedPayload = cleanPayload(payload);
       const res = await createProject(cleanedPayload).unwrap();
@@ -315,9 +323,9 @@ const CreateProject = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[98vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 py-2 border-b border-gray-200">
           <h2 className="text-lg font-semibold">Create New Project</h2>
           <button
             onClick={onClose}
@@ -333,281 +341,316 @@ const CreateProject = ({
         >
           {/* Project Details Section */}
           <section className="space-y-6">
-            <h3 className="text-base font-medium text-slate-800 tracking-tight">
+            {/* <h3 className="text-base font-medium text-slate-800 tracking-tight">
               Project details
-            </h3>
+            </h3> */}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               {/* Project Name */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-700">
-                  Project Name <span className="text-red-500">*</span>
-                </label>
-                <div className="relative group">
-                  <input
-                    type="text"
-                    {...register("name", { required: true })}
-                    placeholder="Enter project name"
-                    className="w-full h-12 px-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
-                  />
-                </div>
-              </div>
-
-              {/* Share With */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-500">
-                  Share With
-                </label>
-                <div className="flex flex-wrap gap-4 pt-1">
-                  {[
-                    { id: "onlyMe", label: "Only Me", icon: Lock },
-                    { id: "inviteStaff", label: "Invite Staff", icon: Users },
-                    {
-                      id: "followTemplate",
-                      label: "Follow Template Settings",
-                      icon: LayoutTemplate,
-                    },
-                  ].map((option) => (
-                    <label
-                      key={option.id}
-                      className="flex items-center gap-2 cursor-pointer group"
-                    >
-                      <div className="relative flex items-center justify-center">
-                        <input
-                          type="radio"
-                          name="shareWith"
-                          checked={shareWith === option.id}
-                          onChange={() => {
-                            setShareWith(option.id as any);
-                            if (option.id !== "inviteStaff")
-                              setSelectedStaffs([]);
-                          }}
-                          className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all cursor-pointer"
-                        />
-                        <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
-                      </div>
-                      <span
-                        className={cn(
-                          "text-xs font-medium transition-colors",
-                          shareWith === option.id
-                            ? "text-slate-900"
-                            : "text-slate-500",
-                        )}
-                      >
-                        {option.label}
-                      </span>
-                      {option.id === "onlyMe" && (
-                        <option.icon size={12} className="text-slate-400" />
-                      )}
-                    </label>
-                  ))}
-                </div>
-
-                {shareWith === "inviteStaff" && (
-                  <div className="mt-3 relative">
-                    <select
-                      onChange={handleStaffSelect}
-                      className="w-full h-11 pl-4 pr-10 appearance-none bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm text-slate-700"
-                    >
-                      <option value="">Select staff members</option>
-                      {allEmployees?.map((emp: any) => (
-                        <option key={emp.id} value={emp.id}>
-                          {emp?.name} ({emp?.role})
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      size={16}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Project Name <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      {...register("name", { required: true })}
+                      placeholder="Enter project name"
+                      className="w-full h-12 px-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
                     />
+                  </div>
+                </div>
+                {/* Data Date */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Data Date
+                  </label>
+                  <div className="relative max-w-[400px] group">
+                    <input
+                      type="date"
+                      {...register("startDate")}
+                      className="w-full h-12 px-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 appearance-none"
+                    />
+                  </div>
+                </div>
 
-                    {selectedStaffs.length > 0 && (
-                      <div className="mt-3 flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
-                        <div className="flex -space-x-3 overflow-hidden">
-                          {selectedStaffs.map((staffId) => {
-                            const staff = allEmployees.find(
-                              (e: any) => e.id === staffId,
-                            );
-                            return (
-                              <button
-                                key={staffId}
-                                type="button"
-                                onClick={() => {
-                                  const newStaffs = selectedStaffs.filter(
-                                    (id) => id !== staffId,
-                                  );
-                                  setSelectedStaffs(newStaffs);
-                                  setValue("employeeIds", newStaffs);
-                                }}
-                                className="inline-block h-8 w-8 rounded-full border-2 border-white bg-slate-100 overflow-hidden hover:scale-110 hover:z-10 transition-transform group"
-                                title={`Click to remove ${staff?.name}`}
-                              >
-                                {staff?.profileImage ? (
-                                  <img
-                                    src={staff.profileImage}
-                                    alt=""
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-600">
-                                    {staff?.name.charAt(0)}
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-bold text-blue-600/70 tracking-tight uppercase text-[11px]">
+                      Data Date Uploading Cycle
+                    </h4>
+                    <Controller
+                      control={control}
+                      name="repeatEvery"
+                      render={({ field }) => (
+                        <div className="flex flex-wrap gap-x-8 gap-y-4">
+                          {["Daily", "Weekly", "Bi Weekly", "Monthly"].map(
+                            (label) => {
+                              const value = label
+                                .toUpperCase()
+                                .replace(" ", "_");
+                              return (
+                                <label
+                                  key={label}
+                                  className="flex items-center gap-2.5 cursor-pointer group"
+                                >
+                                  <div className="relative flex items-center justify-center">
+                                    <input
+                                      type="radio"
+                                      {...field}
+                                      value={value}
+                                      checked={field.value === value}
+                                      className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all"
+                                    />
+                                    <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
+                                  </div>
+                                  <span
+                                    className={cn(
+                                      "text-xs font-semibold transition-colors",
+                                      field.value === value
+                                        ? "text-slate-900"
+                                        : "text-slate-500",
+                                    )}
+                                  >
+                                    {label}
                                   </span>
-                                )}
-                              </button>
+                                </label>
+                              );
+                            },
+                          )}
+                        </div>
+                      )}
+                    />
+                  </div>
+
+                  {repeatEvery !== "MONTHLY" && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="space-y-3">
+                        <label className="block text-sm font-semibold text-slate-700">
+                          Select days
+                        </label>
+                        <div className="flex gap-2">
+                          {[
+                            "Mon",
+                            "Tue",
+                            "Wed",
+                            "Thu",
+                            "Fri",
+                            "Sat",
+                            "Sun",
+                          ].map((day) => {
+                            const isSelected = isDaySelected(day);
+                            return (
+                              <div
+                                key={day}
+                                className="flex flex-col items-center gap-2 min-w-[42px]"
+                              >
+                                <span className="text-[10px] font-bold text-slate-400 uppercase">
+                                  {day}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleDay(day)}
+                                  className={cn(
+                                    "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
+                                    isSelected
+                                      ? "bg-blue-600 border-blue-600 text-white"
+                                      : "bg-white border-slate-200 hover:border-slate-300",
+                                  )}
+                                >
+                                  {isSelected && (
+                                    <svg
+                                      width="10"
+                                      height="8"
+                                      viewBox="0 0 10 8"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M1 4L3.5 6.5L8.5 1.5"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </svg>
+                                  )}
+                                </button>
+                              </div>
                             );
                           })}
                         </div>
-                        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                          Staffs Preview
-                        </span>
                       </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
 
-            {/* Data Date */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700">
-                Data Date
-              </label>
-              <div className="relative max-w-[400px] group">
-                <input
-                  type="date"
-                  {...register("startDate")}
-                  className="w-full h-12 px-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 appearance-none"
-                />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-                  <Clock size={16} className="text-slate-400" />
-                  <Calendar size={16} className="text-slate-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <h4 className="text-sm font-bold text-blue-600/70 tracking-tight uppercase text-[11px]">
-                  Data Date Uploading Cycle
-                </h4>
-                <Controller
-                  control={control}
-                  name="repeatEvery"
-                  render={({ field }) => (
-                    <div className="flex flex-wrap gap-x-8 gap-y-4">
-                      {["Daily", "Weekly", "Bi Weekly", "Monthly"].map(
-                        (label) => {
-                          const value = label.toUpperCase().replace(" ", "_");
-                          return (
+                      <div className="space-y-3">
+                        <label className="block text-sm font-semibold text-slate-700">
+                          Data Upload Date
+                        </label>
+                        <div className="flex gap-8">
+                          {["3", "4", "5"].map((days) => (
                             <label
-                              key={label}
+                              key={days}
                               className="flex items-center gap-2.5 cursor-pointer group"
                             >
                               <div className="relative flex items-center justify-center">
                                 <input
                                   type="radio"
-                                  {...field}
-                                  value={value}
-                                  checked={field.value === value}
-                                  className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all"
+                                  {...register("dataUploadDateDays")}
+                                  value={days}
+                                  className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all cursor-pointer"
                                 />
                                 <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
                               </div>
-                              <span
-                                className={cn(
-                                  "text-xs font-semibold transition-colors",
-                                  field.value === value
-                                    ? "text-slate-900"
-                                    : "text-slate-500",
-                                )}
-                              >
-                                {label}
+                              <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">
+                                {days} Days
                               </span>
                             </label>
-                          );
-                        },
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Share With */}
+              <div className="space-y-12">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-500">
+                    Share With
+                  </label>
+                  <div className="flex flex-wrap gap-4 pt-1">
+                    {[
+                      { id: "onlyMe", label: "Only Me", icon: Lock },
+                      { id: "inviteStaff", label: "Invite Staff", icon: Users },
+                      {
+                        id: "followTemplate",
+                        label: "Follow Template Settings",
+                        icon: LayoutTemplate,
+                      },
+                    ].map((option) => (
+                      <label
+                        key={option.id}
+                        className="flex items-center gap-2 cursor-pointer group"
+                      >
+                        <div className="relative flex items-center justify-center">
+                          <input
+                            type="radio"
+                            name="shareWith"
+                            checked={shareWith === option.id}
+                            onChange={() => {
+                              setShareWith(option.id as any);
+                              if (option.id !== "inviteStaff")
+                                setSelectedStaffs([]);
+                            }}
+                            className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all cursor-pointer"
+                          />
+                          <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
+                        </div>
+                        <span
+                          className={cn(
+                            "text-xs font-medium transition-colors",
+                            shareWith === option.id
+                              ? "text-slate-900"
+                              : "text-slate-500",
+                          )}
+                        >
+                          {option.label}
+                        </span>
+                        {option.id === "onlyMe" && (
+                          <option.icon size={12} className="text-slate-400" />
+                        )}
+                      </label>
+                    ))}
+                  </div>
+
+                  {shareWith === "inviteStaff" && (
+                    <div className="mt-3 relative">
+                      <select
+                        onChange={handleStaffSelect}
+                        className="w-full h-11 pl-4 pr-10 appearance-none bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm text-slate-700"
+                      >
+                        <option value="">Select staff members</option>
+                        {allEmployees?.map((emp: any) => (
+                          <option key={emp.id} value={emp.id}>
+                            {emp?.name} ({emp?.role})
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                      />
+
+                      {selectedStaffs.length > 0 && (
+                        <div className="mt-3 flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
+                          <div className="flex -space-x-3 overflow-hidden">
+                            {selectedStaffs.map((staffId) => {
+                              const staff = allEmployees.find(
+                                (e: any) => e.id === staffId,
+                              );
+                              return (
+                                <button
+                                  key={staffId}
+                                  type="button"
+                                  onClick={() => {
+                                    const newStaffs = selectedStaffs.filter(
+                                      (id) => id !== staffId,
+                                    );
+                                    setSelectedStaffs(newStaffs);
+                                    setValue("employeeIds", newStaffs);
+                                  }}
+                                  className="inline-block h-8 w-8 rounded-full border-2 border-white bg-slate-100 overflow-hidden hover:scale-110 hover:z-10 transition-transform group"
+                                  title={`Click to remove ${staff?.name}`}
+                                >
+                                  {staff?.profileImage ? (
+                                    <img
+                                      src={staff.profileImage}
+                                      alt=""
+                                      className="h-full w-full object-cover"
+                                    />
+                                  ) : (
+                                    <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-600">
+                                      {staff?.name.charAt(0)}
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                            Staffs Preview
+                          </span>
+                        </div>
                       )}
                     </div>
                   )}
-                />
-              </div>
-
-              {repeatEvery !== "MONTHLY" && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="space-y-3">
-                    <label className="block text-sm font-semibold text-slate-700">
-                      Select days
-                    </label>
-                    <div className="flex gap-2">
-                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => {
-                        const isSelected = isDaySelected(day);
-                        return (
-                          <div key={day} className="flex flex-col items-center gap-2 min-w-[42px]">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase">
-                              {day}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => toggleDay(day)}
-                              className={cn(
-                                "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
-                                isSelected
-                                  ? "bg-blue-600 border-blue-600 text-white"
-                                  : "bg-white border-slate-200 hover:border-slate-300",
-                              )}
-                            >
-                              {isSelected && (
-                                <svg
-                                  width="10"
-                                  height="8"
-                                  viewBox="0 0 10 8"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M1 4L3.5 6.5L8.5 1.5"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              )}
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="block text-sm font-semibold text-slate-700">
-                      Data Upload Date
-                    </label>
-                    <div className="flex gap-8">
-                      {["3", "4", "5"].map((days) => (
-                        <label
-                          key={days}
-                          className="flex items-center gap-2.5 cursor-pointer group"
-                        >
-                          <div className="relative flex items-center justify-center">
-                            <input
-                              type="radio"
-                              {...register("dataUploadDateDays")}
-                              value={days}
-                              className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all cursor-pointer"
-                            />
-                            <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
-                          </div>
-                          <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">
-                            {days} Days
-                          </span>
-                        </label>
+                </div>
+                {/* Manager Select */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Assign Project Manager
+                  </label>
+                  <div className="relative">
+                    <select
+                      {...register("managerId")}
+                      className="w-full h-12 pl-4 pr-10 appearance-none bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm text-slate-700"
+                    >
+                      <option value="">Select Manager</option>
+                      {allManagers.map((m: any) => (
+                        <option key={m.id} value={m.id}>
+                          {m.user.name}
+                        </option>
                       ))}
-                    </div>
+                    </select>
+                    <ChevronDown
+                      size={18}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                    />
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Toggle */}
@@ -650,41 +693,17 @@ const CreateProject = ({
                   />
                 </div>
 
-                {/* Location */}
+                {/* short Name */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-700">
-                    Project Location
+                    Project Short Name
                   </label>
                   <div className="relative group">
                     <input
                       type="text"
-                      {...register("latitude")} // Bound as placeholder for address logic if implemented
-                      placeholder="Enter Location here"
+                      {...register("shortName")} // Bound as placeholder for address logic if implemented
+                      placeholder="Enter Project Short Name here"
                       className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
-                    />
-                  </div>
-                </div>
-
-                {/* Manager Select */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
-                    Assign Project Manager
-                  </label>
-                  <div className="relative">
-                    <select
-                      {...register("managerId")}
-                      className="w-full h-12 pl-4 pr-10 appearance-none bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm text-slate-700"
-                    >
-                      <option value="">Select Manager</option>
-                      {allManagers.map((m: any) => (
-                        <option key={m.id} value={m.id}>
-                          {m.user.name}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      size={18}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
                     />
                   </div>
                 </div>
@@ -906,7 +925,7 @@ const CreateProject = ({
           )}
 
           {/* Map Section */}
-          <div className="mt-8">
+          {/* <div className="mt-8">
             <h3 className="text-sm font-medium text-gray-700 mb-2">
               Project Location of Highway Expansion Program
             </h3>
@@ -926,10 +945,9 @@ const CreateProject = ({
                 />
               </MapContainer>
             </div>
-            {/* Hidden inputs to ensure form validation/submission catches these if needed, though state is managed */}
             <input type="hidden" {...register("latitude")} />
             <input type="hidden" {...register("longitude")} />
-          </div>
+          </div> */}
 
           {/* Modal Footer Actions */}
           <div className="flex justify-between items-center mt-12 pt-8 border-t border-slate-100">
