@@ -40,21 +40,39 @@ const DashboardCardProjects = () => {
   }
 
   const projects = data?.data?.projects?.data || [];
+  if (projects.length === 0) {
+    return (
+      <>
+        <h4 className="mb-3 text-gray-900 text-xl font-semibold">
+          All Program & Project
+        </h4>
+        <div className="p-10 bg-gray-50 rounded-lg">
+          <p className="text-center text-gray-500">No projects found</p>
+        </div>
+        <Link
+          to="/staff-manager-panel"
+          className="border p-3 rounded-lg border-gray-300 mt-5 inline-block"
+        >
+          Go Back
+        </Link>
+      </>
+    );
+  }
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-3 gap-5">
-      {projects?.map((projectData: StaffEmployeeProject) => {
-        return (
-          <>
-            <h4 className="mb-3 text-gray-900 text-xl font-semibold">
-              All Program & Project
-            </h4>
+    <>
+      <h4 className="mb-3 text-gray-900 text-xl font-semibold">
+        All Program & Project
+      </h4>
+      <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-3 gap-5">
+        {projects?.map((projectData: StaffEmployeeProject) => {
+          return (
             <div key={projectData.id}>
               <StaffManagerProjectCard project={projectData} />
             </div>
-          </>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </>
   );
 };
 

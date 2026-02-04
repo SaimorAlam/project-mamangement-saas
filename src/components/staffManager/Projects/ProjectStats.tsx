@@ -1,6 +1,6 @@
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
+import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import { useGetProjectPageStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import { FaSpinner } from "react-icons/fa";
 
 const ProjectStats = () => {
   const stats = [
@@ -53,12 +53,7 @@ const ProjectStats = () => {
 
   const dashboardData = staffData?.data;
 
-  if (isLoading)
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <FaSpinner className="animate-spin" size={24} />
-      </div>
-    );
+  if (isLoading) return <SkeletonLoading count={4} height="h-44" />;
 
   if (error) return <div>Error during Fetching data</div>;
 

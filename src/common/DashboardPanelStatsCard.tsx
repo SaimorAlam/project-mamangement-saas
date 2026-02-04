@@ -50,7 +50,7 @@ const DashboardPanelStatsCard = ({
     description,
     growth_type,
     link_text,
-    link,
+    link = "#",
     icon,
     icon_bg_color,
   } = item;

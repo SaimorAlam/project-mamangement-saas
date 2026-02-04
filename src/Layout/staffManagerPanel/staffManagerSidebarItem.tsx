@@ -13,7 +13,6 @@ import {
   Megaphone,
   Building2,
   Store,
-  FolderClosed,
 } from "lucide-react";
 import { IoSettingsOutline } from "react-icons/io5";
 

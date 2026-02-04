@@ -5,6 +5,7 @@ export interface IClientPanelStats {
   growth_type: "up" | "down" | undefined | string;
   description?: string;
   link_text?: string;
+  link?: string;
   icon?: string;
   icon_bg_color?: string;
 }

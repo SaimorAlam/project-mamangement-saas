@@ -19,7 +19,6 @@ import {
 import { Button } from "@/components/ui/button";
 import PrimaryButton from "../../../common/PrimaryButton";
 import DropdownSelect from "../../../common/DropdownSelect";
-import { Loader2 as Loader } from "lucide-react";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import StaffManagerProjectCard from "@/components/staffManager/StaffManagerProjectCard";
 import Pagination from "@/components/client/Pagination";
