@@ -6,6 +6,7 @@ import {
   FileWarning,
   Folders,
   Radio,
+  TrendingDown,
   TrendingUp,
 } from "lucide-react";
 import { JSX, useEffect, useRef, useState } from "react";
@@ -173,13 +174,14 @@ const DashboardPanelStatsCard = ({
             {showIndex && growth && (
               <span
                 className={`flex items-center gap-1 text-sm font-medium px-2 py-1 rounded ${
-                  growth_type === "up"
+                  Number(growth) > 0
                     ? "bg-green-100 text-[#169E7B]"
                     : "bg-red-100 text-red-600"
                 }`}
               >
                 {growth}
-                <TrendingUp className=" size-4" />
+                {Number(growth) > 0 && <TrendingUp className=" size-4" />}
+                {Number(growth) < 0 && <TrendingDown className=" size-4" />}
               </span>
             )}
           </div>

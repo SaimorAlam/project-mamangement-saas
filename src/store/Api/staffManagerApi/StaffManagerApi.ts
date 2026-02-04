@@ -21,6 +21,14 @@ const userApi = baseApi.injectEndpoints({
       },
       providesTags: ["Manager"],
     }),
+    getAllManagerPrograms: builder.query({
+      query: (params) => ({
+        url: "/manager/program",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
     getUpcomingDeadlines: builder.query({
       query: (params) => ({
         url: "/manager/projects/upcoming-deadlines",
@@ -59,7 +67,7 @@ const userApi = baseApi.injectEndpoints({
     }),
     getProgramAllProjects: builder.query({
       query: (params) => ({
-        url: "/manager/program-dashboard",
+        url: "/project",
         method: "GET",
         params,
       }),
@@ -142,6 +150,7 @@ export const {
   useGetStaffEmpStateCartsQuery,
   useGetTopOverdueProjectsQuery,
   useGetSubmissionStatusQuery,
+  useGetAllManagerProgramsQuery,
   useGetUpcomingDeadlinesQuery,
   useGetAllActivityLogsQuery,
   useGetAllLatestSubmissionsQuery,

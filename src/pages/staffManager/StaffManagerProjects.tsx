@@ -44,31 +44,27 @@ const StaffManagerProjects = ({
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<
-  "HIGH" | "MEDIUM" | "LOW" | ""
->("");
+    "HIGH" | "MEDIUM" | "LOW" | ""
+  >("");
 
-const priorityLabel =
-  priorityFilter === "" ? "ALL PRIORITY" : priorityFilter;
-
+  const priorityLabel = priorityFilter === "" ? "ALL PRIORITY" : priorityFilter;
 
   const [sortColumn, setSortColumn] = useState<any | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const [editProject] = useState<UpdateProjectPayload | null>(
-    null
-  );
+  const [editProject] = useState<UpdateProjectPayload | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   // const { data, isLoading, error } = useGetProgramAllProjectsQuery({});
 
   const { data, isLoading, error } = useGetProgramAllProjectsQuery({
     priority: priorityFilter || undefined,
-    search: search || undefined
+    search: search || undefined,
   });
 
-  const [updateProject] = useUpdateProjectMutation();  
+  const [updateProject] = useUpdateProjectMutation();
 
-  const projects = useMemo(() => data?.data?.projects ?? [], [data]);
+  const projects = useMemo(() => data?.data?.projects?.data ?? [], [data]);
   const programDetails = useMemo(() => data?.data?.sidebar ?? [], [data]); // Sidebar data
 
   const meta = data?.data?.meta;
@@ -93,7 +89,7 @@ const priorityLabel =
     if (!sortColumn) {
       return list.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     }
 
@@ -124,10 +120,10 @@ const priorityLabel =
   const formatDate = (date?: string) =>
     date
       ? new Date(date).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
       : "-";
 
   const handleUpdateProject = async (project: UpdateProjectPayload) => {
@@ -155,14 +151,18 @@ const priorityLabel =
   if (!projects) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <h1 className="text-gray-400 text-center">Not yet any Projects Found.</h1>
+        <h1 className="text-gray-400 text-center">
+          Not yet any Projects Found.
+        </h1>
       </div>
     );
   }
   if (error) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <h1 className="text-gray-400 text-center">Not yet any projects found to this manager.</h1>
+        <h1 className="text-gray-400 text-center">
+          Not yet any projects found to this manager.
+        </h1>
       </div>
     );
   }
@@ -198,7 +198,9 @@ const priorityLabel =
                         key={p}
                         onClick={() => {
                           setCurrentPage(1);
-                          setPriorityFilter(p === "ALL" ? "" : (p as "HIGH" | "MEDIUM" | "LOW"));
+                          setPriorityFilter(
+                            p === "ALL" ? "" : (p as "HIGH" | "MEDIUM" | "LOW"),
+                          );
                         }}
                       >
                         {p}
@@ -236,14 +238,18 @@ const priorityLabel =
                       >
                         {col.replace(/([A-Z])/g, " $1")}
                       </th>
-                    )
+                    ),
                 )}
               </tr>
             </thead>
 
             <tbody>
               <tr>
-              {sortedProjects.length===0 && (<div className="text-gray-400 mt-5 ml-6">No projects found.</div>)}
+                {sortedProjects.length === 0 && (
+                  <div className="text-gray-400 mt-5 ml-6">
+                    No projects found.
+                  </div>
+                )}
               </tr>
               {sortedProjects.map((project) => (
                 <tr key={project.id} className="hover:bg-gray-50">
