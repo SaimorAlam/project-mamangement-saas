@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaSpinner } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import { useGetAllManagerProgramsForProgramPageQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import Pagination from "@/common/Pagination";
@@ -15,7 +14,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
+// import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 
 interface IProgramTableProps {
@@ -245,87 +244,91 @@ const StaffManagerAllProgram = ({
           {isLoading ? (
             <SkeletonLoading count={10} height="h-10" direction="vertical" />
           ) : (
-            <table className="w-full table-fixed">
-              <thead className="bg-gray-50 border-gray-200 border-b">
-                <tr>
-                  {[
-                    "programName",
-                    "projects",
-                    "assigned Manager",
-                    "priority",
-                    !hideCreatedOn && "created On",
-                    "updated On",
-                    "deadline",
-                    "progress",
-                    // "actions", // Removed Actions column for manager view as per typical permissioning, but can add back if needed
-                  ].map(
-                    (col) =>
-                      col && (
-                        <th
-                          key={col}
-                          onClick={() => handleSort(col as keyof IProgram)}
-                          className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 capitalize cursor-pointer`}
-                        >
-                          {col.toString().replace(/([A-Z])/g, " $1")}
-                          {sortColumn === col &&
-                            (sortOrder === "asc" ? " ▲" : " ▼")}
-                        </th>
-                      ),
-                  )}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {tableRows.map((program, idx) =>
-                  program ? (
-                    <tr
-                      key={program.id}
-                      onClick={() => handleRowClick(program.id)}
-                      className="hover:bg-gray-50 h-[60px] cursor-pointer"
-                    >
-                      <td className="px-6 py-4 text-sm align-middle">
-                        {program.programName}
-                      </td>
-                      <td className="px-6 py-4 align-middle">
-                        {program?._count?.projects} Projects
-                      </td>
-                      <td className="px-6 py-4 align-middle">
-                        <RenderStaffAvatars
+            <>
+              <table className="w-full table-fixed">
+                <thead className="bg-gray-50 border-gray-200 border-b">
+                  <tr>
+                    {[
+                      "programName",
+                      "projects",
+                      "assigned Manager",
+                      "priority",
+                      !hideCreatedOn && "created On",
+                      "updated On",
+                      "deadline",
+                      "progress",
+                      // "actions", // Removed Actions column for manager view as per typical permissioning, but can add back if needed
+                    ].map(
+                      (col) =>
+                        col && (
+                          <th
+                            key={col}
+                            onClick={() => handleSort(col as keyof IProgram)}
+                            className={`px-6 py-3 text-left text-xs font-semibold text-gray-700 capitalize cursor-pointer`}
+                          >
+                            {col.toString().replace(/([A-Z])/g, " $1")}
+                            {sortColumn === col &&
+                              (sortOrder === "asc" ? " ▲" : " ▼")}
+                          </th>
+                        ),
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {tableRows.map((program, idx) =>
+                    program ? (
+                      <tr
+                        key={program.id}
+                        onClick={() => handleRowClick(program.id)}
+                        className="hover:bg-gray-50 h-[60px] cursor-pointer"
+                      >
+                        <td className="px-6 py-4 text-sm align-middle">
+                          {program.programName}
+                        </td>
+                        <td className="px-6 py-4 align-middle">
+                          {program?._count?.projects} Projects
+                        </td>
+                        <td className="px-6 py-4 align-middle">
+                          {/* <RenderStaffAvatars
                           staff={Array.from({ length: 5 }, (_, i) => ({
                             id: i.toString(),
                             name: `Staff ${i + 1}`,
                             avatar:
                               "https://randomuser.me/api/portraits/men/19.jpg",
                           }))}
-                        />
-                      </td>
-                      <td className="px-6 py-4 align-middle">
-                        <PriorityDropdown defaultPriority={program.priority} />
-                      </td>
-                      {!hideCreatedOn && (
-                        <td className="px-6 py-4 text-gray-600 text-sm align-middle">
-                          {formatDate(program.createdAt)}
+                        /> */}
+                          <div>no img</div>
                         </td>
-                      )}
-                      <td className="px-6 py-4 text-gray-600 text-sm align-middle">
-                        {formatDate(program.updatedAt)}
-                      </td>
-                      <td className="px-6 py-4 text-gray-600 text-sm">
-                        {formatDate(program.deadline)}
-                      </td>
-                      <td className="px-6 py-4 align-middle">
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 bg-gray-200 rounded-full max-w-[120px] h-2 overflow-hidden">
-                            <div
-                              className="bg-blue-600 h-full transition-all"
-                              style={{ width: `${program.progress}%` }}
-                            />
+                        <td className="px-6 py-4 align-middle">
+                          <PriorityDropdown
+                            defaultPriority={program.priority}
+                          />
+                        </td>
+                        {!hideCreatedOn && (
+                          <td className="px-6 py-4 text-gray-600 text-sm align-middle">
+                            {formatDate(program.createdAt)}
+                          </td>
+                        )}
+                        <td className="px-6 py-4 text-gray-600 text-sm align-middle">
+                          {formatDate(program.updatedAt)}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 text-sm">
+                          {formatDate(program.deadline)}
+                        </td>
+                        <td className="px-6 py-4 align-middle">
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 bg-gray-200 rounded-full max-w-[120px] h-2 overflow-hidden">
+                              <div
+                                className="bg-blue-600 h-full transition-all"
+                                style={{ width: `${program.progress}%` }}
+                              />
+                            </div>
+                            <span className="text-gray-600 text-sm">
+                              {program.progress}%
+                            </span>
                           </div>
-                          <span className="text-gray-600 text-sm">
-                            {program.progress}%
-                          </span>
-                        </div>
-                      </td>
-                      {/* <td className="px-6 py-4 align-middle">
+                        </td>
+                        {/* <td className="px-6 py-4 align-middle">
                       <div className="flex gap-2">
                         <button
                           onClick={(e) => {
@@ -338,42 +341,42 @@ const StaffManagerAllProgram = ({
                         </button>
                       </div>
                     </td> */}
-                    </tr>
-                  ) : (
-                    <tr key={`empty-${idx}`} className="h-[60px]">
-                      {[
-                        "programName",
-                        "projects",
-                        "assigned Manager",
-                        "priority",
-                        !hideCreatedOn && "created On",
-                        "updated At",
-                        "deadline",
-                        "progress",
-                        // "actions",
-                      ]
-                        .filter(Boolean)
-                        .map((_, i) => (
-                          <td
-                            key={i}
-                            className="px-6 py-4 text-gray-200 text-sm capitalize"
-                          >
-                            &nbsp;
-                          </td>
-                        ))}
-                    </tr>
-                  ),
-                )}
-              </tbody>
-            </table>
-          )}
-
-          {sortedPrograms.length === 0 && (
-            <div className="flex justify-center items-center w-full h-[60vh]">
-              <h2 className="font-semibold text-gray-200 text-5xl text-center uppercase">
-                No Program Data Available
-              </h2>
-            </div>
+                      </tr>
+                    ) : (
+                      <tr key={`empty-${idx}`} className="h-[60px]">
+                        {[
+                          "programName",
+                          "projects",
+                          "assigned Manager",
+                          "priority",
+                          !hideCreatedOn && "created On",
+                          "updated At",
+                          "deadline",
+                          "progress",
+                          // "actions",
+                        ]
+                          .filter(Boolean)
+                          .map((_, i) => (
+                            <td
+                              key={i}
+                              className="px-6 py-4 text-gray-200 text-sm capitalize"
+                            >
+                              &nbsp;
+                            </td>
+                          ))}
+                      </tr>
+                    ),
+                  )}
+                </tbody>
+              </table>
+              {sortedPrograms.length === 0 && (
+                <div className="flex justify-center items-center w-full h-[60vh]">
+                  <h2 className="font-semibold text-gray-200 text-5xl text-center uppercase">
+                    No Program Data Available
+                  </h2>
+                </div>
+              )}
+            </>
           )}
         </div>
 

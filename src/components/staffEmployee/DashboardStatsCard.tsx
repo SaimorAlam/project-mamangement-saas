@@ -17,10 +17,7 @@ interface IProps {
 
 function splitAndCapitalize(camelCaseString: string) {
   // Insert a space before each capital letter that follows a lowercase letter
-  const spacedString = camelCaseString.replace(
-    /([a-z])([A-Z])/g,
-    "$1 $2"
-  );
+  const spacedString = camelCaseString.replace(/([a-z])([A-Z])/g, "$1 $2");
 
   // Capitalize the first letter of the entire string and return
   return spacedString.charAt(0).toUpperCase() + spacedString.slice(1);
@@ -49,9 +46,7 @@ const DashboardStatsCard = ({ item }: IProps) => {
     Chart: <FaChartPie />,
   };
 
-  const IconElement = Object.keys(IconCollection).includes(
-    iconType as string
-  )
+  const IconElement = Object.keys(IconCollection).includes(iconType as string)
     ? IconCollection[iconType as string]
     : null;
 
@@ -62,7 +57,7 @@ const DashboardStatsCard = ({ item }: IProps) => {
           growth_type === "up"
             ? "bg-[#EBFFF2] text-green-600"
             : "bg-[#FDF4F5] text-red-600"
-        }  bg-[#EBFFF2] rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102`}
+        } rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102`}
       >
         <div className="bg-white shadow-xs shadow-gray-100 rounded-lg p-5 ">
           {/* Icon & Title */}
@@ -81,9 +76,7 @@ const DashboardStatsCard = ({ item }: IProps) => {
 
           {/* Value and growth */}
           <div className="flex items-center justify-between ">
-            <span className="text-4xl font-medium text-gray-900">
-              {value}
-            </span>
+            <span className="text-4xl font-medium text-gray-900">{value}</span>
 
             {growth && (
               <span

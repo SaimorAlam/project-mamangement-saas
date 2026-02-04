@@ -5,7 +5,7 @@ import StaffManagerTimosSuperShop from "@/pages/staffManager/StaffManagerTimosSu
 import StaffManagerProgramName from "@/pages/staffManager/StaffManagerProgramName";
 import StaffManagerProjectBuilder from "@/pages/staffManager/StaffManagerProjectBuilder";
 import StaffManagerHighwayExpansion from "@/pages/staffManager/StaffManagerHighwayExpansion";
-import StaffManagerProjectReview from "@/pages/staffManager/StaffManagerProjectReview";
+// import StaffManagerProjectReview from "@/pages/staffManager/StaffManagerProjectReview";
 import StaffManagerHelp from "@/pages/staffManager/StaffManagerHelp";
 import StaffManagerSupport from "@/pages/staffManager/StaffManagerSupport";
 import StaffManagerSupportTickets from "@/pages/staffManager/StaffManagerSupportTickets";
@@ -64,12 +64,16 @@ export function getStaffManagerRoutes() {
     },
     {
       path: "project-review",
-      element: <StaffManagerProjectReview />,
-      children: [
-        { path: "all-projects", element: <AllProjectsReview /> },
-        { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
-      ],
+      element: <AllProjectsReview />,
     },
+    // {
+    //   path: "project-review",
+    //   element: <StaffManagerProjectReview />,
+    //   children: [
+    //     { path: "all-projects", element: <AllProjectsReview /> },
+    //     { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
+    //   ],
+    // },
     { path: "activity-log", element: <StaffManagerActivityLog /> },
     {
       path: "help",

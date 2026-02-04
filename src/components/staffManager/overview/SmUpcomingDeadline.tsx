@@ -64,14 +64,12 @@ const SmUpcomingDeadline = () => {
         </div>
 
         {/* View Calendar Button */}
-        {/* {deadlineData.length !== 0 && ( */}
         <ViewCalender
           showCalendar={showCalendar}
           setShowCalendar={setShowCalendar}
-          onChange={handleDateChange} // Pass the handleDateChange to get the selected range
+          onChange={handleDateChange}
           value={value}
         />
-        {/* )} */}
       </div>
 
       {/* Display Selected Range Days */}

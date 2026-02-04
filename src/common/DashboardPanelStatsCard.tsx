@@ -98,7 +98,7 @@ const DashboardPanelStatsCard = ({
           growth_type === "up"
             ? "bg-[#EBFFF2] text-green-600"
             : "bg-[#FDF4F5] text-red-600"
-        }  bg-[#EBFFF2] rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102 relative`}
+        } rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102 relative`}
       >
         {/* Menu Button - Absolute Top Right */}
         {(currentPathname.split("/").pop() === "project-builder" ||
