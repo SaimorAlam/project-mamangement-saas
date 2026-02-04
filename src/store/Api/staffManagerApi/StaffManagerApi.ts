@@ -29,6 +29,14 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Manager"],
     }),
+    getAllManagerProgramsForProgramPage: builder.query({
+      query: (params) => ({
+        url: "/program",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
     getUpcomingDeadlines: builder.query({
       query: (params) => ({
         url: "/manager/projects/upcoming-deadlines",
@@ -151,6 +159,7 @@ export const {
   useGetTopOverdueProjectsQuery,
   useGetSubmissionStatusQuery,
   useGetAllManagerProgramsQuery,
+  useGetAllManagerProgramsForProgramPageQuery,
   useGetUpcomingDeadlinesQuery,
   useGetAllActivityLogsQuery,
   useGetAllLatestSubmissionsQuery,
