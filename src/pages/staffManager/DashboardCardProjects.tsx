@@ -4,7 +4,7 @@ import StaffManagerProjectCard, {
   StaffEmployeeProject,
 } from "@/components/staffManager/StaffManagerProjectCard";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import { ChevronLeft, Undo2 } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 

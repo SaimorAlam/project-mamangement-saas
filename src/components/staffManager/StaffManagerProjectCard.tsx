@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Flag, Layers, Star } from "lucide-react";
-import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
+// import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
 import ProjectDetailsModal from "./overview/ProjectDetailsModal";
 import { toast } from "sonner";
