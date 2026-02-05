@@ -11,6 +11,7 @@ import {
   useAddProjectToFavoriteMutation,
   useGetFavoriteProjectsQuery,
 } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import RenderStaffAvatars from "../client/RenderStaffAvater";
 
 export type ProjectStatus =
   | "LIVE"
@@ -55,6 +56,29 @@ export interface StaffEmployeeProject {
 
   createdAt: string;
   updatedAt: string;
+
+  projectEmployees?: {
+    employee: {
+      user: {
+        name: string;
+        profileImage: string;
+      };
+    };
+  };
+  projectViewers?: {
+    viewer: {
+      user: {
+        name: string;
+        profileImage: string;
+      };
+    };
+  };
+  manager?: {
+    user: {
+      name: string;
+      profileImage: string;
+    };
+  };
 }
 
 interface StaffEmployeeProgramCardProps {
@@ -100,6 +124,20 @@ const StaffManagerProjectCard = ({
     progress,
     status,
   } = project;
+
+  const assignedStaffImg = []
+  project?.manager?.user?.profileImage && assignedStaffImg.push({
+    name: project?.manager?.user?.name,
+    avatar: project?.manager?.user?.profileImage
+  })
+  project?.projectEmployees?.employee?.user?.profileImage && assignedStaffImg.push({
+    name: project?.projectEmployees?.employee?.user?.name,
+    avatar: project?.projectEmployees?.employee?.user?.profileImage
+  })
+  project?.projectViewers?.viewer?.user?.profileImage && assignedStaffImg.push({
+    name: project?.projectViewers?.viewer?.user?.name,
+    avatar: project?.projectViewers?.viewer?.user?.profileImage
+  })
 
   const { data } = useGetFavoriteProjectsQuery();
   const [addProjectToFavorite] = useAddProjectToFavoriteMutation();
@@ -195,14 +233,10 @@ const StaffManagerProjectCard = ({
             <div>
               <h3 className="mb-1">Assigned People</h3>
               {/* Kept intentionally even if data is not available */}
-              {/* <RenderStaffAvatars
-                staff={Array.from({ length: 3 }, (_, i) => ({
-                  id: i.toString(),
-                  name: `Staff ${i + 1}`,
-                  avatar: "https://randomuser.me/api/portraits/men/19.jpg",
-                }))}
-              /> */}
-              --
+              <RenderStaffAvatars
+                staff={assignedStaffImg}
+              />
+              {/* -- */}
             </div>
 
             <div className="flex flex-col gap-y-4 text-sm py-2 px-4">

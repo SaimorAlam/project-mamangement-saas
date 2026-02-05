@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { X, Settings } from "lucide-react";
+import { io, Socket } from "socket.io-client";
 import { Button } from "@/components/ui/button";
 import {
   Avatar,
@@ -9,9 +10,6 @@ import {
 import { cn } from "@/lib/utils";
 import { useGetNotificationQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
-/*  
-   API TYPE (REAL RESPONSE)
-  */
 
 interface NotificationApiItem {
   id: string;
@@ -24,10 +22,6 @@ interface NotificationApiItem {
   createdAt: string;
   updatedAt: string;
 }
-
-/*  
-   EXISTING UI TYPES (UNCHANGED)
-  */
 
 export interface NotificationAction {
   label: string;
@@ -61,10 +55,6 @@ export interface NotificationItem {
   status?: "new" | "read";
 }
 
-/*  
-   HELPERS
-  */
-
 const timeAgo = (date: string) => {
   const diff = Date.now() - new Date(date).getTime();
   const mins = Math.floor(diff / 60000);
@@ -81,11 +71,6 @@ const getInitials = (name: string) =>
     .join("")
     .toUpperCase();
 
-/**
- * Extracts:
- * action -> "created a new project"
- * target -> "Project Alpha"
- */
 const parseContext = (context: string) => {
   const match = context.match(/"(.*?)"/);
   return {
@@ -93,10 +78,6 @@ const parseContext = (context: string) => {
     target: match ? match[1] : undefined,
   };
 };
-
-/*  
-   MAPPER (API → EXISTING UI SHAPE)
-  */
 
 const mapApiToNotificationItem = (
   api: NotificationApiItem
@@ -129,10 +110,6 @@ const mapApiToNotificationItem = (
   };
 };
 
-/*  
-   COMPONENT
-  */
-
 interface NotificationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -146,19 +123,60 @@ const tabs = [
   { id: "team", label: "Team" },
 ];
 
+let socket: Socket | null = null;
+
 export default function StaffEmployeeNotificationModal({
   isOpen,
   onClose,
   className,
 }: NotificationModalProps) {
+  const socketURL = "https://gfwndvfv-8080.inc1.devtunnels.ms"
+  // const socketURL = "https://lawaladmin.sakibalhasa.xyz/"
   const [activeTab, setActiveTab] = useState("all");
+  const [realtimeNotifications, setRealtimeNotifications] =
+    useState<NotificationItem[]>([]);
 
   const { data } = useGetNotificationQuery();
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const token = localStorage.getItem("accessToken");
+
+    if (!socket) {
+      socket = io(socketURL, {
+        transports: ["websocket"],
+        auth: {
+          token,
+        },
+      });
+    }
+
+    socket.on("connect", () => {
+      console.log("Socket connected:", socket?.id);
+    });
+
+    socket.on("notification", (payload: NotificationApiItem) => {
+      const mapped = mapApiToNotificationItem(payload);
+      setRealtimeNotifications((prev) => [mapped, ...prev]);
+    });
+
+    return () => {
+      socket?.off("notification");
+    };
+  }, [isOpen]);
+
+  /* =========================
+     COMBINE API + REALTIME
+  ========================= */
+
   const notifications: NotificationItem[] = useMemo(() => {
-    if (!data?.data) return [];
-    return data.data.map(mapApiToNotificationItem);
-  }, [data]);
+    const apiNotifications = data?.data
+      ? data.data.map(mapApiToNotificationItem)
+      : [];
+
+    return [...realtimeNotifications, ...apiNotifications];
+  }, [data, realtimeNotifications]);
 
   const filteredNotifications = notifications.filter((n) => {
     switch (activeTab) {
@@ -175,9 +193,9 @@ export default function StaffEmployeeNotificationModal({
 
   if (!isOpen) return null;
 
-  /*  
-     JSX BELOW IS 100% YOUR ORIGINAL STYLE
-    */
+  /* =========================
+     JSX (UNCHANGED)
+  ========================= */
 
   return (
     <>
@@ -185,6 +203,7 @@ export default function StaffEmployeeNotificationModal({
         className="fixed inset-0 bg-black/30 z-40"
         onClick={onClose}
       ></div>
+
       <div
         className={cn(
           "absolute right-14 top-15 h-[85vh] w-96 bg-white rounded-lg z-50 flex flex-col shadow-xl",
@@ -241,9 +260,7 @@ export default function StaffEmployeeNotificationModal({
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10 shrink-0 border border-gray-200">
                     <AvatarImage
-                      src={
-                        notification.user.avatar || "/placeholder.svg"
-                      }
+                      src={notification.user.avatar || "/placeholder.svg"}
                       alt={notification.user.name}
                     />
                     <AvatarFallback className="text-xs font-medium">

@@ -10,7 +10,7 @@ import { MapPin } from "lucide-react";
 
 interface HeaderContextType {
   heading: string;
-  setHeading: (value: string) => void;  
+  setHeading: (value: string) => void;
   breadcrumb: ReactElement; // ← JSX element type
   setBreadcrumb: (value: ReactElement) => void;
   showButton: boolean;
@@ -37,47 +37,48 @@ export const HeaderProvider = ({
 
   const [showButton, setShowButton] = useState(true);
 
-    useEffect(() => {
-  if (!navigator.geolocation) return;
+  useEffect(() => {
+    if (!navigator.geolocation) return;
 
-  navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      const { latitude, longitude } = position.coords;
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
 
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-        );
-        const data = await res.json();
-
-        if (data?.display_name) {
-          setBreadcrumb(
-            <div className="flex items-center">
-              <MapPin className="w-4 h-4 mr-1" />
-              {data.display_name}
-            </div>
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
           );
-        }
-      } catch (err) {
-        console.log(err);
-        
-        setBreadcrumb(
+          const data = await res.json();
+          const text = data.display_name.split(", ")
+
+          if (text) {
+            setBreadcrumb(
+              <div className="flex items-center">
+                <MapPin className="w-4! h-4! mr-1" />
+                {text.slice(0, 3).join(", ")}
+              </div>
+            );
+          }
+        } catch (err) {
+          console.log(err);
+
+          setBreadcrumb(
             <div className="flex items-center">
               <MapPin className="w-4 h-4 mr-1" />
               hiksfjweo
             </div>
           );
-        
+
+        }
+      },
+      () => {
+        // permission denied → keep default address
       }
-    },
-    () => {
-      // permission denied → keep default address
-    }
-  );
-}, []);
+    );
+  }, []);
 
 
-console.log("sdfksl",breadcrumb);
+  console.log("sdfksl", breadcrumb);
 
   return (
     <HeaderContext.Provider
