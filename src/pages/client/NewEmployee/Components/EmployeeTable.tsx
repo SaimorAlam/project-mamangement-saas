@@ -8,7 +8,6 @@ import { Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ViewUserModal from "./ViewUserModal";
-import UpdateUserModal from "./UpdateUserModal";
 import Swal from "sweetalert2";
 import {
   Select,

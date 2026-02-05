@@ -12,6 +12,9 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useCreateProgramMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { toast } from "sonner";
+import { useGetAllManagersQuery } from "@/store/Api/UserApi/UserApi";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 interface ICreateProgramModalProps {
   open: boolean;
@@ -19,12 +22,16 @@ interface ICreateProgramModalProps {
   onSuccess: ({ programName, id }: { programName: string; id: string }) => void;
   title: string;
 }
-
+interface Manager {
+  id: string;
+  name: string;
+  profileImage: string;
+}
 interface ProgramFormData {
   programName: string;
   startingDate: string;
   description: string;
-  // assignedPerson: string;
+  assignedPerson: string;
   priority: "HIGH" | "MEDIUM" | "LOW";
   deadline: string;
 }
@@ -35,7 +42,16 @@ export default function CreateProgramModal({
   onSuccess,
   title,
 }: ICreateProgramModalProps) {
+  const [selectedManager, setSelectedManager] = useState<string>("");
   const [createProgramMutation] = useCreateProgramMutation();
+  const { data, isLoading } = useGetAllManagersQuery({});
+  const managers = data?.data?.data?.map(
+    (user: { id: string; user: { name: string; profileImage: string } }) => ({
+      id: user?.id,
+      name: user?.user?.name,
+      profileImage: user?.user?.profileImage,
+    }),
+  );
 
   const {
     register,
@@ -48,7 +64,7 @@ export default function CreateProgramModal({
       programName: "",
       startingDate: "",
       description: "",
-      // assignedPerson: "me",
+      assignedPerson: "",
       priority: "HIGH",
       deadline: "",
     },
@@ -65,7 +81,7 @@ export default function CreateProgramModal({
       deadline: data.deadline
         ? new Date(data.deadline).toISOString()
         : undefined,
-      // assignedPerson: data.assignedPerson,
+      assignedPerson: data.assignedPerson,
     };
     try {
       const res = await createProgramMutation(payload).unwrap();
@@ -191,7 +207,7 @@ export default function CreateProgramModal({
           </div>
 
           {/* Assigned Person */}
-          {/* <div className="space-y-2">
+          <div className="space-y-2">
             <label className="text-sm font-medium text-gray-900">
               Assign Person
             </label>
@@ -199,19 +215,33 @@ export default function CreateProgramModal({
               control={control}
               name="assignedPerson"
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    setSelectedManager(value);
+                  }}
+                >
                   <SelectTrigger className="h-10 border border-[#E2E8F0] mt-2 w-full">
-                    <SelectValue />
+                    <SelectValue placeholder="Select a manager" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-[#E2E8F0]">
-                    <SelectItem value="me">Me</SelectItem>
-                    <SelectItem value="kathryn">Kathryn Murphy</SelectItem>
-                    <SelectItem value="john">John Doe</SelectItem>
+                    {isLoading ? (
+                      <Skeleton className="h-10 w-full" />
+                    ) : (
+                      <>
+                        {managers?.map((manager: Manager) => (
+                          <SelectItem key={manager.id} value={manager.id}>
+                            {manager.name}
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               )}
             />
-          </div> */}
+          </div>
 
           {/* Buttons */}
           <div className="flex gap-3 pt-4">
