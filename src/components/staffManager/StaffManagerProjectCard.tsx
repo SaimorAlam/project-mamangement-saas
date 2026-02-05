@@ -11,6 +11,7 @@ import {
   useAddProjectToFavoriteMutation,
   useGetFavoriteProjectsQuery,
 } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import RenderStaffAvatars from "../client/RenderStaffAvater";
 
 export type ProjectStatus =
   | "LIVE"
@@ -56,7 +57,7 @@ export interface StaffEmployeeProject {
   createdAt: string;
   updatedAt: string;
 
-  projectEmployees: {
+  projectEmployees?: {
     employee: {
       user: {
         name: string;
@@ -64,7 +65,7 @@ export interface StaffEmployeeProject {
       };
     };
   };
-  projectViewers: {
+  projectViewers?: {
     viewer: {
       user: {
         name: string;
@@ -72,7 +73,7 @@ export interface StaffEmployeeProject {
       };
     };
   };
-  manager: {
+  manager?: {
     user: {
       name: string;
       profileImage: string;
