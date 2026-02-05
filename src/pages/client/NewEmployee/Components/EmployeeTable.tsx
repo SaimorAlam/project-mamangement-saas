@@ -19,6 +19,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { FieldGroup } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
+import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 
 const EmployeeTable = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -520,10 +521,10 @@ const EmployeeTable = () => {
         onClose={() => setIsModalOpen(false)}
         user={selectedUser}
       />
-      <UpdateUserModal
-        isOpen={isUpdateModalOpen}
+      <AddEmployeeModal
+        open={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
-        user={selectedUser}
+        employee={selectedUser}
       />
     </div>
   );

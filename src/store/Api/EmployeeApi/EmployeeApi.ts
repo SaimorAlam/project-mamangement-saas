@@ -20,7 +20,6 @@ const employeeApi = baseApi.injectEndpoints({
         sortOrder,
       }) => {
         const params = new URLSearchParams();
-
         params.append("page", String(page));
         params.append("limit", String(limit));
 
@@ -66,29 +65,29 @@ const employeeApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Users"],
     }),
-    addManager: builder.mutation({
-      query: (data) => ({
-        url: "/users/managers/create",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Users"],
-    }),
-    addViewer: builder.mutation({
-      query: (data) => ({
-        url: "/users/viewers/create",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Users"],
-    }),
+    // addManager: builder.mutation({
+    //   query: (data) => ({
+    //     url: "/users/managers/create",
+    //     method: "POST",
+    //     body: data,
+    //   }),
+    //   invalidatesTags: ["Users"],
+    // }),
+    // addViewer: builder.mutation({
+    //   query: (data) => ({
+    //     url: "/users/viewers/create",
+    //     method: "POST",
+    //     body: data,
+    //   }),
+    //   invalidatesTags: ["Users"],
+    // }),
     updateEmployee: builder.mutation({
       query: ({ id, ...employeeData }) => ({
         url: `/employees/${id}`,
         method: "PATCH",
         body: employeeData,
       }),
-      invalidatesTags: [{ type: "Employees", id: "LIST" },"Users"],
+      invalidatesTags: [{ type: "Employees", id: "LIST" }, "Users"],
     }),
 
     deleteEmployee: builder.mutation({
@@ -96,7 +95,7 @@ const employeeApi = baseApi.injectEndpoints({
         url: `/employees/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Employees", id: "LIST" },"Users"],
+      invalidatesTags: [{ type: "Employees", id: "LIST" }, "Users"],
     }),
 
     bulkDeleteEmployee: builder.mutation({
@@ -105,7 +104,7 @@ const employeeApi = baseApi.injectEndpoints({
         method: "DELETE",
         body: data,
       }),
-      invalidatesTags: [{ type: "Employees", id: "LIST" },"Users"],
+      invalidatesTags: [{ type: "Employees", id: "LIST" }, "Users"],
     }),
     getEmployeeTaskStatistics: builder.query({
       query: (id) => `/employees/${id}/statistics`,
@@ -126,8 +125,8 @@ export const {
   useBulkDeleteEmployeeMutation,
   useGetEmployeeTaskStatisticsQuery,
   useGetEmployeeTaskByIdQuery,
-  useAddManagerMutation,
-  useAddViewerMutation,
+  // useAddManagerMutation,
+  // useAddViewerMutation,
 } = employeeApi;
 
 export default employeeApi;

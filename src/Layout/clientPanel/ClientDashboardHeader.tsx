@@ -287,11 +287,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           )}
         </div>
 
-        <div className="flex-1 min-w-[200px] grid place-content-center order-3 lg:order-2 w-full lg:w-auto">
+        <div className="flex-1 min-w-[200px] grid place-content-center order-2  w-full sm:w-auto mt-2 sm:mt-0">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </div>
 
-        <div className="flex items-center justify-end gap-2 md:gap-4 lg:gap-6 relative order-2 lg:order-3 ml-auto lg:ml-0">
+        <div className="flex items-center justify-end gap-2 md:gap-4 lg:gap-6 relative order-3 lg:order-3 ml-auto lg:ml-0">
           <PrimaryButton
             leftIcon={<Bell className="text-xl md:text-2xl" />}
             type="Outline"

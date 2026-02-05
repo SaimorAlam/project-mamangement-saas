@@ -1,24 +1,40 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { X, Mail, Calendar, HelpCircle, Plus } from "lucide-react";
+import { X, Mail, Calendar, HelpCircle, Plus, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { IAddEmployeePayload } from "@/types";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   useAddEmployeeMutation,
-  useAddManagerMutation,
-  useAddViewerMutation,
+  // useAddManagerMutation,
+  // useAddViewerMutation,
 } from "@/store/Api/EmployeeApi/EmployeeApi";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
-
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
+import { EyeOff } from "lucide-react";
 interface IAddEmployeeModalProps {
   open: boolean;
   onClose: () => void;
+  employee?: IAddEmployeePayload;
 }
 
 const today = new Date().toISOString().split("T")[0];
 
-const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
+const AddEmployeeModal = ({
+  open,
+  onClose,
+  employee,
+}: IAddEmployeeModalProps) => {
   const {
     register,
     handleSubmit,
@@ -34,19 +50,28 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
       notifyProjectManager: false,
       skills: ["Civil Eng", "Architect"],
       projects: [],
-      role: "Employee",
+      role: "EMPLOYEE",
+      notifyManager: false,
+      welcomeEmail: true,
     },
   });
 
+  useEffect(() => {
+    if (employee) {
+      const { password, ...rest } = employee;
+      reset(rest);
+    }
+  }, [employee, reset, open]);
   const selectedRole = watch("role");
 
+  const [showPassword, setShowPassword] = useState(false);
   const [skillInput, setSkillInput] = useState("");
   // const [projectInput, setProjectInput] = useState("");
   const joinedDateRef = useRef<HTMLInputElement>(null);
   const [addEmployee, { isLoading: employeeLoading }] =
     useAddEmployeeMutation();
-  const [addManager, { isLoading: managerloading }] = useAddManagerMutation();
-  const [addViewer, { isLoading: viewerloading }] = useAddViewerMutation();
+  // const [addManager, { isLoading: managerloading }] = useAddManagerMutation();
+  // const [addViewer, { isLoading: viewerloading }] = useAddViewerMutation();
   const { data: allProjects } = useGetAllProjectsQuery({});
   const projectsData = allProjects?.data?.projects?.data?.map(
     (project: { name: string; id: string }) => ({
@@ -68,7 +93,9 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
         notifyProjectManager: false,
         skills: [],
         projects: [],
-        role: "Employee",
+        role: "EMPLOYEE",
+        notifyManager: false,
+        welcomeEmail: true,
       });
       setSkillInput("");
       // setProjectInput("");
@@ -90,53 +117,24 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
     });
     return newObj;
   };
-
+  const email = watch("email");
   const onSubmit = async (data: IAddEmployeePayload) => {
     try {
       let payload: any = {};
-      let mutation: any;
-
-      if (selectedRole === "Employee") {
-        payload = {
-          name: data.name,
-          email: data.email,
-          phoneNumber: data.phoneNumber,
-          password: data.password,
-          skills: data.skills,
-          description: data.description,
-          joinedDate: data.joinedDate,
-          projects: data.projects,
-          sendWelcomeEmail: data.sendWelcomeEmail,
-          notifyProjectManager: data.notifyProjectManager,
-        };
-        mutation = addEmployee;
-      } else if (selectedRole === "Manager") {
-        payload = {
-          name: data.name,
-          email: data.email,
-          phoneNumber: data.phoneNumber,
-          password: data.password,
-          skills: data.skills,
-          description: data.description,
-          joinedDate: data.joinedDate,
-          projects: data.projects,
-          sendWelcomeEmail: data.sendWelcomeEmail,
-          notifyProjectManager: data.notifyProjectManager,
-        };
-        mutation = addManager;
-      } else if (selectedRole === "Viewer") {
-        payload = {
-          name: data.name,
-          email: data.email,
-          phoneNumber: data.phoneNumber,
-          password: data.password,
-        };
-        mutation = addViewer;
-      }
-
+      payload = {
+        name: data.name,
+        email: data.email,
+        ...(!employee?.password && { password: data.password }),
+        role: data.role,
+        skills: data.skills,
+        description: data.description,
+        joinedDate: data.joinedDate,
+        projects: data.projects,
+        sendWelcomeEmail: data.sendWelcomeEmail,
+        notifyProjectManager: data.notifyProjectManager,
+      };
       const cleanedPayload = cleanObject(payload);
-
-      await mutation(cleanedPayload).unwrap();
+      await addEmployee(cleanedPayload).unwrap();
       toast.success(`${selectedRole} added successfully!`);
       onClose();
     } catch (err: unknown) {
@@ -155,10 +153,10 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 ">
-      <div className="bg-white rounded-lg shadow-xl w-full min-w-xl max-w-2xl max-h-[90vh]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+    <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/50 p-4">
+      <div className="bg-white shadow-xl rounded-lg w-full min-w-xl max-w-2xl max-h-[90vh]">
+        <div className="flex justify-between items-center px-6 py-4 border-gray-200 border-b">
+          <h2 className="font-semibold text-gray-900 text-lg">
             Add New Employee
           </h2>
           <button
@@ -171,27 +169,12 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="px-6 py-5 max-h-[calc(90vh-140px)] space-y-5 overflow-y-auto scrollbar-hide"
+          className="space-y-5 px-6 py-5 max-h-[calc(90vh-140px)] overflow-y-auto scrollbar-hide"
         >
-          {/* Role Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Select Role <span className="text-red-500">*</span>
-            </label>
-            <select
-              {...register("role", { required: "Role is required" })}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none bg-white"
-            >
-              <option value="Employee">Employee</option>
-              <option value="Manager">Manager</option>
-              <option value="Viewer">Viewer</option>
-            </select>
-          </div>
-
           {/* Employee Name and Email */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="gap-4 grid grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block mb-1.5 font-medium text-gray-700 text-sm">
                 Employee Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -199,22 +182,22 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
                   required: "Name is required",
                 })}
                 placeholder="Enter employee name"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none w-full text-sm"
               />
               {errors.name && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="mt-1 text-red-500 text-xs">
                   {errors.name.message}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block mb-1.5 font-medium text-gray-700 text-sm">
                 Employee Email <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Mail
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="top-1/2 left-3 absolute text-gray-400 -translate-y-1/2"
                   size={16}
                 />
                 <input
@@ -227,11 +210,11 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
                     },
                   })}
                   placeholder="Enter employee email"
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none"
+                  className="py-2 pr-3 pl-9 border border-gray-300 rounded-md focus:outline-none w-full text-sm"
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="mt-1 text-red-500 text-xs">
                   {errors.email.message}
                 </p>
               )}
@@ -239,9 +222,9 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
           </div>
 
           {/* Phone and Password */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <div className="gap-4 grid grid-cols-2">
+            {/* <div>
+              <label className="block mb-1.5 font-medium text-gray-700 text-sm">
                 Employee Phone <span className="text-red-500">*</span>
               </label>
               <input
@@ -253,26 +236,57 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
                   },
                 })}
                 placeholder="Enter employee phone"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none w-full text-sm"
               />
               {errors.phoneNumber && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="mt-1 text-red-500 text-xs">
                   {errors.phoneNumber.message}
                 </p>
               )}
+            </div> */}
+            {/* Role Selection */}
+            <div>
+              <label className="block mb-1.5 font-medium text-gray-700 text-sm">
+                Select Role <span className="text-red-500">*</span>
+              </label>
+
+              <Controller
+                name="role"
+                control={control}
+                rules={{ required: "Role is required" }}
+                render={({ field }) => (
+                  <Select
+                    key={field.value}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                  >
+                    <SelectTrigger className="bg-white px-3 py-2 border border-gray-300 rounded-md w-full text-sm">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+
+                    <SelectContent className="bg-white">
+                      <SelectItem value="EMPLOYEE" className="hover:bg-gray-50">
+                        Employee
+                      </SelectItem>
+                      <SelectItem value="MANAGER" className="hover:bg-gray-50">
+                        Manager
+                      </SelectItem>
+                      <SelectItem value="VIEWER" className="hover:bg-gray-50">
+                        Viewer
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block mb-1.5 font-medium text-gray-700 text-sm">
                 Employee Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <HelpCircle
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  size={16}
-                />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   {...register("password", {
                     required: "Password is required",
                     minLength: {
@@ -281,265 +295,301 @@ const AddEmployeeModal = ({ open, onClose }: IAddEmployeeModalProps) => {
                     },
                   })}
                   placeholder="Enter employee password"
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none"
+                  className="py-2 pr-3 pl-4 border border-gray-300 rounded-md focus:outline-none w-full text-sm"
                 />
+                {showPassword ? (
+                  <Eye
+                    onClick={() => {
+                      setShowPassword(!showPassword);
+                    }}
+                    className="top-1/2 right-3 absolute text-gray-400 -translate-y-1/2"
+                    size={16}
+                  />
+                ) : (
+                  <EyeOff
+                    onClick={() => {
+                      setShowPassword(!showPassword);
+                    }}
+                    className="top-1/2 right-3 absolute text-gray-400 -translate-y-1/2"
+                    size={16}
+                  />
+                )}
               </div>
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="mt-1 text-red-500 text-xs">
                   {errors.password.message}
                 </p>
               )}
             </div>
           </div>
 
-          {/* Joined Date */}
-          {selectedRole !== "Viewer" && (
-            <div className="grid grid-cols-1 gap-4">
-              <Controller
-                name="joinedDate"
-                control={control}
-                rules={{ required: "Joined date is required" }}
-                render={({ field }) => {
-                  const openPicker = () => {
-                    joinedDateRef.current?.showPicker?.();
-                    joinedDateRef.current?.focus();
-                  };
-                  return (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Joined Date <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="date"
-                          {...field}
-                          ref={(e) => {
-                            field.ref(e);
-                            joinedDateRef.current = e;
-                          }}
-                          onClick={openPicker}
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none pr-16 cursor-pointer no-date-icon"
-                        />
+          {/* Skills & Projects */}
+
+          <div className="gap-4 grid grid-cols-2">
+            <Controller
+              name="joinedDate"
+              control={control}
+              rules={{ required: "Joined date is required" }}
+              render={({ field }) => {
+                const openPicker = () => {
+                  joinedDateRef.current?.showPicker?.();
+                  joinedDateRef.current?.focus();
+                };
+                return (
+                  <div>
+                    <label className="block mb-1.5 font-medium text-gray-700 text-sm">
+                      Joined Date <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="date"
+                        {...field}
+                        ref={(e) => {
+                          field.ref(e);
+                          joinedDateRef.current = e;
+                        }}
+                        onClick={openPicker}
+                        className="px-3 py-2 pr-16 border border-gray-300 rounded-md focus:outline-none w-full text-sm cursor-pointer no-date-icon"
+                      />
+                      <button
+                        type="button"
+                        onClick={openPicker}
+                        className="top-1/2 right-2 absolute p-1 text-gray-400 hover:text-gray-600 -translate-y-1/2"
+                      >
+                        <Calendar size={16} />
+                      </button>
+                    </div>
+                    {errors.joinedDate && (
+                      <p className="mt-1 text-red-500 text-xs">
+                        {errors.joinedDate.message}
+                      </p>
+                    )}
+                  </div>
+                );
+              }}
+            />
+
+            <Controller
+              name="projects"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <label className="block mb-1.5 font-medium text-gray-700 text-sm">
+                    Project
+                  </label>
+
+                  <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-gray-300 min-h-[42px]">
+                    {field.value.map((projectId: string) => (
+                      <span
+                        key={projectId}
+                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md text-gray-700 text-xs"
+                      >
+                        {PROJECT_OPTIONS?.find(
+                          (p: any) => p.value === projectId,
+                        )?.label || projectId}
                         <button
                           type="button"
-                          onClick={openPicker}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-                        >
-                          <Calendar size={16} />
-                        </button>
-                      </div>
-                      {errors.joinedDate && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.joinedDate.message}
-                        </p>
-                      )}
-                    </div>
-                  );
-                }}
-              />
-            </div>
-          )}
-
-          {/* Skills & Projects */}
-          {selectedRole !== "Viewer" && (
-            <div className="grid grid-cols-2 gap-4">
-              <Controller
-                name="skills"
-                control={control}
-                rules={{
-                  required: "At least one skill is required",
-                  validate: (val) =>
-                    !val || val.length > 0 || "At least one skill is required",
-                }}
-                render={({ field }) => (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Skill <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
-                      {field.value.map((skill) => (
-                        <span
-                          key={skill}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
-                        >
-                          {skill}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newVal = field.value.filter(
-                                (s) => s !== skill,
-                              );
-                              field.onChange(newVal);
-                            }}
-                            className="text-gray-500 hover:text-gray-700"
-                          >
-                            <X size={12} />
-                          </button>
-                        </span>
-                      ))}
-                      <div className="flex-1 flex items-center min-w-[120px]">
-                        <input
-                          value={skillInput}
-                          onChange={(e) => setSkillInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              const val = skillInput.trim();
-                              if (val && !field.value.includes(val)) {
-                                field.onChange([...field.value, val]);
-                                setSkillInput("");
-                              }
-                            }
+                          onClick={() => {
+                            const newVal = field.value.filter(
+                              (p) => p !== projectId,
+                            );
+                            field.onChange(newVal);
                           }}
-                          placeholder="Type a skill..."
-                          className="w-full text-sm outline-none border-none bg-transparent"
-                        />
-                        {skillInput.trim() && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const val = skillInput.trim();
-                              if (val && !field.value.includes(val)) {
-                                field.onChange([...field.value, val]);
-                                setSkillInput("");
-                              }
-                            }}
-                            className="p-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
-                          >
-                            <Plus size={14} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    {errors.skills && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.skills.message}
-                      </p>
-                    )}
-                  </div>
-                )}
-              />
-
-              <Controller
-                name="projects"
-                control={control}
-                rules={{
-                  required: "At least one project is required",
-                  validate: (val) =>
-                    !val ||
-                    val.length > 0 ||
-                    "At least one project is required",
-                }}
-                render={({ field }) => (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Project <span className="text-red-500">*</span>
-                    </label>
-
-                    <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md min-h-[42px] focus-within:ring-2 focus-within:ring-gray-300">
-                      {field.value.map((projectId: string) => (
-                        <span
-                          key={projectId}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
+                          className="text-gray-500 hover:text-gray-700"
                         >
-                          {PROJECT_OPTIONS?.find(
-                            (p: any) => p.value === projectId,
-                          )?.label || projectId}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newVal = field.value.filter(
-                                (p) => p !== projectId,
-                              );
-                              field.onChange(newVal);
-                            }}
-                            className="text-gray-500 hover:text-gray-700"
-                          >
-                            <X size={12} />
-                          </button>
-                        </span>
-                      ))}
+                          <X size={12} />
+                        </button>
+                      </span>
+                    ))}
 
-                      <select
-                        value=""
-                        onChange={(e) => {
-                          if (
-                            e.target.value &&
-                            !field.value.includes(e.target.value)
-                          ) {
-                            field.onChange([...field.value, e.target.value]);
+                    <select
+                      value=""
+                      onChange={(e) => {
+                        if (
+                          e.target.value &&
+                          !field.value.includes(e.target.value)
+                        ) {
+                          field.onChange([...field.value, e.target.value]);
+                        }
+                      }}
+                      className="flex-1 bg-transparent border-none outline-none min-w-[140px] text-gray-600 text-sm cursor-pointer"
+                    >
+                      <option value="" disabled>
+                        Select project
+                      </option>
+                      {PROJECT_OPTIONS.filter(
+                        (p: any) => !field.value.includes(p.value),
+                      ).map((project: any) => (
+                        <option key={project.value} value={project.value}>
+                          {project.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {errors.projects && (
+                    <p className="mt-1 text-red-500 text-xs">
+                      {errors.projects.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            />
+          </div>
+
+          {/* Joined Date */}
+          <div className="gap-4 grid grid-cols-1">
+            <Controller
+              name="skills"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <label className="block mb-1.5 font-medium text-gray-700 text-sm">
+                    Skill
+                  </label>
+                  <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-gray-300 min-h-[42px]">
+                    {field.value.map((skill) => (
+                      <span
+                        key={skill}
+                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md text-gray-700 text-xs"
+                      >
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newVal = field.value.filter(
+                              (s) => s !== skill,
+                            );
+                            field.onChange(newVal);
+                          }}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <X size={12} />
+                        </button>
+                      </span>
+                    ))}
+                    <div className="flex flex-1 items-center min-w-[120px]">
+                      <input
+                        value={skillInput}
+                        onChange={(e) => setSkillInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            const val = skillInput.trim();
+                            if (val && !field.value.includes(val)) {
+                              field.onChange([...field.value, val]);
+                              setSkillInput("");
+                            }
                           }
                         }}
-                        className="flex-1 min-w-[140px] text-sm outline-none border-none bg-transparent text-gray-600 cursor-pointer"
-                      >
-                        <option value="" disabled>
-                          Select project
-                        </option>
-                        {PROJECT_OPTIONS.filter(
-                          (p: any) => !field.value.includes(p.value),
-                        ).map((project: any) => (
-                          <option key={project.value} value={project.value}>
-                            {project.label}
-                          </option>
-                        ))}
-                      </select>
+                        placeholder="Type a skill..."
+                        className="bg-transparent border-none outline-none w-full text-sm"
+                      />
+                      {skillInput.trim() && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const val = skillInput.trim();
+                            if (val && !field.value.includes(val)) {
+                              field.onChange([...field.value, val]);
+                              setSkillInput("");
+                            }
+                          }}
+                          className="bg-blue-50 hover:bg-blue-100 p-1.5 rounded-md text-blue-600 transition-colors"
+                        >
+                          <Plus size={14} />
+                        </button>
+                      )}
                     </div>
-                    {errors.projects && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.projects.message}
-                      </p>
-                    )}
                   </div>
-                )}
-              />
-            </div>
-          )}
-
+                  {errors.skills && (
+                    <p className="mt-1 text-red-500 text-xs">
+                      {errors.skills.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            />
+          </div>
           {/* Description */}
-          {selectedRole !== "Viewer" && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
-                  Program Description{" "}
-                  <HelpCircle size={14} className="text-gray-400" />{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  {...register("description", {
-                    required: "Description is required",
-                  })}
-                  rows={4}
-                  placeholder="Enter a description..."
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none resize-none"
-                />
-                {errors.description && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.description.message}
-                  </p>
-                )}
+          <div className="gap-4 grid grid-cols-2">
+            <div className="">
+              <label className="flex items-center gap-1 mb-1.5 font-medium text-gray-700 text-sm">
+                Program Description{" "}
+                <HelpCircle size={14} className="text-gray-400" />{" "}
+              </label>
+              <textarea
+                {...register("description")}
+                rows={4}
+                placeholder="Enter a description..."
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none w-full text-sm resize-none"
+              />
+              {errors.description && (
+                <p className="mt-1 text-red-500 text-xs">
+                  {errors.description.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-3">
+              <label className="flex items-center gap-1 mb-1.5 font-medium text-gray-700 text-sm">
+                Login Email Preview
+              </label>
+              <input
+                type="email"
+                value={email}
+                disabled={true}
+                placeholder="Enter employee password"
+                className="py-2 pr-3 pl-4 border border-gray-300 rounded-md focus:outline-none w-full text-sm disabled:bg-gray-100 disabled:text-gray-500"
+              />
+              <div className="">
+                <FieldGroup className="flex flex-col gap-2">
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id="welcome-email"
+                      {...register("welcomeEmail")}
+                    />
+                    <Label
+                      htmlFor="welcome-email"
+                      className="text-sm font-normal"
+                    >
+                      Send Welcome Email
+                    </Label>
+                  </Field>
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id="notify-manager"
+                      {...register("notifyManager")}
+                    />
+                    <Label
+                      htmlFor="notify-manager"
+                      className="text-sm font-normal"
+                    >
+                      Notify Manager
+                    </Label>
+                  </Field>
+                </FieldGroup>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 px-6 py-4">
+          <div className="flex justify-end items-center gap-3 py-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+              className="bg-white hover:bg-gray-50 px-4 py-2 border border-gray-300 rounded-md font-medium text-gray-700 text-sm transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={employeeLoading || managerloading || viewerloading}
+              disabled={employeeLoading}
               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
-                employeeLoading || managerloading || viewerloading
+                employeeLoading
                   ? "bg-blue-400 text-white cursor-not-allowed"
                   : "bg-blue-600 text-white hover:bg-blue-700"
               }`}
             >
-              {employeeLoading || managerloading || viewerloading
+              {employeeLoading
                 ? `Adding ${selectedRole}...`
                 : `Add ${selectedRole}`}
             </button>
