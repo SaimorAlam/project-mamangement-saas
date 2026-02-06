@@ -3,6 +3,12 @@ import baseApi from "../BaseApi/BaseApi";
 
 const staffEmployeeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getStaffEmployeeOverviewCards: builder.query({
+      query: () => ({
+        url: `/employeeDashboard/dashboard`,
+        method: "GET",
+      }),
+    }),
     getStaffEmployeeTopOverDue: builder.query({
       query: () => ({
         url: `/employeeDashboard/projects/top-overdue`,
@@ -70,6 +76,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetStaffEmployeeOverviewCardsQuery,
   useGetStaffEmployeeTopOverDueQuery,
   useGetStaffEmployeeUpcomingDeadlinesQuery,
   useGetStaffEmployeeLatestSubmissionsQuery,
