@@ -31,6 +31,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useGetAllEmployeesQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
+import { useNavigate } from "react-router-dom";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -245,7 +246,7 @@ const CreateProject = ({
     });
     return newObj;
   };
-
+  const navigate = useNavigate();
   const onSubmit = async (data: CreateProjectForm) => {
     try {
       const parsedSelectDays = JSON.parse(data.SelectDays || "[]");
@@ -299,6 +300,7 @@ const CreateProject = ({
       const res = await createProject(cleaned).unwrap();
       if (res.success) {
         setProjectId(res.data.id || res.data._id);
+        navigate(`/client-panel/project-builder`);
       }
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to create project");
