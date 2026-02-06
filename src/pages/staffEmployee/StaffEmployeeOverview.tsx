@@ -107,28 +107,25 @@ const StaffEmployeeOverview = () => {
         <AllProgramProject />
       </div>
 
-      <div className="grid grid-cols-3 gap-3 ">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-4">
         <div className="space-y-8 col-span-2">
-          <div className="flex items-start justify-center gap-3">
-            <div className="flex items-start justify-center gap-8">
-              <BoxContainer>
-                <h2 className="text-xl font-semibold mb-4">
-                  Top Overdue Projects
-                </h2>
-                <OverDueChart />
-              </BoxContainer>
-            </div>
+          <div className="flex justify-center gap-3">
+            <BoxContainer>
+              <h2 className="text-xl font-semibold my-2">
+                Top Overdue Projects
+              </h2>
+              <OverDueChart />
+            </BoxContainer>
+
             <ProjectStatusChart />
           </div>
         </div>
-        <div className="space-y-8">
+        <div className="space-y-8 mb-8">
           <UpcomingDeadline />
+          {/* <ActivityLog /> */}
         </div>
       </div>
-      <div className="my-10">
-
-        <LatestSubmission />
-      </div>
+      <LatestSubmission />
     </div>
   );
 };
