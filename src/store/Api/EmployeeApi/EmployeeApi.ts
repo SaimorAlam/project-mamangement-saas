@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import baseApi from "../BaseApi/BaseApi";
 
 const employeeApi = baseApi.injectEndpoints({
@@ -9,26 +10,13 @@ const employeeApi = baseApi.injectEndpoints({
       }),
     }),
     getAllEmployees: builder.query({
-      query: ({
-        page,
-        limit,
-        search,
-        status,
-        joinedDateFrom,
-        joinedDateTo,
-        sortBy,
-        sortOrder,
-      }) => {
+      query: (args: any) => {
         const params = new URLSearchParams();
-        params.append("page", String(page));
-        params.append("limit", String(limit));
-
-        if (search) params.append("search", search);
-        if (status) params.append("status", status);
-        if (joinedDateFrom) params.append("joinedDateFrom", joinedDateFrom);
-        if (joinedDateTo) params.append("joinedDateTo", joinedDateTo);
-        if (sortBy) params.append("sortBy", sortBy);
-        if (sortOrder) params.append("sortOrder", sortOrder);
+        Object.entries(args).forEach(([key, value]) => {
+          if (value !== "" && value !== undefined && value !== null) {
+            params.set(key, value as string);
+          }
+        });
         return {
           url: `/employees`,
           method: "GET",
