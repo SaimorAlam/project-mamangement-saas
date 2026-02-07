@@ -24,17 +24,13 @@ const PrimaryButton: React.FC<ButtonProps> = ({
         type === "Primary"
           ? "bg-[#1C73E0] hover:bg-white border border-[#1C73E0] text-white hover:text-[#1C73E0]"
           : type === "Outline"
-          ? "border border-[#C8CFD9] bg-white hover:border-[#1C73E0] hover:text-[#1C73E0]"
-          : "text-[#1C73E0] text-base hover:bg-blue-50"
+            ? "border border-[#C8CFD9] bg-white hover:border-[#1C73E0] hover:text-[#1C73E0]"
+            : "text-[#1C73E0] text-base hover:bg-blue-50"
       }  ${className}`}
     >
-      {leftIcon && (
-        <span className="flex items-center">{leftIcon}</span>
-      )}
-      {title && <span>{title}</span>}
-      {rightIcon && (
-        <span className="flex items-center">{rightIcon}</span>
-      )}
+      {leftIcon && <span className="flex items-center">{leftIcon}</span>}
+      {title && <span className="sm:block hidden">{title}</span>}
+      {rightIcon && <span className="flex items-center">{rightIcon}</span>}
     </button>
   );
 };

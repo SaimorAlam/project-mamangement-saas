@@ -58,8 +58,12 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
 }) => {
   const { pathname } = useLocation();
   const isProgramBuilder = pathname.split("/")[2] === "program-builder";
-  const [selectedProgram, setSelectedProgram] = useState<string>("");
-  const [selectedProject, setSelectedProject] = useState<string>("");
+  const { state } = useLocation();
+  const { projectId: defaultProjectId, programId: defaultProgramId } = state;
+  const [selectedProgram, setSelectedProgram] =
+    useState<string>(defaultProgramId);
+  const [selectedProject, setSelectedProject] =
+    useState<string>(defaultProjectId);
   const widgets: Widget[] = [
     {
       id: "kpi",

@@ -12,10 +12,13 @@
   /* Font family configuration */
   --font-inter: "Inter", sans-serif;
 }
-
+html {
+  scrollbar-gutter: stable;
+}
 @layer base {
   body {
     font-family: var(--font-inter);
+    /* overflow: hidden; */
   }
 }
 

@@ -1,31 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { useCreateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
-import { useGetAllManagersQuery } from "@/store/Api/UserApi/UserApi";
-// import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import {
+  useGetAllManagersQuery,
+  useGetAllViewersQuery,
+} from "@/store/Api/UserApi/UserApi";
 import "leaflet/dist/leaflet.css";
 
-// Fix Leaflet marker icon issue
 import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import useGetAllEmployees from "@/utils/useGetAllEmployees";
-import { FaSpinner } from "react-icons/fa";
-import {
-  X,
-  Calendar,
-  HelpCircle,
-  Flag,
-  ChevronDown,
-  Lock,
-  Users,
-  LayoutTemplate,
-  Plus,
-} from "lucide-react";
-import ProjectSuccessModal from "./ProjectSuccessModal";
+import { X, HelpCircle, Flag, Lock, Users, CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+import { useGetAllEmployeesQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -35,225 +39,180 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// interface IEmployeeProfile {
-//   id: string;
-//   user: {
-//     name: string;
-//     profileImage?: string;
-//   };
-// }
-
-type RepeatEvery = "WEEKLY" | "BI_WEEKLY" | "MONTHLY";
+type UploadCycle = "Daily" | "Weekly" | "By_Weekly" | "Monthly";
 type Priority = "LOW" | "MEDIUM" | "HIGH";
+type DaysEnum = "Sun" | "Mon" | "Tue" | "Wed" | "Thurs" | "Fri" | "Sat";
 
 interface CreateProjectForm {
-  name: string;
-  message: string;
   programId: string;
-  description?: string;
-  repeatEvery: RepeatEvery;
-  repeatOnDays: string[];
-  repeatOnDates: number[];
-  remindBefore: number;
-  priority: Priority;
-  startDate: string;
-  deadline: string;
-  estimatedCompletedDate: string;
-  managerId?: string;
+  name: string;
+  shareWith: "Only_Me" | "Invite_Staff"; //Invite_Staff
+  managerId: string;
+  viewerIds: string[];
   employeeIds: string[];
-  currentRate: string;
-  budget: string;
-  // latitude: number;
-  shortName: string;
-  // longitude: number;
+  dateDate: string;
+  uploadCycle: UploadCycle;
+  SelectDays: string; // Days { Sun, Mon, Tue, Wed, Thurs, Fri, Sat}
+  selectDate: string;
+  UploadData: string;
+
+  description: string;
+  startDate: string;
+  workingDay: string;
+  sortName: string;
+  deadline: string;
+  priority: Priority;
   status: string;
-  dataUploadDateDays: string;
-  workingDays: string[]; // Added workingDays
+  budget: string;
+  currentRate: string;
 }
-
-// Location Picker Component
-// const LocationMarker = ({
-//   setPos,
-//   pos,
-// }: {
-//   setPos: (lat: number, lng: number) => void;
-//   pos: { lat: number; lng: number };
-// }) => {
-//   useMapEvents({
-//     click(e) {
-//       setPos(e.latlng.lat, e.latlng.lng);
-//     },
-//   });
-
-//   return pos.lat !== 0 ? <Marker position={[pos.lat, pos.lng]} /> : null;
-// };
 
 const CreateProject = ({
   programId,
   onClose,
+  onSuccess,
 }: {
   programId: string;
   onClose: () => void;
+  onSuccess?: (projectName: string, projectId: string) => void;
 }) => {
-  const { allEmployees: allEmployeesData, isLoading: employeeLoading } =
-    useGetAllEmployees();
-  const [createProject, { isLoading, isSuccess }] = useCreateProjectMutation();
-
-  // Queries
+  const [createProject, { isLoading }] = useCreateProjectMutation();
   const { data: managersData } = useGetAllManagersQuery({});
   const allManagers = managersData?.data?.data || [];
-
-  // const { data: employeesData } = useGetAllEmployeesQuery({
-  //   page: 1,
-  //   limit: 100,
-  // });
-  const allEmployees: any = allEmployeesData || [];
-
-  const [shareWith, setShareWith] = useState<
-    "onlyMe" | "inviteStaff" | "followTemplate"
-  >("onlyMe");
-
+  const { data: employeesData } = useGetAllEmployeesQuery({});
+  const { data: viewerData } = useGetAllViewersQuery({});
+  const allEmployees: any = employeesData?.data || [];
+  const allViewer = viewerData?.data?.data || [];
   const [enableDetails, setEnableDetails] = useState(false);
-  const [selectedStaffs, setSelectedStaffs] = useState<string[]>([]);
-  // const [mapPosition, setMapPosition] = useState({ lat: 51.505, lng: -0.09 });
-  const [openSuccessModal, setOpenSuccessModal] = useState(false);
-  const [projectId, setProjectId] = useState<string>("");
-  const [statuses, setStatuses] = useState(["Pending", "Active", "Completed"]);
-  const [isAddingStatus, setIsAddingStatus] = useState(false);
-  const [newStatus, setNewStatus] = useState("");
+  const [statuses] = useState([
+    "PENDING",
+    "LIVE",
+    "DRAFT",
+    "OVERDUE",
+    "PROBLEM",
+    "COMPLETED",
+  ]);
 
   const { register, handleSubmit, watch, setValue, control } =
     useForm<CreateProjectForm>({
       defaultValues: {
         programId,
-        priority: "MEDIUM",
-        repeatEvery: "WEEKLY",
-        repeatOnDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], // Start empty
-        workingDays: [], // Initialize workingDays
-        shortName: "",
-        remindBefore: 30,
+        name: "",
+        shareWith: "Only_Me", //Invite_Staff
+        managerId: "",
+        viewerIds: [],
+        employeeIds: [],
+        dateDate: new Date().toISOString(),
+        uploadCycle: "Weekly",
+        SelectDays: "[]", // Storing as JSON string
+        selectDate: "[]",
+        UploadData: "3",
+
+        description: "",
         startDate: new Date().toISOString().split("T")[0],
-        dataUploadDateDays: "3",
+        workingDay: "[]",
+        sortName: "",
+        deadline: "",
+        priority: "MEDIUM",
+        status: "",
+        budget: "",
+        currentRate: "",
       },
     });
-  const projectName = watch("name");
-  const repeatEvery = watch("repeatEvery");
-  const repeatOnDays = watch("repeatOnDays");
-  const workingDays = watch("workingDays");
 
-  // useEffect(() => {
-  //   // Get user's current location on mount
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-  //         const { latitude, longitude } = position.coords;
-  //         // setMapPosition({ lat: latitude, lng: longitude });
-  //         setValue("latitude", latitude);
-  //         setValue("longitude", longitude);
-  //       },
-  //       () => {
-  //         // If denied, stick to default or previous
-  //       },
-  //     );
-  //   }
-  // }, [setValue]);
+  const uploadCycle = watch("uploadCycle");
+  const SelectDays = watch("SelectDays");
+  const workingDay = watch("workingDay");
+  const shareWith = watch("shareWith");
+  const employeeIds = watch("employeeIds");
+  const viewerIds = watch("viewerIds");
+  const selectedManagerId = watch("managerId");
+  const selectedEmployeeIds = employeeIds.filter(Boolean);
+  const selectedViewerIds = viewerIds.filter(Boolean);
 
-  useEffect(() => {
-    if (isSuccess) {
-      toast.success("Project created successfully");
-      setOpenSuccessModal(true);
-      onClose();
-    }
-  }, [isSuccess, onClose]);
-  if (employeeLoading) {
-    return <FaSpinner />;
-  }
   const toggleDay = (day: string) => {
-    const map: Record<string, string> = {
-      Mon: "MONDAY",
-      Tue: "TUESDAY",
-      Wed: "WEDNESDAY",
-      Thu: "THURSDAY",
-      Fri: "FRIDAY",
-      Sat: "SATURDAY",
-      Sun: "SUNDAY",
+    const map: Record<string, DaysEnum> = {
+      Mon: "Mon",
+      Tue: "Tue",
+      Wed: "Wed",
+      Thu: "Thurs",
+      Fri: "Fri",
+      Sat: "Sat",
+      Sun: "Sun",
     };
-    const apiDay = map[day] || day.toUpperCase();
-    const current = repeatOnDays || [];
+    const apiDay = map[day] || (day.toUpperCase() as any);
+    let current: DaysEnum[] = [];
+    try {
+      current = JSON.parse(SelectDays || "[]");
+    } catch {
+      current = [];
+    }
     const updated = current.includes(apiDay)
       ? current.filter((d) => d !== apiDay)
       : [...current, apiDay];
-    setValue("repeatOnDays", updated);
+    setValue("SelectDays", JSON.stringify(updated));
   };
 
   const isDaySelected = (shortDay: string) => {
-    const map: Record<string, string> = {
-      Mon: "MONDAY",
-      Tue: "TUESDAY",
-      Wed: "WEDNESDAY",
-      Thu: "THURSDAY",
-      Fri: "FRIDAY",
-      Sat: "SATURDAY",
-      Sun: "SUNDAY",
+    const map: Record<string, DaysEnum> = {
+      Mon: "Mon",
+      Tue: "Tue",
+      Wed: "Wed",
+      Thu: "Thurs",
+      Fri: "Fri",
+      Sat: "Sat",
+      Sun: "Sun",
     };
-    return (repeatOnDays || []).includes(map[shortDay]);
+    let current: DaysEnum[] = [];
+    try {
+      current = JSON.parse(SelectDays || "[]");
+    } catch {
+      current = [];
+    }
+    return current.includes(map[shortDay]);
   };
 
   const toggleWorkingDay = (day: string) => {
-    const map: Record<string, string> = {
-      Mon: "MONDAY",
-      Tue: "TUESDAY",
-      Wed: "WEDNESDAY",
-      Thu: "THURSDAY",
-      Fri: "FRIDAY",
-      Sat: "SATURDAY",
-      Sun: "SUNDAY",
+    const map: Record<string, DaysEnum> = {
+      Mon: "Mon",
+      Tue: "Tue",
+      Wed: "Wed",
+      Thu: "Thurs",
+      Fri: "Fri",
+      Sat: "Sat",
+      Sun: "Sun",
     };
-    const apiDay = map[day] || day.toUpperCase();
-    const current = workingDays || [];
+    const apiDay = map[day] || (day.toUpperCase() as any);
+    let current: DaysEnum[] = [];
+    try {
+      current = JSON.parse(workingDay || "[]");
+    } catch {
+      current = [];
+    }
     const updated = current.includes(apiDay)
       ? current.filter((d) => d !== apiDay)
       : [...current, apiDay];
-    setValue("workingDays", updated);
+    setValue("workingDay", JSON.stringify(updated));
   };
 
   const isWorkingDaySelected = (shortDay: string) => {
-    const map: Record<string, string> = {
-      Mon: "MONDAY",
-      Tue: "TUESDAY",
-      Wed: "WEDNESDAY",
-      Thu: "THURSDAY",
-      Fri: "FRIDAY",
-      Sat: "SATURDAY",
-      Sun: "SUNDAY",
+    const map: Record<string, DaysEnum> = {
+      Mon: "Mon",
+      Tue: "Tue",
+      Wed: "Wed",
+      Thu: "Thurs",
+      Fri: "Fri",
+      Sat: "Sat",
+      Sun: "Sun",
     };
-    return (workingDays || []).includes(map[shortDay]);
-  };
-
-  const handleStaffSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    if (value && !selectedStaffs.includes(value)) {
-      const newStaffs = [...selectedStaffs, value];
-      setSelectedStaffs(newStaffs);
-      setValue("employeeIds", newStaffs);
+    let current: DaysEnum[] = [];
+    try {
+      current = JSON.parse(workingDay || "[]");
+    } catch {
+      current = [];
     }
+    return current.includes(map[shortDay]);
   };
-
-  const handleAddStatus = () => {
-    const trimmed = newStatus.trim();
-    if (trimmed && !statuses.includes(trimmed)) {
-      setStatuses([...statuses, trimmed]);
-      setValue("status", trimmed);
-      setNewStatus("");
-      setIsAddingStatus(false);
-    }
-  };
-
-  // const handleLocationSelect = (lat: number, lng: number) => {
-  //   setValue("latitude", lat);
-  //   setValue("longitude", lng);
-  //   setMapPosition({ lat, lng });
-  // };
 
   const toISO = (date: string) => (date ? new Date(date).toISOString() : null);
 
@@ -275,61 +234,76 @@ const CreateProject = ({
 
   const onSubmit = async (data: CreateProjectForm) => {
     try {
-      const { dataUploadDateDays } = data;
-      console.log(selectedStaffs);
-      const payload = {
-        message: data.message || "New Project Created",
-        repeatEvery: data.repeatEvery,
-        managerId: data.managerId || null,
+      const parsedSelectDays = JSON.parse(data.SelectDays || "[]");
+      const parsedWorkingDay = JSON.parse(data.workingDay || "[]");
+      const parsedSelectDates = JSON.parse(data.selectDate || "[]");
+
+      // Convert day numbers to ISO dates for Prisma DateTime[]
+      const formattedSelectDates = parsedSelectDates.map((dayNum: number) => {
+        const d = new Date();
+        d.setDate(dayNum);
+        return d.toISOString();
+      });
+
+      const payload: any = {
+        ...data,
+        SelectDays: parsedSelectDays,
+        workingDay: parsedWorkingDay,
+        selectDate: formattedSelectDates,
+        dateDate: data.dateDate
+          ? new Date(data.dateDate).toISOString()
+          : new Date().toISOString(),
         startDate: toISO(data.startDate),
-        ...(repeatEvery === "MONTHLY"
-          ? {
-              repeatOnDates: data.repeatOnDates || [],
-            }
-          : {
-              repeatOnDays: data.repeatOnDays || [],
-              repeatOnDates: data.repeatOnDates || [],
-              remindBefore: parseInt(dataUploadDateDays) * 24 * 60,
-            }),
-        ...(enableDetails && {
-          description: data.description || "",
-          priority: data.priority,
-          status: data.status,
-          computedProgress: 0,
-          chartList: [],
-          estimatedCompletedDate: toISO(data.estimatedCompletedDate),
-          currentRate: data.currentRate || "0",
-          budget: data.budget || "0",
-          deadline: toISO(data.deadline || data.estimatedCompletedDate),
-        }),
-        ...(shareWith === "onlyMe"
-          ? { shareWith: "Only_Me" }
-          : shareWith === "inviteStaff"
-            ? { employeeIds: selectedStaffs }
-            : { templateId: "550e8400-e29b-41d4-a716-446655440000" }),
-        name: data.name,
-        programId: programId,
+        deadline: toISO(data.deadline),
+        managerId: data.managerId || null,
+        status: data.status
+          ? data.status.toUpperCase() === "PENDING"
+            ? "PENDING"
+            : data.status.toUpperCase()
+          : undefined,
       };
-      const cleanedPayload = cleanPayload(payload);
-      const res = await createProject(cleanedPayload).unwrap();
+
+      if (!enableDetails) {
+        // Remove detail fields if section is closed
+        const detailsFields = [
+          "description",
+          "sortName",
+          "status",
+          "currentRate",
+          "startDate",
+          "workingDay",
+          "deadline",
+          "priority",
+          "budget",
+        ];
+        detailsFields.forEach((field) => {
+          delete payload[field];
+        });
+      }
+
+      const cleaned = cleanPayload(payload);
+      const res = await createProject(cleaned).unwrap();
+      console.log(res);
       if (res.success) {
-        setProjectId(res.data.id);
+        const pId = res.data?.project?.id || res.data?.id;
+        if (onSuccess) {
+          onSuccess(data.name, pId);
+        }
       }
     } catch (error: any) {
-      console.error(error);
       toast.error(error?.data?.message || "Failed to create project");
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[98vh] overflow-hidden">
+    <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/50 p-4">
+      <div className="bg-white shadow-xl rounded-lg w-full max-w-4xl max-h-[98vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-2 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">Create New Project</h2>
+        <div className="flex justify-between items-center px-6 py-2 border-gray-200 border-b">
+          <h2 className="font-semibold text-lg">Create New Project</h2>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all"
+            className="hover:bg-slate-50 p-2 rounded-lg text-slate-400 hover:text-slate-600 transition-all"
           >
             <X size={20} />
           </button>
@@ -337,97 +311,120 @@ const CreateProject = ({
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] scrollbar-hide space-y-8"
+          className="space-y-8 p-6 max-h-[calc(90vh-140px)] overflow-y-auto scrollbar-hide"
         >
           {/* Project Details Section */}
           <section className="space-y-6">
-            {/* <h3 className="text-base font-medium text-slate-800 tracking-tight">
-              Project details
-            </h3> */}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              {/* Project Name */}
+            <div className="gap-x-8 gap-y-6 grid grid-cols-1 md:grid-cols-2">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Project Name <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative group">
+                  <div className="group relative">
                     <input
                       type="text"
                       {...register("name", { required: true })}
                       placeholder="Enter project name"
-                      className="w-full h-12 px-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
+                      className="bg-slate-50/50 px-4 border border-slate-200 focus:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-full h-12 placeholder:text-slate-400 text-sm transition-all"
                     />
                   </div>
                 </div>
                 {/* Data Date */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Data Date
                   </label>
-                  <div className="relative max-w-[400px] group">
-                    <input
-                      type="date"
-                      {...register("startDate")}
-                      className="w-full h-12 px-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 appearance-none"
+                  <div className="relative max-w-[400px]">
+                    <Controller
+                      control={control}
+                      name="dateDate"
+                      render={({ field }) => (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "justify-start bg-slate-50/50 hover:bg-slate-50 px-4 border-slate-200 rounded-lg w-full h-12 font-normal text-left transition-all",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 w-4 h-4" />
+                              {field.value ? (
+                                format(new Date(field.value), "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0 w-auto" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={
+                                field.value ? new Date(field.value) : undefined
+                              }
+                              onSelect={(date) =>
+                                field.onChange(date?.toISOString())
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      )}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-6">
                   <div className="space-y-4">
-                    <h4 className="text-sm font-bold text-blue-600/70 tracking-tight uppercase text-[11px]">
+                    <h4 className="font-bold text-[11px] text-blue-600/70 text-sm uppercase tracking-tight">
                       Data Date Uploading Cycle
                     </h4>
                     <Controller
                       control={control}
-                      name="repeatEvery"
+                      name="uploadCycle"
                       render={({ field }) => (
                         <div className="flex flex-wrap gap-x-8 gap-y-4">
-                          {["Daily", "Weekly", "Bi Weekly", "Monthly"].map(
-                            (label) => {
-                              const value = label
-                                .toUpperCase()
-                                .replace(" ", "_");
-                              return (
-                                <label
-                                  key={label}
-                                  className="flex items-center gap-2.5 cursor-pointer group"
+                          {["Weekly", "By_Weekly", "Monthly"].map((label) => {
+                            const value = label as UploadCycle;
+                            const displayLabel = label.replace("_", " ");
+                            return (
+                              <label
+                                key={label}
+                                className="group flex items-center gap-2.5 cursor-pointer"
+                              >
+                                <div className="relative flex justify-center items-center">
+                                  <input
+                                    type="radio"
+                                    {...field}
+                                    value={value}
+                                    checked={field.value === value}
+                                    className="peer border-2 border-slate-300 checked:border-blue-600 rounded-full w-5 h-5 transition-all appearance-none"
+                                  />
+                                  <div className="absolute bg-blue-600 rounded-full w-2.5 h-2.5 scale-0 peer-checked:scale-100 transition-transform" />
+                                </div>
+                                <span
+                                  className={cn(
+                                    "font-semibold text-xs transition-colors",
+                                    field.value === value
+                                      ? "text-slate-900"
+                                      : "text-slate-500",
+                                  )}
                                 >
-                                  <div className="relative flex items-center justify-center">
-                                    <input
-                                      type="radio"
-                                      {...field}
-                                      value={value}
-                                      checked={field.value === value}
-                                      className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all"
-                                    />
-                                    <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
-                                  </div>
-                                  <span
-                                    className={cn(
-                                      "text-xs font-semibold transition-colors",
-                                      field.value === value
-                                        ? "text-slate-900"
-                                        : "text-slate-500",
-                                    )}
-                                  >
-                                    {label}
-                                  </span>
-                                </label>
-                              );
-                            },
-                          )}
+                                  {displayLabel}
+                                </span>
+                              </label>
+                            );
+                          })}
                         </div>
                       )}
                     />
                   </div>
 
-                  {repeatEvery !== "MONTHLY" && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                  {uploadCycle === "Weekly" && (
+                    <div className="space-y-6 slide-in-from-top-2 animate-in duration-300 fade-in">
                       <div className="space-y-3">
-                        <label className="block text-sm font-semibold text-slate-700">
+                        <label className="block font-semibold text-slate-700 text-sm">
                           Select days
                         </label>
                         <div className="flex gap-2">
@@ -446,14 +443,14 @@ const CreateProject = ({
                                 key={day}
                                 className="flex flex-col items-center gap-2 min-w-[42px]"
                               >
-                                <span className="text-[10px] font-bold text-slate-400 uppercase">
+                                <span className="font-bold text-[10px] text-slate-400 uppercase">
                                   {day}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => toggleDay(day)}
                                   className={cn(
-                                    "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
+                                    "flex justify-center items-center border-2 rounded-md w-5 h-5 transition-all",
                                     isSelected
                                       ? "bg-blue-600 border-blue-600 text-white"
                                       : "bg-white border-slate-200 hover:border-slate-300",
@@ -484,25 +481,25 @@ const CreateProject = ({
                       </div>
 
                       <div className="space-y-3">
-                        <label className="block text-sm font-semibold text-slate-700">
+                        <label className="block font-semibold text-slate-700 text-sm">
                           Data Upload Date
                         </label>
                         <div className="flex gap-8">
                           {["3", "4", "5"].map((days) => (
                             <label
                               key={days}
-                              className="flex items-center gap-2.5 cursor-pointer group"
+                              className="group flex items-center gap-2.5 cursor-pointer"
                             >
-                              <div className="relative flex items-center justify-center">
+                              <div className="relative flex justify-center items-center">
                                 <input
                                   type="radio"
-                                  {...register("dataUploadDateDays")}
+                                  {...register("UploadData")}
                                   value={days}
-                                  className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all cursor-pointer"
+                                  className="peer border-2 border-slate-300 checked:border-blue-600 rounded-full w-5 h-5 transition-all appearance-none cursor-pointer"
                                 />
-                                <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
+                                <div className="absolute bg-blue-600 rounded-full w-2.5 h-2.5 scale-0 peer-checked:scale-100 transition-transform" />
                               </div>
-                              <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">
+                              <span className="font-semibold text-slate-600 group-hover:text-slate-900 text-xs transition-colors">
                                 {days} Days
                               </span>
                             </label>
@@ -511,164 +508,543 @@ const CreateProject = ({
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
 
-              {/* Share With */}
-              <div className="space-y-12">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-500">
-                    Share With
-                  </label>
-                  <div className="flex flex-wrap gap-4 pt-1">
-                    {[
-                      { id: "onlyMe", label: "Only Me", icon: Lock },
-                      { id: "inviteStaff", label: "Invite Staff", icon: Users },
-                      {
-                        id: "followTemplate",
-                        label: "Follow Template Settings",
-                        icon: LayoutTemplate,
-                      },
-                    ].map((option) => (
-                      <label
-                        key={option.id}
-                        className="flex items-center gap-2 cursor-pointer group"
-                      >
-                        <div className="relative flex items-center justify-center">
-                          <input
-                            type="radio"
-                            name="shareWith"
-                            checked={shareWith === option.id}
-                            onChange={() => {
-                              setShareWith(option.id as any);
-                              if (option.id !== "inviteStaff")
-                                setSelectedStaffs([]);
-                            }}
-                            className="peer appearance-none w-5 h-5 rounded-full border-2 border-slate-300 checked:border-blue-600 transition-all cursor-pointer"
-                          />
-                          <div className="absolute w-2.5 h-2.5 rounded-full bg-blue-600 scale-0 peer-checked:scale-100 transition-transform" />
-                        </div>
-                        <span
-                          className={cn(
-                            "text-xs font-medium transition-colors",
-                            shareWith === option.id
-                              ? "text-slate-900"
-                              : "text-slate-500",
-                          )}
-                        >
-                          {option.label}
-                        </span>
-                        {option.id === "onlyMe" && (
-                          <option.icon size={12} className="text-slate-400" />
-                        )}
+                  {uploadCycle === "By_Weekly" && (
+                    <div className="space-y-3 slide-in-from-top-2 animate-in duration-300 fade-in">
+                      <label className="block font-semibold text-slate-700 text-sm">
+                        Select 2 Date
                       </label>
-                    ))}
-                  </div>
-
-                  {shareWith === "inviteStaff" && (
-                    <div className="mt-3 relative">
-                      <select
-                        onChange={handleStaffSelect}
-                        className="w-full h-11 pl-4 pr-10 appearance-none bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm text-slate-700"
-                      >
-                        <option value="">Select staff members</option>
-                        {allEmployees?.map((emp: any) => (
-                          <option key={emp.id} value={emp.id}>
-                            {emp?.name} ({emp?.role})
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown
-                        size={16}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                      />
-
-                      {selectedStaffs.length > 0 && (
-                        <div className="mt-3 flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
-                          <div className="flex -space-x-3 overflow-hidden">
-                            {selectedStaffs.map((staffId) => {
-                              const staff = allEmployees.find(
-                                (e: any) => e.id === staffId,
-                              );
-                              return (
-                                <button
-                                  key={staffId}
-                                  type="button"
-                                  onClick={() => {
-                                    const newStaffs = selectedStaffs.filter(
-                                      (id) => id !== staffId,
-                                    );
-                                    setSelectedStaffs(newStaffs);
-                                    setValue("employeeIds", newStaffs);
-                                  }}
-                                  className="inline-block h-8 w-8 rounded-full border-2 border-white bg-slate-100 overflow-hidden hover:scale-110 hover:z-10 transition-transform group"
-                                  title={`Click to remove ${staff?.name}`}
-                                >
-                                  {staff?.profileImage ? (
-                                    <img
-                                      src={staff.profileImage}
-                                      alt=""
-                                      className="h-full w-full object-cover"
-                                    />
-                                  ) : (
-                                    <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-slate-600">
-                                      {staff?.name.charAt(0)}
-                                    </span>
+                      <div className="relative">
+                        <Controller
+                          control={control}
+                          name="selectDate"
+                          render={({ field }) => (
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className={cn(
+                                    "flex justify-between items-center bg-slate-50/50 hover:bg-slate-50 px-4 border-slate-200 rounded-lg w-full h-12 font-normal text-left transition-all group",
+                                    !field.value || field.value === "[]"
+                                      ? "text-slate-400"
+                                      : "",
                                   )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                            Staffs Preview
-                          </span>
-                        </div>
-                      )}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {(() => {
+                                      let dates = [];
+                                      try {
+                                        dates = JSON.parse(field.value || "[]");
+                                      } catch {
+                                        dates = [];
+                                      }
+                                      if (dates && dates.length > 0) {
+                                        return (
+                                          <span className="text-slate-700">
+                                            {dates
+                                              .slice(0, 2)
+                                              .map((d: any, i: number) => (
+                                                <React.Fragment key={d}>
+                                                  {d < 10 ? `0${d}` : d}/--/----
+                                                  {i === 0 &&
+                                                    dates.length > 1 &&
+                                                    " & "}
+                                                </React.Fragment>
+                                              ))}
+                                            {dates.length === 1 &&
+                                              " & --/--/----"}
+                                          </span>
+                                        );
+                                      }
+                                      return (
+                                        <span>--/--/---- & --/--/----</span>
+                                      );
+                                    })()}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <HelpCircle
+                                      size={16}
+                                      className="text-slate-300 group-hover:text-slate-400 transition-colors"
+                                    />
+                                    <CalendarIcon className="w-4 h-4 text-slate-500" />
+                                  </div>
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="p-0 w-auto"
+                                align="start"
+                              >
+                                <Calendar
+                                  mode="multiple"
+                                  max={2}
+                                  selected={(() => {
+                                    let dates = [];
+                                    try {
+                                      dates = JSON.parse(field.value || "[]");
+                                    } catch {
+                                      dates = [];
+                                    }
+                                    return dates.map(
+                                      (d: any) =>
+                                        new Date(
+                                          new Date().getFullYear(),
+                                          new Date().getMonth(),
+                                          d,
+                                        ),
+                                    );
+                                  })()}
+                                  onSelect={(dates) => {
+                                    const dayNumbers =
+                                      dates?.map((d) => d.getDate()) || [];
+                                    field.onChange(JSON.stringify(dayNumbers));
+                                  }}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {uploadCycle === "Monthly" && (
+                    <div className="space-y-3 slide-in-from-top-2 animate-in duration-300 fade-in">
+                      <label className="block font-semibold text-slate-700 text-sm">
+                        Select Date
+                      </label>
+                      <div className="relative">
+                        <Controller
+                          control={control}
+                          name="selectDate"
+                          render={({ field }) => (
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className={cn(
+                                    "flex justify-between items-center bg-slate-50/50 hover:bg-slate-50 px-4 border-slate-200 rounded-lg w-full h-12 font-normal text-left transition-all group",
+                                    !field.value || field.value === "[]"
+                                      ? "text-slate-400"
+                                      : "",
+                                  )}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {(() => {
+                                      let dates = [];
+                                      try {
+                                        dates = JSON.parse(field.value || "[]");
+                                      } catch {
+                                        dates = [];
+                                      }
+                                      if (dates && dates.length > 0) {
+                                        return (
+                                          <span className="text-slate-700">
+                                            {dates[0] < 10
+                                              ? `0${dates[0]}`
+                                              : dates[0]}
+                                            /--/----
+                                          </span>
+                                        );
+                                      }
+                                      return <span>--/--/----</span>;
+                                    })()}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <HelpCircle
+                                      size={16}
+                                      className="text-slate-300 group-hover:text-slate-400 transition-colors"
+                                    />
+                                    <CalendarIcon className="w-4 h-4 text-slate-500" />
+                                  </div>
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="p-0 w-auto"
+                                align="start"
+                              >
+                                <Calendar
+                                  mode="single"
+                                  selected={(() => {
+                                    let dates = [];
+                                    try {
+                                      dates = JSON.parse(field.value || "[]");
+                                    } catch {
+                                      dates = [];
+                                    }
+                                    return dates[0]
+                                      ? new Date(
+                                          new Date().getFullYear(),
+                                          new Date().getMonth(),
+                                          dates[0],
+                                        )
+                                      : undefined;
+                                  })()}
+                                  onSelect={(date) => {
+                                    field.onChange(
+                                      date
+                                        ? JSON.stringify([date.getDate()])
+                                        : "[]",
+                                    );
+                                  }}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          )}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Column 2 */}
+              <div className="space-y-12">
+                {/* Share With */}
+                <div className="space-y-4">
+                  <h4 className="font-bold text-[11px] text-blue-600/70 text-sm uppercase tracking-tight">
+                    Data Date Uploading Cycle
+                  </h4>
+                  <Controller
+                    control={control}
+                    name="shareWith"
+                    render={({ field }) => (
+                      <div className="flex flex-wrap gap-4 pt-1">
+                        {[
+                          { id: "Only_Me", label: "Only Me", icon: Lock },
+                          {
+                            id: "Invite_Staff",
+                            label: "Invite Staff",
+                            icon: Users,
+                          },
+                        ].map((option) => (
+                          <label
+                            key={option.id}
+                            className="group flex items-center gap-2 cursor-pointer"
+                          >
+                            <div className="relative flex justify-center items-center">
+                              <input
+                                type="radio"
+                                name="shareWith"
+                                checked={field.value === option.id}
+                                onChange={() => {
+                                  field.onChange(option.id);
+                                  if (option.id !== "Invite_Staff") {
+                                    setValue("employeeIds", []);
+                                    setValue("viewerIds", []);
+                                  }
+                                }}
+                                className="peer border-2 border-slate-300 checked:border-blue-600 rounded-full w-5 h-5 transition-all appearance-none cursor-pointer"
+                              />
+                              <div className="absolute bg-blue-600 rounded-full w-2.5 h-2.5 scale-0 peer-checked:scale-100 transition-transform" />
+                            </div>
+                            <span
+                              className={cn(
+                                "font-medium text-xs transition-colors",
+                                field.value === option.id
+                                  ? "text-slate-900"
+                                  : "text-slate-500",
+                              )}
+                            >
+                              {option.label}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  />
+
+                  {shareWith === "Invite_Staff" && (
+                    <div className="relative space-y-6 slide-in-from-top-2 mt-4 pt-6 border-slate-100 border-t animate-in">
+                      <h4 className="font-bold text-[11px] text-blue-600/70 uppercase tracking-widest">
+                        Configure Team Access
+                      </h4>
+                      {/* Employee Select */}
+                      <div className="space-y-2">
+                        <label className="block font-semibold text-slate-700 text-sm">
+                          Assign Project Employees
+                        </label>
+                        <div className="relative">
+                          <Controller
+                            control={control}
+                            name="employeeIds"
+                            render={({ field }) => (
+                              <Select
+                                value=""
+                                onValueChange={(val) => {
+                                  if (val) {
+                                    const current = field.value
+                                      ? field.value
+                                      : [];
+                                    if (!current.includes(val)) {
+                                      field.onChange([...current, val]);
+                                    }
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className="bg-slate-50 px-4 border border-slate-200 focus:border-blue-500 rounded-lg focus:ring-blue-500/20 w-full h-11! text-slate-700 text-sm transition-all">
+                                  <SelectValue placeholder="Add Employee" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white">
+                                  {allEmployees.map((emp: any) => {
+                                    const employeeName =
+                                      emp?.name || emp?.user?.name || "Unknown";
+                                    return (
+                                      <SelectItem key={emp.id} value={emp.id}>
+                                        {employeeName}
+                                      </SelectItem>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          />
+                        </div>
+                      </div>
+                      {/* Viewer Select */}
+                      <div className="space-y-2">
+                        <label className="block font-semibold text-slate-700 text-sm">
+                          Assign Project Viewers
+                        </label>
+                        <div className="relative">
+                          <Controller
+                            control={control}
+                            name="viewerIds"
+                            render={({ field }) => (
+                              <Select
+                                value=""
+                                onValueChange={(val) => {
+                                  if (val) {
+                                    const current = field.value
+                                      ? field.value
+                                      : [];
+                                    if (!current.includes(val)) {
+                                      field.onChange([...current, val]);
+                                    }
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className="bg-slate-50 px-4 border border-slate-200 focus:border-blue-500 rounded-lg focus:ring-blue-500/20 w-full h-11! text-slate-700 text-sm transition-all">
+                                  <SelectValue placeholder="Add Viewer" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white">
+                                  {allViewer.map((v: any) => (
+                                    <SelectItem key={v.id} value={v.id}>
+                                      {v.user?.name || v?.name || "Unknown"}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Manager Select */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Assign Project Manager
                   </label>
                   <div className="relative">
-                    <select
-                      {...register("managerId")}
-                      className="w-full h-12 pl-4 pr-10 appearance-none bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm text-slate-700"
-                    >
-                      <option value="">Select Manager</option>
-                      {allManagers.map((m: any) => (
-                        <option key={m.id} value={m.id}>
-                          {m.user.name}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      size={18}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                    <Controller
+                      control={control}
+                      name="managerId"
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger className="bg-slate-50 px-4 border border-slate-200 focus:border-blue-500 rounded-lg focus:ring-blue-500/20 w-full h-11! text-slate-700 text-sm transition-all">
+                            <SelectValue placeholder="Select Manager" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            {allManagers.map((m: any) => (
+                              <SelectItem key={m.id} value={m.id}>
+                                {m.user.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     />
                   </div>
                 </div>
+
+                {(selectedManagerId ||
+                  selectedEmployeeIds.length > 0 ||
+                  selectedViewerIds.length > 0) && (
+                  <div className="flex flex-col gap-3 bg-slate-50/50 slide-in-from-top-1 p-3 border border-slate-100 rounded-xl animate-in fade-in">
+                    <div className="flex justify-between items-center px-1">
+                      <span className="flex items-center gap-2 font-bold text-[10px] text-slate-400 uppercase tracking-widest">
+                        <Users size={12} className="text-blue-500/70" />
+                        Team Preview
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {selectedManagerId &&
+                        (() => {
+                          const manager = allManagers.find(
+                            (m: any) => m.id === selectedManagerId,
+                          );
+                          if (!manager) return null;
+                          const name = manager.user?.name || "Unknown";
+                          return (
+                            <div className="flex items-center gap-2 bg-white shadow-sm hover:shadow-md p-1 pr-2.5 border border-emerald-100 rounded-full transition-all group">
+                              <div className="flex justify-center items-center bg-emerald-50 border border-emerald-50 rounded-full w-8 h-8 overflow-hidden shrink-0">
+                                {manager.user?.profileImage ? (
+                                  <img
+                                    src={manager.user.profileImage}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <span className="font-bold text-emerald-600 text-[10px]">
+                                    {name.charAt(0)}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-bold text-slate-700 text-[11px] leading-none">
+                                  {name}
+                                </span>
+                                <span className="font-bold text-emerald-500/80 text-[8px] uppercase tracking-tighter leading-none mt-0.5">
+                                  Manager
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setValue("managerId", "")}
+                                className="hover:bg-red-50 ml-1 p-0.5 rounded-full text-slate-300 hover:text-red-500 transition-colors"
+                              >
+                                <X size={12} />
+                              </button>
+                            </div>
+                          );
+                        })()}
+
+                      {selectedEmployeeIds.map((empId) => {
+                        const emp = allEmployees.find(
+                          (e: any) => e.id === empId,
+                        );
+                        if (!emp) return null;
+                        const name = emp?.name || emp?.user?.name || "Unknown";
+                        return (
+                          <div
+                            key={empId}
+                            className="flex items-center gap-2 bg-white shadow-sm hover:shadow-md p-1 pr-2.5 border border-slate-100 rounded-full transition-all group"
+                          >
+                            <div className="flex justify-center items-center bg-blue-50 border border-slate-50 rounded-full w-8 h-8 overflow-hidden shrink-0">
+                              {emp?.profileImage ? (
+                                <img
+                                  src={emp.profileImage}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span className="font-bold text-blue-600 text-[10px]">
+                                  {name.charAt(0)}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-700 text-[11px] leading-none">
+                                {name}
+                              </span>
+                              <span className="font-bold text-blue-500/80 text-[8px] uppercase tracking-tighter leading-none mt-0.5">
+                                Employee
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setValue(
+                                  "employeeIds",
+                                  selectedEmployeeIds.filter(
+                                    (id) => id !== empId,
+                                  ),
+                                );
+                              }}
+                              className="hover:bg-red-50 ml-1 p-0.5 rounded-full text-slate-300 hover:text-red-500 transition-colors"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        );
+                      })}
+
+                      {selectedViewerIds.map((vId) => {
+                        const viewer = allViewer.find((v: any) => v.id === vId);
+                        if (!viewer) return null;
+                        const name =
+                          viewer?.user?.name || viewer?.name || "Unknown";
+                        return (
+                          <div
+                            key={vId}
+                            className="flex items-center gap-2 bg-white shadow-sm hover:shadow-md p-1 pr-2.5 border border-slate-100 rounded-full transition-all group"
+                          >
+                            <div className="flex justify-center items-center bg-indigo-50 border border-slate-50 rounded-full w-8 h-8 overflow-hidden shrink-0">
+                              {viewer?.user?.profileImage ? (
+                                <img
+                                  src={viewer.user.profileImage}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span className="font-bold text-indigo-600 text-[10px]">
+                                  {name.charAt(0)}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-700 text-[11px] leading-none">
+                                {name}
+                              </span>
+                              <span className="font-bold text-indigo-500/80 text-[8px] uppercase tracking-tighter leading-none mt-0.5">
+                                Viewer
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setValue(
+                                  "viewerIds",
+                                  selectedViewerIds.filter((id) => id !== vId),
+                                );
+                              }}
+                              className="hover:bg-red-50 ml-1 p-0.5 rounded-full text-slate-300 hover:text-red-500 transition-colors"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Toggle */}
-            <div className="flex items-center gap-4 py-2 border-t border-slate-100 pt-6">
-              <span className="text-sm font-bold text-slate-800">
+            <div className="flex items-center gap-4 py-2 pt-6 border-slate-100 border-t">
+              <span className="font-bold text-slate-800 text-sm">
                 Enable Project Details settings
               </span>
               <button
                 type="button"
                 onClick={() => setEnableDetails(!enableDetails)}
                 className={cn(
-                  "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                  "inline-flex relative border-2 border-transparent rounded-full focus:outline-none w-11 h-6 transition-colors duration-200 ease-in-out cursor-pointer shrink-0",
                   enableDetails ? "bg-blue-600" : "bg-slate-200",
                 )}
               >
                 <span
                   className={cn(
-                    "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                    "inline-block bg-white shadow rounded-full ring-0 w-5 h-5 transition duration-200 ease-in-out pointer-events-none transform",
                     enableDetails ? "translate-x-5" : "translate-x-0",
                   )}
                 />
@@ -677,116 +1053,80 @@ const CreateProject = ({
           </section>
 
           {enableDetails && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div className="slide-in-from-bottom-2 gap-x-12 gap-y-10 grid grid-cols-1 md:grid-cols-2 animate-in duration-500 fade-in">
               {/* Column 1 */}
               <div className="space-y-8">
                 {/* Description */}
                 <div className="space-y-2">
-                  <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
+                  <label className="flex items-center gap-1.5 font-semibold text-slate-700 text-sm">
                     Project Description{" "}
                     <HelpCircle size={14} className="text-slate-400" />
                   </label>
                   <textarea
                     {...register("description")}
                     placeholder="Write a short description..."
-                    className="w-full h-[140px] px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 resize-none"
+                    className="bg-slate-50 px-4 py-3 border border-slate-200 focus:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-full h-[155px] placeholder:text-slate-400 text-sm transition-all resize-none"
                   />
                 </div>
 
-                {/* short Name */}
+                {/* sort Name */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Project Short Name
                   </label>
-                  <div className="relative group">
+                  <div className="group relative">
                     <input
                       type="text"
-                      {...register("shortName")} // Bound as placeholder for address logic if implemented
+                      {...register("sortName")}
                       placeholder="Enter Project Short Name here"
-                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
+                      className="bg-slate-50 px-4 border border-slate-200 focus:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-full h-12 placeholder:text-slate-400 text-sm transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Status Select */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Status
                   </label>
                   <div className="flex gap-3">
-                    {isAddingStatus ? (
-                      <div className="flex-1 flex gap-2">
-                        <input
-                          type="text"
-                          value={newStatus}
-                          onChange={(e) => setNewStatus(e.target.value)}
-                          placeholder="New status name"
-                          className="flex-1 h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              handleAddStatus();
-                            }
-                            if (e.key === "Escape") setIsAddingStatus(false);
-                          }}
-                          autoFocus
-                        />
-                        <button
-                          type="button"
-                          onClick={handleAddStatus}
-                          className="px-4 h-12 bg-blue-600 text-white rounded-xl text-xs font-bold whitespace-nowrap"
-                        >
-                          Add
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setIsAddingStatus(false)}
-                          className="px-4 h-12 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="relative flex-1">
-                          <select
-                            {...register("status")}
-                            className="w-full h-12 pl-4 pr-10 appearance-none bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm text-slate-700"
+                    <div className="relative flex-1">
+                      <Controller
+                        control={control}
+                        name="status"
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
                           >
-                            {statuses.map((s) => (
-                              <option key={s} value={s}>
-                                {s === "Pending" ? "Planning" : s}
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown
-                            size={18}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setIsAddingStatus(true)}
-                          className="w-12 h-12 shrink-0 flex items-center justify-center border border-slate-200 rounded-full bg-white text-slate-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm"
-                        >
-                          <Plus size={20} />
-                        </button>
-                      </>
-                    )}
+                            <SelectTrigger className="bg-slate-50 px-4 border border-slate-200 focus:border-blue-500 rounded-lg focus:ring-blue-500/20 w-full h-11! text-slate-700 text-sm transition-all">
+                              <SelectValue placeholder="Select Status" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white">
+                              {statuses.map((s) => (
+                                <SelectItem key={s} value={s}>
+                                  {s === "PENDING" ? "Pending" : s}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Rate */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Current Rate
                   </label>
-                  <div className="relative group">
+                  <div className="group relative">
                     <input
                       type="text"
                       {...register("currentRate")}
                       placeholder="Enter hourly rate"
-                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
+                      className="bg-slate-50 px-4 border border-slate-200 focus:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-full h-12 placeholder:text-slate-400 text-sm transition-all"
                     />
                   </div>
                 </div>
@@ -796,25 +1136,52 @@ const CreateProject = ({
               <div className="space-y-8">
                 {/* Starting Date */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Starting Date
                   </label>
-                  <div className="relative group">
-                    <input
-                      type="date"
-                      {...register("startDate")}
-                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 appearance-none"
+                  <div className="relative">
+                    <Controller
+                      control={control}
+                      name="startDate"
+                      render={({ field }) => (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "justify-start bg-slate-50 hover:bg-slate-50 px-4 border-slate-200 rounded-lg w-full h-12 font-normal text-left transition-all",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 w-4 h-4" />
+                              {field.value ? (
+                                format(new Date(field.value), "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0 w-auto" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={
+                                field.value ? new Date(field.value) : undefined
+                              }
+                              onSelect={(date) =>
+                                field.onChange(date?.toISOString())
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      )}
                     />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-                      <HelpCircle size={16} className="text-slate-400" />
-                      <Calendar size={18} className="text-slate-600" />
-                    </div>
                   </div>
                 </div>
 
                 {/* Working Days */}
                 <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Working Days
                   </label>
                   <div className="flex gap-2">
@@ -826,14 +1193,14 @@ const CreateProject = ({
                             key={day}
                             className="flex flex-col items-center gap-2 min-w-[42px]"
                           >
-                            <span className="text-[10px] font-bold text-slate-400 uppercase">
+                            <span className="font-bold text-[10px] text-slate-400 uppercase">
                               {day}
                             </span>
                             <button
                               type="button"
                               onClick={() => toggleWorkingDay(day)}
                               className={cn(
-                                "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
+                                "flex justify-center items-center border-2 rounded-md w-5 h-5 transition-all",
                                 isSelected
                                   ? "bg-blue-600 border-blue-600 text-white"
                                   : "bg-white border-slate-200 hover:border-slate-300",
@@ -866,57 +1233,91 @@ const CreateProject = ({
 
                 {/* Completion Date */}
                 <div className="space-y-2 pt-1">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Estimated Completion Date
                   </label>
-                  <div className="relative group">
-                    <input
-                      type="date"
-                      {...register("estimatedCompletedDate")}
-                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400 appearance-none"
+                  <div className="relative">
+                    <Controller
+                      control={control}
+                      name="deadline"
+                      render={({ field }) => (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "justify-start bg-slate-50 hover:bg-slate-50 px-4 border-slate-200 rounded-lg w-full h-12 font-normal text-left transition-all",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 w-4 h-4" />
+                              {field.value ? (
+                                format(new Date(field.value), "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0 w-auto" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={
+                                field.value ? new Date(field.value) : undefined
+                              }
+                              onSelect={(date) =>
+                                field.onChange(date?.toISOString())
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      )}
                     />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-                      <HelpCircle size={16} className="text-slate-400" />
-                      <Calendar size={18} className="text-slate-600" />
-                    </div>
                   </div>
                 </div>
 
                 {/* Priority Select */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Priority
                   </label>
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+                    <div className="top-1/2 left-4 z-10 absolute text-slate-500 -translate-y-1/2">
                       <Flag size={18} />
                     </div>
-                    <select
-                      {...register("priority")}
-                      className="w-full h-12 pl-12 pr-10 appearance-none bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm text-slate-700"
-                    >
-                      <option value="LOW">Default</option>
-                      <option value="MEDIUM">Medium</option>
-                      <option value="HIGH">High</option>
-                    </select>
-                    <ChevronDown
-                      size={18}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                    <Controller
+                      control={control}
+                      name="priority"
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger className="bg-slate-50 pl-12 border border-slate-200 focus:border-blue-500 rounded-lg focus:ring-blue-500/20 w-full h-11! text-slate-700 text-sm transition-all">
+                            <SelectValue placeholder="Select Priority" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="LOW">Default</SelectItem>
+                            <SelectItem value="MEDIUM">Medium</SelectItem>
+                            <SelectItem value="HIGH">High</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
                     />
                   </div>
                 </div>
 
                 {/* Budget */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block font-semibold text-slate-700 text-sm">
                     Budget
                   </label>
-                  <div className="relative group">
+                  <div className="group relative">
                     <input
                       type="text"
                       {...register("budget")}
                       placeholder="Total budget for this project"
-                      className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm placeholder:text-slate-400"
+                      className="bg-slate-50 px-4 border border-slate-200 focus:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-full h-12 placeholder:text-slate-400 text-sm transition-all"
                     />
                   </div>
                 </div>
@@ -924,56 +1325,25 @@ const CreateProject = ({
             </div>
           )}
 
-          {/* Map Section */}
-          {/* <div className="mt-8">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">
-              Project Location of Highway Expansion Program
-            </h3>
-            <div className="h-64 w-full rounded-lg overflow-hidden border border-gray-200">
-              <MapContainer
-                center={[mapPosition.lat, mapPosition.lng]}
-                zoom={13}
-                style={{ height: "100%", width: "100%" }}
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                <LocationMarker
-                  setPos={handleLocationSelect}
-                  pos={mapPosition}
-                />
-              </MapContainer>
-            </div>
-            <input type="hidden" {...register("latitude")} />
-            <input type="hidden" {...register("longitude")} />
-          </div> */}
-
           {/* Modal Footer Actions */}
-          <div className="flex justify-between items-center mt-12 pt-8 border-t border-slate-100">
+          <div className="flex justify-between items-center mt-12 pt-8 border-slate-100 border-t">
             <button
               type="button"
               onClick={onClose}
-              className="px-8 py-3.5 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 font-bold transition-all text-sm"
+              className="hover:bg-slate-50 px-8 py-3.5 border border-slate-200 rounded-lg font-bold text-slate-700 text-sm transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-10 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all text-sm disabled:opacity-50 disabled:active:scale-100"
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 shadow-blue-500/20 shadow-lg px-10 py-3.5 rounded-lg font-bold text-white text-sm active:scale-95 disabled:active:scale-100 transition-all"
             >
               {isLoading ? "Creating..." : "Create Project"}
             </button>
           </div>
         </form>
       </div>
-      <ProjectSuccessModal
-        open={openSuccessModal}
-        onOpenChange={setOpenSuccessModal}
-        projectName={projectName}
-        projectId={projectId}
-      />
     </div>
   );
 };

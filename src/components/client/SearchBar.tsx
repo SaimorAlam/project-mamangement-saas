@@ -9,7 +9,7 @@ export default function SearchBar({
   setSearchTerm: (value: string) => void;
 }) {
   return (
-    <div className="relative flex items-center w-full xl:w-[300px] 2xl:w-[450px]">
+    <div className="relative flex items-center w-48 sm:w-full xl:w-[300px] 2xl:w-[450px]">
       <Search className="absolute left-4 text-[#64748B] h-5 w-5 pointer-events-none" />
       <Input
         id="global-search"
