@@ -4,11 +4,11 @@ const chartApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createChart: builder.mutation({
       query: (data) => ({
-        url: "/charts",
+        url: "/chart",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Charts"]
+      invalidatesTags: ["Charts"],
     }),
     getActiveInChart: builder.query({
       query: () => ({
@@ -27,7 +27,7 @@ const chartApi = baseApi.injectEndpoints({
         url: `/charts/project/${id}`,
         method: "GET",
       }),
-      providesTags: ["Charts"]
+      providesTags: ["Charts"],
     }),
     getChartById: builder.query({
       query: (id) => ({

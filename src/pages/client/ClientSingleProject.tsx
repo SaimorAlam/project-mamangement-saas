@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAppSelector } from "@/hooks/useRedux";
 import Papa from "papaparse";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { HotTable } from "@handsontable/react-wrapper";
 import "handsontable/dist/handsontable.full.css";
 import {
@@ -24,7 +24,7 @@ export default function ClientSingleProject() {
   const { data: chartResponse } = useGetChartByProjectIdQuery(projectId, {
     skip: !projectId,
   });
-  const charts = chartResponse?.data || [];
+  const charts = useMemo(() => chartResponse?.data || [], [chartResponse]);
   // Use an `any` ref to avoid type mismatch with the HotTable instance (hotInstance)
   const hotRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -33,22 +33,25 @@ export default function ClientSingleProject() {
   // const [updateSheet] = useUpdateSheetMutation(); // new mutation for updating existing cells
 
   /* ------------------------ SUBMIT CELLS ------------------------ */
-  const submitCells = async (cells: any[]) => {
-    if (!cells.length) return;
+  const submitCells = useCallback(
+    async (cells: any[]) => {
+      if (!cells.length) return;
 
-    await Promise.all(
-      cells.map(async (cell) => {
-        await uploadSheet(cell).unwrap();
-      })
-    );
-  };
+      await Promise.all(
+        cells.map(async (cell) => {
+          await uploadSheet(cell).unwrap();
+        }),
+      );
+    },
+    [uploadSheet],
+  );
 
   /* ------------------------ CSV PARSE ------------------------ */
   const parseCsvFile = useCallback(
     (csvFile: File) => {
       const nameWithoutExt = csvFile.name.replace(/\.[^/.]+$/, "");
       const match = nameWithoutExt.match(
-        /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+        /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
       );
 
       const uuid = match ? match[0] : null;
@@ -70,7 +73,7 @@ export default function ClientSingleProject() {
           if (jsonData.length > 0) {
             // Find the active chart to get legend fields
             const activeChart = charts.find(
-              (c: any) => c.category === "Bar" || c.category === "BAR"
+              (c: any) => c.category === "Bar" || c.category === "BAR",
             );
             const legendValues =
               activeChart?.barChart?.widgets?.map((w: any) => ({
@@ -121,13 +124,13 @@ export default function ClientSingleProject() {
         },
       });
     },
-    [submitCells, charts]
+    [submitCells, charts],
   );
 
   /* ------------------------ INITIAL LOAD ------------------------ */
   useEffect(() => {
     if (file) parseCsvFile(file);
-  }, [file]);
+  }, [file, parseCsvFile]);
 
   /* ------------------------ CSV EXPORT ------------------------ */
   const handleExportCsv = () => {
@@ -238,7 +241,7 @@ export default function ClientSingleProject() {
       </div>
 
       {/* Charts Section */}
-      {uploadedExcelData && charts.length > 0 && (
+      {charts.length > 0 && (
         <div className="mb-8 grid grid-cols-1 gap-6">
           {charts.map((item: any) => {
             if (item.category === "Bar" || item.category === "BAR") {
@@ -251,13 +254,13 @@ export default function ClientSingleProject() {
                       item.barChart?.widgets?.map((w: any) => ({
                         label: w.legendName,
                         color: w.color,
-                        field: w.legendName,
+                        field: w.legendName.toLowerCase().replace(/\s+/g, ""),
                       })) || []
                     }
                     numOfLegendDataSet={item.numberOfDataset}
                     startingRange={item.firstFiledDataset}
                     endingRange={item.lastFiledDAtaset}
-                    allUploadedData={uploadedExcelData}
+                    allUploadedData={uploadedExcelData || {}}
                   />
                 </div>
               );

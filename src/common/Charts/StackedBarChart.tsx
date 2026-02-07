@@ -91,36 +91,96 @@ export default function StackedBarChart({
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
-  const chartData: ChartData[] = useMemo(() => {
+  /*   EFFECTIVE DATA FOR RENDERING   */
+
+  const effectiveLegendValues = useMemo(() => {
+    if (legendValues.length > 0 && legendValues.some((l) => l.label !== "")) {
+      return legendValues.map((l) => ({
+        ...l,
+        field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
+      }));
+    }
+    return [
+      { label: "Sample A", field: "field1", color: "#13A490" },
+      { label: "Sample B", field: "field2", color: "#35B6EE" },
+      { label: "Sample C", field: "field3", color: "#6F78F9" },
+    ];
+  }, [legendValues]);
+
+  const effectiveXAxisValues = useMemo(() => {
+    const validValues = xAxisValues.filter((v) => v !== "");
+    if (validValues.length > 0) {
+      return validValues;
+    }
+    return ["Jan", "Feb", "Mar", "Apr", "May"];
+  }, [xAxisValues]);
+
+  const { safeStartingRange, safeEndingRange } = useMemo(() => {
+    let start = startingRange;
+    let end = endingRange;
+    if (start === end) {
+      start = 0;
+      end = 100;
+    }
+    return { safeStartingRange: start, safeEndingRange: end };
+  }, [startingRange, endingRange]);
+
+  const { chartData, isSampleData } = useMemo(() => {
     const sheetName = (widgetTitle || "Sheet")
-      .replace(/[:\/?*\[\]\\]/g, " ")
+      .replace(/[:/?*[\]\\]/g, " ")
       .trim()
       .substring(0, 31);
 
     const dataToUse =
       localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
+    // Priority 1: Real Uploaded Data
     if (dataToUse && dataToUse.length > 0) {
-      return dataToUse;
+      return { chartData: dataToUse, isSampleData: false };
     }
 
-    if (!xAxisValues.length || !legendValues.length) return [];
-    return generateChartData(
-      xAxisValues,
-      legendValues,
-      numOfLegendDataSet,
-      startingRange,
-      endingRange,
-    );
+    const hasConfig =
+      xAxisValues.length > 0 &&
+      xAxisValues.some((v) => v !== "") &&
+      legendValues.length > 0 &&
+      legendValues.some((l) => l.label !== "");
+
+    // Priority 2: Sample Data based on Config
+    if (hasConfig) {
+      return {
+        chartData: generateChartData(
+          xAxisValues.filter((v) => v !== ""),
+          effectiveLegendValues,
+          numOfLegendDataSet,
+          safeStartingRange,
+          safeEndingRange,
+        ),
+        isSampleData: true,
+      };
+    }
+
+    // Priority 3: Default Sample Data (Generic fallback)
+    return {
+      chartData: generateChartData(
+        effectiveXAxisValues,
+        effectiveLegendValues,
+        effectiveLegendValues.length,
+        0,
+        100,
+      ),
+      isSampleData: true,
+    };
   }, [
     xAxisValues,
     legendValues,
     numOfLegendDataSet,
-    startingRange,
-    endingRange,
+    safeStartingRange,
+    safeEndingRange,
     widgetTitle,
     localUploadedData,
     allUploadedData,
+    effectiveXAxisValues,
+    effectiveLegendValues,
   ]);
 
   /*   ACTIONS   */
@@ -136,7 +196,7 @@ export default function StackedBarChart({
       const usedNames = new Set<string>();
 
       const getUniqueSheetName = (name: string) => {
-        let baseName = (name || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim();
+        let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
         if (baseName.length > 25) baseName = baseName.substring(0, 25);
         if (!baseName) baseName = "Sheet";
 
@@ -162,7 +222,7 @@ export default function StackedBarChart({
         XLSX.utils.book_append_sheet(wb, ws, getUniqueSheetName(name));
       };
 
-      if (xAxisValues && legendValues) {
+      if (xAxisValues && legendValues && xAxisValues.length > 0) {
         processNodeData(widgetTitle, xAxisValues, legendValues);
       }
 
@@ -254,7 +314,7 @@ export default function StackedBarChart({
     return (
       <div className="bg-white p-3 border rounded shadow-lg">
         <p className="font-semibold mb-2">{row.name}</p>
-        {legendValues.map((l) => (
+        {effectiveLegendValues.map((l) => (
           <p key={l.field} style={{ color: l.color }} className="text-sm">
             {l.label}: {row[l.field]}
           </p>
@@ -267,7 +327,7 @@ export default function StackedBarChart({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        subtitle="Stacked Performance View"
+        subtitle={`Stacked Performance View ${isSampleData ? "(Sample Data)" : ""}`}
         chartId={chartId || "root"}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
@@ -283,16 +343,23 @@ export default function StackedBarChart({
         isPreview={isPreview}
         customHeaderContent={
           <div className="flex gap-4">
-            {legendValues.slice(0, 3).map((l) =>
+            {effectiveLegendValues.slice(0, 3).map((l) =>
               l.label ? (
                 <div key={l.field} className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: l.color }} />
-                  <span className="text-xs text-gray-500 font-medium">{l.label}</span>
+                  <div
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-xs text-gray-500 font-medium">
+                    {l.label}
+                  </span>
                 </div>
-              ) : null
+              ) : null,
             )}
-            {legendValues.length > 3 && (
-              <span className="text-xs text-gray-400">+{legendValues.length - 3} more</span>
+            {effectiveLegendValues.length > 3 && (
+              <span className="text-xs text-gray-400">
+                +{effectiveLegendValues.length - 3} more
+              </span>
             )}
           </div>
         }
@@ -309,15 +376,20 @@ export default function StackedBarChart({
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
-              <YAxis domain={[startingRange, endingRange]} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+              <YAxis
+                domain={[safeStartingRange, safeEndingRange]}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: "#9ca3af" }}
+              />
               <Tooltip content={<CustomTooltip />} />
-              {legendValues?.map((l, i) => (
+              {effectiveLegendValues?.map((l, i) => (
                 <Bar
                   key={l.field}
                   dataKey={l.field}
                   stackId="a"
                   fill={l.color}
-                  radius={i === legendValues.length - 1 ? [4, 4, 0, 0] : 0}
+                  radius={i === effectiveLegendValues.length - 1 ? [4, 4, 0, 0] : 0}
                 />
               ))}
             </BarChart>

@@ -30,6 +30,7 @@ const WidgetForChartModuleOne = ({
   endingRange,
   setEndingRange,
   onClose,
+  onDelete,
 }: {
   widgedName: string;
   widgetTitle: string;
@@ -48,6 +49,7 @@ const WidgetForChartModuleOne = ({
   endingRange: number;
   setEndingRange: React.Dispatch<React.SetStateAction<number>>;
   onClose?: () => void;
+  onDelete?: () => void;
 }) => {
   const { name, role, profileImage, loading } = useGetUser();
   const projectId = useAppSelector((state) => state.chartSlice.projectId);
@@ -164,11 +166,14 @@ const WidgetForChartModuleOne = ({
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
       projectId,
+      rootchart: true,
+      roottitle: widgetTitle,
     };
     try {
       const res = await createChart(payload).unwrap();
       if (res?.success) {
         toast.success("Chart created successfully", { id: toastId });
+        onDelete?.();
       }
     } catch {
       toast.error("Chart creation failed", { id: toastId });

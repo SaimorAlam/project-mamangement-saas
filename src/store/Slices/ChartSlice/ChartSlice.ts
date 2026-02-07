@@ -6,6 +6,7 @@ interface ChartBuilderState {
   isPreview: boolean;
   isPublished: boolean;
   widgetConfigs: Record<string, unknown>;
+  childPayload: Record<string, unknown>;
 }
 
 const initialState: ChartBuilderState = {
@@ -14,6 +15,7 @@ const initialState: ChartBuilderState = {
   isPreview: false,
   isPublished: false,
   widgetConfigs: {},
+  childPayload: {},
 };
 
 const chartSlice = createSlice({
@@ -38,6 +40,9 @@ const chartSlice = createSlice({
     ) => {
       state.widgetConfigs[action.payload.id] = action.payload.config;
     },
+    setChildPayload: (state, action: { payload: Record<string, unknown> }) => {
+      state.childPayload = action.payload;
+    },
   },
 });
 
@@ -47,6 +52,7 @@ export const {
   setIsPreview,
   setIsPublished,
   setWidgetConfig,
+  setChildPayload,
 } = chartSlice.actions;
 
 export default chartSlice.reducer;

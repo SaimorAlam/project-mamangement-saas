@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 // import GanttChart from "@/common/Charts/GanttChart";
@@ -9,7 +10,7 @@ import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModul
 import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 import HorizontalBarChartModule from "../../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule";
-import { useAppSelector } from "@/hooks/useRedux";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { useGetChartByProjectIdQuery } from "@/store/Api/ChartApi/ChartApi";
 import FunnelChartModule from "@/components/client/ProjectBuilder/chartModules/FunnelChartModule";
 import ScatterChartModule from "@/components/client/ProjectBuilder/chartModules/ScatterChartModule";
@@ -42,7 +43,7 @@ import GeographicMapModule from "@/components/client/ProjectBuilder/chartModules
 import RagChartModule from "@/components/client/ProjectBuilder/chartModules/RagChartModule";
 import RibbonChartModule from "@/components/client/ProjectBuilder/chartModules/RibbonChartModule";
 import KpiModule from "@/components/client/ProjectBuilder/chartModules/KpiModule";
-
+import { setChildPayload } from "@/store/Slices/ChartSlice/ChartSlice";
 const ClientProjectBuilder = () => {
   const { projectId, isPreview, isPublished, widgetConfigs } = useAppSelector(
     (state) => state.chartSlice,
@@ -50,9 +51,41 @@ const ClientProjectBuilder = () => {
 
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [activeWidget, setActiveWidget] = useState("KPI widget");
-
+  const dispatch = useAppDispatch();
   const { data: projectsChart } = useGetChartByProjectIdQuery(projectId);
   const projectsChartsData = projectsChart?.data;
+  console.log(projectsChartsData);
+  useEffect(() => {
+    if (projectsChartsData) {
+      const childPayload = {
+        numberOfDataset: projectsChartsData?.numberOfDataset,
+        firstFiledDataset: projectsChartsData?.firstFiledDataset,
+        lastFiledDAtaset: projectsChartsData?.lastFiledDAtaset,
+
+        widgets: projectsChartsData?.widgets?.map((l: any) => ({
+          legendName: l.legendName,
+          color: l.color,
+        })),
+
+        title: "",
+        status: "ACTIVE",
+        category: projectsChartsData?.category,
+
+        xAxis: JSON.stringify({
+          labels: projectsChartsData?.xAxis?.labels,
+          values: [],
+        }),
+        yAxis: JSON.stringify({}),
+        zAxis: JSON.stringify({}),
+        projectId,
+        // 🔑 child-specific fields
+        parentId: projectsChartsData?.id, // REQUIRED
+        rootchart: false,
+        roottitle: projectsChartsData?.title,
+      };
+      dispatch(setChildPayload(childPayload));
+    }
+  }, [projectsChartsData, projectId, dispatch]);
 
   const handleWidgetSelect = (widgetId: string) => {
     if (widgetId) {

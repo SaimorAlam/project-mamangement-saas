@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { X, Save } from "lucide-react";
 import { useAppSelector } from "@/hooks/useRedux";
-import { useCreateNodeMutation } from "@/store/Api/NodeApi/NodeApi";
 import { toast } from "sonner";
+import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
 
 interface AddTierModalProps {
   isOpen: boolean;
@@ -19,33 +19,34 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
   parentChartName,
   chartId,
 }) => {
-  const {programId,projectId} = useAppSelector((state) => state.chartSlice);
-  const [createNode] = useCreateNodeMutation()
+  const { childPayload } = useAppSelector((state) => state.chartSlice);
+  const [createChart] = useCreateChartMutation();
   const [tierName, setTierName] = useState("");
 
-  const handleSave = async() => {
-    const toastId = toast.loading("Creating Node...")
+  const handleSave = async () => {
+    const toastId = toast.loading("Creating Child Tier...");
     try {
       const payload = {
-        taskName: tierName,
-        programId: programId,
-        projectId: projectId,
-      }
-      const response = await createNode(chartId ? {...payload, parentId: chartId} : payload).unwrap()
-      if(response.success){
-        toast.success("Node Created Successfully", {id: toastId})
-        onClose()
+        ...childPayload,
+        title: tierName,
+      };
+      const response = await createChart(
+        chartId ? { ...payload, parentId: chartId } : payload,
+      ).unwrap();
+      if (response.success) {
+        toast.success("Child Tier Created Successfully", { id: toastId });
+        onClose();
       }
     } catch {
-      toast.error("Cannot Create Node", {id: toastId})
+      toast.error("Cannot Create Child Tier", { id: toastId });
     }
-    
+
     if (tierName.trim()) {
-      onSave?.(tierName);   
+      onSave?.(tierName);
       setTierName("");
     } else {
-      toast.error("Please enter a tier name", {id: toastId});
-     }
+      toast.error("Please enter a tier name", { id: toastId });
+    }
   };
 
   const handleClose = () => {
