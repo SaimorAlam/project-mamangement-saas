@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { useAppSelector } from "@/hooks/useRedux";
 import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
 import { toast } from "sonner";
+import { useGetUser } from "@/hooks/useGetUser";
 
 export type LegendValue = {
   label: string;
@@ -48,24 +49,24 @@ const WidgetForChartModuleOne = ({
   setEndingRange: React.Dispatch<React.SetStateAction<number>>;
   onClose?: () => void;
 }) => {
-  const projectId = useAppSelector((state) => state.chartSlice.projectId)
+  const { name, role, profileImage, loading } = useGetUser();
+  const projectId = useAppSelector((state) => state.chartSlice.projectId);
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
-  const [createChart, {isLoading}] = useCreateChartMutation();
+  const [createChart, { isLoading }] = useCreateChartMutation();
   // for showing user info below
   const assignedBy = {
-    name: "Alexis Burg",
-    role: "Admin",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+    name: !loading && name,
+    role: !loading && role,
+    image: !loading && profileImage,
   };
 
   // handler for Legend inputs
   const minLegend = 3;
   const maxLegend = 5;
   const handleSetNumOfLegendDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
 
@@ -86,7 +87,6 @@ const WidgetForChartModuleOne = ({
           color: "#000000",
         });
       }
-
       return updated.slice(0, value);
     });
   };
@@ -116,8 +116,8 @@ const WidgetForChartModuleOne = ({
 
   // const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
-  const downloadCSV = async () => {
-    const toastId = toast.loading("Creating chart...")
+  const handleSaveChanges = async () => {
+    const toastId = toast.loading("Creating chart...");
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
     for (let i = 0; i < numOfLegendDataSet; i++) {
       if (!legendValues[i]?.label) {
@@ -166,12 +166,12 @@ const WidgetForChartModuleOne = ({
       projectId,
     };
     try {
-      const res = await createChart(payload).unwrap()
+      const res = await createChart(payload).unwrap();
       if (res?.success) {
-        toast.success("Chart created successfully", { id: toastId })
+        toast.success("Chart created successfully", { id: toastId });
       }
     } catch {
-      toast.error("Chart creation failed", { id: toastId })
+      toast.error("Chart creation failed", { id: toastId });
     }
 
     // DownloadAndSaveCSVforModuleOneWidget(
@@ -190,10 +190,7 @@ const WidgetForChartModuleOne = ({
         <h2 className="text-lg font-semibold text-gray-900">
           Widget Configuration
         </h2>
-        <button
-          onClick={onClose}
-          className="text-gray-500 hover:text-gray-700"
-        >
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           <X size={18} />
         </button>
       </div>
@@ -250,14 +247,15 @@ const WidgetForChartModuleOne = ({
                   key={index}
                   type="text"
                   required
-                  placeholder={`Enter ${index + 1}${index === 0
+                  placeholder={`Enter ${index + 1}${
+                    index === 0
                       ? "st"
                       : index === 1
                         ? "nd"
                         : index === 2
                           ? "rd"
                           : "th"
-                    } field name here...`}
+                  } field name here...`}
                   value={xAxisValues[index] || ""}
                   onChange={(e) =>
                     handleXAxisValueChange(index, e.target.value)
@@ -283,12 +281,14 @@ const WidgetForChartModuleOne = ({
             />
             <div
               onClick={() => setShowFilter(!showFilter)}
-              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showFilter ? "bg-blue-600" : "bg-gray-300"
-                }`}
+              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
+                showFilter ? "bg-blue-600" : "bg-gray-300"
+              }`}
             >
               <div
-                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showFilter ? "translate-x-5" : "translate-x-0"
-                  }`}
+                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
+                  showFilter ? "translate-x-5" : "translate-x-0"
+                }`}
               />
             </div>
           </div>
@@ -397,12 +397,14 @@ const WidgetForChartModuleOne = ({
                 />
                 <div
                   onClick={() => setShowLegend(!showLegend)}
-                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showLegend ? "bg-blue-600" : "bg-gray-300"
-                    }`}
+                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
+                    showLegend ? "bg-blue-600" : "bg-gray-300"
+                  }`}
                 >
                   <div
-                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showLegend ? "translate-x-5" : "translate-x-0"
-                      }`}
+                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
+                      showLegend ? "translate-x-5" : "translate-x-0"
+                    }`}
                   />
                 </div>
               </div>
@@ -490,15 +492,17 @@ const WidgetForChartModuleOne = ({
           </label>
           <div className="flex items-center">
             <img
-              src={assignedBy.image}
-              alt="Kathryn Murphy"
+              src={assignedBy?.image || ""}
+              alt={assignedBy?.name || ""}
               className="w-8 h-8 rounded-full mr-2"
             />
             <div>
-              <p className="text-xs font-medium text-gray-900">
-                {assignedBy.name}
+              <p className="text-sm font-medium text-gray-900">
+                {assignedBy?.name || ""}
               </p>
-              <p className="text-xs text-gray-500">{assignedBy.role}</p>
+              <p className="text-xs text-gray-500 font-normal">
+                {assignedBy?.role || ""}
+              </p>
             </div>
           </div>
         </div>
@@ -515,7 +519,7 @@ const WidgetForChartModuleOne = ({
         <button
           disabled={isLoading}
           className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 cursor-pointer"
-          onClick={downloadCSV}
+          onClick={handleSaveChanges}
         >
           {isLoading ? "Saving..." : "Save Changes"}
         </button>

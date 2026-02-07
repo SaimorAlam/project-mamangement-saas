@@ -4,7 +4,7 @@ const chartApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createChart: builder.mutation({
       query: (data) => ({
-        url: "/chart",
+        url: "/charts",
         method: "POST",
         body: data,
       }),
