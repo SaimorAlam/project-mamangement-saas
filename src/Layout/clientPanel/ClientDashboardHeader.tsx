@@ -14,7 +14,7 @@ import NotificationModal from "@/components/client/NotificationModal";
 import { toast } from "sonner";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import NewProjectModal from "@/components/client/NewProjectModal";
-import ProjectSuccessModal from "./ProjectSuccessModal";
+import ProjectSuccessModal from "./CreateProject/ProjectSuccessModal";
 import { Bell, CalendarDays, ChevronDown, Plus, UserPlus } from "lucide-react";
 import {
   Breadcrumb,
@@ -27,7 +27,7 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getClientSidebarItems } from "./clientSidebarItems";
 // import CreateProjectModal from "./CreateProjectModal";
-import CreateProject from "./CreateProject";
+import CreateProject from "./CreateProject/CreateProject";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
   setIsPreview,
