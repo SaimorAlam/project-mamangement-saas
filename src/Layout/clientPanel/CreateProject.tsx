@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { useCreateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
@@ -13,7 +13,6 @@ import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import { X, HelpCircle, Flag, Lock, Users, CalendarIcon } from "lucide-react";
-import ProjectSuccessModal from "./ProjectSuccessModal";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -31,7 +30,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useGetAllEmployeesQuery } from "@/store/Api/EmployeeApi/EmployeeApi";
-import { useNavigate } from "react-router-dom";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -72,23 +70,20 @@ interface CreateProjectForm {
 const CreateProject = ({
   programId,
   onClose,
+  onSuccess,
 }: {
   programId: string;
   onClose: () => void;
+  onSuccess?: (projectName: string, projectId: string) => void;
 }) => {
-  const [createProject, { isLoading, isSuccess }] = useCreateProjectMutation();
+  const [createProject, { isLoading }] = useCreateProjectMutation();
   const { data: managersData } = useGetAllManagersQuery({});
   const allManagers = managersData?.data?.data || [];
   const { data: employeesData } = useGetAllEmployeesQuery({});
   const { data: viewerData } = useGetAllViewersQuery({});
   const allEmployees: any = employeesData?.data || [];
   const allViewer = viewerData?.data?.data || [];
-  // const [shareWith, setShareWith] = useState<
-  //   "onlyMe" | "inviteStaff" | "followTemplate"
-  // >("onlyMe");
   const [enableDetails, setEnableDetails] = useState(false);
-  const [openSuccessModal, setOpenSuccessModal] = useState(false);
-  const [projectId, setProjectId] = useState<string>("");
   const [statuses] = useState([
     "PENDING",
     "LIVE",
@@ -125,7 +120,6 @@ const CreateProject = ({
       },
     });
 
-  const projectName = watch("name");
   const uploadCycle = watch("uploadCycle");
   const SelectDays = watch("SelectDays");
   const workingDay = watch("workingDay");
@@ -133,17 +127,8 @@ const CreateProject = ({
   const employeeIds = watch("employeeIds");
   const viewerIds = watch("viewerIds");
   const selectedManagerId = watch("managerId");
-
   const selectedEmployeeIds = employeeIds.filter(Boolean);
   const selectedViewerIds = viewerIds.filter(Boolean);
-
-  useEffect(() => {
-    if (isSuccess) {
-      toast.success("Project created successfully");
-      setOpenSuccessModal(true);
-      onClose();
-    }
-  }, [isSuccess, onClose]);
 
   const toggleDay = (day: string) => {
     const map: Record<string, DaysEnum> = {
@@ -246,7 +231,7 @@ const CreateProject = ({
     });
     return newObj;
   };
-  const navigate = useNavigate();
+
   const onSubmit = async (data: CreateProjectForm) => {
     try {
       const parsedSelectDays = JSON.parse(data.SelectDays || "[]");
@@ -298,9 +283,12 @@ const CreateProject = ({
 
       const cleaned = cleanPayload(payload);
       const res = await createProject(cleaned).unwrap();
+      console.log(res);
       if (res.success) {
-        setProjectId(res.data.id || res.data._id);
-        navigate(`/client-panel/project-builder`);
+        const pId = res.data?.project?.id || res.data?.id;
+        if (onSuccess) {
+          onSuccess(data.name, pId);
+        }
       }
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to create project");
@@ -1356,12 +1344,6 @@ const CreateProject = ({
           </div>
         </form>
       </div>
-      <ProjectSuccessModal
-        open={openSuccessModal}
-        onOpenChange={setOpenSuccessModal}
-        projectName={projectName}
-        projectId={projectId}
-      />
     </div>
   );
 };

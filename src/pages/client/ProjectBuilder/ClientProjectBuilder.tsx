@@ -47,6 +47,7 @@ const ClientProjectBuilder = () => {
   const { projectId, isPreview, isPublished, widgetConfigs } = useAppSelector(
     (state) => state.chartSlice,
   );
+
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [activeWidget, setActiveWidget] = useState("KPI widget");
 
@@ -106,7 +107,6 @@ const ClientProjectBuilder = () => {
     return () =>
       window.removeEventListener("download-project-config", handleDownload);
   }, [selectedWidgets, widgetConfigs]);
-
   const [hiddenDefaultWidgets, setHiddenDefaultWidgets] = useState<string[]>(
     [],
   );

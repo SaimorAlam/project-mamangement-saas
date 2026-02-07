@@ -14,6 +14,7 @@ interface ProjectSuccessModalProps {
   onOpenChange: (open: boolean) => void;
   projectName: string;
   projectId: string;
+  programId?: string;
 }
 
 const ProjectSuccessModal = ({
@@ -21,8 +22,10 @@ const ProjectSuccessModal = ({
   onOpenChange,
   projectName,
   projectId,
+  programId,
 }: ProjectSuccessModalProps) => {
   const navigate = useNavigate();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[400px] rounded-xl border border-gray-200 space-y-4">
@@ -39,7 +42,7 @@ const ProjectSuccessModal = ({
             <Button
               onClick={() =>
                 navigate("/client-panel/project-builder", {
-                  state: { projectId },
+                  state: { projectId, programId },
                 })
               }
               className="p-2 text-blue-500 cursor-pointer"

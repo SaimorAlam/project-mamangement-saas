@@ -14,6 +14,7 @@ import NotificationModal from "@/components/client/NotificationModal";
 import { toast } from "sonner";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import NewProjectModal from "@/components/client/NewProjectModal";
+import ProjectSuccessModal from "./ProjectSuccessModal";
 import { Bell, CalendarDays, ChevronDown, Plus, UserPlus } from "lucide-react";
 import {
   Breadcrumb,
@@ -27,7 +28,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getClientSidebarItems } from "./clientSidebarItems";
 // import CreateProjectModal from "./CreateProjectModal";
 import CreateProject from "./CreateProject";
-import { useGetUser } from "@/hooks/useGetUser";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
   setIsPreview,
@@ -40,11 +40,9 @@ interface ClientDashboardHeaderProps {
   name?: string;
 }
 
-const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
-  name,
-}) => {
+const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   // const [projectName, setProjectName] = useState<string>("");
-  const { name: userName } = useGetUser();
+
   const { programId, projectId: projectIdFromParams, id } = useParams();
   const projectId = projectIdFromParams || id;
   const location = useLocation();
@@ -136,6 +134,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [, setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [projectSuccessData, setProjectSuccessData] = useState<{
+    projectName: string;
+    projectId: string;
+  } | null>(null);
+  const [projectSuccessOpen, setProjectSuccessOpen] = useState(false);
 
   // const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -158,6 +161,12 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
     setActiveModal(null);
     setSuccessData({ programName, id });
     setSuccessOpen(true);
+  };
+
+  const handleProjectSuccess = (projectName: string, projectId: string) => {
+    setIsProjectModalOpen(false);
+    setProjectSuccessData({ projectName, projectId });
+    setProjectSuccessOpen(true);
   };
 
   const renderQuickActionButton = () => {
@@ -278,7 +287,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           {currentPath.includes("/client-panel") && (
             <div className="min-w-0">
               <h1 className="text-2xl md:text-[32px] font-semibold truncate">
-                Good Morning {userName || name}, 👋
+                Good Morning, 👋
               </h1>
               <p className="text-sm md:text-base text-gray-500 truncate">
                 This is dashboard overview of Acme Corporation
@@ -326,6 +335,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             <CreateProject
               programId={programId as string}
               onClose={() => setIsProjectModalOpen(false)}
+              onSuccess={handleProjectSuccess}
             />
           )}
 
@@ -359,6 +369,16 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
               onOpenChange={setSuccessOpen}
               programName={successData.programName}
               redirectPath={`/client-panel/program-builder`}
+            />
+          )}
+
+          {projectSuccessData && (
+            <ProjectSuccessModal
+              open={projectSuccessOpen}
+              onOpenChange={setProjectSuccessOpen}
+              projectName={projectSuccessData.projectName}
+              projectId={projectSuccessData.projectId}
+              programId={programId}
             />
           )}
         </div>

@@ -51,7 +51,7 @@ const StackedBarChartModule = ({
 
   const minXaxisField = 1;
   const maxXaxisField = 10;
-  
+
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {

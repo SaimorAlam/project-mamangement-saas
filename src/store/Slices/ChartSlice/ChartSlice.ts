@@ -41,7 +41,6 @@ const chartSlice = createSlice({
   },
 });
 
-
 export const {
   setProgramId,
   setProjectId,
