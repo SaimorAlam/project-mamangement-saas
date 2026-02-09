@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -14,8 +14,11 @@ import { toast } from "sonner";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-import useChartData from "./GetChartData";
+// import useChartData from "./useChartData";
 import ChartCardWrapper from "./components/ChartCardWrapper";
+import { useLazyFindChildrenValueQuery } from "@/store/Api/ChartApi/ChartApi";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { setChildPayload } from "@/store/Slices/ChartSlice/ChartSlice";
 
 /*       TYPES       */
 
@@ -53,40 +56,41 @@ type Props = {
   isCreationMode?: boolean;
   allUploadedData?: { [key: string]: ChartData[] };
   isPreview?: boolean;
+  projectId?: string;
+  widgets?: any[];
 };
 
 export default function StackedBarChart({
-  newData,
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
   numOfLegendDataSet = 3,
   startingRange,
   endingRange,
+  chartId,
+  projectId,
+  widgets,
   onToggleWidget,
   onDelete,
   tierLevel = 0,
-  chartId,
   isCreationMode = false,
   allUploadedData,
   isPreview = false,
 }: Props) {
-
   const [localUploadedData, setLocalUploadedData] = useState<
     { [key: string]: ChartData[] } | undefined
   >(allUploadedData);
-  
-  const { childTiers } = useChartData({
-    newData,
-    isCreationMode,
-    chartId,
-    xAxisValues,
-    legendValues,
-    numOfLegendDataSet,
-    startingRange,
-    endingRange,
-  });
 
+  const [findChildrenValue, { data, isLoading }] =
+    useLazyFindChildrenValueQuery();
+
+  useEffect(() => {
+    if (chartId) {
+      findChildrenValue(chartId);
+    }
+  }, [chartId, findChildrenValue]);
+  const dispatch = useAppDispatch();
+  const childTiers = data?.data;
   const [isDownloading, setIsDownloading] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
@@ -257,6 +261,32 @@ export default function StackedBarChart({
   };
 
   const handleAddTierClick = () => {
+    const childPayload = {
+      numberOfDataset: numOfLegendDataSet,
+      firstFiledDataset: safeStartingRange,
+      lastFiledDAtaset: safeEndingRange,
+      widgets: widgets?.map((l: any) => {
+        console.log(l.legendName, "l");
+        return {
+          legendName: l.legendName,
+          color: l.color,
+        };
+      }),
+
+      title: "",
+      status: "ACTIVE",
+      category: "BAR",
+
+      xAxis: JSON.stringify(xAxisValues),
+      yAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({}),
+      projectId: projectId,
+      parentId: chartId,
+      rootchart: false,
+      roottitle: widgetTitle,
+    };
+    dispatch(setChildPayload(childPayload));
+
     setShowAddTierModal(true);
   };
 
@@ -323,6 +353,10 @@ export default function StackedBarChart({
     );
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <ChartCardWrapper
@@ -334,7 +368,13 @@ export default function StackedBarChart({
         menuActions={{
           onCopy: handleCopy,
           onDownload: tierLevel === 0 ? handleDownload : undefined,
-          onUpload: tierLevel === 0 ? () => document.getElementById(`upload-input-${chartId || widgetTitle}`)?.click() : undefined,
+          onUpload:
+            tierLevel === 0
+              ? () =>
+                  document
+                    .getElementById(`upload-input-${chartId || widgetTitle}`)
+                    ?.click()
+              : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode ? handleAddTierClick : undefined,
           onToggleWidget: onToggleWidget,
@@ -366,7 +406,8 @@ export default function StackedBarChart({
         footer={
           childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier
+              {childTiers?.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
@@ -374,8 +415,17 @@ export default function StackedBarChart({
         <div className="relative">
           <ResponsiveContainer width="100%" height={350}>
             <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f0f0f0"
+              />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: "#9ca3af" }}
+              />
               <YAxis
                 domain={[safeStartingRange, safeEndingRange]}
                 axisLine={false}
@@ -389,7 +439,9 @@ export default function StackedBarChart({
                   dataKey={l.field}
                   stackId="a"
                   fill={l.color}
-                  radius={i === effectiveLegendValues.length - 1 ? [4, 4, 0, 0] : 0}
+                  radius={
+                    i === effectiveLegendValues.length - 1 ? [4, 4, 0, 0] : 0
+                  }
                 />
               ))}
             </BarChart>
@@ -444,6 +496,8 @@ export default function StackedBarChart({
                     chartId={tier?.id}
                     allUploadedData={localUploadedData || allUploadedData}
                     isPreview={isPreview}
+                    widgets={tier?.widgets}
+                    projectId={tier?.projectId}
                   />
                 );
               })}

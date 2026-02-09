@@ -40,7 +40,7 @@ const baseQueryWithReauth: BaseQueryFn<
         body: { refreshToken },
       },
       api,
-      extraOptions
+      extraOptions,
     );
     if (refreshResult.data) {
       api.dispatch(setUser(refreshResult.data));
@@ -70,6 +70,7 @@ const baseApi = createApi({
     "Clients",
     "Nodes",
     "Charts",
+    "ChartHistory",
   ],
 });
 export default baseApi;

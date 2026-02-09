@@ -31,7 +31,7 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
         title: tierName,
       };
       const response = await createChart(
-        chartId ? { ...payload, parentId: chartId } : payload,
+        chartId ? { ...payload } : payload,
       ).unwrap();
       if (response.success) {
         toast.success("Child Tier Created Successfully", { id: toastId });

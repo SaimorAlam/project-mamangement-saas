@@ -4,7 +4,7 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-import useChartData from "./GetChartData";
+import useChartData from "./useChartData";
 import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*       TYPES       */

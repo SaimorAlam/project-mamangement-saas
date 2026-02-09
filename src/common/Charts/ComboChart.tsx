@@ -1,17 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState, useRef } from "react";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import { Chart } from "react-chartjs-2";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-import useChartData from "./GetChartData";
+import useChartData from "./useChartData";
 import ChartCardWrapper from "./components/ChartCardWrapper";
 
 // Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+);
 
 /*       TYPES       */
 
@@ -68,7 +87,9 @@ export default function ComboChart({
   isPreview = false,
   allUploadedData,
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<{ [key: string]: ChartData[] } | undefined>(allUploadedData);
+  const [localUploadedData, setLocalUploadedData] = useState<
+    { [key: string]: ChartData[] } | undefined
+  >(allUploadedData);
   const { childTiers } = useChartData({
     newData,
     isCreationMode,
@@ -87,8 +108,12 @@ export default function ComboChart({
 
   /*   CHART DATA   */
   const chartData: ChartData[] = useMemo(() => {
-    const sheetName = (widgetTitle || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim().substring(0, 31);
-    const dataToUse = localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const sheetName = (widgetTitle || "Sheet")
+      .replace(/[:/?*[\]\\]/g, " ")
+      .trim()
+      .substring(0, 31);
+    const dataToUse =
+      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
       return dataToUse;
@@ -100,7 +125,7 @@ export default function ComboChart({
       legendValues,
       numOfLegendDataSet,
       startingRange,
-      endingRange
+      endingRange,
     );
   }, [
     xAxisValues,
@@ -124,9 +149,7 @@ export default function ComboChart({
         label: legend.label,
         data: dataValues,
         borderColor: legend.color,
-        backgroundColor: isLine
-          ? "transparent"
-          : `${legend.color}CC`, // Add transparency for bars
+        backgroundColor: isLine ? "transparent" : `${legend.color}CC`, // Add transparency for bars
         type: isLine ? ("line" as const) : ("bar" as const),
         order: isLine ? 0 : 1, // Lines on top, bars behind
         borderWidth: isLine ? 2 : 0,
@@ -173,7 +196,7 @@ export default function ComboChart({
         },
       },
     }),
-    [widgetTitle, startingRange, endingRange]
+    [widgetTitle, startingRange, endingRange],
   );
 
   /*   ACTIONS   */
@@ -206,7 +229,7 @@ export default function ComboChart({
       const processNodeData = (
         name: string,
         xAxis: string[],
-        legends: LegendValue[]
+        legends: LegendValue[],
       ) => {
         const headers = ["Label", ...legends.map((l) => l.label)];
         const rows = xAxis.map((label) => [label, ...legends.map(() => "")]);
@@ -226,7 +249,7 @@ export default function ComboChart({
             processNodeData(
               node.name || node.taskName,
               node.xAxisValues,
-              node.legendValues
+              node.legendValues,
             );
           }
 
@@ -331,14 +354,15 @@ export default function ComboChart({
                     {l.label} ({l.type || "bar"})
                   </span>
                 </div>
-              ) : null
+              ) : null,
             )}
           </div>
         }
         footer={
           childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium text-center">
-              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier
+              {childTiers?.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }

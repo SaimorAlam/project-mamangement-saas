@@ -4,7 +4,7 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-import useChartData from "./GetChartData";
+import useChartData from "./useChartData";
 import ChartCardWrapper from "./components/ChartCardWrapper";
 
 /*       TYPES       */
@@ -56,8 +56,10 @@ export default function MatrixTableChart({
   allUploadedData,
   isPreview = false,
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<{ [key: string]: number[][] } | undefined>(allUploadedData);
-  const { childTiers, refetch } = useChartData({
+  const [localUploadedData, setLocalUploadedData] = useState<
+    { [key: string]: number[][] } | undefined
+  >(allUploadedData);
+  const { childTiers } = useChartData({
     newData,
     isCreationMode,
     chartId,
@@ -73,8 +75,12 @@ export default function MatrixTableChart({
 
   /*   DATA GENERATION   */
   const matrixData: number[][] = useMemo(() => {
-    const sheetName = (widgetTitle || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim().substring(0, 31);
-    const dataToUse = localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const sheetName = (widgetTitle || "Sheet")
+      .replace(/[:/?*[\]\\]/g, " ")
+      .trim()
+      .substring(0, 31);
+    const dataToUse =
+      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
       return dataToUse;
@@ -86,19 +92,30 @@ export default function MatrixTableChart({
     legendValues.forEach(() => {
       const row: number[] = [];
       xAxisValues.forEach(() => {
-        row.push(Math.floor(Math.random() * (endingRange - startingRange + 1)) + startingRange);
+        row.push(
+          Math.floor(Math.random() * (endingRange - startingRange + 1)) +
+            startingRange,
+        );
       });
       data.push(row);
     });
     return data;
-  }, [xAxisValues, legendValues, startingRange, endingRange, widgetTitle, localUploadedData, allUploadedData]);
+  }, [
+    xAxisValues,
+    legendValues,
+    startingRange,
+    endingRange,
+    widgetTitle,
+    localUploadedData,
+    allUploadedData,
+  ]);
 
   /*   OPACITY SCALE   */
   const getOpacity = (value: number) => {
     if (endingRange === startingRange) return 1;
     const normalized = (value - startingRange) / (endingRange - startingRange);
     const clamped = Math.max(0, Math.min(1, normalized));
-    return 0.2 + (clamped * 0.8);
+    return 0.2 + clamped * 0.8;
   };
 
   /*   CELL COLOR FUNCTION   */
@@ -106,17 +123,20 @@ export default function MatrixTableChart({
     const numValue = typeof value === "string" ? parseFloat(value) : value;
     const opacity = getOpacity(numValue);
     const primaryColor = legendValues[0]?.color || "#3B93A5";
-    
+
     const hex = primaryColor.replace("#", "");
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
-    
+
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
   /*   ROWS & COLUMNS   */
-  const rows = useMemo(() => legendValues.map((l) => l.label || "").filter(Boolean), [legendValues]);
+  const rows = useMemo(
+    () => legendValues.map((l) => l.label || "").filter(Boolean),
+    [legendValues],
+  );
   const columns = useMemo(() => xAxisValues.filter(Boolean), [xAxisValues]);
 
   /*   ACTIONS   */
@@ -167,7 +187,9 @@ export default function MatrixTableChart({
         nodes.forEach((node) => {
           if (node.xAxisValues && node.legendValues) {
             const childCols = node.xAxisValues.filter(Boolean);
-            const childRows = node.legendValues.map((l: LegendValue) => l.label || "").filter(Boolean);
+            const childRows = node.legendValues
+              .map((l: LegendValue) => l.label || "")
+              .filter(Boolean);
             processNodeData(node.name || node.taskName, childCols, childRows);
           }
 
@@ -248,20 +270,24 @@ export default function MatrixTableChart({
           onDelete: onDelete,
           onAddTier: !isCreationMode ? handleAddTierClick : undefined,
           onToggleWidget: onToggleWidget,
-          onUpload: tierLevel === 0 ? () => {
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = ".xlsx, .xls";
-            input.onchange = (event: any) => handleUpload(event);
-            input.click();
-          } : undefined,
+          onUpload:
+            tierLevel === 0
+              ? () => {
+                  const input = document.createElement("input");
+                  input.type = "file";
+                  input.accept = ".xlsx, .xls";
+                  input.onchange = (event: any) => handleUpload(event);
+                  input.click();
+                }
+              : undefined,
         }}
         isDownloading={isDownloading}
         isPreview={isPreview}
         footer={
           childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium text-center">
-              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier
+              {childTiers?.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
@@ -274,7 +300,10 @@ export default function MatrixTableChart({
                   <tr>
                     <th className="px-4 py-3 border-r border-gray-100 bg-gray-50/80 sticky left-0 z-10"></th>
                     {columns.map((col, i) => (
-                      <th key={i} className="px-4 py-3 border-r border-gray-100 last:border-r-0 text-center font-bold tracking-wider">
+                      <th
+                        key={i}
+                        className="px-4 py-3 border-r border-gray-100 last:border-r-0 text-center font-bold tracking-wider"
+                      >
                         {col}
                       </th>
                     ))}
@@ -282,7 +311,10 @@ export default function MatrixTableChart({
                 </thead>
                 <tbody>
                   {rows.map((rowLabel, rowIndex) => (
-                    <tr key={rowIndex} className="border-b border-gray-100 last:border-0">
+                    <tr
+                      key={rowIndex}
+                      className="border-b border-gray-100 last:border-0"
+                    >
                       <td className="px-4 py-3 font-semibold text-gray-700 border-r border-gray-100 bg-gray-50/30 sticky left-0 z-10">
                         {rowLabel}
                       </td>
@@ -292,7 +324,8 @@ export default function MatrixTableChart({
                           className="px-2 py-3 border-r border-gray-100 last:border-r-0 text-center font-medium transition-all duration-200"
                           style={{
                             backgroundColor: cellColorFunction(cellValue),
-                            color: getOpacity(cellValue) > 0.6 ? "#fff" : "#374151",
+                            color:
+                              getOpacity(cellValue) > 0.6 ? "#fff" : "#374151",
                           }}
                         >
                           {cellValue}
@@ -317,8 +350,8 @@ export default function MatrixTableChart({
         chartId={chartId}
         parentChartName={widgetTitle}
         onSave={() => {
-            refetch();
-            setShowAddTierModal(false);
+          // refetch();
+          setShowAddTierModal(false);
         }}
       />
 
