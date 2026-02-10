@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BsThreeDots } from "react-icons/bs";
 import { Copy, Trash2, Download, Upload } from "lucide-react";
 import { MdOutlineWidgets } from "react-icons/md";
@@ -44,9 +44,26 @@ const ChartCardWrapper = ({
   isPreview = false,
 }: Props) => {
   const [showPopover, setShowPopover] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
-  // Helper handling click outside could be added here,
-  // but for now relying on simple toggle/blur or parent handling if needed.
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(event.target as Node)
+      ) {
+        setShowPopover(false);
+      }
+    };
+
+    if (showPopover) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showPopover]);
 
   const handleAction = (action?: () => void) => {
     if (action) {
@@ -90,7 +107,10 @@ const ChartCardWrapper = ({
               </button>
 
               {showPopover && (
-                <div className="absolute right-0 top-12 w-48 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-999">
+                <div
+                  ref={popoverRef}
+                  className="absolute right-0 top-12 w-48 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-[999]"
+                >
                   {/* COPY */}
                   {menuActions.onCopy && (
                     <button

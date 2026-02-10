@@ -193,7 +193,11 @@ export default function StackedBarChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
+    if (!chartId && tierLevel === 0) {
+      toast.error("Save chart before downloading");
+      return;
+    }
     setIsDownloading(true);
     try {
       const wb = XLSX.utils.book_new();
@@ -218,37 +222,82 @@ export default function StackedBarChart({
         name: string,
         xAxis: string[],
         legends: LegendValue[],
+        hasChildren: boolean,
       ) => {
         const headers = ["Label", ...legends.map((l) => l.label)];
-        const rows = xAxis.map((label) => [label, ...legends.map(() => "")]);
+        // Only add rows for leaf nodes (nodes without children)
+        const rows = !hasChildren
+          ? xAxis.map((label) => [label, ...legends.map(() => "")])
+          : [];
         const data = [headers, ...rows];
         const ws = XLSX.utils.aoa_to_sheet(data);
         XLSX.utils.book_append_sheet(wb, ws, getUniqueSheetName(name));
       };
 
-      if (xAxisValues && legendValues && xAxisValues.length > 0) {
-        processNodeData(widgetTitle, xAxisValues, legendValues);
-      }
+      const recursiveFetchAndProcess = async (node: any) => {
+        const nodeId = node.id || node._id;
+        let children: any[] = [];
 
-      const processChildren = (nodes: any[]) => {
-        nodes.forEach((node) => {
-          if (node.xAxisValues && node.legendValues) {
-            processNodeData(
-              node.name || node.taskName,
-              node.xAxisValues,
-              node.legendValues,
-            );
+        // Fetch children for this node if we have an ID
+        if (nodeId) {
+          try {
+            const res = await findChildrenValue(nodeId).unwrap();
+            children = res?.data || [];
+          } catch {
+            console.error("Failed to fetch children for", nodeId);
           }
+        }
 
-          if (node.children && node.children.length > 0) {
-            processChildren(node.children);
+        // Prepare this node's configuration
+        let xAxis = node.xAxisValues;
+        let legends = node.legendValues;
+
+        if (!xAxis && node.xAxis) {
+          try {
+            const parsed =
+              typeof node.xAxis === "string"
+                ? JSON.parse(node.xAxis)
+                : node.xAxis;
+            xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
+          } catch {
+            // Silently ignore parsing errors
           }
-        });
+        }
+
+        if (!legends && node.widgets) {
+          legends = node.widgets.map((w: any) => ({
+            label: w.legendName || w.label || "Legend",
+            field: (w.legendName || w.label || "field")
+              .toLowerCase()
+              .replace(/\s+/g, ""),
+            color: w.color || "#000000",
+          }));
+        }
+
+        const sheetName = node.title || node.name || node.taskName || "Tier";
+        const hasChildren = children.length > 0;
+
+        if (xAxis && legends && xAxis.length > 0) {
+          processNodeData(sheetName, xAxis, legends, hasChildren);
+        }
+
+        // Recursively process children
+        if (hasChildren) {
+          for (const child of children) {
+            await recursiveFetchAndProcess(child);
+          }
+        }
       };
 
-      if (childTiers && childTiers.length > 0) {
-        processChildren(childTiers);
-      }
+      // Start from root
+      const rootNode = {
+        id: chartId,
+        title: widgetTitle,
+        xAxisValues,
+        legendValues,
+      };
+
+      await recursiveFetchAndProcess(rootNode);
 
       XLSX.writeFile(wb, `${widgetTitle}.xlsx`);
       toast.success("Excel downloaded successfully");
@@ -486,7 +535,7 @@ export default function StackedBarChart({
                   <StackedBarChart
                     newData={tier?.children || []}
                     key={tier?.id}
-                    widgetTitle={tier?.name || tier?.taskName}
+                    widgetTitle={tier?.title || tier?.name || tier?.taskName || "Untitled Tier"}
                     xAxisValues={tier?.xAxisValues}
                     legendValues={tier?.legendValues}
                     numOfLegendDataSet={tier?.legendValues?.length}
