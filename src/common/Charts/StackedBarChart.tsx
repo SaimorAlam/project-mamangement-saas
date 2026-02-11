@@ -16,7 +16,10 @@ import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 // import useChartData from "./useChartData";
 import ChartCardWrapper from "./components/ChartCardWrapper";
-import { useLazyFindChildrenValueQuery } from "@/store/Api/ChartApi/ChartApi";
+import {
+  useLazyFindChildrenValueQuery,
+  useLazyGetAllTheLeafChartQuery,
+} from "@/store/Api/ChartApi/ChartApi";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setChildPayload } from "@/store/Slices/ChartSlice/ChartSlice";
 
@@ -80,7 +83,7 @@ export default function StackedBarChart({
   const [localUploadedData, setLocalUploadedData] = useState<
     { [key: string]: ChartData[] } | undefined
   >(allUploadedData);
-
+  const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
   const [findChildrenValue, { data, isLoading }] =
     useLazyFindChildrenValueQuery();
 
@@ -194,65 +197,54 @@ export default function StackedBarChart({
   };
 
   const handleDownload = async () => {
-    if (!chartId && tierLevel === 0) {
-      toast.error("Save chart before downloading");
+    if (!projectId) {
+      toast.error("Project ID is missing");
       return;
     }
     setIsDownloading(true);
     try {
+      const res = await getAllTheLeafChart(projectId as string).unwrap();
+      const leafCharts = res?.data || [];
+
+      if (leafCharts.length === 0) {
+        toast.error("No data found to download");
+        return;
+      }
+
       const wb = XLSX.utils.book_new();
+      const ids: string[] = [];
       const usedNames = new Set<string>();
 
-      const getUniqueSheetName = (name: string) => {
+      const getUniqueSheetName = (name: string, id: string) => {
         let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
-        if (baseName.length > 25) baseName = baseName.substring(0, 25);
-        if (!baseName) baseName = "Sheet";
+        // Use last 8 chars of ID to stay within Excel's 31-character limit
+        const idSuffix = id ? `_${id.slice(-8)}` : "";
 
-        let uniqueName = baseName;
+        if (baseName.length + idSuffix.length > 31) {
+          baseName = baseName.substring(0, 31 - idSuffix.length);
+        }
+
+        const combinedName = baseName + idSuffix;
+        let uniqueName = combinedName;
         let counter = 1;
         while (usedNames.has(uniqueName.toLowerCase())) {
-          uniqueName = `${baseName}_${counter}`;
+          const suffix = `_${counter}`;
+          if (combinedName.length + suffix.length > 31) {
+            uniqueName = combinedName.substring(0, 31 - suffix.length) + suffix;
+          } else {
+            uniqueName = combinedName + suffix;
+          }
           counter++;
         }
         usedNames.add(uniqueName.toLowerCase());
         return uniqueName;
       };
 
-      const processNodeData = (
-        name: string,
-        xAxis: string[],
-        legends: LegendValue[],
-        hasChildren: boolean,
-      ) => {
-        const headers = ["Label", ...legends.map((l) => l.label)];
-        // Only add rows for leaf nodes (nodes without children)
-        const rows = !hasChildren
-          ? xAxis.map((label) => [label, ...legends.map(() => "")])
-          : [];
-        const data = [headers, ...rows];
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        XLSX.utils.book_append_sheet(wb, ws, getUniqueSheetName(name));
-      };
+      leafCharts.forEach((node: any) => {
+        ids.push(node.id);
 
-      const recursiveFetchAndProcess = async (node: any) => {
-        const nodeId = node.id || node._id;
-        let children: any[] = [];
-
-        // Fetch children for this node if we have an ID
-        if (nodeId) {
-          try {
-            const res = await findChildrenValue(nodeId).unwrap();
-            children = res?.data || [];
-          } catch {
-            console.error("Failed to fetch children for", nodeId);
-          }
-        }
-
-        // Prepare this node's configuration
-        let xAxis = node.xAxisValues;
-        let legends = node.legendValues;
-
-        if (!xAxis && node.xAxis) {
+        let xAxis = node.xAxisValues || [];
+        if (!xAxis.length && node.xAxis) {
           try {
             const parsed =
               typeof node.xAxis === "string"
@@ -260,12 +252,19 @@ export default function StackedBarChart({
                 : node.xAxis;
             xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
           } catch {
-            // Silently ignore parsing errors
+            // ignore
           }
         }
 
-        if (!legends && node.widgets) {
-          legends = node.widgets.map((w: any) => ({
+        // Fallback to current chart's xAxis if node has none
+        if (!xAxis.length) {
+          xAxis = effectiveXAxisValues;
+        }
+
+        let legends = node.legendValues || [];
+        const nodeWidgets = node.widgets || node.barChart?.widgets;
+        if (!legends.length && nodeWidgets) {
+          legends = nodeWidgets.map((w: any) => ({
             label: w.legendName || w.label || "Legend",
             field: (w.legendName || w.label || "field")
               .toLowerCase()
@@ -274,32 +273,27 @@ export default function StackedBarChart({
           }));
         }
 
-        const sheetName = node.title || node.name || node.taskName || "Tier";
-        const hasChildren = children.length > 0;
-
-        if (xAxis && legends && xAxis.length > 0) {
-          processNodeData(sheetName, xAxis, legends, hasChildren);
+        // Fallback to current chart's legends if node has none
+        if (!legends.length) {
+          legends = effectiveLegendValues;
         }
 
-        // Recursively process children
-        if (hasChildren) {
-          for (const child of children) {
-            await recursiveFetchAndProcess(child);
-          }
-        }
-      };
+        const headers = ["Label", ...legends.map((l: any) => l.label)];
+        const rows = xAxis.map((label: string) => [
+          label,
+          ...legends.map(() => ""),
+        ]);
+        const data = [headers, ...rows];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const sheetName = getUniqueSheetName(
+          node.title || node.name || "Tier",
+          node.id,
+        );
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      });
 
-      // Start from root
-      const rootNode = {
-        id: chartId,
-        title: widgetTitle,
-        xAxisValues,
-        legendValues,
-      };
-
-      await recursiveFetchAndProcess(rootNode);
-
-      XLSX.writeFile(wb, `${widgetTitle}.xlsx`);
+      const filename = `${widgetTitle}_ID_${ids.join("_")}.xlsx`;
+      XLSX.writeFile(wb, filename);
       toast.success("Excel downloaded successfully");
     } catch (error) {
       console.error("Excel download failed", error);
@@ -535,7 +529,12 @@ export default function StackedBarChart({
                   <StackedBarChart
                     newData={tier?.children || []}
                     key={tier?.id}
-                    widgetTitle={tier?.title || tier?.name || tier?.taskName || "Untitled Tier"}
+                    widgetTitle={
+                      tier?.title ||
+                      tier?.name ||
+                      tier?.taskName ||
+                      "Untitled Tier"
+                    }
                     xAxisValues={tier?.xAxisValues}
                     legendValues={tier?.legendValues}
                     numOfLegendDataSet={tier?.legendValues?.length}

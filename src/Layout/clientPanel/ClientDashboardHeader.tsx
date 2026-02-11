@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {
   useState,
   useEffect,
@@ -5,7 +6,8 @@ import React, {
   ReactElement,
   isValidElement,
 } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import * as XLSX from "xlsx";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
 import CreateProgramModal from "@/components/client/AllProgram/CreateProgramModal";
@@ -15,7 +17,14 @@ import { toast } from "sonner";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import NewProjectModal from "@/components/client/NewProjectModal";
 import ProjectSuccessModal from "./CreateProject/ProjectSuccessModal";
-import { Bell, CalendarDays, ChevronDown, Plus, UserPlus } from "lucide-react";
+import {
+  Bell,
+  CalendarDays,
+  ChevronDown,
+  Plus,
+  Upload,
+  UserPlus,
+} from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -35,6 +44,7 @@ import {
 } from "@/store/Slices/ChartSlice/ChartSlice";
 import { Download } from "lucide-react";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 
 interface ClientDashboardHeaderProps {
   name?: string;
@@ -44,6 +54,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   // const [projectName, setProjectName] = useState<string>("");
 
   const { programId, projectId: projectIdFromParams, id } = useParams();
+  const projectIdFromState = useAppSelector(
+    (state) => state.chartSlice.projectId,
+  );
+  console.log(projectIdFromState, "Project Id From State");
+  const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
   const projectId = projectIdFromParams || id;
   const location = useLocation();
   const currentPath = location.pathname;
@@ -139,8 +154,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
     projectId: string;
   } | null>(null);
   const [projectSuccessOpen, setProjectSuccessOpen] = useState(false);
-
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isPreview, isPublished } = useAppSelector(
     (state) => state.chartSlice,
@@ -167,6 +181,143 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
     setIsProjectModalOpen(false);
     setProjectSuccessData({ projectName, projectId });
     setProjectSuccessOpen(true);
+  };
+
+  const handleDownloadCSV = async () => {
+    if (!projectIdFromState) {
+      toast.error("Project ID is missing");
+      return;
+    }
+    const toastId = toast.loading("Downloading...");
+    try {
+      const res = await getAllTheLeafChart(
+        projectIdFromState as string,
+      ).unwrap();
+      const leafCharts = res?.data || [];
+
+      if (leafCharts.length === 0) {
+        toast.error("No data found to download", { id: toastId });
+        return;
+      }
+
+      // Find template structure from first leaf chart that has data
+      let templateXAxis: string[] = [];
+      let templateLegends: any[] = [];
+
+      for (const node of leafCharts) {
+        let xAxis = node.xAxisValues || [];
+        if (!xAxis.length && node.xAxis) {
+          try {
+            const parsed =
+              typeof node.xAxis === "string"
+                ? JSON.parse(node.xAxis)
+                : node.xAxis;
+            xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
+          } catch {
+            /* ignore */
+          }
+        }
+
+        let legends = node.legendValues || [];
+        const nodeWidgets = node.widgets || node.barChart?.widgets;
+        if (!legends.length && nodeWidgets?.length > 0) {
+          legends = nodeWidgets.map((w: any) => ({
+            label: w.legendName || w.label || "Legend",
+            field: (w.legendName || w.label || "field")
+              .toLowerCase()
+              .replace(/\s+/g, ""),
+            color: w.color || "#000000",
+          }));
+        }
+
+        if (xAxis.length > 0 && legends.length > 0) {
+          templateXAxis = xAxis;
+          templateLegends = legends;
+          break;
+        }
+      }
+
+      const wb = XLSX.utils.book_new();
+      const ids: string[] = [];
+      const usedNames = new Set<string>();
+
+      const getUniqueSheetName = (name: string, id: string) => {
+        let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
+        const idSuffix = id ? `_${id.slice(-8)}` : "";
+        if (baseName.length + idSuffix.length > 31) {
+          baseName = baseName.substring(0, 31 - idSuffix.length);
+        }
+        const combinedName = baseName + idSuffix;
+        let uniqueName = combinedName;
+        let counter = 1;
+        while (usedNames.has(uniqueName.toLowerCase())) {
+          const suffix = `_${counter}`;
+          if (combinedName.length + suffix.length > 31) {
+            uniqueName = combinedName.substring(0, 31 - suffix.length) + suffix;
+          } else {
+            uniqueName = combinedName + suffix;
+          }
+          counter++;
+        }
+        usedNames.add(uniqueName.toLowerCase());
+        return uniqueName;
+      };
+
+      leafCharts.forEach((node: any) => {
+        ids.push(node.id);
+
+        let xAxis = node.xAxisValues || [];
+        if (!xAxis.length && node.xAxis) {
+          try {
+            const parsed =
+              typeof node.xAxis === "string"
+                ? JSON.parse(node.xAxis)
+                : node.xAxis;
+            xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
+          } catch {
+            /* ignore */
+          }
+        }
+
+        let legends = node.legendValues || [];
+        const nodeWidgets = node.widgets || node.barChart?.widgets;
+        if (!legends.length && nodeWidgets?.length > 0) {
+          legends = nodeWidgets.map((w: any) => ({
+            label: w.legendName || w.label || "Legend",
+            field: (w.legendName || w.label || "field")
+              .toLowerCase()
+              .replace(/\s+/g, ""),
+            color: w.color || "#000000",
+          }));
+        }
+
+        // Apply template fallback
+        if (!xAxis.length) xAxis = templateXAxis;
+        if (!legends.length) legends = templateLegends;
+
+        const headers = ["Label", ...legends.map((l: any) => l.label)];
+        const rows = xAxis.map((label: string) => [
+          label,
+          ...legends.map(() => ""),
+        ]);
+        const data = [headers, ...rows];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const sheetName = getUniqueSheetName(
+          node.title || node.name || "Tier",
+          node.id,
+        );
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      });
+
+      const filename = `${projectName || "Project"}_ID_${ids.join("_")}.xlsx`;
+      XLSX.writeFile(wb, filename);
+      toast.success("Excel downloaded successfully", { id: toastId });
+    } catch (error) {
+      console.error("Excel download failed", error);
+      toast.error("Failed to download Excel", { id: toastId });
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   const renderQuickActionButton = () => {
@@ -215,22 +366,19 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         return (
           <div className="flex gap-4">
             <PrimaryButton
+              title="Import CSV"
+              type="Outline"
+              leftIcon={<Upload />}
+              onClick={() => {
+                navigate("/client-panel/project-builder/import-csv");
+              }}
+            />
+            <PrimaryButton
               title="Download CSV"
               leftIcon={<Download />}
               type="Primary"
               onClick={() => {
-                // Trigger CSV download event
-                window.dispatchEvent(
-                  new CustomEvent("download-project-config"),
-                );
-              }}
-            />
-            <PrimaryButton
-              title="Back to Editor"
-              type="Outline"
-              onClick={() => {
-                dispatch(setIsPreview(false));
-                dispatch(setIsPublished(false));
+                handleDownloadCSV();
               }}
             />
           </div>

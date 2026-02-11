@@ -140,16 +140,16 @@ const ClientProjectBuilder = () => {
           !isPreviewOrPublished ? "border border-gray-200 rounded-lg p-4" : ""
         } h-full mb-10 relative`}
       >
-        {isPreviewOrPublished && (
+        {/* {isPreviewOrPublished && (
           <div className="mb-4">
             <h1 className="text-[32px] font-semibold text-[#111827]">
-              Good Morning 👋, Lawal
+              Good Morning 👋
             </h1>
             <p className="text-base text-gray-500">
               This is dashboard overview of Acme Corporation
             </p>
           </div>
-        )}
+        )} */}
 
         <div
           className={`${

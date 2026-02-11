@@ -3,7 +3,6 @@
 import Employee from "@/pages/client/NewEmployee/Employee";
 import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
 import SupportDashboard from "@/pages/client/Support/SupportDashboard";
-
 import ClientOverview from "@/pages/client/Overview/ClientOverview";
 import ClientAllProgram from "@/pages/client/Program/ClientAllProgram";
 import ClientMarketingStrategy from "@/pages/client/ClientMarketingStrategy";
@@ -32,6 +31,8 @@ import ClientAllProgramContainer from "@/pages/client/ClientAllProgramContainer"
 import ProgramOverviewContainer from "@/pages/client/Program/ProgramOverviewContainer";
 import ProjectReviewContainer from "@/pages/client/ProjectReview/ProjectReviewContainer";
 import ClientOverviewContainer from "@/pages/client/Overview/ClientOverviewContainer";
+import ClientProjectBuilderContainer from "@/pages/client/ProjectBuilder/ClientProjectBuilderContainer";
+import PublishProject from "@/pages/client/ProjectBuilder/Components/PublishProject";
 
 export function getClientRoutes() {
   return [
@@ -101,7 +102,15 @@ export function getClientRoutes() {
       element: <ClientSingleProjectCreate />,
     },
 
-    { path: "project-builder", element: <ClientProjectBuilder /> },
+    {
+      path: "project-builder",
+      element: <ClientProjectBuilderContainer />,
+      children: [
+        { index: true, element: <ClientProjectBuilder /> },
+        { path: "publish", element: <PublishProject /> },
+        { path: "project-details/:projectId", element: <ProjectDetails /> },
+      ],
+    },
     { path: "activity-log", element: <ClientActivityLog /> },
 
     {

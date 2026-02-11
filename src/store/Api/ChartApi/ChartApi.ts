@@ -66,6 +66,13 @@ const chartApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Charts"],
     }),
+    getAllTheLeafChart: builder.query({
+      query: (projectId: string) => ({
+        url: `/chart/onlylevechildren/${projectId}`,
+        method: "GET",
+      }),
+      providesTags: ["Charts"],
+    }),
   }),
 });
 
@@ -79,5 +86,7 @@ export const {
   useGetRootChartQuery,
   useFindChildrenValueQuery,
   useLazyFindChildrenValueQuery,
+  useGetAllTheLeafChartQuery,
+  useLazyGetAllTheLeafChartQuery,
 } = chartApi;
 export default chartApi;
