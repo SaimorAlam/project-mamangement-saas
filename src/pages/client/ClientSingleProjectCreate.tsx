@@ -1,5 +1,5 @@
 import { useState } from "react";
-import FileUploadPage from "./FileUploadPage";
+import FileUpload from "./ProjectBuilder/Components/FileUpload";
 import SheetViewPage from "./SheetViewPage";
 import { useNavigate } from "react-router-dom";
 import { setFile } from "@/store/Slices/FileSlice/FileSlice";
@@ -19,7 +19,7 @@ function ClientSingleProjectCreate() {
   return (
     <div className="min-h-screen bg-white mx-auto overflow-x-scroll">
       {currentView === "upload" ? (
-        <FileUploadPage onFileUpload={handleFileUpload} />
+        <FileUpload onFileUpload={handleFileUpload} />
       ) : (
         <SheetViewPage />
       )}

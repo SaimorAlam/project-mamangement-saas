@@ -73,6 +73,14 @@ const chartApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Charts"],
     }),
+    uploadChartData: builder.mutation({
+      query: (data) => ({
+        url: `/chart/bulk/value-change`,
+        method: "PATCH",
+        body:data
+      }),
+      invalidatesTags: ["Charts"],
+    }),
   }),
 });
 
@@ -88,5 +96,6 @@ export const {
   useLazyFindChildrenValueQuery,
   useGetAllTheLeafChartQuery,
   useLazyGetAllTheLeafChartQuery,
+  useUploadChartDataMutation
 } = chartApi;
 export default chartApi;

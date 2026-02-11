@@ -25,7 +25,6 @@ import ClientContactUs from "@/pages/client/ClientContactUs";
 import ClientWorkInProgress from "@/pages/client/ClientWorkInProgress";
 import ClientUserActivityLog from "@/pages/client/ClientUsersActivityLog";
 import ClientSingleProject from "@/pages/client/ClientSingleProject";
-import ClientSingleProjectCreate from "@/pages/client/ClientSingleProjectCreate";
 import ProgramOverview from "@/pages/client/Program/ProgramOverview";
 import ClientAllProgramContainer from "@/pages/client/ClientAllProgramContainer";
 import ProgramOverviewContainer from "@/pages/client/Program/ProgramOverviewContainer";
@@ -33,6 +32,7 @@ import ProjectReviewContainer from "@/pages/client/ProjectReview/ProjectReviewCo
 import ClientOverviewContainer from "@/pages/client/Overview/ClientOverviewContainer";
 import ClientProjectBuilderContainer from "@/pages/client/ProjectBuilder/ClientProjectBuilderContainer";
 import PublishProject from "@/pages/client/ProjectBuilder/Components/PublishProject";
+import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
 
 export function getClientRoutes() {
   return [
@@ -104,7 +104,7 @@ export function getClientRoutes() {
       children: [
         { index: true, element: <ClientProjectBuilder /> },
         { path: "publish", element: <PublishProject /> },
-        { path: "import-csv", element: <ClientSingleProjectCreate /> },
+        { path: "file-upload", element: <FileUpload /> },
         { path: "project-details/:projectId", element: <ProjectDetails /> },
       ],
     },

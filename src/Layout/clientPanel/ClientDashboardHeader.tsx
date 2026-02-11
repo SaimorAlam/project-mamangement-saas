@@ -80,7 +80,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
     "/client-panel/project-builder",
   );
   const isPublishPage = currentPath.includes("/project-builder/publish");
-  const isImportCSVPage = currentPath.includes("/project-builder/import-csv");
+  const isImportCSVPage = currentPath.includes("/project-builder/file-upload");
   const isProjectReviewDetailsPage = currentPath.startsWith(
     "/client-panel/project-review/project-details/",
   );
@@ -379,7 +379,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
               type="Outline"
               leftIcon={<Upload />}
               onClick={() => {
-                navigate("/client-panel/project-builder/import-csv");
+                navigate("/client-panel/project-builder/file-upload");
               }}
             />
             <PrimaryButton
