@@ -18,14 +18,6 @@ const PublishProject = () => {
 
   return (
     <div className="p-6">
-      <div className="mb-8 font-jakarta">
-        <h1 className="text-[32px] font-semibold text-[#111827]">
-          Good Morning 👋
-        </h1>
-        <p className="text-base text-gray-500">
-          This is published dashboard overview
-        </p>
-      </div>
       <ProjectDashboardView
         projectId={projectId as string}
         isPreviewOrPublished={true}
