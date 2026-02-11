@@ -216,29 +216,30 @@ export default function StackedBarChart({
       const usedNames = new Set<string>();
 
       const getUniqueSheetName = (name: string, id: string) => {
-        let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
-        // Use last 8 chars of ID to stay within Excel's 31-character limit
-        const idSuffix = id ? `_${id.slice(-8)}` : "";
+  const safeName = (name || "Sheet")
+    .replace(/[:/?*[\]\\]/g, " ")
+    .trim();
 
-        if (baseName.length + idSuffix.length > 31) {
-          baseName = baseName.substring(0, 31 - idSuffix.length);
-        }
+  const fullName = `${safeName}_${id}`;
 
-        const combinedName = baseName + idSuffix;
-        let uniqueName = combinedName;
-        let counter = 1;
-        while (usedNames.has(uniqueName.toLowerCase())) {
-          const suffix = `_${counter}`;
-          if (combinedName.length + suffix.length > 31) {
-            uniqueName = combinedName.substring(0, 31 - suffix.length) + suffix;
-          } else {
-            uniqueName = combinedName + suffix;
-          }
-          counter++;
-        }
-        usedNames.add(uniqueName.toLowerCase());
-        return uniqueName;
-      };
+  // Enforce Excel 31 character limit
+  let finalName = fullName.length > 31
+    ? fullName.substring(0, 31)
+    : fullName;
+
+  let counter = 1;
+
+  while (usedNames.has(finalName.toLowerCase())) {
+    const suffix = `_${counter}`;
+    const base = fullName.substring(0, 31 - suffix.length);
+    finalName = base + suffix;
+    counter++;
+  }
+
+  usedNames.add(finalName.toLowerCase());
+  return finalName;
+};
+
 
       leafCharts.forEach((node: any) => {
         ids.push(node.id);

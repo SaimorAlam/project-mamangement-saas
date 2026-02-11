@@ -1,9 +1,10 @@
 import { useState } from "react";
-import FileUpload from "./ProjectBuilder/Components/FileUpload";
+
 import SheetViewPage from "./SheetViewPage";
 import { useNavigate } from "react-router-dom";
 import { setFile } from "@/store/Slices/FileSlice/FileSlice";
 import { useAppDispatch } from "@/hooks/useRedux";
+import FileUpload from "@/components/client/Settings/FileUploadComponent";
 
 function ClientSingleProjectCreate() {
   const [currentView, setCurrentView] = useState("upload"); // 'upload' or 'sheet'

@@ -1,24 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, { useState, useRef } from "react";
+import * as XLSX from "xlsx";
 import {
   Upload,
   FileText,
   X,
   CheckCircle,
-  AlertCircle,
+  HelpCircle,
   Plus,
   Send,
+  ArrowRight,
+  Waypoints,
 } from "lucide-react";
 import { useUploadChartDataMutation } from "@/store/Api/ChartApi/ChartApi";
+import { useAppSelector } from "@/hooks/useRedux";
+import ProjectUploadSuccessModal from "./ProjectUploadSuccessModal";
+import { useNavigate } from "react-router-dom";
 
-const FileUpload = () => {
-    const [uploadChartData] = useUploadChartDataMutation()
+interface FileUploadProps {
+  onFileUpload?: (file: File) => void;
+}
+
+const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
+  const [uploadChartData] = useUploadChartDataMutation();
+  const projectId = useAppSelector((state) => state.chartSlice.projectId);
+  const navigate = useNavigate();
+
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [projectNote, setProjectNote] = useState("");
   const [addNotesChecked, setAddNotesChecked] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<"success" | "error" | null>(
-    null,
+    null
   );
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -77,254 +93,336 @@ const FileUpload = () => {
     }
   };
 
-  //   const handleSubmit = () => {
-  //     if (file && onFileUpload) {
-  //       setUploadStatus("success");
-  //       setTimeout(() => {
-  //         onFileUpload(file);
-  //       }, 500);
-  //     }
-  //   };
+  const [sheetCount, setSheetCount] = useState(0);
+
+  const handleSubmit = async () => {
+    if (!file) return;
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const data = e.target?.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        
+        const chartsPayload: any[] = [];
+
+        workbook.SheetNames.forEach((sheetName) => {
+            const sheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            // Parse sheet name for ID
+            const lastUnderscoreIndex = sheetName.lastIndexOf('_');
+            let id = sheetName; // Fallback ID is the whole name
+
+            if (lastUnderscoreIndex !== -1) {
+                id = sheetName.substring(lastUnderscoreIndex + 1);
+            }
+
+            // If ID is empty or invalid after split (e.g. "Name_"), fallback to whole name or generate UUID if needed.
+            // For now, using the parsed ID. User said: "If _ does not exist, handle gracefully with fallback ID."
+            if (!id.trim()) {
+                id = sheetName;
+            }
+
+            chartsPayload.push({
+                id: id,
+                xAxis: JSON.stringify({ labels: jsonData }), 
+                yAxis: JSON.stringify({ values: [] }), 
+                zAxis: JSON.stringify({ values: [] }),
+            });
+        });
+
+        if (chartsPayload.length === 0) {
+            alert("No valid sheets found in the file.");
+            return;
+        }
+
+        const payload = {
+          charts: chartsPayload,
+        };
+
+        // Call API
+        await uploadChartData(payload).unwrap();
+
+        setSheetCount(chartsPayload.length);
+        setUploadStatus("success");
+        setShowSuccessModal(true);
+        
+        if (onFileUpload) {
+            onFileUpload(file);
+        }
+      };
+
+      reader.readAsBinaryString(file);
+    } catch (error) {
+      console.error("Error processing file:", error);
+      setUploadStatus("error");
+      alert("Failed to upload file. Please try again.");
+    }
+  };
+
+  const handleOpenProject = () => {
+    navigate(`/client-panel/project-builder/project-details/${projectId}`);
+  };
 
   return (
-    <div className="flex gap-6 min-h-[80vh]">
-      {/* Main Upload Area */}
-      <div className="flex-1 p-8 md:p-12 flex flex-col overflow-y-auto bg-white rounded-xl border-gray-200 border">
-        <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-center">
-          {/* Header Section */}
-          <div className="text-center mb-10">
-            <div className="size-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-              <img
-                src="/upload.png"
-                alt="File Upload"
-                className="size-8"
-                
-              />
-            </div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              No file Added to this Project Yet
-            </h1>
-            <p className="text-gray-500 text-sm max-w-md mx-auto">
-              You haven't uploaded any data for this project. Start by importing
-              a CSV or spreadsheet file to populate tasks or resources.
-            </p>
-          </div>
-
-          {/* Drag & Drop Zone */}
-          {!file ? (
-            <div
-              className={`border-2 border-dashed rounded-lg p-10 text-center transition-colors ${
-                isDragging
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-300 bg-white"
-              }`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <Upload className="w-5 h-5 text-gray-700" />
+    <>
+      <div className="flex gap-6 min-h-[80vh] font-sans text-[#111827]">
+        {/* Main Upload Area */}
+        <div className="flex-1 p-12 flex flex-col items-center justify-center bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="w-full max-w-[600px] flex flex-col items-center">
+            {/* Header Section */}
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-[#F3F4F6] rounded-full flex items-center justify-center mx-auto mb-6">
+                {/* Road/Map icon placeholder */}
+                <Waypoints className="w-10 h-10 text-slate-500" />
               </div>
-              <p className="text-gray-900 font-medium mb-1">
-                Drag and drop your CSV/XLSX file here
+              <h1 className="text-2xl font-semibold text-[#111827] mb-3">
+                No file Added to this Project Yet
+              </h1>
+              <p className="text-[#6B7280] text-sm leading-relaxed max-w-md mx-auto">
+                You haven't uploaded any data for this project. Start by importing
+                a CSV or spreadsheet file to populate tasks or resources.
               </p>
-              <p className="text-gray-400 text-xs mb-6">
-                Supported formats: .csv, .xls, .xlsx, .mpp | Max file size : 10
-                MB
-              </p>
-
-              <div className="flex items-center gap-3 w-1/2 mx-auto mb-6">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-gray-400 text-sm">OR</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
-              </div>
-
-              <button
-                onClick={handleBrowse}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium text-sm transition-colors flex items-center gap-2 mx-auto"
-              >
-                Browse your device
-                <span>→</span>
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xls,.xlsx,.ods"
-                onChange={handleFileInput}
-                className="hidden"
-              />
             </div>
-          ) : (
-            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900">
-                      {file.name}
-                    </h4>
-                    <p className="text-xs text-gray-500">
-                      {(file.size / 1024).toFixed(2)} KB
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={handleRemoveFile}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              {uploadStatus === "success" && (
-                <div className="mt-4 flex items-center gap-2 text-green-600 text-sm">
-                  <CheckCircle className="w-4 h-4" />
-                  <span>File uploaded successfully</span>
-                </div>
-              )}
-            </div>
-          )}
 
-          {/* Notes Section */}
-          <div className="mt-8">
-            <div className="flex items-center gap-2 mb-4">
-              <div
-                className={`w-9 h-5 rounded-full p-1 cursor-pointer transition-colors relative ${
-                  addNotesChecked ? "bg-blue-500" : "bg-gray-300"
-                }`}
-                onClick={() => setAddNotesChecked(!addNotesChecked)}
-              >
+            {!file ? (
+              <>
+                {/* Drag & Drop Zone */}
                 <div
-                  className={`w-3 h-3 bg-white rounded-full shadow-sm transform transition-transform ${
-                    addNotesChecked ? "translate-x-4" : ""
+                  className={`w-full border-2 border-dashed rounded-lg p-10 text-center transition-all duration-200 mb-4 ${
+                    isDragging
+                      ? "border-blue-500 bg-blue-50/50"
+                      : "border-[#E5E7EB] bg-white hover:border-gray-300"
                   }`}
-                />
-              </div>
-              <span className="text-sm font-medium text-gray-700">
-                Add Notes for Project Admin/Manager
-              </span>
-            </div>
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <div className="w-12 h-12 bg-white border border-[#E5E7EB] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <Upload className="w-6 h-6 text-[#374151]" />
+                  </div>
+                  <p className="text-[#374151] font-medium text-sm">
+                    Drag and drop your CSV/XLSX file here
+                  </p>
+                </div>
 
-            {addNotesChecked && (
-              <div className="relative">
-                <label className="text-xs text-gray-500 mb-1.5 flex items-center gap-1">
-                  Project Note <AlertCircle className="w-3 h-3" />
+                {/* Supported Formats */}
+                <p className="text-[#9CA3AF] text-xs text-center mb-6">
+                  Supported formats: .csv, .xls, .xlsx, .mpp | Max file size : 10
+                  MB
+                </p>
+
+                {/* OR Divider */}
+                <div className="text-[#111827] font-medium text-sm mb-6">OR</div>
+
+                {/* Browse Button */}
+                <button
+                  onClick={handleBrowse}
+                  className="bg-[#1D64D8] hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 mb-10"
+                >
+                  Browse your device
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.xls,.xlsx,.ods"
+                  onChange={handleFileInput}
+                  className="hidden"
+                />
+              </>
+            ) : (
+              <div className="w-full mb-10">
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">
+                        {file.name}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {(file.size / 1024).toFixed(2)} KB
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleRemoveFile}
+                    className="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                {uploadStatus === "success" && (
+                  <div className="mt-3 flex items-center gap-2 text-green-600 text-sm justify-center">
+                    <CheckCircle className="w-4 h-4" />
+                    <span>File uploaded successfully</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Footer Section - Notes */}
+            <div className="w-full self-start">
+              {/* Toggle Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <button
+                  onClick={() => setAddNotesChecked(!addNotesChecked)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    addNotesChecked ? "bg-[#1D64D8]" : "bg-gray-200"
+                  }`}
+                >
+                  <span
+                    className={`${
+                      addNotesChecked ? "translate-x-6" : "translate-x-1"
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </button>
+                <span className="text-sm font-medium text-[#374151]">
+                  Add Notes for Project Admin/Manager
+                </span>
+                
+                {/* Persistent Open Project Button (Only visible after success) */}
+                {uploadStatus === 'success' && (
+                    <button 
+                        onClick={handleOpenProject}
+                        className="ml-auto text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                    >
+                        Open Project <ArrowRight className="w-4 h-4" />
+                    </button>
+                )}
+              </div>
+
+              {/* Note Input */}
+              <div>
+                <label className="flex items-center gap-1.5 text-xs text-[#374151] font-medium mb-2">
+                  Project Note
+                  <HelpCircle className="w-3.5 h-3.5 text-[#9CA3AF]" />
                 </label>
                 <div className="relative">
                   <textarea
                     value={projectNote}
                     onChange={(e) => setProjectNote(e.target.value)}
                     placeholder="Write a short description..."
-                    className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                    disabled={!addNotesChecked}
+                    className="w-full h-32 px-4 py-3 border border-[#E5E7EB] rounded-lg text-sm placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-50 disabled:text-gray-400 transition-all"
                   />
                   <button
-                    // onClick={handleSubmit}
+                    onClick={handleSubmit}
                     disabled={!file}
-                    className="absolute bottom-3 right-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-2 rounded-md transition-colors shadow-sm"
+                    className="absolute bottom-3 right-3 bg-[#1D64D8] hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white p-2 rounded-md transition-colors shadow-sm"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-4 h-4 fill-current" />
                   </button>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Right Sidebar */}
-      <div className="w-96 hidden xl:block overflow-y-auto">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          {/* Program Manager */}
-          <div className="mb-8">
-            <h3 className="text-sm font-medium text-gray-500 mb-4">
-              Program Manager
-            </h3>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-200 rounded-full overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt="Alex Thompson"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold text-gray-900 leading-tight">
-                  Alex Thompson
-                </p>
-                <p className="text-xs text-gray-500 leading-tight">
-                  alex.thompson@example.com
-                </p>
-              </div>
             </div>
           </div>
+        </div>
 
-          {/* Program Duration */}
-          <div className="mb-8">
-            <h3 className="text-sm font-medium text-gray-500 mb-4">
-              Program Duration
-            </h3>
-            <div className="bg-[#F8F9FA] rounded-xl p-5">
-              <div className="flex justify-between mb-6">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1 font-medium">
-                    Start Date
-                  </p>
-                  <p className="text-sm font-medium text-gray-900">
-                    21-Oct-2024
-                  </p>
+        {/* Right Sidebar - Preserved */}
+        <div className="w-96 hidden xl:block overflow-y-auto">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm h-full">
+            {/* Program Manager */}
+            <div className="mb-8">
+              <h3 className="text-sm font-medium text-gray-500 mb-4">
+                Program Manager
+              </h3>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gray-200 rounded-full overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    alt="Alex Thompson"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <div className="">
-                  <p className="text-xs text-gray-500 mb-1 font-medium">
-                    End Date
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold text-gray-900 leading-tight">
+                    Alex Thompson
                   </p>
-                  <p className="text-sm font-medium text-gray-900">
-                    21-Oct-2024
+                  <p className="text-xs text-gray-500 leading-tight">
+                    alex.thompson@example.com
                   </p>
                 </div>
               </div>
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-sm text-gray-500 font-medium">
-                    Time Remaining
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                    <div
-                      className="bg-[#3B82F6] h-1.5 rounded-full"
-                      style={{ width: "35%" }}
-                    ></div>
+            </div>
+
+            {/* Program Duration */}
+            <div className="mb-8">
+              <h3 className="text-sm font-medium text-gray-500 mb-4">
+                Program Duration
+              </h3>
+              <div className="bg-[#F8F9FA] rounded-xl p-5">
+                <div className="flex justify-between mb-6">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1 font-medium">
+                      Start Date
+                    </p>
+                    <p className="text-sm font-medium text-gray-900">
+                      21-Oct-2024
+                    </p>
                   </div>
-                  <span className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                    45 days
-                  </span>
+                  <div className="">
+                    <p className="text-xs text-gray-500 mb-1 font-medium">
+                      End Date
+                    </p>
+                    <p className="text-sm font-medium text-gray-900">
+                      21-Oct-2024
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-sm text-gray-500 font-medium">
+                      Time Remaining
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                      <div
+                        className="bg-[#3B82F6] h-1.5 rounded-full"
+                        style={{ width: "35%" }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                      45 days
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Tags */}
-          <div className="mb-4">
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-500 font-medium">0 Tags</span>
-              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
-                <Plus className="w-4 h-4" /> Add Tags
-              </button>
+            {/* Tags */}
+            <div className="mb-4">
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-sm text-gray-500 font-medium">0 Tags</span>
+                <button className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                  <Plus className="w-4 h-4" /> Add Tags
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Issues */}
-          <div>
-            <div className="bg-[#F8F9FA] rounded-xl p-4 text-center">
-              <p className="text-sm font-medium text-gray-500">
-                No Issues reported yet
-              </p>
+            {/* Issues */}
+            <div>
+              <div className="bg-[#F8F9FA] rounded-xl p-4 text-center">
+                <p className="text-sm font-medium text-gray-500">
+                  No Issues reported yet
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      
+      <ProjectUploadSuccessModal 
+        open={showSuccessModal} 
+        onOpenChange={setShowSuccessModal} 
+        projectId={projectId}
+        sheetCount={sheetCount}
+      />
+    </>
   );
 };
 
