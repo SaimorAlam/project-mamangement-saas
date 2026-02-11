@@ -97,10 +97,6 @@ export function getClientRoutes() {
     },
 
     { path: "single-project", element: <ClientSingleProject /> },
-    {
-      path: "single-project-create",
-      element: <ClientSingleProjectCreate />,
-    },
 
     {
       path: "project-builder",
@@ -108,6 +104,7 @@ export function getClientRoutes() {
       children: [
         { index: true, element: <ClientProjectBuilder /> },
         { path: "publish", element: <PublishProject /> },
+        { path: "import-csv", element: <ClientSingleProjectCreate /> },
         { path: "project-details/:projectId", element: <ProjectDetails /> },
       ],
     },

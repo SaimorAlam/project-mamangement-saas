@@ -59,7 +59,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   );
   console.log(projectIdFromState, "Project Id From State");
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
-  const projectId = projectIdFromParams || id;
+  const projectId = projectIdFromParams || id || projectIdFromState;
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -79,6 +79,8 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   const isProjectBuilderPage = currentPath.includes(
     "/client-panel/project-builder",
   );
+  const isPublishPage = currentPath.includes("/project-builder/publish");
+  const isImportCSVPage = currentPath.includes("/project-builder/import-csv");
   const isProjectReviewDetailsPage = currentPath.startsWith(
     "/client-panel/project-review/project-details/",
   );
@@ -129,6 +131,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
       route = allRoutes.find((r) => r.path === "/client-panel");
     }
 
+    // Special case for Publish or Import CSV page: map to Project Builder
+    if (isPublishPage || isImportCSVPage) {
+      route = allRoutes.find((r) => r.path === "/client-panel/project-builder");
+    }
+
     return route;
   }, [
     allRoutes,
@@ -136,6 +143,8 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
     showProgramOverviewBreadcrumb,
     isProjectReviewDetailsPage,
     isOverviewProjectDetailsPage,
+    isPublishPage,
+    isImportCSVPage,
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -401,7 +410,10 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           <PrimaryButton
             title="Publish"
             type="Primary"
-            onClick={() => dispatch(setIsPublished(true))}
+            onClick={() => {
+              dispatch(setIsPublished(true));
+              navigate("/client-panel/project-builder/publish");
+            }}
           />
         </div>
       );
@@ -594,6 +606,72 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
                     <BreadcrumbItem>
                       <BreadcrumbPage className="text-[#356DF0]">
                         {projectName || "Project Details"}
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                )}
+                {isPublishPage && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link
+                          to="/client-panel/project-builder"
+                          className="text-[#356DF0]"
+                        >
+                          {projectName || "Project"}
+                        </Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-[#356DF0]">
+                        Publish
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                )}
+                {isImportCSVPage && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link
+                          to="/client-panel/project-builder"
+                          className="text-[#356DF0]"
+                        >
+                          {projectName || "Project"}
+                        </Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link
+                          to="/client-panel/project-builder/publish"
+                          className="text-[#356DF0]"
+                        >
+                          Publish
+                        </Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-[#356DF0]">
+                        Import CSV
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                )}
+                {isProjectBuilderPage &&
+                  !isPublishPage &&
+                  !isImportCSVPage &&
+                  projectName && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-[#356DF0]">
+                        {projectName}
                       </BreadcrumbPage>
                     </BreadcrumbItem>
                   </>

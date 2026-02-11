@@ -7,6 +7,7 @@ interface ChartBuilderState {
   isPublished: boolean;
   widgetConfigs: Record<string, unknown>;
   childPayload: Record<string, unknown>;
+  selectedWidgets: string[];
 }
 
 const initialState: ChartBuilderState = {
@@ -16,6 +17,7 @@ const initialState: ChartBuilderState = {
   isPublished: false,
   widgetConfigs: {},
   childPayload: {},
+  selectedWidgets: [],
 };
 
 const chartSlice = createSlice({
@@ -43,6 +45,9 @@ const chartSlice = createSlice({
     setChildPayload: (state, action: { payload: Record<string, unknown> }) => {
       state.childPayload = action.payload;
     },
+    setSelectedWidgets: (state, action: { payload: string[] }) => {
+      state.selectedWidgets = action.payload;
+    },
   },
 });
 
@@ -53,6 +58,7 @@ export const {
   setIsPublished,
   setWidgetConfig,
   setChildPayload,
+  setSelectedWidgets,
 } = chartSlice.actions;
 
 export default chartSlice.reducer;

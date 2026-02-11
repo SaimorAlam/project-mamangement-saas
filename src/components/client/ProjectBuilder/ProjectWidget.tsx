@@ -34,7 +34,7 @@ import useGetAllProgram from "./utils/useGetAllProgram";
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
 import useGetLazyProject from "./utils/useGetLazyProject";
 import { useLocation } from "react-router-dom";
-import { useAppDispatch } from "@/hooks/useRedux";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
   setProgramId,
   setProjectId,
@@ -61,11 +61,15 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   const { state } = useLocation();
   const { projectId: defaultProjectId, programId: defaultProgramId } =
     state || {};
+
+  const { programId: reduxProgramId, projectId: reduxProjectId } =
+    useAppSelector((state) => state.chartSlice);
+
   const [selectedProgram, setSelectedProgram] = useState<string>(
-    defaultProgramId || "",
+    reduxProgramId || defaultProgramId || "",
   );
   const [selectedProject, setSelectedProject] = useState<string>(
-    defaultProjectId || "",
+    reduxProjectId || defaultProjectId || "",
   );
   const widgets: Widget[] = [
     {
@@ -311,9 +315,25 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   } = useGetLazyProject(selectedProgram, isProgramBuilder);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(setProgramId(selectedProgram));
-    dispatch(setProjectId(selectedProject));
-  }, [selectedProgram, selectedProject, dispatch]);
+    if (reduxProgramId && !selectedProgram) {
+      setSelectedProgram(reduxProgramId);
+    }
+    if (reduxProjectId && !selectedProject) {
+      setSelectedProject(reduxProjectId);
+    }
+  }, [reduxProgramId, reduxProjectId, selectedProgram, selectedProject]);
+
+  const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedProgram(val);
+    dispatch(setProgramId(val));
+  };
+
+  const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedProject(val);
+    dispatch(setProjectId(val));
+  };
 
   return (
     <div className="bg-white shadow-lg border border-gray-100 rounded-lg h-screen max-w-78 min-w-78 flex flex-col sticky top-0">
@@ -328,7 +348,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
           <div className="relative">
             <select
               value={selectedProgram}
-              onChange={(e) => setSelectedProgram(e.target.value)}
+              onChange={handleProgramChange}
               className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Add program or select</option>
@@ -367,7 +387,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
             <div className="relative">
               <select
                 value={selectedProject}
-                onChange={(e) => setSelectedProject(e.target.value)}
+                onChange={handleProjectChange}
                 className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-500 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">
