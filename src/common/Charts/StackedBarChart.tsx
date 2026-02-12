@@ -216,30 +216,26 @@ export default function StackedBarChart({
       const usedNames = new Set<string>();
 
       const getUniqueSheetName = (name: string, id: string) => {
-  const safeName = (name || "Sheet")
-    .replace(/[:/?*[\]\\]/g, " ")
-    .trim();
+        const safeName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
 
-  const fullName = `${safeName}_${id}`;
+        const fullName = `${safeName}_${id}`;
 
-  // Enforce Excel 31 character limit
-  let finalName = fullName.length > 31
-    ? fullName.substring(0, 31)
-    : fullName;
+        // Enforce Excel 31 character limit
+        let finalName =
+          fullName.length > 31 ? fullName.substring(0, 31) : fullName;
 
-  let counter = 1;
+        let counter = 1;
 
-  while (usedNames.has(finalName.toLowerCase())) {
-    const suffix = `_${counter}`;
-    const base = fullName.substring(0, 31 - suffix.length);
-    finalName = base + suffix;
-    counter++;
-  }
+        while (usedNames.has(finalName.toLowerCase())) {
+          const suffix = `_${counter}`;
+          const base = fullName.substring(0, 31 - suffix.length);
+          finalName = base + suffix;
+          counter++;
+        }
 
-  usedNames.add(finalName.toLowerCase());
-  return finalName;
-};
-
+        usedNames.add(finalName.toLowerCase());
+        return finalName;
+      };
 
       leafCharts.forEach((node: any) => {
         ids.push(node.id);

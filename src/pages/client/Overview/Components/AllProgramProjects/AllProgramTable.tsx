@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Edit, Eye, Flag, Trash2, ArrowDownUp } from "lucide-react";
 import { useState, useMemo } from "react";
 
@@ -23,6 +24,8 @@ import { Badge } from "@/components/ui/badge";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { useDeleteProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -208,6 +211,7 @@ const AllProgramTable = ({
   const [sortBy, setSortBy] = useState<SortField>("name");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const navigate = useNavigate();
+  const [deleteProject] = useDeleteProjectMutation();
 
   const handleViewProject = (project: StaffEmployeeProject) => {
     // setSelectedProject(project);
@@ -289,6 +293,24 @@ const AllProgramTable = ({
     { label: "Action" },
   ];
 
+ const handleDelete = async (id: string) => {
+     try {
+       const result = await Swal.fire({
+         title: "Are you sure?",
+         text: "This action cannot be undone!",
+         icon: "warning",
+         showCancelButton: true,
+         confirmButtonColor: "#d33",
+       });
+ 
+       if (result.isConfirmed) {
+         await deleteProject(id).unwrap();
+         Swal.fire("Deleted!", "Employee removed.", "success");
+       }
+     } catch (err: any) {
+       Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
+     }
+   };
   return (
     <Card className="shadow-none border-none w-full">
       <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full min-h-[420px]">
@@ -381,14 +403,15 @@ const AllProgramTable = ({
                             variant="ghost"
                             size="sm"
                             onClick={() => handleViewProject(project)}
+                            className="cursor-pointer"
                           >
-                            <Eye className="w-4 h-4 text-[#1C73E0]" />
+                            <Eye className="w-4 h-4 text-[#1C73E0] ``" />
                           </Button>
-                          <Button variant="ghost" size="sm">
-                            <Edit className="w-4 h-4 text-[#169E7B]" />
+                          <Button variant="ghost" size="sm" className="cursor-pointer">
+                            <Edit className="w-4 h-4 text-[#169E7B] ``" />
                           </Button>
-                          <Button variant="ghost" size="sm">
-                            <Trash2 className="w-4 h-4 text-[#B00020]" />
+                          <Button onClick={() => handleDelete(project.id)} variant="ghost" size="sm" className="cursor-pointer">
+                            <Trash2 className="w-4 h-4 text-[#B00020] " />
                           </Button>
                         </div>
                       </TableCell>
