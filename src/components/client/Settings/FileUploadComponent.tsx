@@ -7,6 +7,7 @@ interface FileUploadProps {
   requirements: string;
   buttonText: string;
   className?: string;
+  onFileUpload?: (file: File) => void;
 }
 
 const FileUpload = ({
@@ -15,7 +16,9 @@ const FileUpload = ({
   requirements,
   buttonText,
   className = "",
+  onFileUpload,
 }: FileUploadProps) => {
+  console.log(onFileUpload);
   return (
     <div className={className}>
       <label className="block text-sm font-medium text-gray-900 mb-2">

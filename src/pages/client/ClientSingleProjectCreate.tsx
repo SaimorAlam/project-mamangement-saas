@@ -20,7 +20,13 @@ function ClientSingleProjectCreate() {
   return (
     <div className="min-h-screen bg-white mx-auto overflow-x-scroll">
       {currentView === "upload" ? (
-        <FileUpload onFileUpload={handleFileUpload} />
+        <FileUpload
+          label="Upload Project File"
+          description="Upload your project file here"
+          requirements="File format: .xlsx, .xls, .csv"
+          buttonText="Upload"
+          onFileUpload={handleFileUpload}
+        />
       ) : (
         <SheetViewPage />
       )}
