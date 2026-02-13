@@ -48,7 +48,7 @@ const StaffEmployeeDashboardHeader = () => {
 
   return (
     <div>
-      <div className="flex items-start gap-5 py-5 justify-between">
+      <div className="flex flex-col md:flex-row items-start gap-5 py-5 justify-between">
         {/* Greeting */}
         <div className="max-w-xl flex items-center gap-4">
           <SidebarTrigger className="md:hidden shrink-0" />
