@@ -21,6 +21,7 @@ import ViewerPanelAlfalaBuilders from "@/pages/viewerPanel/ViewerPanelAlfalaBuil
 import ViewerPanelAllProgram from "@/pages/viewerPanel/ViewerPanelAllProgram";
 import FavoriteProjects from "@/pages/viewerPanel/Favorite/FavoriteProjects";
 import AllProject from "@/pages/viewerPanel/ViewerPanelOverview/Components/AllProject";
+import ProfilePage from "@/pages/commonPage/ProfilePage";
 
 export default function getViewerPanelRoutes() {
   return [
@@ -87,5 +88,6 @@ export default function getViewerPanelRoutes() {
     //   path: "user-activity-log",
     //   element: <ViewerPanelUserActivityLog />,
     // },
+    { path: "profile", element: <ProfilePage /> },
   ];
 }

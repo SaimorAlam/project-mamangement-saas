@@ -24,6 +24,7 @@ import StaffEmployeeStateCardDetails from "@/pages/staffEmployee/StaffEmployeeSt
 import StaffEmployeeProjectDetail from "@/pages/staffEmployee/StaffEmployeeProjectDetail";
 import UploadProject from "@/components/staffEmployee/Projects/UploadProject";
 import DashboardCardProjects from "@/components/staffEmployee/Overview/DashboardCardProjects";
+import ProfilePage from "@/pages/commonPage/ProfilePage";
 
 export default function getStaffEmployeeRoutes() {
   return [
@@ -96,5 +97,6 @@ export default function getStaffEmployeeRoutes() {
       path: "projects/:id",
       element: <StaffEmployeeProjectDetail />,
     },
+    { path: "profile", element: <ProfilePage /> },
   ];
 }

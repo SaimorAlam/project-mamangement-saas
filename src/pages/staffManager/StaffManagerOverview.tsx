@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import { useGetStaffEmpStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import BoxContainer from "@/common/BoxContainer";
 import OverDueChart from "./../../components/staffManager/overview/OverDueChart";
 import ProjectStatusChart from "./../../components/staffManager/overview/ProjectStatusChart";
 import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";

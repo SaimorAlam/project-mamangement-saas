@@ -32,6 +32,7 @@ import ClientAllProgramContainer from "@/pages/client/ClientAllProgramContainer"
 import ProgramOverviewContainer from "@/pages/client/Program/ProgramOverviewContainer";
 import ProjectReviewContainer from "@/pages/client/ProjectReview/ProjectReviewContainer";
 import ClientOverviewContainer from "@/pages/client/Overview/ClientOverviewContainer";
+import ProfilePage from "@/pages/commonPage/ProfilePage";
 
 export function getClientRoutes() {
   return [
@@ -127,5 +128,6 @@ export function getClientRoutes() {
     { path: "settings", element: <ClientSettings /> },
     { path: "work-in-progress", element: <ClientWorkInProgress /> },
     { path: "user-activity-log", element: <ClientUserActivityLog /> },
+    { path: "profile", element: <ProfilePage /> },
   ];
 }

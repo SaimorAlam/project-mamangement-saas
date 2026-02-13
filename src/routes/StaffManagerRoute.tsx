@@ -29,6 +29,7 @@ import StaffManagerProjectDetail from "@/pages/staffManager/StaffManagerProjectD
 import ProgramDetailsPage from "@/pages/staffManager/ProgramDetailsPage";
 import DashboardCardProjects from "@/pages/staffManager/DashboardCardProjects";
 import ClientProjectBuilder from "@/pages/client/ProjectBuilder/ClientProjectBuilder";
+import ProfilePage from "@/pages/commonPage/ProfilePage";
 
 export function getStaffManagerRoutes() {
   return [
@@ -110,5 +111,6 @@ export function getStaffManagerRoutes() {
       path: "state-card/:cardTitle",
       element: <StaffManagerStateCardDetails />,
     },
+    { path: "profile", element: <ProfilePage /> },
   ];
 }
