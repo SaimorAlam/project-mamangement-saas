@@ -27,6 +27,7 @@ import { FaSpinner } from "react-icons/fa";
 import { ConfirmAlertModal } from "@/common/Modal/ConfirmAlertModal";
 import { Badge } from "@/components/ui/badge";
 import DeleteModal from "@/common/Modal/DeleteModal";
+import { toast } from "sonner";
 
 const formatDate = (date: string | null) => {
   if (!date) return "Not Set";
@@ -82,8 +83,10 @@ export default function StaffEmployeeProjectDetail() {
   const handleRemove = async () => {
     try {
       await removeProjectFromFavorite(id).unwrap();
-      navigate("/staff-manager-panel");
+      toast.success("Project removed from favorite");
+      navigate("/staff-employee-panel");
     } catch (err) {
+      toast.error("Failed to remove favorite");
       console.error("Failed to remove favorite", err);
     }
   };

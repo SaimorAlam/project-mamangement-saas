@@ -111,7 +111,7 @@ const AllProgramProject = () => {
     return (
       <>
         <h4 className="mb-3 text-gray-900 text-xl font-semibold">
-          All Project
+          Assigned Programs & Projects
         </h4>
         <SkeletonLoading count={3} height="h-66" />
       </>
@@ -142,7 +142,7 @@ const AllProgramProject = () => {
     return (
       <>
         <h4 className="mb-3 text-gray-900 text-xl font-semibold">
-          All Project
+          Assigned Programs & Projects
         </h4>
         <div className="border border-[#E2E8F0] rounded-lg flex items-center justify-center h-96 text-gray-500 text-xl">
           Yet no projects found
@@ -155,7 +155,9 @@ const AllProgramProject = () => {
     <div className="pb-6 min-h-[500px]">
       {/* Header  */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6">
-        <h4 className=" text-gray-900 text-xl font-semibold">All Project</h4>
+        <h4 className=" text-gray-900 text-xl font-semibold">
+          Assigned Programs & Projects
+        </h4>
         <div className="flex items-center gap-3">
           {/* View Toggle */}
           <div className="flex items-center bg-white gap-3">

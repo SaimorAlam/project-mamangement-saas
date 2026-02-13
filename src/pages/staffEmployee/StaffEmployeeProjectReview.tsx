@@ -42,7 +42,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import DashboardStats from "@/components/staffEmployee/Overview/DashboardStats";
+import ReviewCards from "@/components/staffEmployee/review/ReviewCards";
 
 interface IProjectTableProps {
   title?: string;
@@ -228,7 +228,7 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
 
   return (
     <div className="min-h-screen py-6">
-      <DashboardStats />
+      <ReviewCards />
       <div className="mt-6">
         <div className="bg-white rounded-lg border border-gray-200 grow">
           <div className="flex justify-between px-6 py-4 border-b border-gray-200">

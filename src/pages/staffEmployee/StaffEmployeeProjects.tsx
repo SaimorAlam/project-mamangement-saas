@@ -1,4 +1,4 @@
-import ProjectStats from "@/components/staffManager/Projects/ProjectStats";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import Pagination from "@/common/Pagination";
@@ -21,6 +21,7 @@ import DropdownSelect from "@/common/DropdownSelect";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import { useGetEmployeeAllProjectsQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
+import { useSelector } from "react-redux";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -34,7 +35,6 @@ const priorityOrder: Record<string, number> = {
   MEDIUM: 2,
   LOW: 1,
 };
-
 
 const StaffEmployeeProjects = ({
   title = "All Projects",
@@ -51,7 +51,10 @@ const StaffEmployeeProjects = ({
   const [editProject] = useState<UpdateProjectPayload | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
+  const employeeId = useSelector((state: any) => state.auth.user?.userId);
+
   const { data, isLoading, error } = useGetEmployeeAllProjectsQuery({
+    employeeId: employeeId || "",
     priority: priorityFilter === "ALL" ? undefined : priorityFilter,
     status: statusFilter === "ALL" ? undefined : statusFilter,
     search: search || undefined,
@@ -123,10 +126,10 @@ const StaffEmployeeProjects = ({
   const formatDate = (date?: string) =>
     date
       ? new Date(date).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
       : "-";
 
   const handleUpdateProject = async (project: UpdateProjectPayload) => {
@@ -220,79 +223,82 @@ const StaffEmployeeProjects = ({
           {isLoading ? (
             <SkeletonLoading count={10} height="h-10" direction="vertical" />
           ) : (
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  {[
-                    "name",
-                    "assignStaff",
-                    "priority",
-                    "deadline",
-                    "progress",
-                  ].map(
-                    (col) =>
-                      col && (
-                        <th
-                          key={col}
-                          className="px-6 py-3 text-left text-xs font-semibold capitalize"
-                        >
-                          {col.replace(/([A-Z])/g, " $1")}
-                        </th>
-                      ),
-                  )}
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr>
-                  {sortedProjects.length === 0 && (
-                    <div className="text-gray-400 p-10 text-center">
-                      No projects found.
-                    </div>
-                  )}
-                </tr>
-                {sortedProjects.map((project) => (
-                  <tr key={project.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">{project.name}</td>
-                    <td className="px-6 py-4">
-                      {project.projectEmployees?.length > 0 ? (
-                        <RenderStaffAvatars
-                          staff={project.projectEmployees.map(
-                            (emp: {
-                              user?: { name: string; image: string };
-                            }) => ({
-                              name: emp.user?.name || "Staff",
-                              avatar:
-                                emp.user?.image ||
-                                "https://ui-avatars.com/api/?name=Staff",
-                            }),
-                          )}
-                        />
-                      ) : (
-                        <span className="text-gray-500 text-sm">No Staff</span>
+            <>
+              {sortedProjects.length === 0 ? (
+                <div className="text-gray-400 p-10 text-center ">
+                  Yet no projects found.
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      {[
+                        "name",
+                        "assignStaff",
+                        "priority",
+                        "deadline",
+                        "progress",
+                      ].map(
+                        (col) =>
+                          col && (
+                            <th
+                              key={col}
+                              className="px-6 py-3 text-left text-xs font-semibold capitalize"
+                            >
+                              {col.replace(/([A-Z])/g, " $1")}
+                            </th>
+                          ),
                       )}
-                    </td>
+                    </tr>
+                  </thead>
 
-                    <td className="px-6 py-4">
-                      <PriorityDropdown defaultPriority={project.priority} />
-                    </td>
+                  <tbody>
+                    {sortedProjects.map((project) => (
+                      <tr key={project.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4">{project.name}</td>
+                        <td className="px-6 py-4">
+                          {project.projectEmployees?.length > 0 ? (
+                            <RenderStaffAvatars
+                              staff={project.projectEmployees.map(
+                                (emp: {
+                                  user?: { name: string; image: string };
+                                }) => ({
+                                  name: emp.user?.name || "Staff",
+                                  avatar:
+                                    emp.user?.image ||
+                                    "https://ui-avatars.com/api/?name=Staff",
+                                }),
+                              )}
+                            />
+                          ) : (
+                            <span className="text-gray-500 text-sm">
+                              No Staff
+                            </span>
+                          )}
+                        </td>
 
-                    {/* <td className="px-6 py-4">{formatDate(project.startDate)}</td> */}
+                        <td className="px-6 py-4">
+                          <PriorityDropdown
+                            defaultPriority={project.priority}
+                          />
+                        </td>
 
-                    <td className="px-6 py-4">
-                      {formatDate(project.deadline)}
-                    </td>
+                        {/* <td className="px-6 py-4">{formatDate(project.startDate)}</td> */}
 
-                    <td className="px-6 py-4 w-[180px]">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-xs text-gray-500">
-                          {project.progress}%
-                        </span>
-                        <Progress value={project.progress} />
-                      </div>
-                    </td>
+                        <td className="px-6 py-4">
+                          {formatDate(project.deadline)}
+                        </td>
 
-                    {/* <td className="px-6 py-4">
+                        <td className="px-6 py-4 w-[180px]">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-xs text-gray-500">
+                              {project.progress}%
+                            </span>
+                            <Progress value={project.progress} />
+                          </div>
+                        </td>
+
+                        {/* <td className="px-6 py-4">
                     <button
                       onClick={() => {
                         setEditProject(project);
@@ -302,10 +308,12 @@ const StaffEmployeeProjects = ({
                       <FaEdit className="text-blue-600" />
                     </button>
                   </td> */}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </>
           )}
 
           <Pagination
