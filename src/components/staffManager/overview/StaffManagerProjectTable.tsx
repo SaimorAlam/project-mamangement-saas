@@ -25,6 +25,7 @@ import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import DeleteModal from "@/common/Modal/DeleteModal";
 import { useDeleteManagerProjectMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import EditProjectModal from "./EditProjectModal";
+import { useNavigate } from "react-router-dom";
 
 export type ProjectStatus =
   | "LIVE"
@@ -200,6 +201,7 @@ const ProjectModal = ({
 const StaffManagerProjectTable = ({
   projects,
 }: StaffEmployeeProjectTableProps) => {
+  const navigate = useNavigate();
   const [selectedProject, setSelectedProject] =
     useState<StaffEmployeeProject | null>(null);
   const [open, setOpen] = useState(false);
@@ -238,7 +240,10 @@ const StaffManagerProjectTable = ({
             {projects?.map((project) => (
               <TableRow
                 key={project.id}
-                className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
+                className="border-b border-gray-200 hover:bg-gray-100 odd:bg-white even:bg-[#F7F9FA]"
+                onClick={() =>
+                  navigate(`/staff-manager-panel/projects/${project.id}`)
+                }
               >
                 <TableCell className="px-6 py-3.5 font-medium">
                   {project.programName || "Program Name"}

@@ -2,14 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { X, Settings } from "lucide-react";
 import { io, Socket } from "socket.io-client";
 import { Button } from "@/components/ui/button";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useGetNotificationQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-
 
 interface NotificationApiItem {
   id: string;
@@ -26,12 +21,12 @@ interface NotificationApiItem {
 export interface NotificationAction {
   label: string;
   variant?:
-  | "default"
-  | "destructive"
-  | "outline"
-  | "secondary"
-  | "ghost"
-  | "link";
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link";
   onClick: () => void;
 }
 
@@ -80,7 +75,7 @@ const parseContext = (context: string) => {
 };
 
 const mapApiToNotificationItem = (
-  api: NotificationApiItem
+  api: NotificationApiItem,
 ): NotificationItem => {
   const { action, target } = parseContext(api.context);
 
@@ -130,11 +125,12 @@ export default function StaffEmployeeNotificationModal({
   onClose,
   className,
 }: NotificationModalProps) {
-  const socketURL = "https://gfwndvfv-8080.inc1.devtunnels.ms"
+  const socketURL = "https://gfwndvfv-8080.inc1.devtunnels.ms";
   // const socketURL = "https://lawaladmin.sakibalhasa.xyz/"
   const [activeTab, setActiveTab] = useState("all");
-  const [realtimeNotifications, setRealtimeNotifications] =
-    useState<NotificationItem[]>([]);
+  const [realtimeNotifications, setRealtimeNotifications] = useState<
+    NotificationItem[]
+  >([]);
 
   const { data } = useGetNotificationQuery();
 
@@ -199,15 +195,12 @@ export default function StaffEmployeeNotificationModal({
 
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black/30 z-40"
-        onClick={onClose}
-      ></div>
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose}></div>
 
       <div
         className={cn(
-          "absolute right-14 top-15 h-[85vh] w-96 bg-white rounded-lg z-50 flex flex-col shadow-xl",
-          className
+          "absolute right-0 top-2 md:top-15 h-[85vh] w-96 bg-white rounded-lg z-50 flex flex-col shadow-xl",
+          className,
         )}
       >
         {/* Header */}
@@ -234,7 +227,7 @@ export default function StaffEmployeeNotificationModal({
                   "text-sm font-medium transition-colors pb-1 cursor-pointer",
                   activeTab === tab.id
                     ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-gray-500 hover:text-gray-700",
                 )}
               >
                 {tab.label}
@@ -254,7 +247,7 @@ export default function StaffEmployeeNotificationModal({
                 key={notification.id}
                 className={cn(
                   "p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors",
-                  notification.status === "new" && "bg-blue-50"
+                  notification.status === "new" && "bg-blue-50",
                 )}
               >
                 <div className="flex items-center space-x-3">
@@ -271,7 +264,7 @@ export default function StaffEmployeeNotificationModal({
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-900">
                       <span className="font-medium">
-                        {notification.user.name}
+                        {/* {notification.user.name} */}
                       </span>{" "}
                       {notification.action}{" "}
                       {notification.target && (
