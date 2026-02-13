@@ -9,6 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getStaffManagerSidebarItems } from "./staffManagerSidebarItem";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffManagerHeaderContext";
@@ -25,20 +26,14 @@ const StaffManagerDashboardHeader = () => {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const allRoutes = StaffManagerSidebarItems.flatMap(
-    (group) => group.items
-  );
-  const currentRoute = allRoutes.find(
-    (route) => route.path === currentPath
-  );
+  const allRoutes = StaffManagerSidebarItems.flatMap((group) => group.items);
+  const currentRoute = allRoutes.find((route) => route.path === currentPath);
 
   const previewButtonPaths = [
     "/staff-manager-panel/projects/upload-submission",
     "/staff-manager-panel/project-builder",
   ];
-  const saveDraftButtonPaths = [
-    "/staff-manager-panel/project-builder",
-  ];
+  const saveDraftButtonPaths = ["/staff-manager-panel/project-builder"];
   const publishButtonPaths = [
     "/staff-manager-panel/projects/upload-submission",
     "/staff-manager-panel/project-builder",
@@ -53,14 +48,17 @@ const StaffManagerDashboardHeader = () => {
 
   return (
     <div className="flex flex-col gap-2 py-5">
-      <div className="flex items-center justify-between">
-        <div className="min-w-0">
-          <h1 className="text-2xl md:text-[32px] font-semibold truncate">
-            Good Morning {userName || name}, 👋
-          </h1>
-          <p className="text-sm md:text-base text-gray-500 truncate">
-            This is dashboard overview of Acme Corporation
-          </p>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
+        <div className="flex items-center gap-4 min-w-0">
+          <SidebarTrigger className="md:hidden shrink-0" />
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-[32px] font-semibold truncate">
+              Good Morning {userName || name}, 👋
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 truncate">
+              This is dashboard overview of Acme Corporation
+            </p>
+          </div>
         </div>
         {/* Search */}
         <GlobalSearch />
@@ -109,7 +107,9 @@ const StaffManagerDashboardHeader = () => {
               leftIcon={<Upload className="text-2xl" />}
               title="Upload Submission"
               type="Primary"
-              onClick={() => navigate("/staff-manager-panel/projects/upload-submission")}
+              onClick={() =>
+                navigate("/staff-manager-panel/projects/upload-submission")
+              }
             />
           )}
         </div>
@@ -131,14 +131,13 @@ const StaffManagerDashboardHeader = () => {
             {currentRoute ? (
               <BreadcrumbItem>
                 <BreadcrumbPage className="text-[#356DF0] text-sm flex items-center justify-center gap-1 ">
-                  {currentRoute.icon &&
-                    React.isValidElement(currentRoute.icon)
+                  {currentRoute.icon && React.isValidElement(currentRoute.icon)
                     ? cloneElement(
-                      currentRoute.icon as React.ReactElement<{
-                        className?: string;
-                      }>,
-                      { className: "w-4 h-4" }
-                    )
+                        currentRoute.icon as React.ReactElement<{
+                          className?: string;
+                        }>,
+                        { className: "w-4 h-4" },
+                      )
                     : null}
                   {currentRoute.name}
                 </BreadcrumbPage>
@@ -154,7 +153,6 @@ const StaffManagerDashboardHeader = () => {
           <p className="text-sm text-gray-500">{breadcrumb}</p>
         )}
       </div>
-
     </div>
   );
 };

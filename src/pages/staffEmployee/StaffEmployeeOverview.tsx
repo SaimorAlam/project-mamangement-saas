@@ -14,18 +14,18 @@ const clientData = [
     value: 0,
     growth: 0,
     growth_type: "up",
-    description: "",
+    description: "Since last month",
     link_text: "View all",
     link: "/staff-employee-panel/projects",
     icon: "FolderIcon",
-    icon_bg_color: "#069576",
+    icon_bg_color: "#4881FF",
   },
   {
     title: "Submitted for Review",
     value: 0,
     growth: 0,
     growth_type: "up",
-    description: "",
+    description: "Awaiting for approval",
     link_text: "View all",
     link: "/staff-employee-panel/projects/status/PENDING",
     icon: "FolderIcon",
@@ -36,29 +36,29 @@ const clientData = [
     value: 0,
     growth: 0,
     growth_type: "up",
-    description: "",
+    description: "3 new file returned",
     link_text: "View all",
     link: "/staff-employee-panel/projects/status/PROBLEM",
     icon: "LiveProject",
-    icon_bg_color: "#756CF5",
+    icon_bg_color: "#F5B31A",
   },
   {
     title: "In live",
     value: 0,
     growth: 0,
     growth_type: "up",
-    description: "",
+    description: "Active and published",
     link_text: "View all",
     link: "/staff-employee-panel/projects/status/LIVE",
     icon: "ProjectInDraft",
-    icon_bg_color: "#4881FF",
+    icon_bg_color: "#169E7B",
   },
   {
     title: "Submission Overdue",
     value: 0,
     growth: null,
     growth_type: "down",
-    description: "",
+    description: "Project data haven't submitted",
     link_text: "View all",
     link: "/staff-employee-panel/projects/status/OVERDUE",
     icon: "SubmissionOverdue",
@@ -109,7 +109,7 @@ const StaffEmployeeOverview = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-4">
         <div className="space-y-8 col-span-2">
-          <div className="flex justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
             <Card className="w-full border-[#E2E8F0] shadow-none">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-7">
                 <h2 className="text-xl font-semibold my-2">

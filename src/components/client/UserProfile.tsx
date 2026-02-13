@@ -15,13 +15,11 @@ import { toast } from "sonner";
 import { logOut } from "@/store/Slices/AuthSlice/authSlice";
 
 interface UserProfileButtonProps {
-  onProfileClick?: () => void;
   onSettingsClick?: () => void;
   state?: "expanded" | "collapsed";
 }
 
 export default function UserProfile({
-  onProfileClick,
   onSettingsClick,
   state,
 }: UserProfileButtonProps) {
@@ -99,22 +97,24 @@ export default function UserProfile({
         className="w-56   mt-2 border border-[#E2E8F0] bg-white space-y-2 focus:outline-none focus-visible:outline-none"
       >
         <DropdownMenuItem
-          onClick={onProfileClick}
+          asChild
           className="cursor-pointer focus:outline-none focus-visible:outline-none"
         >
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
-              <img
-                src={profileImage || "/placeholder.svg"}
-                alt={name}
-                className="w-full h-full object-cover"
-              />
+          <Link to="profile">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
+                <img
+                  src={profileImage || "/placeholder.svg"}
+                  alt={name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">{name}</span>
+                <span className="text-xs text-gray-500">{role}</span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{name}</span>
-              <span className="text-xs text-gray-500">{role}</span>
-            </div>
-          </div>
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator className="border border-[#E2E8F0] h-px" />
@@ -123,12 +123,12 @@ export default function UserProfile({
           Settings
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={onProfileClick} className="cursor-pointer">
-          Profile
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link to="profile">Profile</Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={onProfileClick} className="cursor-pointer">
-          <Link to="/user-activity-log">Activity Log</Link>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link to="user-activity-log">Activity Log</Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator className="border border-[#E2E8F0] " />

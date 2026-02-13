@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import DashboardPanelStatsCard from "@/common/DashboardPanelStatsCard";
 import { useGetStaffEmpStateCartsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import BoxContainer from "@/common/BoxContainer";
 import OverDueChart from "./../../components/staffManager/overview/OverDueChart";
 import ProjectStatusChart from "./../../components/staffManager/overview/ProjectStatusChart";
 import SmUpcomingDeadline from "@/components/staffManager/overview/SmUpcomingDeadline";
@@ -113,7 +112,7 @@ const StaffManagerOverview = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-4">
         <div className="space-y-8 col-span-2">
-          <div className="flex justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
             <Card className="w-full border-[#E2E8F0] shadow-none">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-7">
                 <h2 className="text-xl font-semibold my-2">

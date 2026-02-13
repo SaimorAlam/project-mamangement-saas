@@ -105,7 +105,7 @@ const OverDueChart = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg p-4 min-w-88 min-h-[400px]">
+    <div className="bg-white rounded-lg p-4 min-w-full md:min-w-88 min-h-[400px] overflow-hidden">
       {error && (
         <div className="text-center text-sm text-red-600 py-6">
           {getErrorMessage(error)}
