@@ -23,11 +23,13 @@ import StaffEmployeeCreateTicket from "@/pages/staffEmployee/StaffEmployeeCreate
 import StaffEmployeeStateCardDetails from "@/pages/staffEmployee/StaffEmployeeStateCardDetails";
 import StaffEmployeeProjectDetail from "@/pages/staffEmployee/StaffEmployeeProjectDetail";
 import UploadProject from "@/components/staffEmployee/Projects/UploadProject";
+import DashboardCardProjects from "@/components/staffEmployee/Overview/DashboardCardProjects";
 
 export default function getStaffEmployeeRoutes() {
   return [
     { index: true, element: <StaffEmployeeOverview /> },
     { path: "projects", element: <StaffEmployeeProjects /> },
+    { path: "projects/status/:status", element: <DashboardCardProjects /> },
     { path: "upload-submission", element: <UploadProject /> },
     { path: "carlyle-hall", element: <StaffEmployeeCarlyleHall /> },
     { path: "employees", element: <StaffEmployeeEmployees /> },

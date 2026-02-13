@@ -31,10 +31,21 @@ import ProgramOverview from "@/pages/client/Program/ProgramOverview";
 import ClientAllProgramContainer from "@/pages/client/ClientAllProgramContainer";
 import ProgramOverviewContainer from "@/pages/client/Program/ProgramOverviewContainer";
 import ProjectReviewContainer from "@/pages/client/ProjectReview/ProjectReviewContainer";
+import ClientOverviewContainer from "@/pages/client/Overview/ClientOverviewContainer";
 
 export function getClientRoutes() {
   return [
-    { index: true, element: <ClientOverview /> },
+    {
+      path: "",
+      element: <ClientOverviewContainer />,
+      children: [
+        { index: true, element: <ClientOverview /> },
+        {
+          path: "overview/project-details/:projectId",
+          element: <ProjectDetails />,
+        },
+      ],
+    },
 
     { path: "employees", element: <Employee /> },
 

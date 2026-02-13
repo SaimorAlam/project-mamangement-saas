@@ -116,7 +116,7 @@ const EmployeeTable = ({
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getRoleBadgeColor(
-                      employee.user.role
+                      employee.user.role,
                     )}`}
                   >
                     {employee.user.role}
@@ -151,7 +151,7 @@ const EmployeeTable = ({
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(
-                      employee.user.status ? "Active" : "In Active"
+                      employee.user.status ? "Active" : "In Active",
                     )}`}
                   >
                     {employee.user.status ? "Active" : "In Active"}

@@ -26,23 +26,29 @@ const ViewerPanelProjects = () => {
         <ViewerPanelSkeleton />
       ) : (
         <div>
-          <div className="flex gap-6 items-stretch">
-            <ProjectInformation projectData={projectData} />
-            <ProgressRing />
-            <EmployeeWorkloadChart />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-6 relative">
+            <div className="h-full">
+              <ProjectInformation projectData={projectData} />
+            </div>
+            <div className="h-full">
+              <ProgressRing />
+            </div>
+            <div className="h-full md:col-span-2 xl:col-span-1">
+              <EmployeeWorkloadChart />
+            </div>
           </div>
-          <div className="flex gap-6 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
             <ProgressChart />
             <ProjectCostChart />
           </div>
           <div>
-            <div className="flex gap-6 mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
               <CostOverview />
               <PhasePlan />
             </div>
           </div>
           <div className="flex justify-end mt-6">
-            <img src="man.png" alt="Not Found" />
+            <img src="man.png" alt="Not Found" className="max-w-full h-auto" />
           </div>
         </div>
       )}

@@ -33,7 +33,7 @@ const EditEmployeeModal = ({
 
   const [skillInput, setSkillInput] = useState("");
   const [projectInput, setProjectInput] = useState("");
-
+  const inputRef1 = useRef<HTMLInputElement>(null);
   const [updateEmployee, { isLoading }] = useUpdateEmployeeMutation();
 
   // Reset form when modal opens or employee changes
@@ -59,7 +59,7 @@ const EditEmployeeModal = ({
   const removeSkillTag = (skillToRemove: string) => {
     setValue(
       "skills",
-      skills.filter((s) => s !== skillToRemove)
+      skills.filter((s) => s !== skillToRemove),
     );
   };
 
@@ -73,7 +73,7 @@ const EditEmployeeModal = ({
   const removeProjectTag = (projectToRemove: string) => {
     setValue(
       "projects",
-      projects.filter((p) => p !== projectToRemove)
+      projects.filter((p) => p !== projectToRemove),
     );
   };
 
@@ -112,7 +112,7 @@ const EditEmployeeModal = ({
       if (err && typeof err === "object" && "data" in err) {
         const errorData = (err as { data?: { message?: string } }).data;
         toast.error(
-          errorData?.message || "Failed to add employee. Please try again."
+          errorData?.message || "Failed to add employee. Please try again.",
         );
       } else {
         toast.error("Something went wrong. Please try again.");
@@ -207,7 +207,7 @@ const EditEmployeeModal = ({
               control={control}
               rules={{ required: "Joined date is required" }}
               render={({ field }) => {
-                const inputRef = useRef<HTMLInputElement>(null);
+                const inputRef = inputRef1;
                 const openPicker = () => {
                   inputRef.current?.showPicker?.();
                   inputRef.current?.focus();

@@ -5,7 +5,7 @@ import StaffManagerTimosSuperShop from "@/pages/staffManager/StaffManagerTimosSu
 import StaffManagerProgramName from "@/pages/staffManager/StaffManagerProgramName";
 import StaffManagerProjectBuilder from "@/pages/staffManager/StaffManagerProjectBuilder";
 import StaffManagerHighwayExpansion from "@/pages/staffManager/StaffManagerHighwayExpansion";
-import StaffManagerProjectReview from "@/pages/staffManager/StaffManagerProjectReview";
+// import StaffManagerProjectReview from "@/pages/staffManager/StaffManagerProjectReview";
 import StaffManagerHelp from "@/pages/staffManager/StaffManagerHelp";
 import StaffManagerSupport from "@/pages/staffManager/StaffManagerSupport";
 import StaffManagerSupportTickets from "@/pages/staffManager/StaffManagerSupportTickets";
@@ -14,26 +14,31 @@ import StaffManagerProductTour from "@/pages/staffManager/StaffManagerProductTou
 import StaffManagerSettings from "@/pages/staffManager/StaffManagerSettings";
 import StaffManagerWorkInProgress from "@/pages/staffManager/StaffManagerWorkInProgress";
 import StaffManagerUserActivityLog from "@/pages/staffManager/StaffManagerUsersActivityLog";
-import StaffManagerCarlyleHall from '@/pages/staffManager/StaffManagerCarlyleHall';
-import StaffManagerEmployees from '@/pages/staffManager/StaffManagerEmployees';
-import StaffManagerAlfalaBuilders from '@/pages/staffManager/StaffManagerAlfalaBuilders';
-import StaffManagerAllProgram from '@/pages/staffManager/StaffManagerAllProgram';
-import StaffManagerActivityLog from '@/pages/staffManager/StaffManagerActivityLog';
-import StaffManagerCreateTicket from '@/pages/staffManager/StaffManagerCreateTicket';
-import StaffManagerContactUs from '@/pages/staffManager/StaffManagerContactUs';
+import StaffManagerCarlyleHall from "@/pages/staffManager/StaffManagerCarlyleHall";
+import StaffManagerEmployees from "@/pages/staffManager/StaffManagerEmployees";
+import StaffManagerAlfalaBuilders from "@/pages/staffManager/StaffManagerAlfalaBuilders";
+import StaffManagerAllProgram from "@/pages/staffManager/StaffManagerAllProgram";
+import StaffManagerActivityLog from "@/pages/staffManager/StaffManagerActivityLog";
+import StaffManagerCreateTicket from "@/pages/staffManager/StaffManagerCreateTicket";
+import StaffManagerContactUs from "@/pages/staffManager/StaffManagerContactUs";
 // import CommingSoonPage from "@/common/CommingSoonPage";
 import StaffManagerStateCardDetails from "@/pages/staffManager/StaffManagerStateCardDetails";
 import StaffManagerUploadSubmission from "@/pages/staffManager/StaffManagerUploadSubmission";
 import AllProjectsReview from "@/pages/staffManager/AllProjectsReview";
 import StaffManagerProjectDetail from "@/pages/staffManager/StaffManagerProjectDetail";
 import ProgramDetailsPage from "@/pages/staffManager/ProgramDetailsPage";
+import DashboardCardProjects from "@/pages/staffManager/DashboardCardProjects";
 
 export function getStaffManagerRoutes() {
   return [
     { index: true, element: <StaffManagerOverview /> },
     { path: "projects", element: <StaffManagerProjects /> },
     { path: "projects/:id", element: <StaffManagerProjectDetail /> },
-    { path: "projects/upload-submission", element: <StaffManagerUploadSubmission />  },
+    { path: "projects/status/:status", element: <DashboardCardProjects /> },
+    {
+      path: "projects/upload-submission",
+      element: <StaffManagerUploadSubmission />,
+    },
     { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
     { path: "employees", element: <StaffManagerEmployees /> },
     {
@@ -59,12 +64,16 @@ export function getStaffManagerRoutes() {
     },
     {
       path: "project-review",
-      element: <StaffManagerProjectReview />,
-      children: [
-        { path: "all-projects", element: <AllProjectsReview /> },
-        { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
-      ],
+      element: <AllProjectsReview />,
     },
+    // {
+    //   path: "project-review",
+    //   element: <StaffManagerProjectReview />,
+    //   children: [
+    //     { path: "all-projects", element: <AllProjectsReview /> },
+    //     { path: "carlyle-hall", element: <StaffManagerCarlyleHall /> },
+    //   ],
+    // },
     { path: "activity-log", element: <StaffManagerActivityLog /> },
     {
       path: "help",
@@ -97,7 +106,7 @@ export function getStaffManagerRoutes() {
     },
     {
       path: "state-card/:cardTitle",
-      element: <StaffManagerStateCardDetails/>,
+      element: <StaffManagerStateCardDetails />,
     },
   ];
 }

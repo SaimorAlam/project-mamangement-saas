@@ -26,10 +26,8 @@ const DropdownSelect = ({
         </SelectTrigger>
         <SelectContent className="border border-[#CBD5E1] bg-white ">
           {dropdownItem.map((item, index) => {
-            const value =
-              typeof item === "string" ? item : item.value;
-            const title =
-              typeof item === "string" ? item : item.title;
+            const value = typeof item === "string" ? item : item.value;
+            const title = typeof item === "string" ? item : item.title;
             return (
               <SelectItem
                 key={index}

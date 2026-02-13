@@ -69,7 +69,7 @@ export default function ProgressRing({
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 border border-gray-200 w-[75%] ">
+    <div className="bg-white rounded-lg p-6 border border-gray-200 w-full h-full ">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-800">{title}</h2>

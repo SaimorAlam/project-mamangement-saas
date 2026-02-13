@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -171,23 +172,19 @@ const StaffEmployeeProjectCard = ({
           {renderStatusBadge(status)}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 py-3">
-          <div className="w-full h-full flex flex-col justify-between gap-3">
-            {/* Assigned People */}
-            <div className="py-2 px-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="mb-1">Assigned People</h3>
-                  {/* Kept intentionally even if data is not available */}
-                  <RenderStaffAvatars
-                    staff={Array.from({ length: 3 }, (_, i) => ({
-                      id: i.toString(),
-                      name: `Staff ${i + 1}`,
-                      avatar: "https://randomuser.me/api/portraits/men/19.jpg",
-                    }))}
-                  />
-                </div>
-              </div>
+        {/* Assigned People */}
+        <div className="py-2 px-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="mb-1">Assigned People</h3>
+              {/* Kept intentionally even if data is not available */}
+              <RenderStaffAvatars
+                staff={Array.from({ length: 3 }, (_, i) => ({
+                  id: i.toString(),
+                  name: `Staff ${i + 1}`,
+                  avatar: "https://randomuser.me/api/portraits/men/19.jpg",
+                }))}
+              />
             </div>
 
             {/* Priority */}

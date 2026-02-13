@@ -3,11 +3,19 @@ import baseApi from "../BaseApi/BaseApi";
 
 const staffEmployeeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getStaffEmployeeOverviewCards: builder.query({
+      query: () => ({
+        url: `/employeeDashboard/dashboard`,
+        method: "GET",
+      }),
+      providesTags: ["Employee"],
+    }),
     getStaffEmployeeTopOverDue: builder.query({
       query: () => ({
         url: `/employeeDashboard/projects/top-overdue`,
         method: "GET",
       }),
+      providesTags: ["Employee"],
     }),
     getStaffEmployeeUpcomingDeadlines: builder.query({
       query: (params) => ({
@@ -15,6 +23,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "GET",
         params,
       }),
+      providesTags: ["Employee"],
     }),
     getStaffEmployeeLatestSubmissions: builder.query({
       query: (query) => {
@@ -36,16 +45,18 @@ const staffEmployeeApi = baseApi.injectEndpoints({
           params: searchParams,
         };
       },
+      providesTags: ["Employee"],
     }),
     getStaffEmployeeSubmissionStatus: builder.query({
       query: () => ({
         url: `/employeeDashboard/submission-status`,
         method: "GET",
       }),
+      providesTags: ["Employee"],
     }),
     getFavoriteProjects: builder.query<any, void>({
       query: () => `/favorites-project/me`,
-      providesTags: ["menuItems"],
+      providesTags: ["Employee"],
     }),
     addToFavouriteProject: builder.mutation<any, string>({
       query: (projectId) => ({
@@ -53,7 +64,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: { projectId },
       }),
-      invalidatesTags: ["menuItems"],
+      invalidatesTags: ["Employee"],
     }),
     removeFavouriteProject: builder.mutation({
       query: (projectId) => ({
@@ -61,15 +72,24 @@ const staffEmployeeApi = baseApi.injectEndpoints({
         method: "DELETE",
         body: { projectId: projectId },
       }),
-      invalidatesTags: ["menuItems"],
+      invalidatesTags: ["Employee"],
     }),
     getNotifications: builder.query({
       query: () => `/notification/received`,
+    }),
+    getEmployeeAllProjects: builder.query({
+      query: (params) => ({
+        url: "/project",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Employee"],
     }),
   }),
 });
 
 export const {
+  useGetStaffEmployeeOverviewCardsQuery,
   useGetStaffEmployeeTopOverDueQuery,
   useGetStaffEmployeeUpcomingDeadlinesQuery,
   useGetStaffEmployeeLatestSubmissionsQuery,
@@ -78,6 +98,7 @@ export const {
   useAddToFavouriteProjectMutation,
   useRemoveFavouriteProjectMutation,
   useGetNotificationsQuery,
+  useGetEmployeeAllProjectsQuery,
 } = staffEmployeeApi;
 
 export default staffEmployeeApi;

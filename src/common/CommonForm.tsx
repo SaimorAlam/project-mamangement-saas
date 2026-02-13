@@ -32,7 +32,6 @@ const CommonForm = <T extends Record<string, unknown>>({
 
   const onSubmit = (data: T) => {
     onSubmitRedux(data);
-    console.log(data);
   };
 
   return (

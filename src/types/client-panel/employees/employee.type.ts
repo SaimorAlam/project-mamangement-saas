@@ -56,7 +56,9 @@ export interface IAddEmployeePayload {
   notifyProjectManager: boolean;
   skills: string[];
   projects: string[];
-  role: "Employee" | "Manager" | "Viewer";
+  role: "EMPLOYEE" | "MANAGER" | "VIEWER";
+  notifyManager: boolean;
+  welcomeEmail: boolean;
 }
 
 export interface IEditEmployeePayload {

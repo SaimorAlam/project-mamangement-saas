@@ -3,7 +3,7 @@
 import Chart from "react-apexcharts";
 import { useState, useEffect } from "react";
 import { useGetTopOverdueProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import { Spinner } from "@/components/ui/spinner";
+import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 
 const OverDueChart = () => {
   const [overDueChartData, setOverDueChartData] = useState<{
@@ -21,18 +21,15 @@ const OverDueChart = () => {
   } = useGetTopOverdueProjectsQuery({});
 
   useEffect(() => {
-    if (!overdueData?.data || overdueData.data.length === 0) {
+    const projects = overdueData?.data?.projects;
+    if (!projects || projects.length === 0) {
       setOverDueChartData({ series: [], options: {} });
       return;
     }
 
-    const categories = overdueData.data.map(
-      (item: any) => item.projectName
-    );
-    const values = overdueData.data.map(
-      (item: any) => item.overdueDays
-    );
-    const colors = overdueData.data.map((item: any) => {
+    const categories = projects.map((item: any) => item.name);
+    const values = projects.map((item: any) => item.overdueDays);
+    const colors = projects.map((item: any) => {
       if (item.priority === "High") return "#DA4352";
       if (item.priority === "Medium") return "#FF974B";
       if (item.priority === "Low") return "#F5B31A";
@@ -105,11 +102,7 @@ const OverDueChart = () => {
 
   return (
     <div className="bg-white rounded-lg p-4">
-      {overdueLoading && (
-        <div className="flex items-center justify-center h-40">
-          <Spinner />
-        </div>
-      )}
+      {overdueLoading && <SkeletonLoading />}
 
       {overdueError && (
         <div className="text-center text-gray-400 py-6">

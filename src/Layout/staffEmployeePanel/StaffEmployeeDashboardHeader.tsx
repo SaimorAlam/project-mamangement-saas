@@ -21,6 +21,7 @@ const StaffEmployeeDashboardHeader = () => {
 
   const ClientSidebarGroups = getStaffEmployeeSidebarItems();
   const { breadcrumb } = useHeaderContext();
+  // const shortedLocation = breadcrumb.split(",").pop();
   const { name } = useGetUser();
 
   const location = useLocation();
@@ -35,81 +36,85 @@ const StaffEmployeeDashboardHeader = () => {
   );
 
   const previewButtonPaths = [
-      "/staff-employee-panel/upload-submission",
-      "/staff-employee-panel/project-builder",
-    ];
-    const saveDraftButtonPaths = [
-      "/staff-employee-panel/project-builder",
-      
-    ];
-    const publishButtonPaths = [
-      "/staff-employee-panel/upload-submission",
-      "/staff-employee-panel/project-builder",
-    ];
-    const uploadSubmissionButtonPaths = [
-      "/staff-employee-panel/projects",
-      "/staff-employee-panel",
-    ];
+    "/staff-employee-panel/upload-submission",
+    "/staff-employee-panel/project-builder",
+  ];
+  const saveDraftButtonPaths = [
+    "/staff-employee-panel/project-builder",
+
+  ];
+  const publishButtonPaths = [
+    "/staff-employee-panel/upload-submission",
+    "/staff-employee-panel/project-builder",
+  ];
+  const uploadSubmissionButtonPaths = [
+    "/staff-employee-panel/projects",
+    "/staff-employee-panel",
+  ];
 
   return (
     <div>
-      <div className="flex items-center py-5 justify-between">
+      <div className="flex items-start gap-5 py-5 justify-between">
         {/* Greeting */}
-        <div>
+        <div className="max-w-xl">
           <h1 className="text-[32px] font-semibold">{name ? name : "Mr./Mrs. Employee"}</h1>
-          <p className="text-base text-gray-500">{breadcrumb}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-base text-gray-500">{breadcrumb}</p>
+          </div>
         </div>
 
-        {/* Search */}
-        <GlobalSearch />
+        <div className="flex items-center justify-end gap-2 grow">
+          {/* Search */}
+          <GlobalSearch />
 
-        {/* Right Controls */}
-        <div className="flex items-center justify-between gap-2 relative">
-          {/* Notifications */}
-          <PrimaryButton
-            leftIcon={<Bell className="text-2xl" />}
-            type={"Outline"}
-            onClick={() => setIsOpen(true)}
-          />
-          <NotificationModalNew
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-          />
-
-          {previewButtonPaths.includes(currentPath) && (
+          {/* Right Controls */}
+          <div className="flex items-center justify-between gap-2 relative">
+            {/* Notifications */}
             <PrimaryButton
-              leftIcon={<Eye className="text-2xl" />}
-              title="Preview"
+              leftIcon={<Bell className="text-2xl" />}
               type={"Outline"}
               onClick={() => setIsOpen(true)}
             />
-          )}
+            <NotificationModalNew
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+            />
 
-          {saveDraftButtonPaths.includes(currentPath) && (
-            <PrimaryButton
-              leftIcon={<FileText className="text-2xl" />}
-              title="Save Draft"
-              type={"Outline"}
-              onClick={() => setIsOpen(true)}
-            />
-          )}
-          {publishButtonPaths.includes(currentPath) && (
-            <PrimaryButton
-              leftIcon={<Upload className="text-2xl" />}
-              title="Submit for Review"
-              type={"Primary"}
-              onClick={() => setIsOpen(true)}
-            />
-          )}
+            {previewButtonPaths.includes(currentPath) && (
+              <PrimaryButton
+                leftIcon={<Eye className="text-2xl" />}
+                title="Preview"
+                type={"Outline"}
+                onClick={() => setIsOpen(true)}
+              />
+            )}
 
-          {uploadSubmissionButtonPaths.includes(currentPath) && (
-            <PrimaryButton
-              leftIcon={<Upload className="text-2xl" />}
-              title="Upload Submission"
-              type="Primary"
-              onClick={() => navigate("/staff-employee-panel/upload-submission")}
-            />
-          )}
+            {saveDraftButtonPaths.includes(currentPath) && (
+              <PrimaryButton
+                leftIcon={<FileText className="text-2xl" />}
+                title="Save Draft"
+                type={"Outline"}
+                onClick={() => setIsOpen(true)}
+              />
+            )}
+            {publishButtonPaths.includes(currentPath) && (
+              <PrimaryButton
+                leftIcon={<Upload className="text-2xl" />}
+                title="Submit for Review"
+                type={"Primary"}
+                onClick={() => setIsOpen(true)}
+              />
+            )}
+
+            {uploadSubmissionButtonPaths.includes(currentPath) && (
+              <PrimaryButton
+                leftIcon={<Upload className="text-2xl" />}
+                title="Upload Submission"
+                type="Primary"
+                onClick={() => navigate("/staff-employee-panel/upload-submission")}
+              />
+            )}
+          </div>
         </div>
       </div>
 

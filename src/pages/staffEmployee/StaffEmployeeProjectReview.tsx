@@ -15,10 +15,16 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-import { ChevronDown, Eye, PencilLine, Trash2, Calendar as CalendarIcon } from "lucide-react";
+import {
+  ChevronDown,
+  Eye,
+  PencilLine,
+  Trash2,
+  Calendar as CalendarIcon,
+} from "lucide-react";
 // -------------
 // -------------
-// akhono staff employee er review er get query paini, pelei akhane integrate kore dite hobe 
+// akhono staff employee er review er get query paini, pelei akhane integrate kore dite hobe
 // --------------
 // --------------
 import { useGetAllReviewProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
@@ -28,7 +34,11 @@ import ViewSubmissionModal from "@/components/staffManager/projectReview/ViewSub
 import ReviewSubmissionModal from "@/components/staffManager/projectReview/ReviewSubmissionModal";
 import DeleteSubmissionModal from "@/components/staffManager/projectReview/DeleteSubmissionModal";
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -54,7 +64,9 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
     "" | "APPROVED" | "PENDING" | "REJECTED"
   >("");
 
-  const [sortColumn, setSortColumn] = useState<"" | "startDate" | "endDate">("");
+  const [sortColumn, setSortColumn] = useState<"" | "startDate" | "endDate">(
+    "",
+  );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
@@ -64,7 +76,6 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-
 
   /*   RTK QUERY   */
   const { data, isLoading } = useGetAllReviewProjectsQuery({
@@ -76,13 +87,13 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
     search: search || undefined,
   });
 
-
   const projects = useMemo(() => data?.data ?? [], [data]);
   const meta = data?.data?.meta;
 
   const totalProjects = meta?.total ?? projects.length;
   const itemsPerPage = meta?.limit ?? limit;
-  const totalPages = meta?.totalPages ?? Math.ceil(totalProjects / itemsPerPage);
+  const totalPages =
+    meta?.totalPages ?? Math.ceil(totalProjects / itemsPerPage);
 
   /*   SORTING   */
   const handleSort = (column: any) => {
@@ -100,7 +111,7 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
     if (!sortColumn) {
       return list.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     }
 
@@ -131,10 +142,10 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
   const formatDate = (date?: string) =>
     date
       ? new Date(date).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
       : "-";
 
   const handleExportPDF = () => {
@@ -150,9 +161,9 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
       priorityFilter ? `Status: ${priorityFilter}` : "Status: All",
       dateRange?.from && dateRange?.to
         ? `Date: ${format(dateRange.from, "dd MMM yyyy")} - ${format(
-          dateRange.to,
-          "dd MMM yyyy"
-        )}`
+            dateRange.to,
+            "dd MMM yyyy",
+          )}`
         : "Date: All",
     ];
 
@@ -195,7 +206,6 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
     doc.save(`projects-submissions-review-${Date.now()}.pdf`);
   };
 
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -218,15 +228,13 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
 
   return (
     <div className="min-h-screen py-6">
-      <DashboardStats/>
+      <DashboardStats />
       <div className="mt-6">
         <div className="bg-white rounded-lg border border-gray-200 grow">
-          {/* HEADER */}
           <div className="flex justify-between px-6 py-4 border-b border-gray-200">
             <h1 className="text-lg font-semibold">{title}</h1>
 
             <div className="flex gap-3">
-              {/* SEARCH */}
               <input
                 value={search}
                 onChange={(e) => {
@@ -247,11 +255,10 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                     <CalendarIcon size={16} />
                     {dateRange?.from && dateRange?.to
                       ? `${format(dateRange.from, "MMM dd, yyyy")} - ${format(
-                        dateRange.to,
-                        "MMM dd, yyyy"
-                      )}`
+                          dateRange.to,
+                          "MMM dd, yyyy",
+                        )}`
                       : "Select Range"}
-
                   </Button>
                 </PopoverTrigger>
 
@@ -266,7 +273,6 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                     numberOfMonths={1}
                   />
 
-
                   {dateRange?.from && (
                     <div className="p-3 border-t text-right">
                       <Button
@@ -276,13 +282,11 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                       >
                         Clear
                       </Button>
-
                     </div>
                   )}
                 </PopoverContent>
               </Popover>
 
-              {/* STATUS FILTER */}
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex gap-2 items-center border border-gray-200 px-4 py-2 rounded text-sm">
                   {priorityFilter === "" ? "All Status" : priorityFilter}
@@ -312,11 +316,9 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                 <Download size={16} />
                 Export PDF
               </Button>
-
             </div>
           </div>
 
-          {/* TABLE */}
           {sortedProjects.length === 0 ? (
             <div className="flex items-center justify-center h-[60vh] text-gray-400">
               No projects found.
@@ -325,17 +327,24 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  {["name", "assignStaff", "status", "priority", "submitDate", "actions"].map(
-                    (col) => (
-                      <th
-                        key={col}
-                        onClick={col !== "actions" ? () => handleSort(col) : undefined}
-                        className="px-6 py-3 text-left text-xs font-semibold capitalize cursor-pointer"
-                      >
-                        {col.replace(/([A-Z])/g, " $1")}
-                      </th>
-                    )
-                  )}
+                  {[
+                    "name",
+                    "assignStaff",
+                    "status",
+                    "priority",
+                    "submitDate",
+                    "actions",
+                  ].map((col) => (
+                    <th
+                      key={col}
+                      onClick={
+                        col !== "actions" ? () => handleSort(col) : undefined
+                      }
+                      className="px-6 py-3 text-left text-xs font-semibold capitalize cursor-pointer"
+                    >
+                      {col.replace(/([A-Z])/g, " $1")}
+                    </th>
+                  ))}
                 </tr>
               </thead>
 

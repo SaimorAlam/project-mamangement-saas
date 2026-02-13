@@ -55,7 +55,6 @@ const UpdateUserModal = ({ isOpen, onClose, user }: UpdateUserModalProps) => {
   };
 
   const handleSubmit = () => {
-    console.log(formData);
     onClose();
   };
 

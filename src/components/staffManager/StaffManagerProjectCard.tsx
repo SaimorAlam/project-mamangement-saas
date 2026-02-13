@@ -3,11 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Flag, Layers, Star } from "lucide-react";
-import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
+// import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
 import ProjectDetailsModal from "./overview/ProjectDetailsModal";
 import { toast } from "sonner";
-import { useAddProjectToFavoriteMutation, useGetFavoriteProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import {
+  useAddProjectToFavoriteMutation,
+  useGetFavoriteProjectsQuery,
+} from "@/store/Api/staffManagerApi/StaffManagerApi";
+import RenderStaffAvatars from "../client/RenderStaffAvater";
 
 export type ProjectStatus =
   | "LIVE"
@@ -52,6 +56,29 @@ export interface StaffEmployeeProject {
 
   createdAt: string;
   updatedAt: string;
+
+  projectEmployees?: {
+    employee: {
+      user: {
+        name: string;
+        profileImage: string;
+      };
+    };
+  };
+  projectViewers?: {
+    viewer: {
+      user: {
+        name: string;
+        profileImage: string;
+      };
+    };
+  };
+  manager?: {
+    user: {
+      name: string;
+      profileImage: string;
+    };
+  };
 }
 
 interface StaffEmployeeProgramCardProps {
@@ -97,6 +124,20 @@ const StaffManagerProjectCard = ({
     progress,
     status,
   } = project;
+
+  const assignedStaffImg = []
+  project?.manager?.user?.profileImage && assignedStaffImg.push({
+    name: project?.manager?.user?.name,
+    avatar: project?.manager?.user?.profileImage
+  })
+  project?.projectEmployees?.employee?.user?.profileImage && assignedStaffImg.push({
+    name: project?.projectEmployees?.employee?.user?.name,
+    avatar: project?.projectEmployees?.employee?.user?.profileImage
+  })
+  project?.projectViewers?.viewer?.user?.profileImage && assignedStaffImg.push({
+    name: project?.projectViewers?.viewer?.user?.name,
+    avatar: project?.projectViewers?.viewer?.user?.profileImage
+  })
 
   const { data } = useGetFavoriteProjectsQuery();
   const [addProjectToFavorite] = useAddProjectToFavoriteMutation();
@@ -148,7 +189,7 @@ const StaffManagerProjectCard = ({
   };
 
   return (
-    <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">
+    <Card className="min-w-60 lg:min-w-80 bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">
       <CardContent className="flex flex-col justify-between p-0">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-gray-200 py-2 px-4">
@@ -164,11 +205,18 @@ const StaffManagerProjectCard = ({
               <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2">
                 <span>{name || "Project Name"}</span>{" "}
                 {data.data.some((element: any) => element.projectId === id) ? (
-                  <button title="You added this project in your favorite list." className="hover:cursor-not-allowed">
+                  <button
+                    title="You added this project in your favorite list."
+                    className="hover:cursor-not-allowed"
+                  >
                     <FaStar className="text-yellow-500" size={18} />
                   </button>
                 ) : (
-                  <button onClick={() => handleAddToFavourite(id)} title="Add to favorite" className="hover:scale-105 hover:cursor-pointer duration-300">
+                  <button
+                    onClick={() => handleAddToFavourite(id)}
+                    title="Add to favorite"
+                    className="hover:scale-105 hover:cursor-pointer duration-300"
+                  >
                     <Star className="text-gray-500" size={18} />
                   </button>
                 )}
@@ -186,12 +234,9 @@ const StaffManagerProjectCard = ({
               <h3 className="mb-1">Assigned People</h3>
               {/* Kept intentionally even if data is not available */}
               <RenderStaffAvatars
-                staff={Array.from({ length: 3 }, (_, i) => ({
-                  id: i.toString(),
-                  name: `Staff ${i + 1}`,
-                  avatar: "https://randomuser.me/api/portraits/men/19.jpg",
-                }))}
+                staff={assignedStaffImg}
               />
+              {/* -- */}
             </div>
 
             <div className="flex flex-col gap-y-4 text-sm py-2 px-4">

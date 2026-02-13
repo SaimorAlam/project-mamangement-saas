@@ -8,7 +8,6 @@ import { Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ViewUserModal from "./ViewUserModal";
-import UpdateUserModal from "./UpdateUserModal";
 import Swal from "sweetalert2";
 import {
   Select,
@@ -19,6 +18,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { FieldGroup } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
+import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 
 const EmployeeTable = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -520,10 +520,10 @@ const EmployeeTable = () => {
         onClose={() => setIsModalOpen(false)}
         user={selectedUser}
       />
-      <UpdateUserModal
-        isOpen={isUpdateModalOpen}
+      <AddEmployeeModal
+        open={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
-        user={selectedUser}
+        employee={selectedUser}
       />
     </div>
   );

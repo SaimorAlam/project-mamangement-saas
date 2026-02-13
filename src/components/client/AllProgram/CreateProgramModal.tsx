@@ -12,6 +12,18 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useCreateProgramMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { toast } from "sonner";
+import { useGetAllManagersQuery } from "@/store/Api/UserApi/UserApi";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 
 interface ICreateProgramModalProps {
   open: boolean;
@@ -19,14 +31,20 @@ interface ICreateProgramModalProps {
   onSuccess: ({ programName, id }: { programName: string; id: string }) => void;
   title: string;
 }
-
+interface Manager {
+  id: string;
+  name: string;
+  profileImage: string;
+  role: string;
+}
 interface ProgramFormData {
   programName: string;
-  startingDate: string;
-  description: string;
+  dateTime: string;
+  programDescription: string;
   // assignedPerson: string;
-  priority: "HIGH" | "MEDIUM" | "LOW";
-  deadline: string;
+  managerId: string;
+  // priority: "HIGH" | "MEDIUM" | "LOW";
+  // deadline: string;
 }
 
 export default function CreateProgramModal({
@@ -35,8 +53,22 @@ export default function CreateProgramModal({
   onSuccess,
   title,
 }: ICreateProgramModalProps) {
+  const [selectedManager, setSelectedManager] = useState<string>("");
+  const [assignedManager, setAssignedManager] = useState<Manager | null>(null);
   const [createProgramMutation] = useCreateProgramMutation();
-
+  const { data, isLoading } = useGetAllManagersQuery({});
+  const managers = data?.data?.data?.map(
+    (user: {
+      id: string;
+      user: { name: string; profileImage: string; role: string };
+    }) => ({
+      id: user?.id,
+      name: user?.user?.name,
+      profileImage: user?.user?.profileImage,
+      role: user?.user?.role,
+    }),
+  );
+  console.log(selectedManager);
   const {
     register,
     handleSubmit,
@@ -46,26 +78,35 @@ export default function CreateProgramModal({
   } = useForm<ProgramFormData>({
     defaultValues: {
       programName: "",
-      startingDate: "",
-      description: "",
-      // assignedPerson: "me",
-      priority: "HIGH",
-      deadline: "",
+      dateTime: "",
+      programDescription: "",
+      managerId: "",
+      // priority: "HIGH",
+      // deadline: "",
     },
   });
+
+  useEffect(() => {
+    if (selectedManager) {
+      const manager = managers?.find(
+        (manager: Manager) => manager.id === selectedManager,
+      );
+      setAssignedManager(manager);
+    }
+  }, [selectedManager]);
 
   const onSubmit = async (data: ProgramFormData) => {
     const payload = {
       programName: data.programName,
-      datetime: data.startingDate
-        ? new Date(data.startingDate).toISOString()
+      datetime: data.dateTime
+        ? new Date(data.dateTime).toISOString()
         : new Date().toISOString(),
-      programDescription: data.description,
-      priority: data.priority,
-      deadline: data.deadline
-        ? new Date(data.deadline).toISOString()
-        : undefined,
-      // assignedPerson: data.assignedPerson,
+      programDescription: data.programDescription,
+      managerId: selectedManager,
+      // priority: data.priority,
+      // deadline: data.deadline
+      //   ? new Date(data.deadline).toISOString()
+      //   : undefined,
     };
     try {
       const res = await createProgramMutation(payload).unwrap();
@@ -91,7 +132,7 @@ export default function CreateProgramModal({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 pb-6 space-y-6">
-          <h3 className="text-lg font-medium text-gray-700">Program details</h3>
+          {/* <h3 className="text-lg font-medium text-gray-700">Program details</h3> */}
 
           {/* Program Name */}
           <div className="space-y-2">
@@ -113,7 +154,7 @@ export default function CreateProgramModal({
           </div>
 
           {/* Starting Date */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="text-sm font-medium text-gray-900">
               Starting Date
             </label>
@@ -129,6 +170,45 @@ export default function CreateProgramModal({
                 {errors.startingDate.message}
               </p>
             )}
+          </div> */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-900">
+              Starting Date
+            </label>
+
+            <Controller
+              control={control}
+              name="dateTime"
+              rules={{ required: "Starting Date is required" }}
+              render={({ field }) => (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={`w-full h-10 justify-start text-left font-normal border border-[#E2E8F0] ${!field.value && "text-muted-foreground"}`}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {field.value ? format(field.value, "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => {
+                        field.onChange(date ? date.toISOString() : "");
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              )}
+            />
+
+            {errors.dateTime && (
+              <p className="text-red-500 text-sm">{errors.dateTime.message}</p>
+            )}
           </div>
 
           {/* Description */}
@@ -137,21 +217,21 @@ export default function CreateProgramModal({
               Program Description
             </label>
             <Textarea
-              {...register("description", {
+              {...register("programDescription", {
                 required: "Description is required",
               })}
               placeholder="Enter a description..."
               className="min-h-20 resize-none border-[#E2E8F0] mt-2"
             />
-            {errors.description && (
+            {errors.programDescription && (
               <p className="text-red-500 text-sm">
-                {errors.description.message}
+                {errors.programDescription.message}
               </p>
             )}
           </div>
 
           {/* Priority */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="text-sm font-medium text-gray-900">
               Priority
             </label>
@@ -171,10 +251,10 @@ export default function CreateProgramModal({
                 </Select>
               )}
             />
-          </div>
+          </div> */}
 
           {/* Deadline */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="text-sm font-medium text-gray-900">
               Deadline
             </label>
@@ -188,30 +268,65 @@ export default function CreateProgramModal({
             {errors.deadline && (
               <p className="text-red-500 text-sm">{errors.deadline.message}</p>
             )}
-          </div>
+          </div> */}
 
           {/* Assigned Person */}
-          {/* <div className="space-y-2">
+          <div className="space-y-2">
             <label className="text-sm font-medium text-gray-900">
               Assign Person
             </label>
             <Controller
               control={control}
-              name="assignedPerson"
+              name="managerId"
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    setSelectedManager(value);
+                  }}
+                >
                   <SelectTrigger className="h-10 border border-[#E2E8F0] mt-2 w-full">
-                    <SelectValue />
+                    <SelectValue placeholder="Select a manager" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-[#E2E8F0]">
-                    <SelectItem value="me">Me</SelectItem>
-                    <SelectItem value="kathryn">Kathryn Murphy</SelectItem>
-                    <SelectItem value="john">John Doe</SelectItem>
+                    {isLoading ? (
+                      <Skeleton className="h-10 w-full" />
+                    ) : (
+                      <>
+                        {managers?.map((manager: Manager) => (
+                          <SelectItem key={manager.id} value={manager.id}>
+                            {manager.name}
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               )}
             />
-          </div> */}
+          </div>
+          {assignedManager && (
+            <div className="">
+              <label className="text-sm font-medium text-gray-900">
+                Assign Manager
+              </label>
+              <div className="flex items-center gap-2 mt-2">
+                <Avatar className="size-12 border border-gray-200">
+                  <AvatarImage src={assignedManager?.profileImage || ""} />
+                  <AvatarFallback>
+                    {assignedManager?.name?.slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="">
+                  <p className="font-medium">{assignedManager?.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {assignedManager?.role}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Buttons */}
           <div className="flex gap-3 pt-4">

@@ -1,9 +1,8 @@
 import React, { cloneElement, useState } from "react";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
-import { Bell } from "lucide-react";
-import NotificationModal from "@/components/client/NotificationModal";
-import { useLocation, Link } from "react-router-dom";
+import { Bell, CalendarDays, ChevronDown } from "lucide-react";
+import { useLocation, Link, useParams } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,6 +13,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useHeaderContext } from "./ViewerPanelDashboardHeaderContext";
 import { getViewerPanelSidebarItems } from "./viewerPanelSidebarItems";
+import ViewerNotificationModal from "./ViewerNotificationModal";
+import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
 
 const ViewerPanelHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -22,6 +23,12 @@ const ViewerPanelHeader = () => {
   const { heading } = useHeaderContext();
 
   const location = useLocation();
+  const { projectId } = useParams();
+  const { data } = useGetProjectByIdQuery(projectId!, {
+    skip: !projectId,
+  });
+  const projectDetails = data?.data;
+
   const currentPath = location.pathname;
 
   const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
@@ -31,23 +38,37 @@ const ViewerPanelHeader = () => {
     <div>
       <div className="flex items-center py-5 justify-between">
         {/* Greeting */}
-        <div>
-          <h1 className="text-[32px] font-semibold">{heading}</h1>
-          {/* <p className="text-base text-gray-500">{breadcrumb}</p> */}
+        <div className="flex-1">
+          <h1 className="text-[32px] font-semibold">
+            Good Morning👋, {heading}
+          </h1>
         </div>
 
         {/* Search */}
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <div className="flex-1">
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        </div>
 
         {/* Right Controls */}
-        <div className="flex items-center justify-between gap-6 relative">
+        <div className="flex-1 flex items-center justify-end gap-4 relative">
           {/* Notifications */}
           <PrimaryButton
             leftIcon={<Bell className="text-2xl" />}
             type={"Outline"}
             onClick={() => setIsOpen(true)}
           />
-          <NotificationModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+          <ViewerNotificationModal
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+          />
+          <div className="hidden sm:block">
+            <PrimaryButton
+              title="Last 1 Week"
+              leftIcon={<CalendarDays className="size-4 md:size-5" />}
+              rightIcon={<ChevronDown className="size-4 md:size-5" />}
+              type="Primary"
+            />
+          </div>
         </div>
       </div>
 
@@ -69,7 +90,7 @@ const ViewerPanelHeader = () => {
                         currentRoute.icon as React.ReactElement<{
                           className?: string;
                         }>,
-                        { className: "w-4 h-4" }
+                        { className: "w-4 h-4" },
                       )
                     : null}
                   {currentRoute.name}
@@ -77,7 +98,17 @@ const ViewerPanelHeader = () => {
               </BreadcrumbItem>
             ) : (
               <BreadcrumbItem>
-                <BreadcrumbPage></BreadcrumbPage>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild className="text-[#356DF0]">
+                    <Link to={`/viewer-panel`}>Overview</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>
+                    {projectDetails?.project?.name}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
               </BreadcrumbItem>
             )}
           </BreadcrumbList>

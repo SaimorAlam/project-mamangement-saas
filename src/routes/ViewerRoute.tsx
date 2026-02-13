@@ -20,12 +20,23 @@ import ViewerPanelEmployees from "@/pages/viewerPanel/ViewerPanelEmployees";
 import ViewerPanelAlfalaBuilders from "@/pages/viewerPanel/ViewerPanelAlfalaBuilders";
 import ViewerPanelAllProgram from "@/pages/viewerPanel/ViewerPanelAllProgram";
 import FavoriteProjects from "@/pages/viewerPanel/Favorite/FavoriteProjects";
+import AllProject from "@/pages/viewerPanel/ViewerPanelOverview/Components/AllProject";
 
 export default function getViewerPanelRoutes() {
   return [
-    { index: true, element: <ViewerPanelOverview /> },
+    {
+      path: "",
+      element: <ViewerPanelOverview />,
+      children: [
+        { index: true, element: <AllProject /> },
+        {
+          path: "overview/project-details/:projectId",
+          element: <FavoriteProjects />,
+        },
+      ],
+    },
+    { path: "project-details/:projectId", element: <FavoriteProjects /> },
     { path: "projects", element: <ViewerPanelProjects /> },
-    { path: "project-details/:id", element: <FavoriteProjects /> },
     { path: "carlyle-hall", element: <ViewerPanelCarlyleHall /> },
     { path: "employees", element: <ViewerPanelEmployees /> },
     {

@@ -63,8 +63,8 @@ const StaffManagerSidebar = () => {
     const fullPath = item.index
       ? parentPath
       : item.path?.startsWith("/")
-      ? item.path
-      : `${parentPath}/${item.path}`;
+        ? item.path
+        : `${parentPath}/${item.path}`;
 
     const currentPath = location.pathname;
 
@@ -91,8 +91,8 @@ const StaffManagerSidebar = () => {
     const fullPath = item.index
       ? parentPath
       : item.path?.startsWith("/")
-      ? item.path
-      : `${parentPath}/${item.path}`;
+        ? item.path
+        : `${parentPath}/${item.path}`;
 
     const active = isRouteActive(item, parentPath);
 
@@ -105,15 +105,14 @@ const StaffManagerSidebar = () => {
               <button
                 className={`self-stretch rounded-[10px] inline-flex items-center w-full
                   ${state === "expanded" ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
-                  ${
-                    active
-                      ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
-                      : "text-gray-900 hover:bg-slate-100"
+                  ${active
+                    ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                    : "text-gray-900 hover:bg-slate-100"
                   }`}
               >
                 <div className={`flex items-center ${state === "expanded" ? "justify-between w-full" : "justify-center"}`}>
                   <span className={`flex items-center ${state === "expanded" ? "gap-2" : ""}`}>
-                    <span className="size-6 flex-shrink-0">{item.icon}</span>
+                    <span className="size-6 shrink-0">{item.icon}</span>
                     {state === "expanded" && (
                       <span className="text-base font-normal">{item.name}</span>
                     )}
@@ -121,7 +120,7 @@ const StaffManagerSidebar = () => {
 
                   {state === "expanded" && (
                     <ChevronRight
-                      className={`flex-shrink-0 ${open ? "rotate-90 duration-200" : ""}`}
+                      className={`shrink-0 ${open ? "rotate-90 duration-200" : ""}`}
                     />
                   )}
                 </div>
@@ -156,14 +155,13 @@ const StaffManagerSidebar = () => {
             asChild
             className={`self-stretch rounded-[10px] inline-flex items-center w-full
               ${state === "expanded" ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
-              ${
-                active
-                  ? "bg-gradient-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
-                  : "text-gray-900"
+              ${active
+                ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                : "text-gray-900"
               }`}
           >
             <div className={`flex items-center ${state === "expanded" ? "gap-2" : ""}`}>
-              <span className="size-6 flex-shrink-0">{item.icon}</span>
+              <span className="size-6 shrink-0">{item.icon}</span>
               {state === "expanded" && (
                 <span className="text-base font-normal">{item.name}</span>
               )}
@@ -194,23 +192,26 @@ const StaffManagerSidebar = () => {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {groups.map((group) => (
-                <div key={group.label}>
-                  {state === "expanded" && (
-                    <SidebarGroupLabel className="text-[#64748B] text-sm font-medium">
-                      {group.label}
-                    </SidebarGroupLabel>
-                  )}
+              {groups.map((group) => {
+                if (group.items.length === 0) return null;
+                return (
+                  <div key={group.label}>
+                    {state === "expanded" && (
+                      <SidebarGroupLabel className="text-[#64748B] text-sm font-medium">
+                        {group.label}
+                      </SidebarGroupLabel>
+                    )}
 
-                  <SidebarMenu className="space-y-2.5">
-                    {group.items.map((item) => renderSidebarItem(item))}
-                  </SidebarMenu>
+                    <SidebarMenu className="space-y-2.5">
+                      {group.items.map((item) => renderSidebarItem(item))}
+                    </SidebarMenu>
 
-                  {state === "expanded" && (
-                    <hr className="w-56 text-slate-300 my-5" />
-                  )}
-                </div>
-              ))}
+                    {state === "expanded" && (
+                      <hr className="w-56 text-slate-300 my-5" />
+                    )}
+                  </div>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

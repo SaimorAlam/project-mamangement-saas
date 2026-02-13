@@ -14,6 +14,7 @@ import NotificationModal from "@/components/client/NotificationModal";
 import { toast } from "sonner";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import NewProjectModal from "@/components/client/NewProjectModal";
+import ProjectSuccessModal from "./ProjectSuccessModal";
 import { Bell, CalendarDays, ChevronDown, Plus, UserPlus } from "lucide-react";
 import {
   Breadcrumb,
@@ -27,7 +28,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getClientSidebarItems } from "./clientSidebarItems";
 // import CreateProjectModal from "./CreateProjectModal";
 import CreateProject from "./CreateProject";
-import { useGetUser } from "@/hooks/useGetUser";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
   setIsPreview,
@@ -40,11 +40,9 @@ interface ClientDashboardHeaderProps {
   name?: string;
 }
 
-const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
-  name,
-}) => {
+const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   // const [projectName, setProjectName] = useState<string>("");
-  const { name: userName } = useGetUser();
+
   const { programId, projectId: projectIdFromParams, id } = useParams();
   const projectId = projectIdFromParams || id;
   const location = useLocation();
@@ -59,9 +57,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const isProgramOverviewPage =
     currentPath.includes("/all-program/program-overview/") &&
     !currentPath.includes("/project-details/");
-  const isProjectDetailsPage = currentPath.includes(
-    "/client-panel/project-details/",
-  );
+  const isProjectDetailsPage = currentPath.includes("/project-details/");
   const isProjectReviewPage = currentPath.includes(
     "/client-panel/project-review",
   );
@@ -79,36 +75,53 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
   const projectName = ProjectData?.data?.project?.name;
 
-  const ClientSidebarGroups = getClientSidebarItems();
-  const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
+  const allRoutes = React.useMemo(() => {
+    return getClientSidebarItems().flatMap((group) => group.items);
+  }, []);
 
-  // Determine current route
-  let currentRoute = allRoutes.find((route) => {
-    // Match exact path or any child path
-    if (route.children) {
-      return route.children.some(
-        (child) => `${route.path}/${child.path}` === currentPath,
-      );
-    }
-    return route.path === currentPath;
-  });
+  const isOverviewProjectDetailsPage = currentPath.includes(
+    "/client-panel/overview/project-details/",
+  );
 
-  // Special case for Program Overview: map to All Program
   const showProgramOverviewBreadcrumb = currentPath.startsWith(
     "/client-panel/all-program/program-overview/",
   );
-  if (showProgramOverviewBreadcrumb) {
-    currentRoute = allRoutes.find(
-      (r) => r.path === "/client-panel/all-program",
-    );
-  }
 
-  // Special case for Project Review Details: map to Project Review
-  if (isProjectReviewDetailsPage) {
-    currentRoute = allRoutes.find(
-      (r) => r.path === "/client-panel/project-review",
-    );
-  }
+  // Determine current route
+  const currentRoute = React.useMemo(() => {
+    let route = allRoutes.find((r) => {
+      // Match exact path or any child path
+      if (r.children) {
+        return r.children.some(
+          (child) => `${r.path}/${child.path}` === currentPath,
+        );
+      }
+      return r.path === currentPath;
+    });
+
+    // Special case for Program Overview: map to All Program
+    if (showProgramOverviewBreadcrumb) {
+      route = allRoutes.find((r) => r.path === "/client-panel/all-program");
+    }
+
+    // Special case for Project Review Details: map to Project Review
+    if (isProjectReviewDetailsPage) {
+      route = allRoutes.find((r) => r.path === "/client-panel/project-review");
+    }
+
+    // Special case for Overview Project Details: map to Overview
+    if (isOverviewProjectDetailsPage) {
+      route = allRoutes.find((r) => r.path === "/client-panel");
+    }
+
+    return route;
+  }, [
+    allRoutes,
+    currentPath,
+    showProgramOverviewBreadcrumb,
+    isProjectReviewDetailsPage,
+    isOverviewProjectDetailsPage,
+  ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -121,6 +134,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
   const [, setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [projectSuccessData, setProjectSuccessData] = useState<{
+    projectName: string;
+    projectId: string;
+  } | null>(null);
+  const [projectSuccessOpen, setProjectSuccessOpen] = useState(false);
 
   // const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -145,21 +163,21 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
     setSuccessOpen(true);
   };
 
+  const handleProjectSuccess = (projectName: string, projectId: string) => {
+    setIsProjectModalOpen(false);
+    setProjectSuccessData({ projectName, projectId });
+    setProjectSuccessOpen(true);
+  };
+
   const renderQuickActionButton = () => {
     if (isEmployeePage)
       return (
-        <>
-          <PrimaryButton
-            title="Add Employee"
-            leftIcon={<UserPlus />}
-            type="Primary"
-            onClick={() => setIsEmployeeModalOpen(true)}
-          />
-          <AddEmployeeModal
-            open={isEmployeeModalOpen}
-            onClose={() => setIsEmployeeModalOpen(false)}
-          />
-        </>
+        <PrimaryButton
+          title="Add Employee"
+          leftIcon={<UserPlus />}
+          type="Primary"
+          onClick={() => setIsEmployeeModalOpen(true)}
+        />
       );
 
     if (isAllProgramPage)
@@ -174,49 +192,22 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
     if (isProgramOverviewPage)
       return (
-        <>
-          <PrimaryButton
-            title="Add Project"
-            leftIcon={<Plus />}
-            type="Primary"
-            onClick={() => setIsProjectModalOpen(true)}
-          />
-          {/* <CreateProjectModal
-            open={isProjectModalOpen}
-            programId={programId as string}
-            onClose={() => setIsProjectModalOpen(false)}
-          /> */}
-          {isProjectModalOpen && (
-            <CreateProject
-              programId={programId as string}
-              onClose={() => setIsProjectModalOpen(false)}
-            />
-          )}
-        </>
+        <PrimaryButton
+          title="Add Project"
+          leftIcon={<Plus />}
+          type="Primary"
+          onClick={() => setIsProjectModalOpen(true)}
+        />
       );
 
     if (isHighwayExpansionPage)
       return (
-        <>
-          <PrimaryButton
-            title="Add Project"
-            leftIcon={<Plus />}
-            type="Primary"
-            onClick={() => setIsProjectModalOpen(true)}
-          />
-          <NewProjectModal
-            open={isProjectModalOpen}
-            onClose={() => setIsProjectModalOpen(false)}
-            onSuccess={(projectName: string) => {
-              setIsProjectModalOpen(false);
-              setSuccessData({
-                programName: projectName || "New Project",
-                id: "",
-              });
-              setSuccessOpen(true);
-            }}
-          />
-        </>
+        <PrimaryButton
+          title="Add Project"
+          leftIcon={<Plus />}
+          type="Primary"
+          onClick={() => setIsProjectModalOpen(true)}
+        />
       );
 
     if (isProjectBuilderPage) {
@@ -256,7 +247,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
             title="Save as Draft"
             type="Outline"
             onClick={() => {
-              // Handle save as draft logic if needed
               toast.success("Project saved as draft");
             }}
           />
@@ -268,20 +258,15 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
         </div>
       );
     }
-
+    const shouldHideAddProgram =
+      isProjectReviewPage ||
+      isActivityLogPage ||
+      isProjectDetailsPage ||
+      isSupportPage;
     return (
       <>
-        {/* <PrimaryButton
-          title="Quick Action"
-          leftIcon={<Plus />}
-          rightIcon={<ChevronDown />}
-          type="Primary"
-          onClick={() => setIsDropdownOpen((prev) => !prev)}
-        /> */}
-
-        {/* {isDropdownOpen && ( */}
         <div>
-          {!isProjectReviewPage && !isActivityLogPage && !isSupportPage && (
+          {!shouldHideAddProgram && (
             <PrimaryButton
               title="Add Program"
               leftIcon={<Plus />}
@@ -302,7 +287,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           {currentPath.includes("/client-panel") && (
             <div className="min-w-0">
               <h1 className="text-2xl md:text-[32px] font-semibold truncate">
-                Good Morning {userName || name}, 👋
+                Good Morning, 👋
               </h1>
               <p className="text-sm md:text-base text-gray-500 truncate">
                 This is dashboard overview of Acme Corporation
@@ -311,11 +296,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
           )}
         </div>
 
-        <div className="flex-1 min-w-[200px] grid place-content-center order-3 lg:order-2 w-full lg:w-auto">
+        <div className="flex-1 min-w-[200px] grid place-content-center order-2  w-full sm:w-auto mt-2 sm:mt-0">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </div>
 
-        <div className="flex items-center justify-end gap-2 md:gap-4 lg:gap-6 relative order-2 lg:order-3 ml-auto lg:ml-0">
+        <div className="flex items-center justify-end gap-2 md:gap-4 lg:gap-6 relative order-3 lg:order-3 ml-auto lg:ml-0">
           <PrimaryButton
             leftIcon={<Bell className="text-xl md:text-2xl" />}
             type="Outline"
@@ -338,6 +323,37 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
 
           <div className="relative">{renderQuickActionButton()}</div>
 
+          {/* Activity Modals */}
+          {isEmployeeModalOpen && (
+            <AddEmployeeModal
+              open={isEmployeeModalOpen}
+              onClose={() => setIsEmployeeModalOpen(false)}
+            />
+          )}
+
+          {isProjectModalOpen && isProgramOverviewPage && (
+            <CreateProject
+              programId={programId as string}
+              onClose={() => setIsProjectModalOpen(false)}
+              onSuccess={handleProjectSuccess}
+            />
+          )}
+
+          {isProjectModalOpen && isHighwayExpansionPage && (
+            <NewProjectModal
+              open={isProjectModalOpen}
+              onClose={() => setIsProjectModalOpen(false)}
+              onSuccess={(projectName: string) => {
+                setIsProjectModalOpen(false);
+                setSuccessData({
+                  programName: projectName || "New Project",
+                  id: "",
+                });
+                setSuccessOpen(true);
+              }}
+            />
+          )}
+
           {activeModal === "Add Program" && (
             <CreateProgramModal
               open
@@ -353,6 +369,16 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
               onOpenChange={setSuccessOpen}
               programName={successData.programName}
               redirectPath={`/client-panel/program-builder`}
+            />
+          )}
+
+          {projectSuccessData && (
+            <ProjectSuccessModal
+              open={projectSuccessOpen}
+              onOpenChange={setProjectSuccessOpen}
+              projectName={projectSuccessData.projectName}
+              projectId={projectSuccessData.projectId}
+              programId={programId}
             />
           )}
         </div>
@@ -414,20 +440,19 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
                     </BreadcrumbItem>
                   </>
                 )}
-
-                {/* {isProjectDetailsPage && project && (
+                {isOverviewProjectDetailsPage && (
                   <>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                       <BreadcrumbPage className="text-[#356DF0]">
-                        {project}
+                        {projectName || "Project Details"}
                       </BreadcrumbPage>
                     </BreadcrumbItem>
                   </>
-                )} */}
+                )}
               </>
             )}
-            {isProjectDetailsPage && (
+            {isProjectDetailsPage && !isOverviewProjectDetailsPage && (
               <>
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-[#356DF0]">

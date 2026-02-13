@@ -81,6 +81,14 @@ const ClientSidebar = () => {
 
     const currentPath = location.pathname;
 
+    // Special case for Overview Project Details
+    if (
+      fullPath === "/client-panel" &&
+      currentPath.includes("/overview/project-details")
+    ) {
+      return true;
+    }
+
     // Exact match
     if (currentPath === fullPath) return true;
 

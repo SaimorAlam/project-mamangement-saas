@@ -39,18 +39,14 @@ const initialData: CostData[] = [
 ];
 
 export default function CostOverview() {
-  const [data, _setData] = useState<CostData[]>(initialData);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(
-    null
-  );
+  const [data] = useState<CostData[]>(initialData);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
-    <div className="w-[60%] overflow-x-auto">
+    <div className="w-full h-full overflow-x-auto">
       <div className="h-full bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">
-            Cost Overview
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800">Cost Overview</h2>
         </div>
 
         <ResponsiveContainer width="100%" height={400}>
@@ -95,9 +91,7 @@ export default function CostOverview() {
                       : "#d8b4fe"
                   }
                   opacity={
-                    hoveredIndex === null || hoveredIndex === index
-                      ? 1
-                      : 0.5
+                    hoveredIndex === null || hoveredIndex === index ? 1 : 0.5
                   }
                 />
               ))}

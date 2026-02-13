@@ -8,11 +8,33 @@ const userApi = baseApi.injectEndpoints({
       providesTags: ["Manager"],
     }),
     getTopOverdueProjects: builder.query({
-      query: () => `/manager/charts/top-overdue-projects`,
+      query: () => `/manager/projects/top-overdue`,
       providesTags: ["Manager"],
     }),
     getSubmissionStatus: builder.query({
-      query: () => `/manager/submission-status`,
+      query: (params) => {
+        return {
+          url: `/manager/submission-status`,
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: ["Manager"],
+    }),
+    getAllManagerPrograms: builder.query({
+      query: (params) => ({
+        url: "/manager/program",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Manager"],
+    }),
+    getAllManagerProgramsForProgramPage: builder.query({
+      query: (params) => ({
+        url: "/program",
+        method: "GET",
+        params,
+      }),
       providesTags: ["Manager"],
     }),
     getUpcomingDeadlines: builder.query({
@@ -39,10 +61,10 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Manager"],
     }),
-    deleteManagerProject: builder.mutation<any, {id: string}>({
-      query: ({id})=> ({
+    deleteManagerProject: builder.mutation<any, { id: string }>({
+      query: ({ id }) => ({
         url: `/project/manager-project-softdelete/${id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
       invalidatesTags: ["Manager"],
     }),
@@ -51,20 +73,20 @@ const userApi = baseApi.injectEndpoints({
       query: () => `/manager/project-dashboard`,
       providesTags: ["Manager"],
     }),
-    getProgramAllProjects: builder.query({ 
+    getProgramAllProjects: builder.query({
       query: (params) => ({
-        url: "/manager/program-dashboard",
+        url: "/project",
         method: "GET",
-        params
+        params,
       }),
       providesTags: ["Manager"],
     }),
     // for program review
-    getProjectReviewPageCards: builder.query({ 
+    getProjectReviewPageCards: builder.query({
       query: () => `/manager/overview`,
       providesTags: ["Manager"],
     }),
-    getAllReviewProjects: builder.query({ 
+    getAllReviewProjects: builder.query({
       query: (params) => ({
         url: "/manager/submissions",
         method: "GET",
@@ -72,19 +94,22 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Manager"],
     }),
-    getAllReviewProjectsReviewerActivity: builder.query({ 
+    getAllReviewProjectsReviewerActivity: builder.query({
       query: () => `/manager/activity`,
       providesTags: ["Manager"],
     }),
-    editSubmission: builder.mutation<any, {submissionId: string; action: string}>({
+    editSubmission: builder.mutation<
+      any,
+      { submissionId: string; action: string }
+    >({
       query: ({ submissionId, action }) => ({
         url: `/manager/${submissionId}/status`,
         method: "PATCH",
-        body: { status : action },
+        body: { status: action },
       }),
       invalidatesTags: ["Manager"],
     }),
-    deleteSubmission: builder.mutation<any, {submissionId: string}>({
+    deleteSubmission: builder.mutation<any, { submissionId: string }>({
       query: ({ submissionId }) => ({
         url: `/manager/${submissionId}/delete-submission`,
         method: "DELETE",
@@ -93,11 +118,11 @@ const userApi = baseApi.injectEndpoints({
     }),
     // for favorite projects
     getFavoriteProjects: builder.query<any, void>({
-      query: ()=> `/favorites-project/me`,
+      query: () => `/favorites-project/me`,
       providesTags: ["Manager", "Favorite"],
     }),
-    addProjectToFavorite: builder.mutation<any, {projectId: string}>({
-      query: (body)=> ({
+    addProjectToFavorite: builder.mutation<any, { projectId: string }>({
+      query: (body) => ({
         url: `/favorites-project`,
         method: "POST",
         body,
@@ -114,16 +139,16 @@ const userApi = baseApi.injectEndpoints({
     }),
     // for notification
     getNotification: builder.query<any, void>({
-      query: ()=> `/notification/received`,
+      query: () => `/notification/received`,
       providesTags: ["Manager"],
     }),
-    // for global search 
+    // for global search
     getGlobalSearchItems: builder.query({
-      query: (searchText)=> ({
+      query: (searchText) => ({
         url: "/manager/global-search",
         method: "GET",
-        params: {query: searchText}
-      }) ,
+        params: { query: searchText },
+      }),
       providesTags: ["Manager"],
     }),
   }),
@@ -133,6 +158,8 @@ export const {
   useGetStaffEmpStateCartsQuery,
   useGetTopOverdueProjectsQuery,
   useGetSubmissionStatusQuery,
+  useGetAllManagerProgramsQuery,
+  useGetAllManagerProgramsForProgramPageQuery,
   useGetUpcomingDeadlinesQuery,
   useGetAllActivityLogsQuery,
   useGetAllLatestSubmissionsQuery,
@@ -148,7 +175,7 @@ export const {
   useAddProjectToFavoriteMutation,
   useRemoveProjectFromFavoriteMutation,
   useGetNotificationQuery,
-  useGetGlobalSearchItemsQuery
+  useGetGlobalSearchItemsQuery,
 } = userApi;
 
 export default userApi;

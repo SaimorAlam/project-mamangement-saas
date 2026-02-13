@@ -6,6 +6,7 @@ import {
   FileWarning,
   Folders,
   Radio,
+  TrendingDown,
   TrendingUp,
 } from "lucide-react";
 import { JSX, useEffect, useRef, useState } from "react";
@@ -49,6 +50,7 @@ const DashboardPanelStatsCard = ({
     description,
     growth_type,
     link_text,
+    link = "#",
     icon,
     icon_bg_color,
   } = item;
@@ -90,13 +92,13 @@ const DashboardPanelStatsCard = ({
   }, [ref]);
 
   return (
-    <div>
+    <div className=" min-w-[200px]">
       <div
         className={`${
           growth_type === "up"
             ? "bg-[#EBFFF2] text-green-600"
             : "bg-[#FDF4F5] text-red-600"
-        }  bg-[#EBFFF2] rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102 relative`}
+        } rounded-lg flex flex-col justify-between border border-[#CAD2DB] transform transition-transform duration-300 hover:scale-102 relative`}
       >
         {/* Menu Button - Absolute Top Right */}
         {(currentPathname.split("/").pop() === "project-builder" ||
@@ -172,13 +174,14 @@ const DashboardPanelStatsCard = ({
             {showIndex && growth && (
               <span
                 className={`flex items-center gap-1 text-sm font-medium px-2 py-1 rounded ${
-                  growth_type === "up"
+                  Number(growth) > 0
                     ? "bg-green-100 text-[#169E7B]"
                     : "bg-red-100 text-red-600"
                 }`}
               >
                 {growth}
-                <TrendingUp className=" size-4" />
+                {Number(growth) > 0 && <TrendingUp className=" size-4" />}
+                {Number(growth) < 0 && <TrendingDown className=" size-4" />}
               </span>
             )}
           </div>
@@ -192,7 +195,7 @@ const DashboardPanelStatsCard = ({
                   <span className="">{description && description}</span>
                 )}
                 {showFooterButton && (
-                  <Link to={`#`} className="text-blue-500 hover:underline">
+                  <Link to={link} className="text-blue-500 hover:underline">
                     {link_text} &rarr;
                   </Link>
                 )}

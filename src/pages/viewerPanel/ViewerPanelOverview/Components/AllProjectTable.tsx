@@ -118,61 +118,61 @@ const renderPriority = (priority: ProjectPriority) => (
 //   setOpen: (open: boolean) => void;
 // }) => (
 //   <Dialog open={open} onOpenChange={setOpen}>
-//     <DialogContent className="p-0 rounded-2xl max-w-3xl overflow-hidden">
-//       <div className="bg-linear-to-r from-slate-50 to-white px-6 py-5 border-gray-200 border-b">
+//     <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-2xl">
+//       <div className="px-6 py-5 border-b border-gray-200 bg-linear-to-r from-slate-50 to-white">
 //         <DialogHeader>
-//           <DialogTitle className="font-semibold text-gray-900 text-xl">
+//           <DialogTitle className="text-xl font-semibold text-gray-900">
 //             {project.name}
 //           </DialogTitle>
-//           <DialogDescription className="text-muted-foreground text-sm">
+//           <DialogDescription className="text-sm text-muted-foreground">
 //             Project details overview
 //           </DialogDescription>
 //         </DialogHeader>
 //       </div>
 
-//       <div className="space-y-6 px-6 py-6">
+//       <div className="px-6 py-6 space-y-6">
 //         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Project ID</p>
+//           <p className="text-muted-foreground mb-1">Project ID</p>
 //           <p className="font-medium text-gray-900">{project.id}</p>
 //         </div>
 
 //         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Status</p>
+//           <p className="text-muted-foreground mb-1">Status</p>
 //           {renderStatusBadge(project.status)}
 //         </div>
 
 //         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Deadline</p>
+//           <p className="text-muted-foreground mb-1">Deadline</p>
 //           <p className="font-medium text-gray-900">
 //             {formatDate(project.deadline)}
 //           </p>
 //         </div>
 
 //         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Priority</p>
+//           <p className="text-muted-foreground mb-1">Priority</p>
 //           {renderPriority(project.priority)}
 //         </div>
 
 //         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Progress</p>
-//           <div className="bg-slate-200 rounded-full w-full h-2.5 overflow-hidden">
+//           <p className="text-muted-foreground mb-1">Progress</p>
+//           <div className="h-2.5 w-full bg-slate-200 rounded-full overflow-hidden">
 //             <div
-//               className="bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full h-full"
+//               className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400"
 //               style={{ width: `${project.progress}%` }}
 //             />
 //           </div>
-//           <p className="mt-1 font-medium text-sm">{project.progress}%</p>
+//           <p className="mt-1 text-sm font-medium">{project.progress}%</p>
 //         </div>
 
 //         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Description</p>
+//           <p className="text-muted-foreground mb-1">Description</p>
 //           <p className="leading-relaxed">
 //             {project.description || "No description provided."}
 //           </p>
 //         </div>
 //       </div>
 
-//       <div className="flex justify-end gap-2 bg-slate-50 px-6 py-4 border-gray-200 border-t">
+//       <div className="px-6 py-4 border-t border-gray-200 bg-slate-50 flex justify-end gap-2">
 //         <Button variant="outline" onClick={() => setOpen(false)}>
 //           Close
 //         </Button>
@@ -198,22 +198,21 @@ type SortOrder = "asc" | "desc";
 
 const TABLE_SKELETON_ROWS = 6;
 
-const AllProgramTable = ({
+const AllProjectTable = ({
   projects,
   isLoading = false,
 }: AllProgramTableProps) => {
-  // const [selectedProject, setSelectedProject] =
-  //   useState<StaffEmployeeProject | null>(null);
-  // const [open, setOpen] = useState(false);
+  //   const [selectedProject, setSelectedProject] =
+  //     useState<StaffEmployeeProject | null>(null);
+  //   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<SortField>("name");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
-  const navigate = useNavigate();
 
-  const handleViewProject = (project: StaffEmployeeProject) => {
-    // setSelectedProject(project);
-    // setOpen(true);
-    navigate(`/client-panel/overview/project-details/${project.id}`);
-  };
+  //   const handleViewProject = (project: StaffEmployeeProject) => {
+  //     setSelectedProject(project);
+  //     setOpen(true);
+  //   };
 
   /* ---------- sorting ---------- */
   const sortedProjects = useMemo(() => {
@@ -290,12 +289,12 @@ const AllProgramTable = ({
   ];
 
   return (
-    <Card className="shadow-none border-none w-full">
+    <Card className="w-full shadow-none border-none">
       <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full min-h-[420px]">
         {projects.length > 0 ? (
           <Table>
             <TableHeader>
-              <TableRow className="bg-[#F7F9FA] border-gray-200 border-b">
+              <TableRow className="border-b border-gray-200 bg-[#F7F9FA]">
                 {columns.map((col) => (
                   <TableHead
                     key={col.label}
@@ -333,7 +332,7 @@ const AllProgramTable = ({
                     <TableRow key={i} className="animate-pulse">
                       {columns.map((_, j) => (
                         <TableCell key={j} className="px-6 py-3.5">
-                          <div className="bg-gray-200 rounded w-full h-4"></div>
+                          <div className="h-4 bg-gray-200 rounded w-full"></div>
                         </TableCell>
                       ))}
                     </TableRow>
@@ -341,7 +340,7 @@ const AllProgramTable = ({
                 : sortedProjects.map((project) => (
                     <TableRow
                       key={project.id}
-                      className="hover:bg-muted/30 even:bg-[#F7F9FA] odd:bg-white border-gray-200 border-b"
+                      className="border-b border-gray-200 hover:bg-muted/30 odd:bg-white even:bg-[#F7F9FA]"
                     >
                       <TableCell className="px-6 py-3.5 font-medium">
                         {project?.program?.programName || "Program Name"}
@@ -371,7 +370,7 @@ const AllProgramTable = ({
                       <TableCell className="px-6 py-3.5 text-muted-foreground">
                         {formatDate(project.deadline)}
                       </TableCell>
-                      <TableCell className="flex items-center gap-2 px-6 py-3.5 text-muted-foreground">
+                      <TableCell className="px-6 py-3.5 text-muted-foreground flex items-center gap-2">
                         <Progress value={project.progress} className="h-2" />
                         <span className="font-medium">{project.progress}%</span>
                       </TableCell>
@@ -380,7 +379,11 @@ const AllProgramTable = ({
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleViewProject(project)}
+                            onClick={() =>
+                              navigate(
+                                `/viewer-panel/overview/project-details/${project.id}`,
+                              )
+                            }
                           >
                             <Eye className="w-4 h-4 text-[#1C73E0]" />
                           </Button>
@@ -397,17 +400,17 @@ const AllProgramTable = ({
             </TableBody>
           </Table>
         ) : (
-          <div className="flex justify-center items-center h-96 text-gray-500 text-xl">
+          <div className="flex items-center justify-center h-96 text-gray-500 text-xl">
             No projects found
           </div>
         )}
       </CardContent>
-
-      {/* {selectedProject && (
+      {/* 
+      {selectedProject && (
         <ProjectModal project={selectedProject} open={open} setOpen={setOpen} />
       )} */}
     </Card>
   );
 };
 
-export default AllProgramTable;
+export default AllProjectTable;

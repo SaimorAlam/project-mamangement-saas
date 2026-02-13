@@ -100,7 +100,7 @@ const ClientPanelStatsCard = ({ item }: IProps) => {
           {!isInStaffManager && (
             <>
               <span className="">{description && description}</span>
-              <Link to={`#`} className="text-blue-500 hover:underline">
+              <Link to={`#`} className="text-blue-500 no-underline font-medium">
                 {link_text} &rarr;
               </Link>
             </>

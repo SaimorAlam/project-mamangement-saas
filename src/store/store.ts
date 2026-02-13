@@ -13,10 +13,7 @@ const persistConfig = {
   storage,
 };
 
-const persistedAuthReducer = persistReducer(
-  persistConfig,
-  authReducer
-);
+const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
@@ -24,7 +21,7 @@ export const store = configureStore({
     auth: persistedAuthReducer,
     form: formReducer,
     file: fileReducer,
-    chartSlice: chartSliceReducer
+    chartSlice: chartSliceReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

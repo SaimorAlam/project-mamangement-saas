@@ -48,55 +48,20 @@ const StaffManagerDashboardHeader = () => {
     "/staff-manager-panel",
   ];
 
+  const userName = localStorage.getItem("userName");
+  const name = localStorage.getItem("name");
+
   return (
-    <div>
-      <div className="flex items-center py-5 justify-between">
-        {/* Greeting */}
-        {/* <div>
-          <h1 className="text-[32px] font-semibold">{heading}</h1>
-          <p className="text-base text-gray-500">{breadcrumb}</p>
-        </div> */}
-        {/* Breadcrumb */}
-        <div className="flex flex-col gap-2">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <div className="text-xl flex items-center justify-center gap-1 ">
-                    <Home className="w-6 h-6" />
-                    <Link to="/">Home</Link>
-                  </div>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              {currentRoute ? (
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="text-[#356DF0] text-xl flex items-center justify-center gap-1 ">
-                    {currentRoute.icon &&
-                      React.isValidElement(currentRoute.icon)
-                      ? cloneElement(
-                        currentRoute.icon as React.ReactElement<{
-                          className?: string;
-                        }>,
-                        { className: "w-6 h-6" }
-                      )
-                      : null}
-                    {currentRoute.name}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              ) : (
-                <BreadcrumbItem>
-                  <BreadcrumbPage></BreadcrumbPage>
-                </BreadcrumbItem>
-              )}
-            </BreadcrumbList>
-          </Breadcrumb>
-          {currentPath === "/staff-manager-panel/projects" && (
-            <p className="text-base text-gray-500">{breadcrumb}</p>
-          )}
-
+    <div className="flex flex-col gap-2 py-5">
+      <div className="flex items-center justify-between">
+        <div className="min-w-0">
+          <h1 className="text-2xl md:text-[32px] font-semibold truncate">
+            Good Morning {userName || name}, 👋
+          </h1>
+          <p className="text-sm md:text-base text-gray-500 truncate">
+            This is dashboard overview of Acme Corporation
+          </p>
         </div>
-
         {/* Search */}
         <GlobalSearch />
 
@@ -148,6 +113,46 @@ const StaffManagerDashboardHeader = () => {
             />
           )}
         </div>
+      </div>
+
+      {/* Breadcrumb */}
+      <div className="flex flex-col gap-2">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <div className="text-sm flex items-center justify-center gap-1 ">
+                  <Home className="w-4 h-4" />
+                  <Link to="/">Home</Link>
+                </div>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            {currentRoute ? (
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-[#356DF0] text-sm flex items-center justify-center gap-1 ">
+                  {currentRoute.icon &&
+                    React.isValidElement(currentRoute.icon)
+                    ? cloneElement(
+                      currentRoute.icon as React.ReactElement<{
+                        className?: string;
+                      }>,
+                      { className: "w-4 h-4" }
+                    )
+                    : null}
+                  {currentRoute.name}
+                </BreadcrumbPage>
+              </BreadcrumbItem>
+            ) : (
+              <BreadcrumbItem>
+                <BreadcrumbPage></BreadcrumbPage>
+              </BreadcrumbItem>
+            )}
+          </BreadcrumbList>
+        </Breadcrumb>
+        {currentPath === "/staff-manager-panel/projects" && (
+          <p className="text-sm text-gray-500">{breadcrumb}</p>
+        )}
       </div>
 
     </div>
