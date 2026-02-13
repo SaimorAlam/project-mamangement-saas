@@ -9,11 +9,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffEmployeeHeaderContext";
 import { getStaffEmployeeSidebarItems } from "./staffEmployeeSidebarMenuItems";
 import GlobalSearch from "@/components/staffManager/GlobalSearch";
-import NotificationModalNew from '@/components/staffManager/NotificationModalNew';
+import NotificationModalNew from "@/components/staffManager/NotificationModalNew";
 import { useGetUser } from "@/hooks/useGetUser";
 
 const StaffEmployeeDashboardHeader = () => {
@@ -28,21 +29,14 @@ const StaffEmployeeDashboardHeader = () => {
   const currentPath = location.pathname;
   const navigate = useNavigate();
 
-  const allRoutes = ClientSidebarGroups.flatMap(
-    (group) => group.items
-  );
-  const currentRoute = allRoutes.find(
-    (route) => route.path === currentPath
-  );
+  const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
+  const currentRoute = allRoutes.find((route) => route.path === currentPath);
 
   const previewButtonPaths = [
     "/staff-employee-panel/upload-submission",
     "/staff-employee-panel/project-builder",
   ];
-  const saveDraftButtonPaths = [
-    "/staff-employee-panel/project-builder",
-
-  ];
+  const saveDraftButtonPaths = ["/staff-employee-panel/project-builder"];
   const publishButtonPaths = [
     "/staff-employee-panel/upload-submission",
     "/staff-employee-panel/project-builder",
@@ -56,10 +50,15 @@ const StaffEmployeeDashboardHeader = () => {
     <div>
       <div className="flex items-start gap-5 py-5 justify-between">
         {/* Greeting */}
-        <div className="max-w-xl">
-          <h1 className="text-[32px] font-semibold">{name ? name : "Mr./Mrs. Employee"}</h1>
-          <div className="flex items-center gap-2">
-            <p className="text-base text-gray-500">{breadcrumb}</p>
+        <div className="max-w-xl flex items-center gap-4">
+          <SidebarTrigger className="md:hidden shrink-0" />
+          <div className="max-w-xl">
+            <h1 className="text-[32px] font-semibold">
+              {name ? name : "Mr./Mrs. Employee"}
+            </h1>
+            <div className="flex items-center gap-2">
+              <p className="text-base text-gray-500">{breadcrumb}</p>
+            </div>
           </div>
         </div>
 
@@ -111,7 +110,9 @@ const StaffEmployeeDashboardHeader = () => {
                 leftIcon={<Upload className="text-2xl" />}
                 title="Upload Submission"
                 type="Primary"
-                onClick={() => navigate("/staff-employee-panel/upload-submission")}
+                onClick={() =>
+                  navigate("/staff-employee-panel/upload-submission")
+                }
               />
             )}
           </div>
@@ -131,14 +132,13 @@ const StaffEmployeeDashboardHeader = () => {
             {currentRoute ? (
               <BreadcrumbItem>
                 <BreadcrumbPage className="text-[#356DF0] flex items-center justify-center gap-1 ">
-                  {currentRoute.icon &&
-                    React.isValidElement(currentRoute.icon)
+                  {currentRoute.icon && React.isValidElement(currentRoute.icon)
                     ? cloneElement(
-                      currentRoute.icon as React.ReactElement<{
-                        className?: string;
-                      }>,
-                      { className: "w-4 h-4" }
-                    )
+                        currentRoute.icon as React.ReactElement<{
+                          className?: string;
+                        }>,
+                        { className: "w-4 h-4" },
+                      )
                     : null}
                   {currentRoute.name}
                 </BreadcrumbPage>
