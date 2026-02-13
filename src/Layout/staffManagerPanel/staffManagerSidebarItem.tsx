@@ -60,6 +60,12 @@ export const getStaffManagerSidebarItems = (): SidebarGroup[] => {
           name: "Project Review",
           path: "/staff-manager-panel/project-review",
         },
+        {
+          icon: <Grid2x2 />,
+          name: "Project Builder",
+          path: "/staff-manager-panel/project-builder",
+        },
+
       ],
     },
     {

@@ -59,9 +59,9 @@ const StaffEmployeeSidebar = () => {
   const updatedGroups = groups.map((group, index) =>
     index === 1
       ? {
-          ...group,
-          items: favorites.length ? favorites : group.items,
-        }
+        ...group,
+        items: favorites,
+      }
       : group
   );
 
@@ -70,8 +70,8 @@ const StaffEmployeeSidebar = () => {
     const fullPath = item.index
       ? parentPath
       : item.path?.startsWith("/")
-      ? item.path
-      : `${parentPath}/${item.path}`;
+        ? item.path
+        : `${parentPath}/${item.path}`;
 
     const currentPath = location.pathname;
 
@@ -98,8 +98,8 @@ const StaffEmployeeSidebar = () => {
     const fullPath = item.index
       ? parentPath
       : item.path?.startsWith("/")
-      ? item.path
-      : `${parentPath}/${item.path}`;
+        ? item.path
+        : `${parentPath}/${item.path}`;
 
     const active = isRouteActive(item, parentPath);
 
@@ -112,10 +112,9 @@ const StaffEmployeeSidebar = () => {
               <button
                 className={`self-stretch rounded-[10px] inline-flex items-center w-full
                   ${state === "expanded" ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
-                  ${
-                    active
-                      ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
-                      : "text-gray-900 hover:bg-slate-100"
+                  ${active
+                    ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                    : "text-gray-900 hover:bg-slate-100"
                   }`}
               >
                 <div className={`flex items-center ${state === "expanded" ? "justify-between w-full" : "justify-center"}`}>
@@ -165,10 +164,9 @@ const StaffEmployeeSidebar = () => {
             asChild
             className={`self-stretch rounded-[10px] inline-flex items-center w-full
               ${state === "expanded" ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
-              ${
-                active
-                  ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
-                  : "text-gray-900"
+              ${active
+                ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                : "text-gray-900"
               }`}
           >
             <div className={`flex items-center ${state === "expanded" ? "gap-2" : ""}`}>
@@ -203,25 +201,28 @@ const StaffEmployeeSidebar = () => {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {updatedGroups.map((group) => (
-                <div key={group.label}>
-                  {state === "expanded" && (
-                    <SidebarGroupLabel className="text-[#64748B] text-sm font-medium">
-                      {group.label}
-                    </SidebarGroupLabel>
-                  )}
-
-                  <SidebarMenu className="space-y-[10px]">
-                    {group.items.map((item) =>
-                      renderSidebarItem(item)
+              {updatedGroups.map((group) => {
+                if (group.items.length === 0) return null;
+                return (
+                  <div key={group.label}>
+                    {state === "expanded" && (
+                      <SidebarGroupLabel className="text-[#64748B] text-sm font-medium">
+                        {group.label}
+                      </SidebarGroupLabel>
                     )}
-                  </SidebarMenu>
 
-                  {state === "expanded" && (
-                    <hr className="w-56 text-slate-300 my-5" />
-                  )}
-                </div>
-              ))}
+                    <SidebarMenu className="space-y-[10px]">
+                      {group.items.map((item) =>
+                        renderSidebarItem(item)
+                      )}
+                    </SidebarMenu>
+
+                    {state === "expanded" && (
+                      <hr className="w-56 text-slate-300 my-5" />
+                    )}
+                  </div>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
