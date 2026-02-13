@@ -16,16 +16,16 @@ export default function ProjectReviewOverviewCard() {
       icon_bg_color: "#069576",
       growth: 0,
       growth_type: "up",
-      description: "",
+      description: "0 score growth",
     },
     {
       title: "Pending Review",
       value: dashboardData.PENDING || 0,
       icon: "PendingReview",
-      icon_bg_color: "#4881FF",
+      icon_bg_color: "#FF974B",
       growth: 0,
       growth_type: "up",
-      description: "",
+      description: "0 score growth",
     },
     {
       title: "Returned",
@@ -34,7 +34,7 @@ export default function ProjectReviewOverviewCard() {
       icon_bg_color: "#4881FF",
       growth: 0,
       growth_type: "down",
-      description: "",
+      description: "0 new clients joined",
     },
     {
       title: "Overdue",
@@ -43,7 +43,7 @@ export default function ProjectReviewOverviewCard() {
       icon_bg_color: "#DA4352",
       growth: 0,
       growth_type: "down",
-      description: "",
+      description: "0 clients left",
     },
   ];
 
