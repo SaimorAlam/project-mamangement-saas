@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef } from "react";
 import { BsThreeDots } from "react-icons/bs";
-import { Copy, Trash2, Download, Upload } from "lucide-react";
+import { Trash2, Download, Upload } from "lucide-react";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
 
@@ -109,17 +109,17 @@ const ChartCardWrapper = ({
               {showPopover && (
                 <div
                   ref={popoverRef}
-                  className="absolute right-0 top-12 w-48 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-[999]"
+                  className="absolute right-0 top-12 w-48 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-999"
                 >
                   {/* COPY */}
-                  {menuActions.onCopy && (
+                  {/* {menuActions.onCopy && (
                     <button
                       onClick={() => handleAction(menuActions.onCopy)}
                       className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left items-center"
                     >
                       <Copy size={18} /> Copy
                     </button>
-                  )}
+                  )} */}
 
                   {/* DOWNLOAD - Only for Root */}
                   {tierLevel === 0 && menuActions.onDownload && (

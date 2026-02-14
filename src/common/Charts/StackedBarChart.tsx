@@ -20,8 +20,67 @@ import {
   useLazyFindChildrenValueQuery,
   useLazyGetAllTheLeafChartQuery,
 } from "@/store/Api/ChartApi/ChartApi";
-import { useAppDispatch } from "@/hooks/useRedux";
-import { setChildPayload } from "@/store/Slices/ChartSlice/ChartSlice";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import {
+  setChildPayload,
+  setGroupTitle,
+} from "@/store/Slices/ChartSlice/ChartSlice";
+
+/**
+ * Parse xAxis 2D array format from API
+ * Format: [["day", "absent", "late", "ontime"], ["Sunday", 1, 2, 50], ...]
+ * Returns: { labels: ["Sunday", "Monday", ...], data: {...} }
+ */
+const parseXAxisData = (
+  xAxis: any[][] | string,
+  legendValues: any[],
+  widgetTitle: string,
+) => {
+  let parsedXAxis = xAxis;
+
+  if (typeof xAxis === "string") {
+    try {
+      parsedXAxis = JSON.parse(xAxis);
+    } catch (error) {
+      console.error("Error parsing xAxis JSON:", error);
+      parsedXAxis = [];
+    }
+  }
+
+  if (!parsedXAxis || !Array.isArray(parsedXAxis) || parsedXAxis.length === 0) {
+    return { labels: [], data: {} as { [key: string]: ChartData[] } };
+  }
+
+  // First row is the header
+  const headers = parsedXAxis[0];
+  if (!Array.isArray(headers) || headers.length === 0) {
+    return { labels: [], data: {} as { [key: string]: ChartData[] } };
+  }
+
+  // Extract labels from the first column of data rows (skip header)
+  const labels = parsedXAxis.slice(1).map((row: any) => String(row[0] || ""));
+
+  // Transform data into the format expected by StackedBarChart
+  const chartData: ChartData[] = parsedXAxis.slice(1).map((row: any) => {
+    const dataPoint: ChartData = { name: String(row[0] || "") };
+
+    // Map each legend to its corresponding column value
+    legendValues.forEach((legend, index) => {
+      const columnIndex = index + 1; // Skip first column (label)
+      dataPoint[legend.field] = Number(row[columnIndex]) || 0;
+    });
+
+    return dataPoint;
+  });
+
+  // Create data object keyed by sheet name (sanitized widget title)
+  const sheetName = (widgetTitle || "Sheet")
+    .replace(/[:/?*[\]\\]/g, " ")
+    .trim()
+    .substring(0, 31);
+
+  return { labels, data: { [sheetName]: chartData } };
+};
 
 /*       TYPES       */
 
@@ -80,7 +139,7 @@ export default function StackedBarChart({
   endingRange,
   chartId,
   projectId,
-  widgets,
+
   onToggleWidget,
   onDelete,
   tierLevel = 0,
@@ -107,12 +166,16 @@ export default function StackedBarChart({
   const [isDownloading, setIsDownloading] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
-
+  const groupTitle = useAppSelector((state) => state.chartSlice.groupTitle);
   const currentBreadcrumbs = useMemo(() => {
-    const base = breadcrumbPath.length === 0 
-      ? [{ id: "dashboard", name: "Dashboard", level: -1 }] 
-      : breadcrumbPath;
-    return [...base, { id: chartId || "root", name: widgetTitle, level: tierLevel }];
+    const base =
+      breadcrumbPath.length === 0
+        ? [{ id: "dashboard", name: "Dashboard", level: -1 }]
+        : breadcrumbPath;
+    return [
+      ...base,
+      { id: chartId || "root", name: widgetTitle, level: tierLevel },
+    ];
   }, [breadcrumbPath, chartId, widgetTitle, tierLevel]);
 
   const handleChildNavigate = (targetLevel: number) => {
@@ -230,7 +293,7 @@ export default function StackedBarChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = async () => {
+  const handleDownload = async (title: string) => {
     if (!projectId) {
       toast.error("Project ID is missing");
       return;
@@ -238,9 +301,9 @@ export default function StackedBarChart({
     setIsDownloading(true);
     try {
       const res = await getAllTheLeafChart(projectId as string).unwrap();
-      const leafCharts = res?.data || [];
-
-      if (leafCharts.length === 0) {
+      const leafCharts =
+        res?.data?.find((item: any) => item.grouptitle === title) || [];
+      if (leafCharts.charts?.length === 0) {
         toast.error("No data found to download");
         return;
       }
@@ -270,10 +333,8 @@ export default function StackedBarChart({
         usedNames.add(finalName.toLowerCase());
         return finalName;
       };
-
-      leafCharts.forEach((node: any) => {
+      leafCharts?.charts?.forEach((node: any) => {
         ids.push(node.id);
-
         let xAxis = node.xAxisValues || [];
         if (!xAxis.length && node.xAxis) {
           try {
@@ -281,7 +342,16 @@ export default function StackedBarChart({
               typeof node.xAxis === "string"
                 ? JSON.parse(node.xAxis)
                 : node.xAxis;
-            xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
+
+            if (Array.isArray(parsed)) {
+              if (parsed.length > 0 && Array.isArray(parsed[0])) {
+                xAxis = parsed.slice(1).map((row: any) => row[0]);
+              } else {
+                xAxis = parsed;
+              }
+            } else {
+              xAxis = parsed.labels || [];
+            }
           } catch {
             // ignore
           }
@@ -312,7 +382,7 @@ export default function StackedBarChart({
         const headers = ["Label", ...legends.map((l: any) => l.label)];
         const rows = xAxis.map((label: string) => [
           label,
-          ...legends.map(() => ""),
+          ...Array(numOfLegendDataSet).fill(" "),
         ]);
         const data = [headers, ...rows];
         const ws = XLSX.utils.aoa_to_sheet(data);
@@ -334,30 +404,37 @@ export default function StackedBarChart({
     }
   };
 
-  const handleAddTierClick = () => {
+  const handleAddTierClick = (title: string) => {
+    if (tierLevel === 0) {
+      dispatch(setGroupTitle(title));
+    }
     const childPayload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: safeStartingRange,
       lastFiledDAtaset: safeEndingRange,
-      widgets: widgets?.map((l: any) => {
-        console.log(l.legendName, "l");
-        return {
-          legendName: l.legendName,
-          color: l.color,
-        };
-      }),
+      widgets: legendValues.map((l) => ({
+        legendName: l.label,
+        color: l.color,
+      })),
 
       title: "",
       status: "ACTIVE",
       category: "BAR",
 
-      xAxis: JSON.stringify(xAxisValues),
+      xAxis: JSON.stringify([
+        ["Label", ...legendValues.map((l) => l.label)],
+        ...xAxisValues.map((label) => [
+          label,
+          ...Array(numOfLegendDataSet).fill(0),
+        ]),
+      ]),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
       projectId: projectId,
       parentId: chartId,
       rootchart: false,
       roottitle: widgetTitle,
+      grouptitle: groupTitle,
     };
     dispatch(setChildPayload(childPayload));
 
@@ -367,6 +444,9 @@ export default function StackedBarChart({
   const handleChartClick = () => {
     if (childTiers?.length > 0) {
       setShowChildrenModal(true);
+      if (tierLevel === 0) {
+        dispatch(setGroupTitle(widgetTitle));
+      }
     }
   };
 
@@ -441,7 +521,8 @@ export default function StackedBarChart({
         onHeaderClick={handleChartClick}
         menuActions={{
           onCopy: handleCopy,
-          onDownload: tierLevel === 0 ? handleDownload : undefined,
+          onDownload:
+            tierLevel === 0 ? () => handleDownload(widgetTitle) : undefined,
           onUpload:
             tierLevel === 0
               ? () =>
@@ -450,7 +531,9 @@ export default function StackedBarChart({
                     ?.click()
               : undefined,
           onDelete: onDelete,
-          onAddTier: !isCreationMode ? handleAddTierClick : undefined,
+          onAddTier: !isCreationMode
+            ? () => handleAddTierClick(widgetTitle)
+            : undefined,
           onToggleWidget: onToggleWidget,
         }}
         isDownloading={isDownloading}
@@ -543,7 +626,7 @@ export default function StackedBarChart({
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
         chartId={chartId}
-        parentChartName={widgetTitle}
+        parentChartName={groupTitle}
       />
 
       {showChildrenModal && (
@@ -558,6 +641,19 @@ export default function StackedBarChart({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers &&
               childTiers?.map((tier: any) => {
+                const tierLegends = (tier?.barChart?.widgets || []).map(
+                  (w: any) => ({
+                    label: w.legendName,
+                    color: w.color,
+                  }),
+                );
+
+                const { labels, data } = parseXAxisData(
+                  tier.xAxis,
+                  tierLegends,
+                  tier.title,
+                );
+
                 return (
                   <StackedBarChart
                     newData={tier?.children || []}
@@ -568,14 +664,14 @@ export default function StackedBarChart({
                       tier?.taskName ||
                       "Untitled Tier"
                     }
-                    xAxisValues={tier?.xAxisValues}
-                    legendValues={tier?.legendValues}
-                    numOfLegendDataSet={tier?.legendValues?.length}
+                    xAxisValues={labels}
+                    legendValues={tierLegends}
+                    numOfLegendDataSet={tierLegends.length}
                     startingRange={startingRange}
                     endingRange={endingRange}
                     tierLevel={tierLevel + 1}
                     chartId={tier?.id}
-                    allUploadedData={localUploadedData || allUploadedData}
+                    allUploadedData={data}
                     isPreview={isPreview}
                     widgets={tier?.widgets}
                     projectId={tier?.projectId}

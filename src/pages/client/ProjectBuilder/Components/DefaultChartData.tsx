@@ -7,30 +7,45 @@ import { ChartData } from "@/common/Charts/StackedBarChart";
  * Format: [["day", "absent", "late", "ontime"], ["Sunday", 1, 2, 50], ...]
  * Returns: { labels: ["Sunday", "Monday", ...], data: {...} }
  */
-const parseXAxisData = (xAxis: any[][], legendValues: any[], widgetTitle: string) => {
-  if (!xAxis || !Array.isArray(xAxis) || xAxis.length === 0) {
+const parseXAxisData = (
+  xAxis: any[][] | string,
+  legendValues: any[],
+  widgetTitle: string,
+) => {
+  let parsedXAxis = xAxis;
+
+  if (typeof xAxis === "string") {
+    try {
+      parsedXAxis = JSON.parse(xAxis);
+    } catch (error) {
+      console.error("Error parsing xAxis JSON:", error);
+      parsedXAxis = [];
+    }
+  }
+
+  if (!parsedXAxis || !Array.isArray(parsedXAxis) || parsedXAxis.length === 0) {
     return { labels: [], data: {} as { [key: string]: ChartData[] } };
   }
 
   // First row is the header
-  const headers = xAxis[0];
+  const headers = parsedXAxis[0];
   if (!Array.isArray(headers) || headers.length === 0) {
     return { labels: [], data: {} as { [key: string]: ChartData[] } };
   }
 
   // Extract labels from the first column of data rows (skip header)
-  const labels = xAxis.slice(1).map((row) => String(row[0] || ""));
+  const labels = parsedXAxis.slice(1).map((row) => String(row[0] || ""));
 
   // Transform data into the format expected by StackedBarChart
-  const chartData: ChartData[] = xAxis.slice(1).map((row) => {
+  const chartData: ChartData[] = parsedXAxis.slice(1).map((row) => {
     const dataPoint: ChartData = { name: String(row[0] || "") };
-    
+
     // Map each legend to its corresponding column value
     legendValues.forEach((legend, index) => {
       const columnIndex = index + 1; // Skip first column (label)
       dataPoint[legend.field] = Number(row[columnIndex]) || 0;
     });
-    
+
     return dataPoint;
   });
 
@@ -39,7 +54,7 @@ const parseXAxisData = (xAxis: any[][], legendValues: any[], widgetTitle: string
     .replace(/[:/?*[\]\\]/g, " ")
     .trim()
     .substring(0, 31);
-    
+
   return { labels, data: { [sheetName]: chartData } };
 };
 
@@ -51,13 +66,17 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
         .map((item: any) => {
           if (item.category === "Bar" || item.category === "BAR") {
             const legendValues =
-              item?.barChart?.widgets?.map((w: any) => ({
+              (item?.barChart?.widgets || item?.widgets)?.map((w: any) => ({
                 label: w.legendName,
                 color: w.color,
-                field: w.legendName.toLowerCase().replace(/\s+/g, ""),
+                // field: w.legendName.toLowerCase().replace(/\s+/g, ""),
               })) || [];
 
-            const { labels, data } = parseXAxisData(item?.xAxis, legendValues, item?.title);
+            const { labels, data } = parseXAxisData(
+              item?.xAxis,
+              legendValues,
+              item?.title,
+            );
 
             return (
               <div key={item.id} className="w-full">

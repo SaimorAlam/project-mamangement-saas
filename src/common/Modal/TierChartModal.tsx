@@ -51,7 +51,10 @@ const TierChartModal: React.FC<TierChartModalProps> = ({
               </React.Fragment>
             ))}
           </div>
-          <button onClick={onClose} className="text-red-500 hover:text-red-700 ml-4 shrink-0">
+          <button
+            onClick={onClose}
+            className="text-red-500 hover:text-red-700 ml-4 shrink-0"
+          >
             <X size={24} />
           </button>
         </div>

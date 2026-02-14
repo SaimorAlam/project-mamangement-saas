@@ -144,7 +144,9 @@ const ProjectDashboardView = ({
           <div className={isPreviewOrPublished ? "col-span-full" : ""}>
             <KpiModule
               onDelete={
-                isPreviewOrPublished ? undefined : () => handleWidgetDelete("kpi")
+                isPreviewOrPublished
+                  ? undefined
+                  : () => handleWidgetDelete("kpi")
               }
               isPreview={isPreviewOrPublished}
             />

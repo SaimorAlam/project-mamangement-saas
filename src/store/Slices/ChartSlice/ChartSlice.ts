@@ -8,6 +8,7 @@ interface ChartBuilderState {
   widgetConfigs: Record<string, unknown>;
   childPayload: Record<string, unknown>;
   selectedWidgets: string[];
+  groupTitle: string;
 }
 
 const initialState: ChartBuilderState = {
@@ -18,6 +19,7 @@ const initialState: ChartBuilderState = {
   widgetConfigs: {},
   childPayload: {},
   selectedWidgets: [],
+  groupTitle: "",
 };
 
 const chartSlice = createSlice({
@@ -48,6 +50,9 @@ const chartSlice = createSlice({
     setSelectedWidgets: (state, action: { payload: string[] }) => {
       state.selectedWidgets = action.payload;
     },
+    setGroupTitle: (state, action: { payload: string }) => {
+      state.groupTitle = action.payload;
+    },
   },
 });
 
@@ -59,6 +64,7 @@ export const {
   setWidgetConfig,
   setChildPayload,
   setSelectedWidgets,
+  setGroupTitle,
 } = chartSlice.actions;
 
 export default chartSlice.reducer;

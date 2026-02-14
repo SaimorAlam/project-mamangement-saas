@@ -68,7 +68,7 @@ const WidgetForChartModuleOne = ({
       setProjectId(projectIdFromState);
     }
   }, [projectIdFromSlice, projectIdFromState]);
-  console.log({ projectIdFromSlice, projectIdFromState, projectId });
+
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
@@ -178,15 +178,13 @@ const WidgetForChartModuleOne = ({
       title: widgetTitle,
       status: "ACTIVE",
       category: widgetCategory,
-      xAxis: JSON.stringify(
-        xAxisValues.map((label, index) => [
+      xAxis: JSON.stringify([
+        ["Label", ...legendValues.map((l) => l.label)],
+        ...xAxisValues.map((label) => [
           label,
-          ...Array.from(
-            { length: numOfLegendDataSet },
-            (_, i) => index + i + 1,
-          ),
+          ...Array(numOfLegendDataSet).fill(0),
         ]),
-      ),
+      ]),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
       projectId: projectId ? projectId : projectIdFromState,

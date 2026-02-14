@@ -22,7 +22,6 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
   const { childPayload } = useAppSelector((state) => state.chartSlice);
   const [createChart] = useCreateChartMutation();
   const [tierName, setTierName] = useState("");
-
   const handleSave = async () => {
     const toastId = toast.loading("Creating Child Tier...");
     try {
