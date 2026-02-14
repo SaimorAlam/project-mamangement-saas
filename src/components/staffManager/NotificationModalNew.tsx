@@ -1,109 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+
+import { useState } from "react";
 import { X, Settings } from "lucide-react";
-import { io, Socket } from "socket.io-client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { useGetNotificationQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-
-interface NotificationApiItem {
-  id: string;
-  senderId: string;
-  receiverIds: string[];
-  projectId: string | null;
-  context: string;
-  type: "NEW_EMPLOYEE_ASSIGNED";
-  isRead: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface NotificationAction {
-  label: string;
-  variant?:
-  | "default"
-  | "destructive"
-  | "outline"
-  | "secondary"
-  | "ghost"
-  | "link";
-  onClick: () => void;
-}
-
-export interface NotificationItem {
-  id: string;
-  type: "project" | "team" | "system" | "file";
-  user: {
-    name: string;
-    avatar: string;
-    initials: string;
-  };
-  action: string;
-  target?: string;
-  timestamp: string;
-  team?: string;
-  actions?: NotificationAction[];
-  attachment?: {
-    name: string;
-    type: "pdf" | "doc" | "image";
-  };
-  status?: "new" | "read";
-}
-
-const timeAgo = (date: string) => {
-  const diff = Date.now() - new Date(date).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins} mins ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs} hrs ago`;
-  return `${Math.floor(hrs / 24)} days ago`;
-};
-
-const getInitials = (name: string) =>
-  name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
-
-const parseContext = (context: string) => {
-  const match = context.match(/"(.*?)"/);
-  return {
-    action: match ? context.replace(match[0], "").trim() : context,
-    target: match ? match[1] : undefined,
-  };
-};
-
-const mapApiToNotificationItem = (
-  api: NotificationApiItem,
-): NotificationItem => {
-  const { action, target } = parseContext(api.context);
-
-  const systemUser = "System";
-
-  return {
-    id: api.id,
-    type: api.projectId ? "project" : "system",
-    user: {
-      name: systemUser,
-      avatar: "",
-      initials: getInitials(systemUser),
-    },
-    action,
-    target,
-    timestamp: timeAgo(api.createdAt),
-    status: api.isRead ? "read" : "new",
-    actions: [
-      {
-        label: "View",
-        variant: "default",
-        onClick: () => {
-          console.log("View notification:", api.id);
-        },
-      },
-    ],
-  };
-};
+import { useNotification, NotificationItem } from "@/context/NotificationContext";
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -118,63 +19,15 @@ const tabs = [
   { id: "team", label: "Team" },
 ];
 
-let socket: Socket | null = null;
-
 export default function StaffEmployeeNotificationModal({
   isOpen,
   onClose,
   className,
 }: NotificationModalProps) {
-  const socketURL = "https://gfwndvfv-8080.inc1.devtunnels.ms";
-  // const socketURL = "https://lawaladmin.sakibalhasa.xyz/"
   const [activeTab, setActiveTab] = useState("all");
-  const [realtimeNotifications, setRealtimeNotifications] = useState<
-    NotificationItem[]
-  >([]);
+  const { notifications } = useNotification();
 
-  const { data } = useGetNotificationQuery();
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const token = localStorage.getItem("accessToken");
-
-    if (!socket) {
-      socket = io(socketURL, {
-        transports: ["websocket"],
-        auth: {
-          token,
-        },
-      });
-    }
-
-    socket.on("connect", () => {
-      console.log("Socket connected:", socket?.id);
-    });
-
-    socket.on("notification", (payload: NotificationApiItem) => {
-      const mapped = mapApiToNotificationItem(payload);
-      setRealtimeNotifications((prev) => [mapped, ...prev]);
-    });
-
-    return () => {
-      socket?.off("notification");
-    };
-  }, [isOpen]);
-
-  /* =========================
-     COMBINE API + REALTIME
-  ========================= */
-
-  const notifications: NotificationItem[] = useMemo(() => {
-    const apiNotifications = data?.data
-      ? data.data.map(mapApiToNotificationItem)
-      : [];
-
-    return [...realtimeNotifications, ...apiNotifications];
-  }, [data, realtimeNotifications]);
-
-  const filteredNotifications = notifications.filter((n) => {
+  const filteredNotifications = notifications.filter((n: NotificationItem) => {
     switch (activeTab) {
       case "inbox":
         return n.status === "new";
@@ -188,10 +41,6 @@ export default function StaffEmployeeNotificationModal({
   });
 
   if (!isOpen) return null;
-
-  /* =========================
-     JSX (UNCHANGED)
-  ========================= */
 
   return (
     <>

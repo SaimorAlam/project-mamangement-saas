@@ -1,22 +1,21 @@
 import { io, Socket } from "socket.io-client";
 
-let socket: Socket | null = null;
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "https://lawaladmin.sakibalhasa.xyz/";
 
-export const getSocket = (token?: string) => {
-    if (!socket) {
-        socket = io("https://lawal.sakibalhasa.xyz", {
-            transports: ["websocket"],
-            auth: {
-                token, // JWT if backend expects it
-            },
-        });
+export const socket: Socket = io(SOCKET_URL, {
+    autoConnect: false,
+    transports: ["websocket"],
+});
+
+export const connectSocket = (token: string) => {
+    if (!socket.connected) {
+        socket.auth = { token };
+        socket.connect();
     }
-    return socket;
 };
 
 export const disconnectSocket = () => {
-    if (socket) {
+    if (socket.connected) {
         socket.disconnect();
-        socket = null;
     }
 };

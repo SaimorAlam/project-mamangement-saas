@@ -16,6 +16,7 @@ import { getStaffEmployeeSidebarItems } from "./staffEmployeeSidebarMenuItems";
 import GlobalSearch from "@/components/staffManager/GlobalSearch";
 import NotificationModalNew from "@/components/staffManager/NotificationModalNew";
 import { useGetUser } from "@/hooks/useGetUser";
+import { useNotification } from "@/context/NotificationContext";
 
 const StaffEmployeeDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +25,7 @@ const StaffEmployeeDashboardHeader = () => {
   const { breadcrumb } = useHeaderContext();
   // const shortedLocation = breadcrumb.split(",").pop();
   const { name } = useGetUser();
+  const { unreadCount } = useNotification();
 
   const location = useLocation();
   const currentPath = location.pathname;
@@ -69,11 +71,18 @@ const StaffEmployeeDashboardHeader = () => {
           {/* Right Controls */}
           <div className="flex items-center justify-between gap-2 relative">
             {/* Notifications */}
-            <PrimaryButton
-              leftIcon={<Bell className="text-2xl" />}
-              type={"Outline"}
-              onClick={() => setIsOpen(true)}
-            />
+            <div className="relative">
+              <PrimaryButton
+                leftIcon={<Bell className="text-2xl" />}
+                type={"Outline"}
+                onClick={() => setIsOpen(true)}
+              />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </div>
             <NotificationModalNew
               isOpen={isOpen}
               onClose={() => setIsOpen(false)}
@@ -134,11 +143,11 @@ const StaffEmployeeDashboardHeader = () => {
                 <BreadcrumbPage className="text-[#356DF0] flex items-center justify-center gap-1 ">
                   {currentRoute.icon && React.isValidElement(currentRoute.icon)
                     ? cloneElement(
-                        currentRoute.icon as React.ReactElement<{
-                          className?: string;
-                        }>,
-                        { className: "w-4 h-4" },
-                      )
+                      currentRoute.icon as React.ReactElement<{
+                        className?: string;
+                      }>,
+                      { className: "w-4 h-4" },
+                    )
                     : null}
                   {currentRoute.name}
                 </BreadcrumbPage>
