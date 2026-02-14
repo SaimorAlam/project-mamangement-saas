@@ -44,6 +44,12 @@ export type TierChart = {
   children: TierChart[];
 };
 
+export type BreadcrumbItem = {
+  id: string;
+  name: string;
+  level: number;
+};
+
 type Props = {
   newData?: any[];
   widgetTitle?: string;
@@ -61,6 +67,8 @@ type Props = {
   isPreview?: boolean;
   projectId?: string;
   widgets?: any[];
+  breadcrumbPath?: BreadcrumbItem[];
+  onNavigate?: (level: number) => void;
 };
 
 export default function StackedBarChart({
@@ -79,6 +87,8 @@ export default function StackedBarChart({
   isCreationMode = false,
   allUploadedData,
   isPreview = false,
+  breadcrumbPath = [],
+  onNavigate,
 }: Props) {
   const [localUploadedData, setLocalUploadedData] = useState<
     { [key: string]: ChartData[] } | undefined
@@ -97,6 +107,30 @@ export default function StackedBarChart({
   const [isDownloading, setIsDownloading] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
+
+  const currentBreadcrumbs = useMemo(() => {
+    const base = breadcrumbPath.length === 0 
+      ? [{ id: "dashboard", name: "Dashboard", level: -1 }] 
+      : breadcrumbPath;
+    return [...base, { id: chartId || "root", name: widgetTitle, level: tierLevel }];
+  }, [breadcrumbPath, chartId, widgetTitle, tierLevel]);
+
+  const handleChildNavigate = (targetLevel: number) => {
+    if (targetLevel < tierLevel) {
+      setShowChildrenModal(false);
+      if (onNavigate) onNavigate(targetLevel);
+    }
+  };
+
+  const handleBreadcrumbClick = (index: number) => {
+    const target = currentBreadcrumbs[index];
+    if (index < currentBreadcrumbs.length - 1) {
+      if (onNavigate) {
+        onNavigate(target.level);
+      }
+      setShowChildrenModal(false);
+    }
+  };
 
   /*   EFFECTIVE DATA FOR RENDERING   */
 
@@ -518,6 +552,8 @@ export default function StackedBarChart({
           onClose={() => setShowChildrenModal(false)}
           tierLevel={tierLevel + 1}
           title={widgetTitle}
+          breadcrumbs={currentBreadcrumbs}
+          onBreadcrumbClick={handleBreadcrumbClick}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers &&
@@ -543,6 +579,8 @@ export default function StackedBarChart({
                     isPreview={isPreview}
                     widgets={tier?.widgets}
                     projectId={tier?.projectId}
+                    breadcrumbPath={currentBreadcrumbs}
+                    onNavigate={handleChildNavigate}
                   />
                 );
               })}
