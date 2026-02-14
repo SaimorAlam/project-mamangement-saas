@@ -21,12 +21,12 @@ interface NotificationApiItem {
 export interface NotificationAction {
   label: string;
   variant?:
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
+  | "default"
+  | "destructive"
+  | "outline"
+  | "secondary"
+  | "ghost"
+  | "link";
   onClick: () => void;
 }
 
