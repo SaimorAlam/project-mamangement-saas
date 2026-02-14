@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronRight, X } from "lucide-react";
+import { X, ArrowLeft, BarChart3 } from "lucide-react";
 
 interface TierChartModalProps {
   isOpen: boolean;
@@ -16,34 +16,69 @@ const TierChartModal: React.FC<TierChartModalProps> = ({
   onClose,
   children,
   tierLevel,
+  title,
   breadcrumbs = [],
   onBreadcrumbClick,
 }) => {
   if (!isOpen) return null;
 
-  // Calculate z-index based on tier level to stack modals properly
   const zIndex = 50 + tierLevel * 10;
+  const currentBreadcrumbIndex = breadcrumbs.length - 1;
+  const parentBreadcrumb =
+    breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2] : null;
+
+  const handleBack = () => {
+    if (parentBreadcrumb && onBreadcrumbClick) {
+      onBreadcrumbClick(currentBreadcrumbIndex - 1);
+    } else {
+      onClose();
+    }
+  };
 
   return (
     <div
-      className="fixed inset-0 backdrop-blur-sm bg-opacity-30 flex items-center justify-center"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-200"
       style={{ zIndex }}
     >
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-auto mx-4 my-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[80rem] h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 sticky top-0 bg-white z-10">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white shrink-0">
+          <button
+            onClick={handleBack}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600"
+          >
+            <ArrowLeft size={20} />
+          </button>
+
+          <h2 className="text-lg font-semibold text-gray-800 tracking-tight">
+            {title}
+          </h2>
+
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-red-50 rounded-full transition-colors text-red-500 group"
+          >
+            <X
+              size={20}
+              className="group-hover:scale-110 transition-transform"
+            />
+          </button>
+        </div>
+
+        {/* Breadcrumb / Context Bar */}
+        <div className="px-8 py-3 bg-white border-b border-gray-50 flex items-center gap-2 shrink-0">
+          <BarChart3 size={16} className="text-blue-500" />
+          <div className="flex items-center gap-2 text-sm font-medium">
             {breadcrumbs.map((crumb, index) => (
               <React.Fragment key={crumb.id || index}>
-                {index > 0 && (
-                  <ChevronRight size={14} className="text-gray-400 shrink-0" />
-                )}
+                {index > 0 && <span className="text-gray-300">/</span>}
                 <button
                   onClick={() => onBreadcrumbClick?.(index)}
-                  className={`text-sm font-medium whitespace-nowrap transition-colors ${
+                  disabled={index === breadcrumbs.length - 1}
+                  className={`transition-colors ${
                     index === breadcrumbs.length - 1
-                      ? "text-gray-900 cursor-default"
-                      : "text-blue-600 hover:text-blue-800"
+                      ? "text-blue-600 cursor-default"
+                      : "text-gray-500 hover:text-blue-500"
                   }`}
                 >
                   {crumb.name}
@@ -51,16 +86,12 @@ const TierChartModal: React.FC<TierChartModalProps> = ({
               </React.Fragment>
             ))}
           </div>
-          <button
-            onClick={onClose}
-            className="text-red-500 hover:text-red-700 ml-4 shrink-0"
-          >
-            <X size={24} />
-          </button>
         </div>
 
         {/* Content */}
-        <div className="p-6">{children}</div>
+        <div className="flex-1 overflow-y-auto bg-gray-50/50 p-8">
+          {children}
+        </div>
       </div>
     </div>
   );
