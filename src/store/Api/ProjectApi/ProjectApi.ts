@@ -34,6 +34,7 @@ const projectApi = baseApi.injectEndpoints({
       providesTags: [
         { type: "Project", id: "LIST" },
         { type: "Manager", id: "LIST" },
+        { type: "Employee", id: "LIST" },
       ],
     }),
 
