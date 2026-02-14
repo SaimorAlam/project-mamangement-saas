@@ -41,7 +41,8 @@ const StaffEmployeeSidebar = () => {
   const location = useLocation();
   const groups = getStaffEmployeeSidebarItems();
   const [open, setOpen] = useState(false);
-  const { state } = useSidebar();
+  const { state, isMobile } = useSidebar();
+  const isExpanded = state === "expanded" || isMobile;
 
   const { data } = useGetFavoriteProjectsQuery();
 
@@ -60,9 +61,9 @@ const StaffEmployeeSidebar = () => {
     index === 1
       ? {
           ...group,
-          items: favorites.length ? favorites : group.items,
+          items: favorites,
         }
-      : group
+      : group,
   );
 
   // Active logic — active if route matches current path or any child route matches
@@ -70,8 +71,8 @@ const StaffEmployeeSidebar = () => {
     const fullPath = item.index
       ? parentPath
       : item.path?.startsWith("/")
-      ? item.path
-      : `${parentPath}/${item.path}`;
+        ? item.path
+        : `${parentPath}/${item.path}`;
 
     const currentPath = location.pathname;
 
@@ -98,8 +99,8 @@ const StaffEmployeeSidebar = () => {
     const fullPath = item.index
       ? parentPath
       : item.path?.startsWith("/")
-      ? item.path
-      : `${parentPath}/${item.path}`;
+        ? item.path
+        : `${parentPath}/${item.path}`;
 
     const active = isRouteActive(item, parentPath);
 
@@ -111,22 +112,26 @@ const StaffEmployeeSidebar = () => {
             <DropdownMenuTrigger asChild className="border-none">
               <button
                 className={`self-stretch rounded-[10px] inline-flex items-center w-full
-                  ${state === "expanded" ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
+                  ${isExpanded ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
                   ${
                     active
                       ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                       : "text-gray-900 hover:bg-slate-100"
                   }`}
               >
-                <div className={`flex items-center ${state === "expanded" ? "justify-between w-full" : "justify-center"}`}>
-                  <span className={`flex items-center ${state === "expanded" ? "gap-2" : ""}`}>
+                <div
+                  className={`flex items-center ${isExpanded ? "justify-between w-full" : "justify-center"}`}
+                >
+                  <span
+                    className={`flex items-center ${isExpanded ? "gap-2" : ""}`}
+                  >
                     <span className="size-6 shrink-0">{item.icon}</span>
-                    {state === "expanded" && (
+                    {isExpanded && (
                       <span className="text-base font-normal">{item.name}</span>
                     )}
                   </span>
 
-                  {state === "expanded" && (
+                  {isExpanded && (
                     <ChevronRight
                       className={`shrink-0 ${open ? "rotate-90 duration-200" : ""}`}
                     />
@@ -136,8 +141,8 @@ const StaffEmployeeSidebar = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
-              side={state === "collapsed" ? "right" : "bottom"}
-              align={state === "collapsed" ? "start" : "end"}
+              side={!isExpanded ? "right" : "bottom"}
+              align={!isExpanded ? "start" : "end"}
               className="bg-white border border-[#CBD5E1] p-1 space-y-1 min-w-[200px]"
             >
               {item.children.map((child: any) => (
@@ -164,16 +169,16 @@ const StaffEmployeeSidebar = () => {
           <SidebarMenuButton
             asChild
             className={`self-stretch rounded-[10px] inline-flex items-center w-full
-              ${state === "expanded" ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
+              ${isExpanded ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
               ${
                 active
                   ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
                   : "text-gray-900"
               }`}
           >
-            <div className={`flex items-center ${state === "expanded" ? "gap-2" : ""}`}>
+            <div className={`flex items-center ${isExpanded ? "gap-2" : ""}`}>
               <span className="size-6 shrink-0">{item.icon}</span>
-              {state === "expanded" && (
+              {isExpanded && (
                 <span className="text-base font-normal">{item.name}</span>
               )}
             </div>
@@ -186,49 +191,48 @@ const StaffEmployeeSidebar = () => {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-1 border-slate-200 px-2 py-8 space-y-8 !bg-white overflow-y-auto"
+      className="border border-slate-200 px-2 py-8 space-y-8 bg-white! overflow-y-auto"
     >
-      <SidebarHeader className="!bg-white">
+      <SidebarHeader className="bg-white!">
         <div className="flex items-center justify-between">
-          {state === "expanded" && (
+          {isExpanded && (
             <Link to="/">
               <img src={Logo} alt="Logo" className="w-[176px] h-[50px]" />
             </Link>
           )}
-          <SidebarTrigger className={state === "collapsed" ? "mx-auto" : "ml-auto"} />
+          <SidebarTrigger className={!isExpanded ? "mx-auto" : "ml-auto"} />
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="!bg-white">
+      <SidebarContent className="bg-white!">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {updatedGroups.map((group) => (
-                <div key={group.label}>
-                  {state === "expanded" && (
-                    <SidebarGroupLabel className="text-[#64748B] text-sm font-medium">
-                      {group.label}
-                    </SidebarGroupLabel>
-                  )}
-
-                  <SidebarMenu className="space-y-[10px]">
-                    {group.items.map((item) =>
-                      renderSidebarItem(item)
+              {updatedGroups.map((group) => {
+                if (group.items.length === 0) return null;
+                return (
+                  <div key={group.label}>
+                    {isExpanded && (
+                      <SidebarGroupLabel className="text-[#64748B] text-sm font-medium">
+                        {group.label}
+                      </SidebarGroupLabel>
                     )}
-                  </SidebarMenu>
 
-                  {state === "expanded" && (
-                    <hr className="w-56 text-slate-300 my-5" />
-                  )}
-                </div>
-              ))}
+                    <SidebarMenu className="space-y-[10px]">
+                      {group.items.map((item) => renderSidebarItem(item))}
+                    </SidebarMenu>
+
+                    {isExpanded && <hr className="w-56 text-slate-300 my-5" />}
+                  </div>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="!bg-white">
-        <UserProfile />
+      <SidebarFooter className="bg-white!">
+        <UserProfile state={isExpanded ? "expanded" : "collapsed"} />
       </SidebarFooter>
     </Sidebar>
   );

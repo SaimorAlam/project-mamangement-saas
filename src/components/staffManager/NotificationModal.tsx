@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { X, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 export interface NotificationAction {
@@ -196,14 +192,11 @@ export default function NotificationModal({
 
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black/30 z-40"
-        onClick={onClose}
-      ></div>
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose}></div>
       <div
         className={cn(
           "absolute right-14 top-15 h-[85vh] w-96 bg-white rounded-lg z-50 flex flex-col shadow-xl",
-          className
+          className,
         )}
       >
         {/* Header */}
@@ -230,7 +223,7 @@ export default function NotificationModal({
                   "text-sm font-medium transition-colors pb-1 cursor-pointer",
                   activeTab === tab.id
                     ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-gray-500 hover:text-gray-700",
                 )}
               >
                 {tab.label}
@@ -250,15 +243,13 @@ export default function NotificationModal({
                 key={notification.id}
                 className={cn(
                   "p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors",
-                  notification.status === "new" && "bg-blue-50"
+                  notification.status === "new" && "bg-blue-50",
                 )}
               >
                 <div className="flex space-x-3">
                   <Avatar className="h-10 w-10 flex-shrink-0">
                     <AvatarImage
-                      src={
-                        notification.user.avatar || "/placeholder.svg"
-                      }
+                      src={notification.user.avatar || "/placeholder.svg"}
                       alt={notification.user.name}
                     />
                     <AvatarFallback className="text-xs font-medium">
@@ -285,9 +276,7 @@ export default function NotificationModal({
                       </span>
                       {notification.team && (
                         <>
-                          <span className="text-xs text-gray-400">
-                            •
-                          </span>
+                          <span className="text-xs text-gray-400">•</span>
                           <span className="text-xs text-gray-500">
                             {notification.team}
                           </span>
@@ -311,19 +300,17 @@ export default function NotificationModal({
                     {notification.actions &&
                       notification.actions.length > 0 && (
                         <div className="flex space-x-2 mt-3">
-                          {notification.actions.map(
-                            (action, index) => (
-                              <Button
-                                key={index}
-                                variant={action.variant || "outline"}
-                                size="sm"
-                                onClick={action.onClick}
-                                className="h-7 px-3 text-xs"
-                              >
-                                {action.label}
-                              </Button>
-                            )
-                          )}
+                          {notification.actions.map((action, index) => (
+                            <Button
+                              key={index}
+                              variant={action.variant || "outline"}
+                              size="sm"
+                              onClick={action.onClick}
+                              className="h-7 px-3 text-xs"
+                            >
+                              {action.label}
+                            </Button>
+                          ))}
                         </div>
                       )}
                   </div>

@@ -33,6 +33,7 @@ import ClientOverviewContainer from "@/pages/client/Overview/ClientOverviewConta
 import ClientProjectBuilderContainer from "@/pages/client/ProjectBuilder/ClientProjectBuilderContainer";
 import PublishProject from "@/pages/client/ProjectBuilder/Components/PublishProject";
 import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
+import ProfilePage from "@/pages/commonPage/ProfilePage";
 
 export function getClientRoutes() {
   return [
@@ -133,5 +134,6 @@ export function getClientRoutes() {
     { path: "settings", element: <ClientSettings /> },
     { path: "work-in-progress", element: <ClientWorkInProgress /> },
     { path: "user-activity-log", element: <ClientUserActivityLog /> },
+    { path: "profile", element: <ProfilePage /> },
   ];
 }

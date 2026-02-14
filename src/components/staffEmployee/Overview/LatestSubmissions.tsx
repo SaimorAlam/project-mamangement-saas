@@ -24,13 +24,12 @@ const LatestSubmission = () => {
   return (
     <BoxContainer>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 px-0">
-        <h4 className="font-semibold text-xl">Latest Submission</h4>
+        <h4 className="font-semibold text-xl">My Latest Submission</h4>
         <div className="mb-3 w-[200px]">
           <DropdownSelect
             placeholderText="Status"
             dropdownItem={statusOptions}
             onChange={setStatusFilter}
-            label="Status"
           />
         </div>
       </CardHeader>

@@ -15,13 +15,11 @@ import { toast } from "sonner";
 import { logOut } from "@/store/Slices/AuthSlice/authSlice";
 
 interface UserProfileButtonProps {
-  onProfileClick?: () => void;
   onSettingsClick?: () => void;
   state?: "expanded" | "collapsed";
 }
 
 export default function UserProfile({
-  onProfileClick,
   onSettingsClick,
   state,
 }: UserProfileButtonProps) {
@@ -47,14 +45,12 @@ export default function UserProfile({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={`h-auto mt-5 transition-all duration-300 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none! focus-visible:outline-none! ${
-            isCollapsed ? "p-2 w-fit mx-auto" : "p-3 w-full"
-          }`}
+          className={`h-auto mt-5 transition-all duration-300 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none! focus-visible:outline-none! ${isCollapsed ? "p-2 w-fit mx-auto" : "p-3 w-full"
+            }`}
         >
           <div
-            className={`flex items-center w-full gap-3 ${
-              isCollapsed ? "justify-center" : "justify-between px-3"
-            }`}
+            className={`flex items-center w-full gap-2 ${isCollapsed ? "justify-center" : "justify-between "
+              }`}
           >
             {/* Profile Avatar */}
             <div className="flex items-center gap-2">
@@ -68,15 +64,14 @@ export default function UserProfile({
 
               {/* User Info */}
               {!isCollapsed && (
-                <div className="flex flex-col items-start text-left">
+                <div className="flex flex-col items-start text-left  max-w-[150px] overflow-hidden">
                   <div className="flex items-center gap-1">
                     <span className="text-base font-medium text-gray-900">
                       {name}
                     </span>
                     <ChevronDown
-                      className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                        isOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+                        }`}
                     />
                   </div>
                   <span className="text-xs text-gray-500">{role}</span>
@@ -86,7 +81,7 @@ export default function UserProfile({
 
             {/* Logout Icon */}
             {!isCollapsed && (
-              <div className="ml-2 pl-2 border-l border-gray-400">
+              <div className="ml-1 pl-3 border-l border-gray-400">
                 <Power size={30} className="text-red-500" />
               </div>
             )}
@@ -99,22 +94,24 @@ export default function UserProfile({
         className="w-56   mt-2 border border-[#E2E8F0] bg-white space-y-2 focus:outline-none focus-visible:outline-none"
       >
         <DropdownMenuItem
-          onClick={onProfileClick}
+          asChild
           className="cursor-pointer focus:outline-none focus-visible:outline-none"
         >
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
-              <img
-                src={profileImage || "/placeholder.svg"}
-                alt={name}
-                className="w-full h-full object-cover"
-              />
+          <Link to="profile">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
+                <img
+                  src={profileImage || "/placeholder.svg"}
+                  alt={name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">{name}</span>
+                <span className="text-xs text-gray-500">{role}</span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{name}</span>
-              <span className="text-xs text-gray-500">{role}</span>
-            </div>
-          </div>
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator className="border border-[#E2E8F0] h-px" />
@@ -123,12 +120,12 @@ export default function UserProfile({
           Settings
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={onProfileClick} className="cursor-pointer">
-          Profile
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link to="profile">Profile</Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={onProfileClick} className="cursor-pointer">
-          <Link to="/user-activity-log">Activity Log</Link>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link to="user-activity-log">Activity Log</Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator className="border border-[#E2E8F0] " />

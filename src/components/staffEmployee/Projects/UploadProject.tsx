@@ -3,6 +3,8 @@ import { UploadCloud, ChevronDown, Upload, Calendar } from "lucide-react";
 import { FaRoad } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 
 const UploadProject = () => {
   const [program, setProgram] = useState("");
@@ -17,8 +19,11 @@ const UploadProject = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const datePickerRef = useRef<HTMLDivElement>(null);
 
-  const programs = ["Program A", "Program B", "Program C", "Program D", "Program E", "Program F", "Program G", "Program H", "Program I"];
-  const projects = ["Project X", "Project Y", "Project Z"];
+  // const programs = ["Program A", "Program B", "Program C", "Program D", "Program E", "Program F", "Program G", "Program H", "Program I"];
+  // const projects = ["Project X", "Project Y", "Project Z"];
+
+  const { data: programs } = useGetAllProgramQuery({});
+  const { data: projects } = useGetAllProjectsQuery({});
 
   const dateOptions = [
     { value: "last1week", label: "Last 1 Week" },
@@ -123,8 +128,10 @@ const UploadProject = () => {
               className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md appearance-none"
             >
               <option value="">Select program name</option>
-              {programs.map((p) => (
-                <option key={p} value={p}>{p}</option>
+              {programs?.data?.data?.map((p: any) => (
+                <option key={p.id} value={p.id}>
+                  {p.programName}
+                </option>
               ))}
             </select>
             <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
@@ -141,8 +148,11 @@ const UploadProject = () => {
               className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md appearance-none"
             >
               <option value="">Select Project Name</option>
-              {projects.map((p) => (
+              {/* {projects.map((p: any) => (
                 <option key={p} value={p}>{p}</option>
+              ))} */}
+              {projects?.data?.projects?.data.map((p: any) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
             <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
@@ -280,7 +290,7 @@ const UploadProject = () => {
                 onClick={downloadCsvTemplate}
                 className="text-sm text-blue-400 hover:underline"
               >
-                Download Simple CSV Template →
+                Download Sample CSV Template →
               </button>
             </div>
           </>

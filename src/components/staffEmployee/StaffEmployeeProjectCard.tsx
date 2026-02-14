@@ -187,7 +187,19 @@ const StaffEmployeeProjectCard = ({
               />
             </div>
 
-            <div className="flex flex-col gap-y-4 text-sm py-2 px-4">
+            {/* Priority */}
+            <div className="px-4 py-2">
+              <p className="text-gray-500">Priority</p>
+              <div className="flex items-center gap-1">
+                <Flag className={`w-4 h-4 ${priorityColor}`} />
+                <span className={`text-sm font-medium ${priorityColor}`}>
+                  {priority}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="w-full h-full flex flex-col justify-between gap-3">
+            <div className="flex h-full flex-col justify-between gap-y-4 text-sm py-2 px-4">
               <div>
                 <p className="text-gray-500">Project start</p>
                 <p className="font-medium">{formatDate(startDate)}</p>
@@ -198,17 +210,6 @@ const StaffEmployeeProjectCard = ({
                 <p className="font-medium">{formatDate(deadline)}</p>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Priority */}
-        <div className="px-4 py-2">
-          <p className="text-gray-500">Priority</p>
-          <div className="flex items-center gap-1">
-            <Flag className={`w-4 h-4 ${priorityColor}`} />
-            <span className={`text-sm font-medium ${priorityColor}`}>
-              {priority}
-            </span>
           </div>
         </div>
 

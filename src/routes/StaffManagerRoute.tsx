@@ -3,7 +3,7 @@ import StaffManagerProjects from "@/pages/staffManager/StaffManagerProjects";
 import StaffManagerMarketingStrategy from "@/pages/staffManager/StaffManagerMarketingStrategy";
 import StaffManagerTimosSuperShop from "@/pages/staffManager/StaffManagerTimosSuperShop";
 import StaffManagerProgramName from "@/pages/staffManager/StaffManagerProgramName";
-import StaffManagerProjectBuilder from "@/pages/staffManager/StaffManagerProjectBuilder";
+// import StaffManagerProjectBuilder from "@/pages/staffManager/StaffManagerProjectBuilder";
 import StaffManagerHighwayExpansion from "@/pages/staffManager/StaffManagerHighwayExpansion";
 // import StaffManagerProjectReview from "@/pages/staffManager/StaffManagerProjectReview";
 import StaffManagerHelp from "@/pages/staffManager/StaffManagerHelp";
@@ -28,6 +28,8 @@ import AllProjectsReview from "@/pages/staffManager/AllProjectsReview";
 import StaffManagerProjectDetail from "@/pages/staffManager/StaffManagerProjectDetail";
 import ProgramDetailsPage from "@/pages/staffManager/ProgramDetailsPage";
 import DashboardCardProjects from "@/pages/staffManager/DashboardCardProjects";
+import ClientProjectBuilder from "@/pages/client/ProjectBuilder/ClientProjectBuilder";
+import ProfilePage from "@/pages/commonPage/ProfilePage";
 
 export function getStaffManagerRoutes() {
   return [
@@ -56,7 +58,8 @@ export function getStaffManagerRoutes() {
     { path: "program-name", element: <StaffManagerProgramName /> },
     {
       path: "project-builder",
-      element: <StaffManagerProjectBuilder />,
+      element: <ClientProjectBuilder />,
+      // element: <StaffManagerProjectBuilder />,
     },
     {
       path: "highway-expansion",
@@ -108,5 +111,6 @@ export function getStaffManagerRoutes() {
       path: "state-card/:cardTitle",
       element: <StaffManagerStateCardDetails />,
     },
+    { path: "profile", element: <ProfilePage /> },
   ];
 }

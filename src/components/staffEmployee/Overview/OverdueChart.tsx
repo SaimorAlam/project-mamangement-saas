@@ -6,17 +6,16 @@ import { useGetStaffEmployeeTopOverDueQuery } from "@/store/Api/StaffEmployeeApi
 import ContentLoader from "react-content-loader";
 
 const OverDueChart = () => {
-  const { overdueList, isLoading, error } =
-    useGetStaffEmployeeTopOverDueQuery(
-      {},
-      {
-        selectFromResult: ({ data, isLoading, error }) => ({
-          overdueList: data?.data?.projects ?? [],
-          isLoading,
-          error,
-        }),
-      }
-    );
+  const { overdueList, isLoading, error } = useGetStaffEmployeeTopOverDueQuery(
+    {},
+    {
+      selectFromResult: ({ data, isLoading, error }) => ({
+        overdueList: data?.data?.projects ?? [],
+        isLoading,
+        error,
+      }),
+    },
+  );
 
   const chartData = useMemo<{
     series: { name: string; data: number[] }[];
@@ -30,7 +29,7 @@ const OverDueChart = () => {
       name: item.projectName ?? item.name ?? "Unnamed",
       days: Number(item.overdueDays ?? item.overdue_days ?? 0),
       priority: String(
-        item.priority ?? item.priority_level ?? ""
+        item.priority ?? item.priority_level ?? "",
       ).toLowerCase(),
     }));
 
@@ -106,7 +105,7 @@ const OverDueChart = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg p-4 min-w-88 h-full">
+    <div className="bg-white rounded-lg p-4 min-w-full md:min-w-88 min-h-[400px] overflow-hidden">
       {error && (
         <div className="text-center text-sm text-red-600 py-6">
           {getErrorMessage(error)}

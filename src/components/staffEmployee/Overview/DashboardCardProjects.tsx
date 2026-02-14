@@ -12,9 +12,9 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 const DashboardCardProjects = () => {
   const { status } = useParams();
   const navigate = useNavigate();
-  const managerId = useSelector((state: any) => state.auth.user?.userId);
+  const employeeId = useSelector((state: any) => state.auth.user?.userId);
   const { data, isLoading, error } = useGetAllProjectsQuery({
-    managerId,
+    employeeId,
     status: status ? status : "ALL",
   });
 
@@ -34,7 +34,7 @@ const DashboardCardProjects = () => {
         <h4 className="mb-3 text-gray-900 text-center text-xl font-semibold">
           Something went wrong
         </h4>
-        <Link to="/staff-manager-panel" className="btn btn-primary">
+        <Link to="/staff-employee-panel" className="btn btn-primary">
           Go back
         </Link>
       </>
@@ -51,13 +51,12 @@ const DashboardCardProjects = () => {
         <div className="p-10 bg-gray-50 rounded-lg">
           <p className="text-center text-gray-500">No projects found</p>
         </div>
-        <button
-          onClick={() => navigate(-1)}
-          className="mt-5  flex items-center gap-2 text-primary hover:cursor-pointer border border-gray-300 rounded-lg px-4 py-2"
+        <Link
+          to="/staff-employee-panel"
+          className="border p-3 rounded-lg border-gray-300 mt-5 inline-block"
         >
-          <ChevronLeft />
-          Go back
-        </button>
+          Go Back
+        </Link>
       </>
     );
   }
@@ -69,7 +68,7 @@ const DashboardCardProjects = () => {
         </h4>
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-primary hover:cursor-pointer border border-gray-300 rounded-lg px-4 py-2"
+          className="flex items-center gap-2 text-primary border border-gray-300 rounded-lg px-4 py-2"
         >
           <ChevronLeft />
           Go back
