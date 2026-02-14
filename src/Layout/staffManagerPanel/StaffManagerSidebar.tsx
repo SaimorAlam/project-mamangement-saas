@@ -101,26 +101,23 @@ const StaffManagerSidebar = () => {
     // Dropdown (parent with children)
     if (item.children && item.children.length > 0) {
       return (
-        <SidebarMenuItem key={fullPath} className="w-full">
+        <SidebarMenuItem key={fullPath} className="w-full ">
           <DropdownMenu onOpenChange={(v) => setOpen(v)}>
             <DropdownMenuTrigger asChild className="border-none">
               <button
                 className={`self-stretch rounded-[10px] inline-flex items-center 
-                  ${
-                    isExpanded
-                      ? "px-4 py-3 justify-start w-full"
-                      : "px-1 justify-center"
+                  ${isExpanded
+                    ? "px-4 py-3 justify-start w-full"
+                    : "px-1 justify-center"
                   }
-                  ${
-                    active
-                      ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
-                      : "text-gray-900 hover:bg-slate-100"
+                  ${active
+                    ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                    : "text-gray-900 hover:bg-slate-100"
                   }`}
               >
                 <div
-                  className={`flex items-center ${
-                    isExpanded ? "justify-between w-full" : "justify-center"
-                  }`}
+                  className={`flex items-center ${isExpanded ? "justify-between w-full" : "justify-center"
+                    }`}
                 >
                   <span
                     className={`flex items-center ${isExpanded ? "gap-2" : ""}`}
@@ -135,9 +132,8 @@ const StaffManagerSidebar = () => {
 
                   {isExpanded && (
                     <ChevronRight
-                      className={`shrink-0 ${
-                        open ? "rotate-90 duration-200" : ""
-                      }`}
+                      className={`shrink-0 ${open ? "rotate-90 duration-200" : ""
+                        }`}
                     />
                   )}
                 </div>
@@ -173,15 +169,13 @@ const StaffManagerSidebar = () => {
           <SidebarMenuButton
             asChild
             className={`self-stretch rounded-[10px] inline-flex items-center w-full
-              ${
-                isExpanded
-                  ? "px-4 py-5 justify-start"
-                  : "px-2 py-3 justify-center"
+              ${isExpanded
+                ? "px-4 py-5 justify-start"
+                : "px-2 py-3 justify-center"
               }
-              ${
-                active
-                  ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
-                  : "text-gray-900"
+              ${active
+                ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                : "text-gray-900"
               }`}
           >
             <div className={`flex items-center ${isExpanded ? "gap-2" : ""}`}>
@@ -205,12 +199,11 @@ const StaffManagerSidebar = () => {
     >
       <SidebarHeader className="bg-white">
         <div
-          className={`flex ${
-            !isExpanded ? "flex-col" : ""
-          } items-center justify-between`}
+          className={`flex ${!isExpanded ? "flex-col" : ""
+            } items-center justify-between`}
         >
           {
-            <Link to="/">
+            <Link to="/staff-manager-panel">
               <img
                 src={Logo}
                 alt="Logo"
@@ -227,7 +220,7 @@ const StaffManagerSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               {groups.map((group) => {
-                // if (group.items.length === 0) return null;
+                if (group.items.length === 0) return null;
                 return (
                   <SidebarMenuItem key={group.label}>
                     {isExpanded && (

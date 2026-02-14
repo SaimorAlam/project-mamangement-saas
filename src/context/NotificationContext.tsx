@@ -40,6 +40,7 @@ export interface NotificationItem {
         type: "pdf" | "doc" | "image";
     };
     status?: "new" | "read";
+    projectId?: string | null;
 }
 
 // --- Helper Functions ---
@@ -92,12 +93,14 @@ const mapApiToNotificationItem = (api: NotificationApiItem): NotificationItem =>
                 },
             },
         ],
+        projectId: api.projectId,
     };
 };
 
 interface NotificationContextType {
     notifications: NotificationItem[];
     unreadCount: number;
+    isConnected: boolean;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -146,6 +149,8 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     const unreadCount = notifications.filter((n) => n.status === "new").length;
 
+    const [isConnected, setIsConnected] = useState(false);
+
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         if (token) {
@@ -162,20 +167,31 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
             });
         };
 
-        socket.on("connect", () => {
+        const handleConnect = () => {
             console.log("Socket connected:", socket.id);
-        });
+            setIsConnected(true);
+        };
 
-        socket.on("disconnect", () => {
+        const handleDisconnect = () => {
             console.log("Socket disconnected");
-        });
+            setIsConnected(false);
+        };
 
+        const handleConnectError = (err: Error) => {
+            console.error("Socket connection error:", err);
+            setIsConnected(false);
+        };
+
+        socket.on("connect", handleConnect);
+        socket.on("disconnect", handleDisconnect);
+        socket.on("connect_error", handleConnectError);
         socket.on("notification_received", handleNotification);
         socket.on("notification", handleNotification); // Fallback for legacy event name
 
         return () => {
-            socket.off("connect");
-            socket.off("disconnect");
+            socket.off("connect", handleConnect);
+            socket.off("disconnect", handleDisconnect);
+            socket.off("connect_error", handleConnectError);
             socket.off("notification_received", handleNotification);
             socket.off("notification", handleNotification);
             disconnectSocket();
@@ -183,7 +199,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     }, []); // Run once on mount
 
     return (
-        <NotificationContext.Provider value={{ notifications, unreadCount }}>
+        <NotificationContext.Provider value={{ notifications, unreadCount, isConnected }}>
             {children}
         </NotificationContext.Provider>
     );

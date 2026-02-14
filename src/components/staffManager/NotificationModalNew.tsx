@@ -1,10 +1,11 @@
 
 import { useState } from "react";
-import { X, Settings } from "lucide-react";
+import { X, Settings, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useNotification, NotificationItem } from "@/context/NotificationContext";
+import { useNavigate } from "react-router-dom";
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -25,7 +26,8 @@ export default function StaffEmployeeNotificationModal({
   className,
 }: NotificationModalProps) {
   const [activeTab, setActiveTab] = useState("all");
-  const { notifications } = useNotification();
+  const { notifications, isConnected } = useNotification();
+  const navigate = useNavigate();
 
   const filteredNotifications = notifications.filter((n: NotificationItem) => {
     switch (activeTab) {
@@ -54,7 +56,16 @@ export default function StaffEmployeeNotificationModal({
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <h4 className="font-semibold text-lg">Notifications</h4>
+          <div className="flex items-center gap-2">
+            <h4 className="font-semibold text-lg">Notifications</h4>
+            <div
+              className={cn(
+                "w-2 h-2 rounded-full",
+                isConnected ? "bg-green-500" : "bg-red-500"
+              )}
+              title={isConnected ? "Connected to realtime updates" : "Disconnected"}
+            />
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -96,18 +107,19 @@ export default function StaffEmployeeNotificationModal({
                 key={notification.id}
                 className={cn(
                   "p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors",
-                  notification.status === "new" && "bg-blue-50",
+                  notification.status === "new" && "bg-blue-50/10",
                 )}
               >
                 <div className="flex items-center space-x-3">
-                  <Avatar className="h-10 w-10 shrink-0 border border-gray-200">
-                    <AvatarImage
+                  <Avatar className="h-10 w-10 shrink-0 border border-gray-200 flex items-center justify-center">
+                    {/* <AvatarImage
                       src={notification.user.avatar || "/placeholder.svg"}
                       alt={notification.user.name}
-                    />
-                    <AvatarFallback className="text-xs font-medium">
+                    /> */}
+                    {/* <AvatarFallback className="text-xs font-medium">
                       {notification.user.initials}
-                    </AvatarFallback>
+                    </AvatarFallback> */}
+                    <Bell className="h-4 w-4 text-gray-400" />
                   </Avatar>
 
                   <div className="flex-1 min-w-0">
@@ -136,8 +148,8 @@ export default function StaffEmployeeNotificationModal({
                             key={index}
                             variant={action.variant || "outline"}
                             size="sm"
-                            onClick={action.onClick}
-                            className="h-7 px-3 text-xs"
+                            onClick={() => navigate(`/staff-manager-panel/projects/${notification.projectId}`)}
+                            className="h-7 px-3 text-xs bg-gray-100 hover:cursor-pointer hover:text-blue-600"
                           >
                             {action.label}
                           </Button>

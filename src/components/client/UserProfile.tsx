@@ -45,14 +45,12 @@ export default function UserProfile({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={`h-auto mt-5 transition-all duration-300 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none! focus-visible:outline-none! ${
-            isCollapsed ? "p-2 w-fit mx-auto" : "p-3 w-full"
-          }`}
+          className={`h-auto mt-5 transition-all duration-300 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none! focus-visible:outline-none! ${isCollapsed ? "p-2 w-fit mx-auto" : "p-3 w-full"
+            }`}
         >
           <div
-            className={`flex items-center w-full gap-3 ${
-              isCollapsed ? "justify-center" : "justify-between px-3"
-            }`}
+            className={`flex items-center w-full gap-2 ${isCollapsed ? "justify-center" : "justify-between "
+              }`}
           >
             {/* Profile Avatar */}
             <div className="flex items-center gap-2">
@@ -66,15 +64,14 @@ export default function UserProfile({
 
               {/* User Info */}
               {!isCollapsed && (
-                <div className="flex flex-col items-start text-left">
+                <div className="flex flex-col items-start text-left  max-w-[150px] overflow-hidden">
                   <div className="flex items-center gap-1">
                     <span className="text-base font-medium text-gray-900">
                       {name}
                     </span>
                     <ChevronDown
-                      className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                        isOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+                        }`}
                     />
                   </div>
                   <span className="text-xs text-gray-500">{role}</span>
@@ -84,7 +81,7 @@ export default function UserProfile({
 
             {/* Logout Icon */}
             {!isCollapsed && (
-              <div className="ml-2 pl-2 border-l border-gray-400">
+              <div className="ml-1 pl-3 border-l border-gray-400">
                 <Power size={30} className="text-red-500" />
               </div>
             )}
