@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Plus, X } from "lucide-react";
+import { useGetManagerByIdQuery } from "@/store/Api/UserApi/UserApi";
 
 interface Tag {
   id: number;
@@ -16,7 +17,10 @@ interface Alert {
   by: string;
 }
 
-const ProgramManager: React.FC = () => {
+const ProgramManager = ({ managerId }: { managerId: string }) => {
+  const { data, isLoading } = useGetManagerByIdQuery(managerId);
+  console.log(data?.data);
+  console.log(managerId);
   const [tags, setTags] = useState<Tag[]>([
     { id: 1, label: "Infrastructure", color: "blue" },
     { id: 2, label: "Highway", color: "green" },
@@ -26,6 +30,7 @@ const ProgramManager: React.FC = () => {
     { id: 6, label: "Priority", color: "red" },
   ]);
 
+  if (isLoading) return <div>Loading...</div>;
   const alerts: Alert[] = [
     {
       id: 1,
@@ -102,16 +107,8 @@ const ProgramManager: React.FC = () => {
   const addTag = () => {
     const tagName = prompt("Enter tag name:");
     if (tagName) {
-      const colors = [
-        "blue",
-        "green",
-        "purple",
-        "gray",
-        "yellow",
-        "red",
-      ];
-      const randomColor =
-        colors[Math.floor(Math.random() * colors.length)];
+      const colors = ["blue", "green", "purple", "gray", "yellow", "red"];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
       setTags([
         ...tags,
         { id: Date.now(), label: tagName, color: randomColor },
@@ -150,18 +147,12 @@ const ProgramManager: React.FC = () => {
       <div className="mb-6 bg-gray-100 p-4 rounded-md">
         <div className="flex gap-3 mb-3">
           <div className="flex-1">
-            <div className="text-xs text-gray-600 mb-1">
-              Start Date
-            </div>
-            <div className="text-sm font-medium text-gray-900">
-              21-Oct-2024
-            </div>
+            <div className="text-xs text-gray-600 mb-1">Start Date</div>
+            <div className="text-sm font-medium text-gray-900">21-Oct-2024</div>
           </div>
           <div className="flex-1">
             <div className="text-xs text-gray-600 mb-1">End Date</div>
-            <div className="text-sm font-medium text-gray-900">
-              21-Oct-2024
-            </div>
+            <div className="text-sm font-medium text-gray-900">21-Oct-2024</div>
           </div>
         </div>
 
@@ -171,9 +162,7 @@ const ProgramManager: React.FC = () => {
             <span className="text-xs text-blue-600 font-medium">
               Time Remaining
             </span>
-            <span className="text-xs text-gray-900 font-medium">
-              45 days
-            </span>
+            <span className="text-xs text-gray-900 font-medium">45 days</span>
           </div>
           <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
             <div
@@ -187,9 +176,7 @@ const ProgramManager: React.FC = () => {
       {/* Tags Section */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-semibold text-gray-600">
-            Tags
-          </h3>
+          <h3 className="text-xs font-semibold text-gray-600">Tags</h3>
           <button
             onClick={addTag}
             className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
@@ -203,7 +190,7 @@ const ProgramManager: React.FC = () => {
             <span
               key={tag.id}
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getTagColor(
-                tag.color
+                tag.color,
               )}`}
             >
               {tag.label}
@@ -221,19 +208,15 @@ const ProgramManager: React.FC = () => {
       {/* Alerts Section */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-semibold text-gray-600">
-            Alerts
-          </h3>
-          <span className="text-xs text-red-600 font-medium">
-            3 Issues
-          </span>
+          <h3 className="text-xs font-semibold text-gray-600">Alerts</h3>
+          <span className="text-xs text-red-600 font-medium">3 Issues</span>
         </div>
         <div className="space-y-3">
           {alerts.map((alert) => (
             <div key={alert.id} className="flex gap-3">
               <div
                 className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${getAlertColor(
-                  alert.type
+                  alert.type,
                 )}`}
               />
               <div className="flex-1 min-w-0">

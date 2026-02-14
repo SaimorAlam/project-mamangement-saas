@@ -32,7 +32,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   const [projectNote, setProjectNote] = useState("");
   const [addNotesChecked, setAddNotesChecked] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<"success" | "error" | null>(
-    null
+    null,
   );
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -103,38 +103,38 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
       reader.onload = async (e) => {
         const data = e.target?.result;
         const workbook = XLSX.read(data, { type: "binary" });
-        
+
         const chartsPayload: any[] = [];
 
         workbook.SheetNames.forEach((sheetName) => {
-            const sheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const sheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-            // Parse sheet name for ID
-            const lastUnderscoreIndex = sheetName.lastIndexOf('_');
-            let id = sheetName; // Fallback ID is the whole name
+          // Parse sheet name for ID
+          const lastUnderscoreIndex = sheetName.lastIndexOf("_");
+          let id = sheetName; // Fallback ID is the whole name
 
-            if (lastUnderscoreIndex !== -1) {
-                id = sheetName.substring(lastUnderscoreIndex + 1);
-            }
+          if (lastUnderscoreIndex !== -1) {
+            id = sheetName.substring(lastUnderscoreIndex + 1);
+          }
 
-            // If ID is empty or invalid after split (e.g. "Name_"), fallback to whole name or generate UUID if needed.
-            // For now, using the parsed ID. User said: "If _ does not exist, handle gracefully with fallback ID."
-            if (!id.trim()) {
-                id = sheetName;
-            }
+          // If ID is empty or invalid after split (e.g. "Name_"), fallback to whole name or generate UUID if needed.
+          // For now, using the parsed ID. User said: "If _ does not exist, handle gracefully with fallback ID."
+          if (!id.trim()) {
+            id = sheetName;
+          }
 
-            chartsPayload.push({
-                id: id,
-                xAxis: JSON.stringify({ labels: jsonData }), 
-                yAxis: JSON.stringify({ values: [] }), 
-                zAxis: JSON.stringify({ values: [] }),
-            });
+          chartsPayload.push({
+            id: id,
+            xAxis: JSON.stringify({ labels: jsonData }),
+            yAxis: JSON.stringify({ values: [] }),
+            zAxis: JSON.stringify({ values: [] }),
+          });
         });
 
         if (chartsPayload.length === 0) {
-            alert("No valid sheets found in the file.");
-            return;
+          alert("No valid sheets found in the file.");
+          return;
         }
 
         const payload = {
@@ -147,9 +147,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
         setSheetCount(chartsPayload.length);
         setUploadStatus("success");
         setShowSuccessModal(true);
-        
+
         if (onFileUpload) {
-            onFileUpload(file);
+          onFileUpload(file);
         }
       };
 
@@ -181,8 +181,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
                 No file Added to this Project Yet
               </h1>
               <p className="text-[#6B7280] text-sm leading-relaxed max-w-md mx-auto">
-                You haven't uploaded any data for this project. Start by importing
-                a CSV or spreadsheet file to populate tasks or resources.
+                You haven't uploaded any data for this project. Start by
+                importing a CSV or spreadsheet file to populate tasks or
+                resources.
               </p>
             </div>
 
@@ -209,12 +210,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
 
                 {/* Supported Formats */}
                 <p className="text-[#9CA3AF] text-xs text-center mb-6">
-                  Supported formats: .csv, .xls, .xlsx, .mpp | Max file size : 10
-                  MB
+                  Supported formats: .csv, .xls, .xlsx, .mpp | Max file size :
+                  10 MB
                 </p>
 
                 {/* OR Divider */}
-                <div className="text-[#111827] font-medium text-sm mb-6">OR</div>
+                <div className="text-[#111827] font-medium text-sm mb-6">
+                  OR
+                </div>
 
                 {/* Browse Button */}
                 <button
@@ -283,47 +286,50 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
                 <span className="text-sm font-medium text-[#374151]">
                   Add Notes for Project Admin/Manager
                 </span>
-                
+
                 {/* Persistent Open Project Button (Only visible after success) */}
-                {uploadStatus === 'success' && (
-                    <button 
-                        onClick={handleOpenProject}
-                        className="ml-auto text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
-                    >
-                        Open Project <ArrowRight className="w-4 h-4" />
-                    </button>
+                {uploadStatus === "success" && (
+                  <button
+                    onClick={handleOpenProject}
+                    className="ml-auto text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                  >
+                    Open Project <ArrowRight className="w-4 h-4" />
+                  </button>
                 )}
               </div>
 
               {/* Note Input */}
-              <div>
-                <label className="flex items-center gap-1.5 text-xs text-[#374151] font-medium mb-2">
-                  Project Note
-                  <HelpCircle className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                </label>
-                <div className="relative">
-                  <textarea
-                    value={projectNote}
-                    onChange={(e) => setProjectNote(e.target.value)}
-                    placeholder="Write a short description..."
-                    disabled={!addNotesChecked}
-                    className="w-full h-32 px-4 py-3 border border-[#E5E7EB] rounded-lg text-sm placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-50 disabled:text-gray-400 transition-all"
-                  />
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!file}
-                    className="absolute bottom-3 right-3 bg-[#1D64D8] hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white p-2 rounded-md transition-colors shadow-sm"
-                  >
-                    <Send className="w-4 h-4 fill-current" />
-                  </button>
+              {addNotesChecked && (
+                <div className="mb-4">
+                  <label className="flex items-center gap-1.5 text-xs text-[#374151] font-medium mb-2">
+                    Project Note
+                    <HelpCircle className="w-3.5 h-3.5 text-[#9CA3AF]" />
+                  </label>
+                  <div className="relative">
+                    <textarea
+                      value={projectNote}
+                      onChange={(e) => setProjectNote(e.target.value)}
+                      placeholder="Write a short description..."
+                      className="w-full h-32 px-4 py-3 border border-[#E5E7EB] rounded-lg text-sm placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all"
+                    />
+                  </div>
                 </div>
+              )}
+              <div className="flex justify-center">
+                <button
+                  onClick={handleSubmit}
+                  disabled={!file}
+                  className="bg-[#1D64D8] hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md transition-colors shadow-sm flex items-center gap-2"
+                >
+                  <Send className="w-4 h-4 fill-current" /> Submit Data
+                </button>
               </div>
             </div>
           </div>
         </div>
 
         {/* Right Sidebar - Preserved */}
-        <div className="w-96 hidden xl:block overflow-y-auto">
+        <div className="w-96 h-fit hidden xl:block overflow-y-auto">
           <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm h-full">
             {/* Program Manager */}
             <div className="mb-8">
@@ -397,7 +403,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
             {/* Tags */}
             <div className="mb-4">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-500 font-medium">0 Tags</span>
+                <span className="text-sm text-gray-500 font-medium">
+                  0 Tags
+                </span>
                 <button className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
                   <Plus className="w-4 h-4" /> Add Tags
                 </button>
@@ -415,10 +423,10 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
           </div>
         </div>
       </div>
-      
-      <ProjectUploadSuccessModal 
-        open={showSuccessModal} 
-        onOpenChange={setShowSuccessModal} 
+
+      <ProjectUploadSuccessModal
+        open={showSuccessModal}
+        onOpenChange={setShowSuccessModal}
         projectId={projectId}
         sheetCount={sheetCount}
       />

@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
-import { setSelectedWidgets, setIsPreview, setIsPublished } from "@/store/Slices/ChartSlice/ChartSlice";
+import {
+  setSelectedWidgets,
+  setIsPreview,
+  setIsPublished,
+} from "@/store/Slices/ChartSlice/ChartSlice";
 import { toast } from "sonner";
 import ProjectDashboardView from "./Components/ProjectDashboardView";
 
@@ -27,11 +31,11 @@ const ClientProjectBuilder = () => {
   };
 
   const handleWidgetDelete = (widgetId: string) => {
-    const toastId = toast.loading("Deleting widget...");
+    // const toastId = toast.loading("Deleting widget...");
     dispatch(
       setSelectedWidgets(selectedWidgets.filter((id) => id !== widgetId)),
     );
-    toast.success("Widget deleted successfully", { id: toastId });
+    // toast.success("Widget deleted successfully", { id: toastId });
   };
 
   useEffect(() => {

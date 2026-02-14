@@ -9,7 +9,7 @@ const ClientAllHighway = () => {
       <HighwayStats />
       <div className="flex items-baseline gap-6">
         <AllHighwayProject />
-        <ProgramManager />
+        <ProgramManager managerId="" />
       </div>
       <HighwayMap />
     </div>

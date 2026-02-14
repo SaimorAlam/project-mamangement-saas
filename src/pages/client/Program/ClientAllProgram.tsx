@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaSpinner, FaEdit } from "react-icons/fa";
+import { FaSpinner } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import {
   useGetAllProgramQuery,
@@ -50,7 +50,7 @@ const ClientAllProgram = ({
   const debouncedSearch = useDebounce(search, 500);
 
   // Edit modal
-  const [editProgram, setEditProgram] = useState<IProgram | null>(null);
+  const [editProgram ] = useState<IProgram | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   // API calls
@@ -125,10 +125,10 @@ const ClientAllProgram = ({
     });
   };
 
-  const handleEditClick = (program: IProgram) => {
-    setEditProgram(program);
-    setEditModalOpen(true);
-  };
+  // const handleEditClick = (program: IProgram) => {
+  //   setEditProgram(program);
+  //   setEditModalOpen(true);
+  // };
 
   // const handleDeleteClick = async (programId: string) => {
   //   if (confirm("Are you sure you want to delete this program?")) {
@@ -266,7 +266,7 @@ const ClientAllProgram = ({
                   "updated On",
                   "deadline",
                   "progress",
-                  "actions",
+                  // "actions",
                 ].map(
                   (col) =>
                     col && (
@@ -340,7 +340,7 @@ const ClientAllProgram = ({
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 align-middle">
+                    {/* <td className="px-6 py-4 align-middle">
                       <div className="flex gap-2">
                         <button
                           onClick={(e) => {
@@ -351,11 +351,11 @@ const ClientAllProgram = ({
                         >
                           <FaEdit className="text-blue-600" />
                         </button>
-                        {/* <button onClick={() => handleDeleteClick(program.id)}>
+                        <button onClick={() => handleDeleteClick(program.id)}>
                           <FaTrash className="text-red-600" />
-                        </button> */}
+                        </button>
                       </div>
-                    </td>
+                    </td> */}
                   </tr>
                 ) : (
                   <tr key={`empty-${idx}`} className="h-[60px]">
