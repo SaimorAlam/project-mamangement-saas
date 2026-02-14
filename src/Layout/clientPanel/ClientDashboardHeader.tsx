@@ -53,13 +53,15 @@ interface ClientDashboardHeaderProps {
 const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   // const [projectName, setProjectName] = useState<string>("");
 
-  const { programId, projectId: projectIdFromParams, id } = useParams();
+  const { programId, projectId: projectIdFromParams } = useParams();
   const projectIdFromState = useAppSelector(
     (state) => state.chartSlice.projectId,
   );
-  console.log(projectIdFromState, "Project Id From State");
+
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
-  const projectId = projectIdFromParams || id || projectIdFromState;
+  const projectId = projectIdFromParams
+    ? projectIdFromParams
+    : projectIdFromState;
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -667,15 +669,15 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
                   !isPublishPage &&
                   !isImportCSVPage &&
                   projectName && (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-[#356DF0]">
-                        {projectName}
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                )}
+                    <>
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        <BreadcrumbPage className="text-[#356DF0]">
+                          {projectName}
+                        </BreadcrumbPage>
+                      </BreadcrumbItem>
+                    </>
+                  )}
               </>
             )}
             {isProjectDetailsPage && !isOverviewProjectDetailsPage && (

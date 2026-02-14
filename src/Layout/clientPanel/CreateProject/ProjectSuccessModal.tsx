@@ -6,8 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAppDispatch } from "@/hooks/useRedux";
 import { ArrowRight, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { setProjectId } from "@/store/Slices/ChartSlice/ChartSlice";
 
 interface ProjectSuccessModalProps {
   open: boolean;
@@ -25,7 +28,11 @@ const ProjectSuccessModal = ({
   programId,
 }: ProjectSuccessModalProps) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    dispatch(setProjectId(projectId));
+  }, [projectId, dispatch]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[400px] rounded-xl border border-gray-200 space-y-4">

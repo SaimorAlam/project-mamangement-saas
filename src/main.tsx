@@ -8,12 +8,10 @@ import { persistor, store } from "./store/store.ts";
 import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from "./components/ui/sonner.tsx";
 
-
 import "@syncfusion/ej2-base/styles/material.css";
 import "@syncfusion/ej2-buttons/styles/material.css";
 import "@syncfusion/ej2-react-gantt/styles/material.css";
 import "@syncfusion/ej2-react-dropdowns/styles/material.css";
-
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -23,5 +21,5 @@ createRoot(document.getElementById("root")!).render(
         <Toaster position="top-right" richColors theme="light" />
       </PersistGate>
     </Provider>
-  </StrictMode>
+  </StrictMode>,
 );

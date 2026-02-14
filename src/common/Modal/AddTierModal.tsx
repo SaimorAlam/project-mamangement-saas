@@ -29,6 +29,7 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
       const payload = {
         ...childPayload,
         title: tierName,
+        grouptitle: parentChartName,
       };
       const response = await createChart(
         chartId ? { ...payload } : payload,

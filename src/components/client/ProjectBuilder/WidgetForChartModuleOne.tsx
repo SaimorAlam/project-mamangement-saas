@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 // import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { useAppSelector } from "@/hooks/useRedux";
 import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
 import { toast } from "sonner";
 import { useGetUser } from "@/hooks/useGetUser";
+import { useLocation } from "react-router-dom";
 
 export type LegendValue = {
   label: string;
@@ -51,8 +52,23 @@ const WidgetForChartModuleOne = ({
   onClose?: () => void;
   onDelete?: () => void;
 }) => {
+  const [projectId, setProjectId] = useState<string>("");
   const { name, role, profileImage, loading } = useGetUser();
-  const projectId = useAppSelector((state) => state.chartSlice.projectId);
+  const projectIdFromSlice = useAppSelector(
+    (state) => state?.chartSlice?.projectId,
+  );
+  const location = useLocation();
+  const projectIdFromState = location.state?.projectId;
+
+  useEffect(() => {
+    if (projectIdFromSlice) {
+      setProjectId(projectIdFromSlice);
+    }
+    if (projectIdFromState) {
+      setProjectId(projectIdFromState);
+    }
+  }, [projectIdFromSlice, projectIdFromState]);
+  console.log({ projectIdFromSlice, projectIdFromState, projectId });
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
@@ -73,7 +89,9 @@ const WidgetForChartModuleOne = ({
     const value = parseInt(e.target.value, 10);
 
     if (isNaN(value) || value < minLegend || value > maxLegend) {
-      alert(`Please enter a number between ${minLegend} and ${maxLegend}`);
+      toast.error(
+        `Please enter a number between ${minLegend} and ${maxLegend}`,
+      );
       return;
     }
 
@@ -119,35 +137,36 @@ const WidgetForChartModuleOne = ({
   // const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const handleSaveChanges = async () => {
-    const toastId = toast.loading("Creating chart...");
-    // validating that if any of the legend labels or xAxisValues are empty, alert the user
+    // validating that if any of the legend labels or xAxisValues are empty, toast the user
     for (let i = 0; i < numOfLegendDataSet; i++) {
       if (!legendValues[i]?.label) {
-        alert(`Please fill in the label for legend ${i + 1}`);
+        toast.error(`Please fill in the label for legend ${i + 1}`);
         return;
       }
     }
 
     for (let i = 0; i < xAxisValues.length; i++) {
       if (!xAxisValues[i]) {
-        alert(`Please fill in the value for X-Axis field ${i + 1}`);
+        toast.error(`Please fill in the value for X-Axis field ${i + 1}`);
         return;
       }
     }
 
     if (legendValues.length < 3) {
-      alert(`Please add at least ${minLegend} legend values`);
+      toast.error(`Please add at least ${minLegend} legend values`);
       return;
     }
     if (xAxisValues.length < 1) {
-      alert(`Please add at least ${1} X-Axis value`);
+      toast.error(`Please add at least 1 X-Axis value`);
       return;
     }
     if (!widgetCategory) {
-      alert(`Please input category : ${widgetCategory}`);
+      toast.error(`Please input category : ${widgetCategory}`);
       console.log("category: ", widgetCategory);
       return;
     }
+
+    const toastId = toast.loading("Creating chart...");
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFiledDataset: startingRange,
@@ -159,15 +178,21 @@ const WidgetForChartModuleOne = ({
       title: widgetTitle,
       status: "ACTIVE",
       category: widgetCategory,
-      xAxis: JSON.stringify({
-        labels: xAxisValues,
-        values: [],
-      }),
+      xAxis: JSON.stringify(
+        xAxisValues.map((label, index) => [
+          label,
+          ...Array.from(
+            { length: numOfLegendDataSet },
+            (_, i) => index + i + 1,
+          ),
+        ]),
+      ),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
-      projectId,
+      projectId: projectId ? projectId : projectIdFromState,
       rootchart: true,
       roottitle: widgetTitle,
+      grouptitle: widgetTitle,
     };
     try {
       const res = await createChart(payload).unwrap();
@@ -178,14 +203,6 @@ const WidgetForChartModuleOne = ({
     } catch {
       toast.error("Chart creation failed", { id: toastId });
     }
-
-    // DownloadAndSaveCSVforModuleOneWidget(
-    //   payload,
-    //   getChartTitleId,
-    //   widgetTitle,
-    //   xAxisValues,
-    //   legendValues
-    // );
   };
 
   return (
