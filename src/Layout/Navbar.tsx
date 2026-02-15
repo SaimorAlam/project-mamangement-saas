@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Navbar: React.FC = () => {
   const { currentRoute } = useGetUser();
-
+  console.log(currentRoute);
   return (
     <nav className="bg-white shadow-sm fixed w-full">
       <div className=" mx-auto py-2 px-4 sm:px-6 lg:px-8">

@@ -91,7 +91,7 @@ const ClientAllProgram = ({
   const debouncedSearch = useDebounce(search, 500);
 
   // Edit modal
-  const [editProgram ] = useState<IProgram | null>(null);
+  const [editProgram] = useState<IProgram | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   // API calls
