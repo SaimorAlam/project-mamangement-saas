@@ -15,6 +15,7 @@ const ProgramOverview = () => {
   //   programId: programId,
   // });
   // console.log(allProjects?.data);
+
   return (
     <div className="">
       <h1 className="text-2xl font-semibold my-6">
@@ -24,7 +25,7 @@ const ProgramOverview = () => {
         <HighwayStats />
         <div className="flex items-baseline gap-6">
           <AllProject title="All Project" programId={programId as string} />
-          <ProgramManager />
+          <ProgramManager managerId={program?.data?.managerId} />
         </div>
         <div className="z-0!">
           <HighwayMap />

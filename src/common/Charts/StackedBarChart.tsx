@@ -31,12 +31,12 @@ import {
  * Format: [["day", "absent", "late", "ontime"], ["Sunday", 1, 2, 50], ...]
  * Returns: { labels: ["Sunday", "Monday", ...], data: {...} }
  */
-const parseXAxisData = (
-  xAxis: any[][] | string,
+export const parseXAxisData = (
+  xAxis: any[][] | string | { labels: any[][] },
   legendValues: any[],
   widgetTitle: string,
 ) => {
-  let parsedXAxis = xAxis;
+  let parsedXAxis: any = xAxis;
 
   if (typeof xAxis === "string") {
     try {
@@ -45,6 +45,16 @@ const parseXAxisData = (
       console.error("Error parsing xAxis JSON:", error);
       parsedXAxis = [];
     }
+  }
+
+  // Handle case where API returns { labels: [...] }
+  if (
+    parsedXAxis &&
+    !Array.isArray(parsedXAxis) &&
+    typeof parsedXAxis === "object" &&
+    "labels" in parsedXAxis
+  ) {
+    parsedXAxis = parsedXAxis.labels;
   }
 
   if (!parsedXAxis || !Array.isArray(parsedXAxis) || parsedXAxis.length === 0) {
@@ -163,6 +173,7 @@ export default function StackedBarChart({
   }, [chartId, findChildrenValue]);
   const dispatch = useAppDispatch();
   const childTiers = data?.data;
+  console.log(childTiers);
   const [isDownloading, setIsDownloading] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
@@ -644,6 +655,7 @@ export default function StackedBarChart({
                 const tierLegends = (tier?.barChart?.widgets || []).map(
                   (w: any) => ({
                     label: w.legendName,
+                    field: w.legendName?.toLowerCase().replace(/\s+/g, ""),
                     color: w.color,
                   }),
                 );

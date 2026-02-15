@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaSpinner, FaEdit } from "react-icons/fa";
+import { FaSpinner } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import {
   useGetAllProgramQuery,
@@ -20,7 +20,48 @@ import EditProgramModal from "./EditProgramModal";
 import { useNavigate } from "react-router-dom";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
+import { useGetManagerByIdQuery } from "@/store/Api/UserApi/UserApi";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+const ManagerCell = ({ managerId }: { managerId?: string }) => {
+  const { data, isLoading } = useGetManagerByIdQuery(managerId, {
+    skip: !managerId,
+  });
+
+  if (!managerId) return <span className="text-gray-400">N/A</span>;
+  if (isLoading)
+    return <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />;
+
+  const manager = data?.data;
+  const name = manager?.name || "Unknown Manager";
+  const image = manager?.profileImage;
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-center">
+            <Avatar className="h-8 w-8 border border-gray-100">
+              <AvatarImage src={image} alt={name} />
+              <AvatarFallback className="bg-blue-50 text-blue-600 text-[10px]">
+                {name.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{name}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 interface IProgramTableProps {
   title?: string;
@@ -50,7 +91,7 @@ const ClientAllProgram = ({
   const debouncedSearch = useDebounce(search, 500);
 
   // Edit modal
-  const [editProgram, setEditProgram] = useState<IProgram | null>(null);
+  const [editProgram ] = useState<IProgram | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   // API calls
@@ -125,10 +166,10 @@ const ClientAllProgram = ({
     });
   };
 
-  const handleEditClick = (program: IProgram) => {
-    setEditProgram(program);
-    setEditModalOpen(true);
-  };
+  // const handleEditClick = (program: IProgram) => {
+  //   setEditProgram(program);
+  //   setEditModalOpen(true);
+  // };
 
   // const handleDeleteClick = async (programId: string) => {
   //   if (confirm("Are you sure you want to delete this program?")) {
@@ -266,7 +307,7 @@ const ClientAllProgram = ({
                   "updated On",
                   "deadline",
                   "progress",
-                  "actions",
+                  // "actions",
                 ].map(
                   (col) =>
                     col && (
@@ -304,14 +345,7 @@ const ClientAllProgram = ({
                       {program.projects?.length} Projects
                     </td>
                     <td className="px-6 py-4 align-middle">
-                      <RenderStaffAvatars
-                        staff={Array.from({ length: 5 }, (_, i) => ({
-                          id: i.toString(),
-                          name: `Staff ${i + 1}`,
-                          avatar:
-                            "https://randomuser.me/api/portraits/men/19.jpg",
-                        }))}
-                      />
+                      <ManagerCell managerId={program.managerId} />
                     </td>
                     <td className="px-6 py-4 align-middle">
                       <PriorityDropdown defaultPriority={program.priority} />
@@ -340,7 +374,7 @@ const ClientAllProgram = ({
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 align-middle">
+                    {/* <td className="px-6 py-4 align-middle">
                       <div className="flex gap-2">
                         <button
                           onClick={(e) => {
@@ -351,11 +385,11 @@ const ClientAllProgram = ({
                         >
                           <FaEdit className="text-blue-600" />
                         </button>
-                        {/* <button onClick={() => handleDeleteClick(program.id)}>
+                        <button onClick={() => handleDeleteClick(program.id)}>
                           <FaTrash className="text-red-600" />
-                        </button> */}
+                        </button>
                       </div>
-                    </td>
+                    </td> */}
                   </tr>
                 ) : (
                   <tr key={`empty-${idx}`} className="h-[60px]">

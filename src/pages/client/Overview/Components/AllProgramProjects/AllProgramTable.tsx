@@ -26,6 +26,7 @@ import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useDeleteProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
+import UpdateProjectModal from "@/pages/client/Program/UpdateProjectModal";
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -55,6 +56,17 @@ export interface StaffEmployeeProject {
   startDate: string;
   deadline: string;
   progress: number;
+  managerId?: string;
+  employeeIds?: string[];
+  viewerIds?: string[];
+  uploadCycle?: string;
+  SelectDays?: string | string[];
+  selectDate?: string | string[];
+  UploadData?: string | number;
+  workingDay?: string | string[];
+  sortName?: string;
+  budget?: string | number;
+  currentRate?: string | number;
 }
 
 interface AllProgramTableProps {
@@ -213,6 +225,11 @@ const AllProgramTable = ({
   const navigate = useNavigate();
   const [deleteProject] = useDeleteProjectMutation();
 
+  const [editProject, setEditProject] = useState<StaffEmployeeProject | null>(
+    null,
+  );
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
   const handleViewProject = (project: StaffEmployeeProject) => {
     // setSelectedProject(project);
     // setOpen(true);
@@ -293,24 +310,24 @@ const AllProgramTable = ({
     { label: "Action" },
   ];
 
- const handleDelete = async (id: string) => {
-     try {
-       const result = await Swal.fire({
-         title: "Are you sure?",
-         text: "This action cannot be undone!",
-         icon: "warning",
-         showCancelButton: true,
-         confirmButtonColor: "#d33",
-       });
- 
-       if (result.isConfirmed) {
-         await deleteProject(id).unwrap();
-         Swal.fire("Deleted!", "Employee removed.", "success");
-       }
-     } catch (err: any) {
-       Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
-     }
-   };
+  const handleDelete = async (id: string) => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+      });
+
+      if (result.isConfirmed) {
+        await deleteProject(id).unwrap();
+        Swal.fire("Deleted!", "Employee removed.", "success");
+      }
+    } catch (err: any) {
+      Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
+    }
+  };
   return (
     <Card className="shadow-none border-none w-full">
       <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full min-h-[420px]">
@@ -407,10 +424,24 @@ const AllProgramTable = ({
                           >
                             <Eye className="w-4 h-4 text-[#1C73E0] ``" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="cursor-pointer">
+                           <Button
+                            variant="ghost"
+                            size="sm"
+                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditProject(project);
+                              setEditModalOpen(true);
+                            }}
+                          >
                             <Edit className="w-4 h-4 text-[#169E7B] ``" />
                           </Button>
-                          <Button onClick={() => handleDelete(project.id)} variant="ghost" size="sm" className="cursor-pointer">
+                          <Button
+                            onClick={() => handleDelete(project.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="cursor-pointer"
+                          >
                             <Trash2 className="w-4 h-4 text-[#B00020] " />
                           </Button>
                         </div>
@@ -429,6 +460,14 @@ const AllProgramTable = ({
       {/* {selectedProject && (
         <ProjectModal project={selectedProject} open={open} setOpen={setOpen} />
       )} */}
+
+      {editModalOpen && editProject && (
+        <UpdateProjectModal
+          project={editProject}
+          open={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+        />
+      )}
     </Card>
   );
 };

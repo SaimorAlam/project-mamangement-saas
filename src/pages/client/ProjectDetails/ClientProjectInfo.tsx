@@ -34,6 +34,7 @@ interface ProjectInfoProps {
 
 const ClientProjectInfo = ({ projectData, isLoading }: ProjectInfoProps) => {
   if (isLoading) return <ClientProjectInfo.Skeleton />;
+  console.log(projectData, "projectData");
   const infoItems = [
     { label: "Start Date", value: formatDate(projectData?.project?.startDate) },
     {

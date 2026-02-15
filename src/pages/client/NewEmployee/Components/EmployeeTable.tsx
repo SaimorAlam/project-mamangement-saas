@@ -294,7 +294,7 @@ const EmployeeTable = () => {
                 />
               </th>
               <th
-                className="px-6 py-3 text-left text-sm font-semibold w-[200px] cursor-pointer"
+                className="px-6 py-3 text-left text-sm font-semibold w-[350px] cursor-pointer"
                 onClick={() => handleSort("name")}
               >
                 Profile Name {renderSortIcon("name")}
@@ -311,7 +311,7 @@ const EmployeeTable = () => {
               >
                 Role {renderSortIcon("role")}
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">
+              <th className="px-4 py-3 text-left text-sm font-semibold w-[300px]">
                 Assign Project
               </th>
               <th
@@ -348,7 +348,7 @@ const EmployeeTable = () => {
                           }
                         />
                       </td>
-                      <td className="px-6 py-3 w-[200px] align-middle">
+                      <td className="px-6 py-3 w-[350px] align-middle">
                         <div className="flex items-center gap-2">
                           <img
                             src={
@@ -375,22 +375,49 @@ const EmployeeTable = () => {
                                 : "bg-gray-50 text-gray-700 border-gray-200"
                           }`}
                         >
-                          {user.role}
+                          {user.role === "MANAGER"
+                            ? "Manager"
+                            : user.role === "EMPLOYEE"
+                              ? "Staff"
+                              : "Viewer"}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 align-middle">
+                      <td className="px-4 py-3 align-middle w-[300px]">
                         <div className="flex flex-wrap gap-1">
-                          {user.assignedProjects?.length
-                            ? user.assignedProjects.map((p: any) => (
-                                <Badge
-                                  key={p.id}
-                                  variant="outline"
-                                  className="text-sm px-2 py-1 border-gray-200"
-                                >
-                                  {p.name}
-                                </Badge>
-                              ))
-                            : ""}
+                          {user.role === "MANAGER" &&
+                            user.manager?.projects?.map((p: any) => (
+                              <Badge
+                                key={p.id}
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0.5 border-gray-200 truncate block text-center"
+                                title={p.name}
+                              >
+                                {p.name}
+                              </Badge>
+                            ))}
+                          {(user.role === "EMPLOYEE" ||
+                            user.role === "VIEWER") &&
+                            user.employee?.projectEmployees?.map((pe: any) => (
+                              <Badge
+                                key={pe.id}
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0.5 border-gray-200 truncate block text-center"
+                                title={pe.project?.name}
+                              >
+                                {pe.project?.name}
+                              </Badge>
+                            ))}
+                          {user.role === "VIEWER" &&
+                            user.viewer?.projectViewers?.map((pv: any) => (
+                              <Badge
+                                key={pv.id}
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0.5 border-gray-200 truncate block text-center"
+                                title={pv.project?.name}
+                              >
+                                {pv.project?.name}
+                              </Badge>
+                            ))}
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-500 align-middle">
