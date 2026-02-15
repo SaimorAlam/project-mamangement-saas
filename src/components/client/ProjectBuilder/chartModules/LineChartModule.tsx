@@ -111,6 +111,7 @@ const LineChartModule = ({
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
           isPreview={isPreview}
+          isCreationMode={true}
         />
       </div>
       {!isPreview && showWidget && (
