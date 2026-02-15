@@ -157,7 +157,7 @@ const AddEmployeeModal = ({
       payload = {
         name: data.name,
         email: data.email,
-        ...(!isUpdate && { password: data.password }),
+        ...(isUpdate && { password: data.password }),
         role: data.role,
         skills: data.skills,
         description: data.description,
@@ -214,7 +214,8 @@ const AddEmployeeModal = ({
           <div className="gap-4 grid grid-cols-2">
             <div>
               <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                Employee Name {!isUpdate && <span className="text-red-500">*</span>}
+                Employee Name{" "}
+                {!isUpdate && <span className="text-red-500">*</span>}
               </label>
               <input
                 {...register("name", {
@@ -232,7 +233,8 @@ const AddEmployeeModal = ({
 
             <div>
               <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                Employee Email {!isUpdate && <span className="text-red-500">*</span>}
+                Employee Email{" "}
+                {!isUpdate && <span className="text-red-500">*</span>}
               </label>
               <div className="relative">
                 <Mail
@@ -261,7 +263,9 @@ const AddEmployeeModal = ({
           </div>
 
           {/* Phone and Password */}
-          <div className="gap-4 grid grid-cols-2">
+          <div
+            className={`gap-4 grid ${isUpdate ? "grid-cols-2" : "grid-cols-1"}`}
+          >
             {/* <div>
               <label className="block mb-1.5 font-medium text-gray-700 text-sm">
                 Employee Phone <span className="text-red-500">*</span>
@@ -286,7 +290,8 @@ const AddEmployeeModal = ({
             {/* Role Selection */}
             <div>
               <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                Select Role {!isUpdate && <span className="text-red-500">*</span>}
+                Select Role{" "}
+                {!isUpdate && <span className="text-red-500">*</span>}
               </label>
 
               <Controller
@@ -319,47 +324,50 @@ const AddEmployeeModal = ({
               />
             </div>
 
-            <div>
-              <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                Employee Password {!isUpdate && <span className="text-red-500">*</span>}
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  {...register("password", {
-                    required: isUpdate ? false : "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters",
-                    },
-                  })}
-                  placeholder="Enter employee password"
-                  className="py-2 pr-3 pl-4 border border-gray-300 rounded-md focus:outline-none w-full text-sm"
-                />
-                {showPassword ? (
-                  <Eye
-                    onClick={() => {
-                      setShowPassword(!showPassword);
-                    }}
-                    className="top-1/2 right-3 absolute text-gray-400 -translate-y-1/2"
-                    size={16}
+            {isUpdate && (
+              <div>
+                <label className="block mb-1.5 font-medium text-gray-700 text-sm">
+                  Employee Password{" "}
+                  {!isUpdate && <span className="text-red-500">*</span>}
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    {...register("password", {
+                      required: isUpdate ? false : "Password is required",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters",
+                      },
+                    })}
+                    placeholder="Enter employee password"
+                    className="py-2 pr-3 pl-4 border border-gray-300 rounded-md focus:outline-none w-full text-sm"
                   />
-                ) : (
-                  <EyeOff
-                    onClick={() => {
-                      setShowPassword(!showPassword);
-                    }}
-                    className="top-1/2 right-3 absolute text-gray-400 -translate-y-1/2"
-                    size={16}
-                  />
+                  {showPassword ? (
+                    <Eye
+                      onClick={() => {
+                        setShowPassword(!showPassword);
+                      }}
+                      className="top-1/2 right-3 absolute text-gray-400 -translate-y-1/2"
+                      size={16}
+                    />
+                  ) : (
+                    <EyeOff
+                      onClick={() => {
+                        setShowPassword(!showPassword);
+                      }}
+                      className="top-1/2 right-3 absolute text-gray-400 -translate-y-1/2"
+                      size={16}
+                    />
+                  )}
+                </div>
+                {errors.password && (
+                  <p className="mt-1 text-red-500 text-xs">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
-              {errors.password && (
-                <p className="mt-1 text-red-500 text-xs">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+            )}
           </div>
 
           {/* Skills & Projects */}
@@ -377,7 +385,8 @@ const AddEmployeeModal = ({
                 return (
                   <div>
                     <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                      Joined Date {!isUpdate && <span className="text-red-500">*</span>}
+                      Joined Date{" "}
+                      {!isUpdate && <span className="text-red-500">*</span>}
                     </label>
                     <div className="relative">
                       <input
