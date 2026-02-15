@@ -19,8 +19,8 @@ import NewProjectModal from "@/components/client/NewProjectModal";
 import ProjectSuccessModal from "./CreateProject/ProjectSuccessModal";
 import {
   Bell,
-  CalendarDays,
-  ChevronDown,
+  // CalendarDays,
+  // ChevronDown,
   Plus,
   Upload,
   UserPlus,
@@ -591,14 +591,14 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             onClose={() => setIsNotificationOpen(false)}
           />
 
-          <div className="hidden sm:block">
+          {/* <div className="hidden sm:block">
             <PrimaryButton
               title="Last 1 Week"
               leftIcon={<CalendarDays className="size-4 md:size-5" />}
               rightIcon={<ChevronDown className="size-4 md:size-5" />}
               type="Outline"
             />
-          </div>
+          </div> */}
 
           <div className="relative">{renderQuickActionButton()}</div>
 
