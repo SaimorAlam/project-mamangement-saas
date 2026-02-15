@@ -22,6 +22,7 @@ import DropdownSelect from "@/common/DropdownSelect";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import { useSelector } from "react-redux";
+import ProjectLocationsMap from "@/components/staffManager/Projects/ProjectLocationsMap";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -414,6 +415,7 @@ const StaffManagerProjects = ({
       {/* <div className="bg-green-200 h-[80vh]"></div> */}
       {/* google map according to longitude and latitude  */}
       {/* <ProjectLocationsMap projects={projects} /> */}
+      <ProjectLocationsMap />
 
       {editModalOpen && editProject && (
         <UpdateProjectModal
