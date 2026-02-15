@@ -30,6 +30,10 @@ import ProgramDetailsPage from "@/pages/staffManager/ProgramDetailsPage";
 import DashboardCardProjects from "@/pages/staffManager/DashboardCardProjects";
 import ClientProjectBuilder from "@/pages/client/ProjectBuilder/ClientProjectBuilder";
 import ProfilePage from "@/pages/commonPage/ProfilePage";
+import ClientProjectBuilderContainer from "@/pages/client/ProjectBuilder/ClientProjectBuilderContainer";
+import PublishProject from "@/pages/client/ProjectBuilder/Components/PublishProject";
+import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
+import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
 
 export function getStaffManagerRoutes() {
   return [
@@ -56,10 +60,20 @@ export function getStaffManagerRoutes() {
     { path: "program/:id", element: <ProgramDetailsPage /> },
 
     { path: "program-name", element: <StaffManagerProgramName /> },
+    // {
+    //   path: "project-builder",
+    //   element: <ClientProjectBuilder />,
+    //   // element: <StaffManagerProjectBuilder />,
+    // },
     {
       path: "project-builder",
-      element: <ClientProjectBuilder />,
-      // element: <StaffManagerProjectBuilder />,
+      element: <ClientProjectBuilderContainer />,
+      children: [
+        { index: true, element: <ClientProjectBuilder /> },
+        { path: "publish", element: <PublishProject /> },
+        { path: "file-upload", element: <FileUpload /> },
+        { path: "project-details/:projectId", element: <ProjectDetails /> },
+      ],
     },
     {
       path: "highway-expansion",
