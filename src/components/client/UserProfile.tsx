@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { toast } from "sonner";
@@ -26,13 +26,13 @@ export default function UserProfile({
   const [isOpen, setIsOpen] = useState(false);
   const { name, role, profileImage } = useGetUser();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const onLogout = () => {
     try {
       dispatch(logOut());
       toast.success("Logout successful");
-      navigate("/login");
+
+      window.location.href = "/login";
     } catch {
       toast.error("Logout failed");
     }
