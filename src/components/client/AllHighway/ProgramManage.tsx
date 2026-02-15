@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
-import { useGetUserByIdQuery } from "@/store/Api/UserApi/UserApi";
+import { useGetManagerByIdQuery } from "@/store/Api/UserApi/UserApi";
 
 interface Tag {
   id: number;
@@ -18,7 +18,7 @@ interface Alert {
 }
 
 const ProgramManager = ({ managerId }: { managerId: string }) => {
-  const { data, isLoading } = useGetUserByIdQuery(managerId, {
+  const { data, isLoading } = useGetManagerByIdQuery(managerId, {
     skip: !managerId,
   });
 
@@ -140,23 +140,23 @@ const ProgramManager = ({ managerId }: { managerId: string }) => {
           Program Manager
         </h3>
         <div className="flex items-center gap-3">
-          {manager?.profileImage ? (
+          {manager?.user?.profileImage ? (
             <img
-              src={manager.profileImage}
-              alt={manager.name}
+              src={manager.user.profileImage}
+              alt={manager.user.name}
               className="w-10 h-10 rounded-full object-cover border border-gray-100"
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-semibold text-sm border border-blue-100">
-              {manager?.name?.substring(0, 2).toUpperCase() || "NA"}
+              {manager?.user?.name?.substring(0, 2).toUpperCase() || "NA"}
             </div>
           )}
           <div>
             <div className="text-sm font-semibold text-gray-900">
-              {manager?.name || "Unknown Manager"}
+              {manager?.user?.name || "Unknown Manager"}
             </div>
             <div className="text-xs text-gray-500">
-              {manager?.email || "No email available"}
+              {manager?.user?.email || "No email available"}
             </div>
           </div>
         </div>

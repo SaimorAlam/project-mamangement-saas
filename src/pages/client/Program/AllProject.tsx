@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AssignedStaffAvatars } from "@/components/client/AssignedStaffAvatars";
 // import { toast } from "sonner";
 
 // import EditProjectModal from "./EditProjectModal";
@@ -253,58 +254,71 @@ const AllProject = ({
           </thead>
 
           <tbody className="">
-            {sortedProjects.map((project) => (
-              <tr
-                key={project.id}
-                className="hover:bg-gray-50 cursor-pointer even:bg-gray-100"
-                onClick={() => navigate(`project-details/${project.id}`)}
-              >
-                <td className="px-6 py-4 max-w-42">{project.name}</td>
-                <td className="px-6 py-4">
-                  <span className="px-2 py-1 text-xs rounded bg-gray-100">
-                    {project.assignedStaff}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <PriorityDropdown defaultPriority={project.priority} />
-                </td>
+            {sortedProjects.map((project) => {
+              console.log(project);
+              return (
+                <tr
+                  key={project.id}
+                  className="hover:bg-gray-50 cursor-pointer even:bg-gray-100"
+                  onClick={() => navigate(`project-details/${project.id}`)}
+                >
+                  <td className="px-6 py-4 max-w-42">{project.name}</td>
+                  <td className="px-6 py-4">
+                    <AssignedStaffAvatars
+                      manager={project.manager}
+                      employees={
+                        project.projectEmployees?.map(
+                          (pe: any) => pe.employee,
+                        ) || []
+                      }
+                      viewers={
+                        project.projectViewers?.map((pv: any) => pv.viewer) ||
+                        []
+                      }
+                      maxVisible={3}
+                    />
+                  </td>
+                  <td className="px-6 py-4">
+                    <PriorityDropdown defaultPriority={project.priority} />
+                  </td>
 
-                <td className="px-6 py-4">{formatDate(project.updatedAt)}</td>
+                  <td className="px-6 py-4">{formatDate(project.updatedAt)}</td>
 
-                <td className="px-6 py-4">{formatDate(project.deadline)}</td>
+                  <td className="px-6 py-4">{formatDate(project.deadline)}</td>
 
-                <td className="px-6 py-4 w-[180px]">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">
-                      {project.progress}%
-                    </span>
-                    <Progress value={project.progress} />
-                  </div>
-                </td>
+                  <td className="px-6 py-4 w-[180px]">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-gray-500">
+                        {project.progress}%
+                      </span>
+                      <Progress value={project.progress} />
+                    </div>
+                  </td>
 
-                <td className="px-6 py-4 space-x-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditProject(project);
-                      setEditModalOpen(true);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <FaEdit className="text-blue-600" />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(project);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <FaTrash className="text-red-600" />
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  <td className="px-6 py-4 space-x-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditProject(project);
+                        setEditModalOpen(true);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <FaEdit className="text-blue-600" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(project);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <FaTrash className="text-red-600" />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 

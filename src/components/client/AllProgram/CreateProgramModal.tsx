@@ -59,10 +59,10 @@ export default function CreateProgramModal({
   const { data, isLoading } = useGetAllManagersQuery({});
   const managers = data?.data?.data?.map(
     (user: {
-      id: string;
+      userId: string;
       user: { name: string; profileImage: string; role: string };
     }) => ({
-      id: user?.id,
+      id: user?.userId,
       name: user?.user?.name,
       profileImage: user?.user?.profileImage,
       role: user?.user?.role,

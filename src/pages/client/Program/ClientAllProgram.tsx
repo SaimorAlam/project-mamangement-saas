@@ -21,12 +21,6 @@ import { useNavigate } from "react-router-dom";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGetManagerByIdQuery } from "@/store/Api/UserApi/UserApi";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ManagerCell = ({ managerId }: { managerId?: string }) => {
@@ -39,27 +33,21 @@ const ManagerCell = ({ managerId }: { managerId?: string }) => {
     return <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />;
 
   const manager = data?.data;
-  const name = manager?.name || "Unknown Manager";
-  const image = manager?.profileImage;
+  const name = manager?.user?.name || "Unknown Manager";
+  const image = manager?.user?.profileImage;
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center">
-            <Avatar className="h-8 w-8 border border-gray-100">
-              <AvatarImage src={image} alt={name} />
-              <AvatarFallback className="bg-blue-50 text-blue-600 text-[10px]">
-                {name.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{name}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <div>
+      <div className="flex items-center gap-1">
+        <Avatar className="h-8 w-8 border border-gray-100">
+          <AvatarImage src={image} alt={name} />
+          <AvatarFallback className="bg-blue-50 text-blue-600 text-[10px]">
+            {name.substring(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <p className="text-sm font-medium text-gray-600">{name}</p>
+      </div>
+    </div>
   );
 };
 
