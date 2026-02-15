@@ -5,6 +5,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import PrimaryButton from "@/common/PrimaryButton";
+import * as XLSX from "xlsx";
+import { useUploadChartDataMutation } from "@/store/Api/ChartApi/ChartApi";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const UploadProject = () => {
   const [program, setProgram] = useState("");
@@ -18,12 +23,12 @@ const UploadProject = () => {
   const [projectNote, setProjectNote] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const datePickerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  // const programs = ["Program A", "Program B", "Program C", "Program D", "Program E", "Program F", "Program G", "Program H", "Program I"];
-  // const projects = ["Project X", "Project Y", "Project Z"];
-
+  // API hooks
   const { data: programs } = useGetAllProgramQuery({});
   const { data: projects } = useGetAllProjectsQuery({});
+  const [uploadChartData] = useUploadChartDataMutation();
 
   const dateOptions = [
     { value: "last1week", label: "Last 1 Week" },
@@ -98,17 +103,83 @@ const UploadProject = () => {
     setAddNotes(false);
   };
 
-  const handleSaveDraft = () => {
-    console.log({
-      program,
-      project,
-      dateOption,
-      startDate: customStartDate,
-      endDate: customEndDate,
-      file: file?.name,
-      notes: projectNote,
-      addNotes,
-    });
+  const handleSaveDraft = async () => {
+    if (!file) {
+      toast.error("Please select a file first.");
+      return;
+    }
+
+    // Extract ID from filename: "Test 1_ID_A9QWX0_1EXPEW_1M2JBM_IZEEBR_FI4VF4.xlsx" -> "FI4VF4"
+    // Remove extension first
+    const fileNameWithoutExtension =
+      file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
+    // Split by underscore
+    const nameParts = fileNameWithoutExtension.split("_");
+    // Take the last part as the ID
+    let chartId = nameParts[nameParts.length - 1];
+
+    chartId = chartId.trim();
+
+    if (!chartId) {
+      toast.error("Could not extract Chart ID from filename.");
+      return;
+    }
+
+    console.log("Extracted Chart ID:", chartId);
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const data = e.target?.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+
+        // Take the first sheet
+        const sheetName = workbook.SheetNames[0];
+        if (!sheetName) {
+          toast.error("No sheets found in file.");
+          return;
+        }
+
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        const payload = {
+          charts: [
+            {
+              id: chartId,
+              xAxis: JSON.stringify({ labels: jsonData }),
+              yAxis: JSON.stringify({ values: [] }), // Default empty as per client panel
+              zAxis: JSON.stringify({ values: [] }), // Default empty as per client panel
+            },
+          ],
+        };
+
+        console.log("Payload:", payload);
+
+        try {
+          await uploadChartData(payload).unwrap();
+          toast.success("File uploaded successfully!");
+          // Optional: clear file after success
+          // setFile(null);
+        } catch (apiError: any) {
+          console.error("API Error:", apiError);
+          if (apiError.status === 404) {
+            toast.error(`Chart with ID "${chartId}" not found in the database. Please verify the filename contains a valid and existing Chart ID.`);
+          } else {
+            toast.error(apiError?.data?.message || "Failed to upload chart data.");
+          }
+        }
+      };
+
+      reader.readAsBinaryString(file);
+      setFile(null);
+      setProjectNote("");
+      setAddNotes(false);
+      navigate("/staff-employee-panel");
+    } catch (error) {
+      console.error("File processing error:", error);
+      toast.error("Error processing file.");
+    }
   };
 
   return (
@@ -264,7 +335,7 @@ const UploadProject = () => {
             </div>
 
             <p className="text-xs text-gray-500 text-center mb-6">
-              Supported formats: .csv, .xls, .xlsx | Max file size: 10 MB
+              Supported formats: .xlsx | Max file size: 10 MB
             </p>
 
             <div className="flex justify-center mb-4">
@@ -334,12 +405,20 @@ const UploadProject = () => {
               >
                 Cancel
               </button>
-              <button
+              {/* <button
                 onClick={handleSaveDraft}
                 className="px-5 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600"
               >
                 Save Draft
-              </button>
+              </button> */}
+
+              {/* i want when i will click in this button then only the file will be uploaded with id in that router  */}
+              <PrimaryButton
+                leftIcon={<Upload className="text-2xl" />}
+                title="Submit for Review"
+                type={"Primary"}
+                onClick={handleSaveDraft}
+              />
             </div>
           </div>
         )}

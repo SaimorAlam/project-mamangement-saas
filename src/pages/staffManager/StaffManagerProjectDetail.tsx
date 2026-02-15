@@ -115,16 +115,7 @@ export default function StaffManagerProjectDetail() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       {/* Top Navigation & Actions */}
-      <div className="flex items-center justify-between mb-8">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back
-        </Button>
-
+      <div className="flex items-center justify-end mb-8">
         <div className="flex items-center gap-4">
           {favoriteData?.data?.some((fav: any) => fav.projectId === id) && (
             <ConfirmAlertModal
@@ -330,6 +321,14 @@ export default function StaffManagerProjectDetail() {
       </div>
 
       <div className="mt-12 pt-6 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </Button>
         <p>Slug: {project.slug}</p>
         <p>Last synchronized: {new Date(project.updatedAt).toLocaleString()}</p>
       </div>

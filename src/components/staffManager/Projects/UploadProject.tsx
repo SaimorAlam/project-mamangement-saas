@@ -1,17 +1,64 @@
 import React, { useState, useRef } from "react";
-import { UploadCloud, ChevronDown, Upload } from "lucide-react";
+import { UploadCloud, ChevronDown, Upload, Calendar } from "lucide-react";
 import { FaRoad } from "react-icons/fa";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import PrimaryButton from "@/common/PrimaryButton";
+import * as XLSX from "xlsx";
+import { useUploadChartDataMutation } from "@/store/Api/ChartApi/ChartApi";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
-const ProjectFileUpload = () => {
+const UploadProject = () => {
   const [program, setProgram] = useState("");
   const [project, setProject] = useState("");
+  const [dateOption, setDateOption] = useState("last1week");
+  const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
+  const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [addNotes, setAddNotes] = useState(false);
   const [projectNote, setProjectNote] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const datePickerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  const programs = ["Program A", "Program B", "Program C"];
-  const projects = ["Project X", "Project Y", "Project Z"];
+  // API hooks
+  const { data: programs } = useGetAllProgramQuery({});
+  const { data: projects } = useGetAllProjectsQuery({});
+  const [uploadChartData] = useUploadChartDataMutation();
+
+  const dateOptions = [
+    { value: "last1week", label: "Last 1 Week" },
+    { value: "last1month", label: "Last 1 Month" },
+    { value: "last3months", label: "Last 3 Months" },
+    { value: "custom", label: "Custom Range" },
+  ];
+
+  const handleDateOptionChange = (value: string) => {
+    setDateOption(value);
+
+    if (value !== "custom") {
+      // Auto-close the dropdown when preset is selected
+      setIsDatePickerOpen(false);
+
+      // Optionally auto-set dates based on selection
+      const end = new Date();
+      const start = new Date();
+
+      if (value === "last1week") start.setDate(end.getDate() - 7);
+      if (value === "last1month") start.setMonth(end.getMonth() - 1);
+      if (value === "last3months") start.setMonth(end.getMonth() - 3);
+
+      setCustomStartDate(start);
+      setCustomEndDate(end);
+    } else {
+      // Open calendar for custom range
+      setIsDatePickerOpen(true);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -37,8 +84,7 @@ const ProjectFileUpload = () => {
   };
 
   const downloadCsvTemplate = () => {
-    const csvContent =
-      "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
+    const csvContent = "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -57,14 +103,83 @@ const ProjectFileUpload = () => {
     setAddNotes(false);
   };
 
-  const handleSaveDraft = () => {
-    console.log({
-      program,
-      project,
-      file: file?.name,
-      notes: projectNote,
-      addNotes,
-    });
+  const handleSaveDraft = async () => {
+    if (!file) {
+      toast.error("Please select a file first.");
+      return;
+    }
+
+    // Extract ID from filename: "Test 1_ID_A9QWX0_1EXPEW_1M2JBM_IZEEBR_FI4VF4.xlsx" -> "FI4VF4"
+    // Remove extension first
+    const fileNameWithoutExtension =
+      file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
+    // Split by underscore
+    const nameParts = fileNameWithoutExtension.split("_");
+    // Take the last part as the ID
+    let chartId = nameParts[nameParts.length - 1];
+
+    chartId = chartId.trim();
+
+    if (!chartId) {
+      toast.error("Could not extract Chart ID from filename.");
+      return;
+    }
+
+    console.log("Extracted Chart ID:", chartId);
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const data = e.target?.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+
+        // Take the first sheet
+        const sheetName = workbook.SheetNames[0];
+        if (!sheetName) {
+          toast.error("No sheets found in file.");
+          return;
+        }
+
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        const payload = {
+          charts: [
+            {
+              id: chartId,
+              xAxis: JSON.stringify({ labels: jsonData }),
+              yAxis: JSON.stringify({ values: [] }), // Default empty as per client panel
+              zAxis: JSON.stringify({ values: [] }), // Default empty as per client panel
+            },
+          ],
+        };
+
+        console.log("Payload:", payload);
+
+        try {
+          await uploadChartData(payload).unwrap();
+          toast.success("File uploaded successfully!");
+          // Optional: clear file after success
+          // setFile(null);
+        } catch (apiError: any) {
+          console.error("API Error:", apiError);
+          if (apiError.status === 404) {
+            toast.error(`Chart with ID "${chartId}" not found in the database. Please verify the filename contains a valid and existing Chart ID.`);
+          } else {
+            toast.error(apiError?.data?.message || "Failed to upload chart data.");
+          }
+        }
+      };
+
+      reader.readAsBinaryString(file);
+      setFile(null);
+      setProjectNote("");
+      setAddNotes(false);
+      navigate("/staff-manager-panel");
+    } catch (error) {
+      console.error("File processing error:", error);
+      toast.error("Error processing file.");
+    }
   };
 
   return (
@@ -74,6 +189,7 @@ const ProjectFileUpload = () => {
           Select Project & Program Name First
         </h2>
 
+        {/* Program Select */}
         <div className="mb-4">
           <label className="text-sm mb-1 block">Program Name *</label>
           <div className="relative">
@@ -83,15 +199,18 @@ const ProjectFileUpload = () => {
               className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md appearance-none"
             >
               <option value="">Select program name</option>
-              {programs.map((p) => (
-                <option key={p} value={p}>{p}</option>
+              {programs?.data?.data?.map((p: any) => (
+                <option key={p.id} value={p.id}>
+                  {p.programName}
+                </option>
               ))}
             </select>
             <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
           </div>
         </div>
 
-        <div className="mb-8">
+        {/* Project Select */}
+        <div className="mb-4">
           <label className="text-sm mb-1 block">Project Name *</label>
           <div className="relative">
             <select
@@ -100,19 +219,83 @@ const ProjectFileUpload = () => {
               className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md appearance-none"
             >
               <option value="">Select Project Name</option>
-              {projects.map((p) => (
+              {/* {projects.map((p: any) => (
                 <option key={p} value={p}>{p}</option>
+              ))} */}
+              {projects?.data?.projects?.data.map((p: any) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
             <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
           </div>
         </div>
 
+        {/* NEW: Date Range Selector */}
+        <div className="mb-8">
+          <label className="text-sm mb-1 block">Data Upload Date Range *</label>
+          <div className="relative" ref={datePickerRef}>
+            <div
+              onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+              className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md flex items-center justify-between cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Calendar size={16} className="text-gray-500" />
+                <span className="text-sm">
+                  {dateOptions.find((opt) => opt.value === dateOption)?.label || "Select date range"}
+                </span>
+              </div>
+              <ChevronDown className={`text-gray-500 transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`} size={16} />
+            </div>
 
-        {
-        // Showing upload section only if project and program are selected
-         program && project &&
-        !file && (
+            {isDatePickerOpen && (
+              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg">
+                {/* Preset Options */}
+                {dateOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    onClick={() => handleDateOptionChange(option.value)}
+                    className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                  >
+                    {option.label}
+                    {dateOption === option.value && <span className="text-blue-500">✓</span>}
+                  </div>
+                ))}
+
+                {/* Custom Range Calendar */}
+                {dateOption === "custom" && (
+                  <div className="p-4 border-t border-gray-200">
+                    <DatePicker
+                      selected={customStartDate}
+                      onChange={(dates: [Date | null, Date | null]) => {
+                        const [start, end] = dates;
+                        setCustomStartDate(start);
+                        setCustomEndDate(end);
+                        if (end) {
+                          setIsDatePickerOpen(false); // Close when end date selected
+                        }
+                      }}
+                      startDate={customStartDate}
+                      endDate={customEndDate}
+                      selectsRange
+                      inline
+                      calendarClassName="custom-datepicker"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Display selected range below */}
+          {(customStartDate || customEndDate) && (
+            <p className="text-xs text-gray-500 mt-2">
+              Selected: {customStartDate?.toLocaleDateString()} - {customEndDate?.toLocaleDateString() || "Ongoing"}
+            </p>
+          )}
+        </div>
+
+        {/* Upload Section - Only show when program, project, and date range selected */}
+        {program && project && dateOption && !file && (
           <>
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
@@ -125,8 +308,7 @@ const ProjectFileUpload = () => {
             </h3>
 
             <p className="text-center text-sm text-gray-400 mb-6">
-              You haven't uploaded any data for this project. Start by importing
-              a CSV or spreadsheet file to populate tasks or resources.
+              You haven't uploaded any data for this project. Start by importing a CSV or spreadsheet file.
             </p>
 
             <div
@@ -153,14 +335,13 @@ const ProjectFileUpload = () => {
             </div>
 
             <p className="text-xs text-gray-500 text-center mb-6">
-              Supported formats: .csv, .xls, .xlsx | Max file size: 10 MB
+              Supported formats: .xlsx | Max file size: 10 MB
             </p>
 
             <div className="flex justify-center mb-4">
               <button
                 onClick={handleImportClick}
-                disabled={!program || !project}
-                className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-black px-6 py-2 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-black px-6 py-2 rounded-md text-sm"
               >
                 <UploadCloud size={16} />
                 Import Project File
@@ -180,13 +361,11 @@ const ProjectFileUpload = () => {
                 onClick={downloadCsvTemplate}
                 className="text-sm text-blue-400 hover:underline"
               >
-                Download Simple CSV Template →
+                Download Sample CSV Template →
               </button>
             </div>
           </>
-        )
-        
-        }
+        )}
 
         {file && (
           <div className="bg-gray-900 border border-gray-700 rounded-md p-4 text-center mb-6">
@@ -226,12 +405,20 @@ const ProjectFileUpload = () => {
               >
                 Cancel
               </button>
-              <button
+              {/* <button
                 onClick={handleSaveDraft}
                 className="px-5 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600"
               >
                 Save Draft
-              </button>
+              </button> */}
+
+              {/* i want when i will click in this button then only the file will be uploaded with id in that router  */}
+              <PrimaryButton
+                leftIcon={<Upload className="text-2xl" />}
+                title="Submit for Review"
+                type={"Primary"}
+                onClick={handleSaveDraft}
+              />
             </div>
           </div>
         )}
@@ -240,4 +427,4 @@ const ProjectFileUpload = () => {
   );
 };
 
-export default ProjectFileUpload;
+export default UploadProject;
