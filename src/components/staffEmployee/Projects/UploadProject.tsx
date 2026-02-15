@@ -9,6 +9,7 @@ import PrimaryButton from "@/common/PrimaryButton";
 import * as XLSX from "xlsx";
 import { useUploadChartDataMutation } from "@/store/Api/ChartApi/ChartApi";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const UploadProject = () => {
   const [program, setProgram] = useState("");
@@ -104,7 +105,7 @@ const UploadProject = () => {
 
   const handleSaveDraft = async () => {
     if (!file) {
-      alert("Please select a file first.");
+      toast.error("Please select a file first.");
       return;
     }
 
@@ -120,7 +121,7 @@ const UploadProject = () => {
     chartId = chartId.trim();
 
     if (!chartId) {
-      alert("Could not extract Chart ID from filename.");
+      toast.error("Could not extract Chart ID from filename.");
       return;
     }
 
@@ -135,7 +136,7 @@ const UploadProject = () => {
         // Take the first sheet
         const sheetName = workbook.SheetNames[0];
         if (!sheetName) {
-          alert("No sheets found in file.");
+          toast.error("No sheets found in file.");
           return;
         }
 
@@ -157,15 +158,15 @@ const UploadProject = () => {
 
         try {
           await uploadChartData(payload).unwrap();
-          alert("File uploaded successfully!");
+          toast.success("File uploaded successfully!");
           // Optional: clear file after success
           // setFile(null);
         } catch (apiError: any) {
           console.error("API Error:", apiError);
           if (apiError.status === 404) {
-            alert(`Chart with ID "${chartId}" not found in the database. Please verify the filename contains a valid and existing Chart ID.`);
+            toast.error(`Chart with ID "${chartId}" not found in the database. Please verify the filename contains a valid and existing Chart ID.`);
           } else {
-            alert(apiError?.data?.message || "Failed to upload chart data.");
+            toast.error(apiError?.data?.message || "Failed to upload chart data.");
           }
         }
       };
@@ -177,7 +178,7 @@ const UploadProject = () => {
       navigate("/staff-employee-panel");
     } catch (error) {
       console.error("File processing error:", error);
-      alert("Error processing file.");
+      toast.error("Error processing file.");
     }
   };
 

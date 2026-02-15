@@ -15,10 +15,8 @@ import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
 import { toast } from "sonner";
 import UpdateProjectModal from "../client/Program/UpdateProjectModal";
-import SideManagerMain from "@/components/staffManager/Projects/SideManagerMain";
 import { ChevronDown, Filter, Search } from "lucide-react";
 import { useGetProgramAllProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import ProjectLocationsMap from "@/components/staffManager/Projects/ProjectLocationsMap";
 import { Button } from "@/components/ui/button";
 import DropdownSelect from "@/common/DropdownSelect";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
@@ -38,35 +36,35 @@ const priorityOrder: Record<string, number> = {
   LOW: 1,
 };
 
-const dummySidebar = {
-  programManager: {
-    name: "Aahsanul Haque",
-    email: "ahsan@softvence.com",
-    image: "https://ui-avatars.com/api/?name=Aahsanul+Haque",
-  },
-  duration: {
-    start: new Date().toISOString(),
-    end: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000).toISOString(),
-    daysRemaining: "300 days",
-  },
-  tags: [
-    { id: "1", name: "Urban Development", color: "bg-blue-100 text-blue-700" },
-    { id: "2", name: "Construction", color: "bg-green-100 text-green-700" },
-  ],
-  alerts: {
-    issueCount: 2,
-    list: [
-      {
-        id: "1",
-        title: "Material Shortage",
-        description: "Late delivery of cement expected.",
-        time: "2 hours ago",
-        by: "System",
-        color: "bg-red-500",
-      },
-    ],
-  },
-};
+// const dummySidebar = {
+//   programManager: {
+//     name: "Aahsanul Haque",
+//     email: "ahsan@softvence.com",
+//     image: "https://ui-avatars.com/api/?name=Aahsanul+Haque",
+//   },
+//   duration: {
+//     start: new Date().toISOString(),
+//     end: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000).toISOString(),
+//     daysRemaining: "300 days",
+//   },
+//   tags: [
+//     { id: "1", name: "Urban Development", color: "bg-blue-100 text-blue-700" },
+//     { id: "2", name: "Construction", color: "bg-green-100 text-green-700" },
+//   ],
+//   alerts: {
+//     issueCount: 2,
+//     list: [
+//       {
+//         id: "1",
+//         title: "Material Shortage",
+//         description: "Late delivery of cement expected.",
+//         time: "2 hours ago",
+//         by: "System",
+//         color: "bg-red-500",
+//       },
+//     ],
+//   },
+// };
 
 const StaffManagerProjects = ({
   title = "All Projects",
@@ -97,11 +95,6 @@ const StaffManagerProjects = ({
   const [updateProject] = useUpdateProjectMutation();
 
   const projects = useMemo(() => data?.data?.projects?.data ?? [], [data]);
-
-  const programDetails = useMemo(
-    () => data?.data?.sidebar ?? dummySidebar,
-    [data],
-  );
 
   const meta = data?.data?.meta;
   const totalProjects = meta?.total ?? projects.length;

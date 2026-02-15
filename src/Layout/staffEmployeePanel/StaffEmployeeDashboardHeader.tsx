@@ -39,10 +39,6 @@ const StaffEmployeeDashboardHeader = () => {
     "/staff-employee-panel/project-builder",
   ];
   const saveDraftButtonPaths = ["/staff-employee-panel/project-builder"];
-  const publishButtonPaths = [
-    "/staff-employee-panel/upload-submission",
-    "/staff-employee-panel/project-builder",
-  ];
   const uploadSubmissionButtonPaths = [
     "/staff-employee-panel/projects",
     "/staff-employee-panel",
