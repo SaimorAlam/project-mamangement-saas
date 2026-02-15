@@ -12,9 +12,9 @@
   /* Font family configuration */
   --font-inter: "Inter", sans-serif;
 }
-html {
+/* html {
   scrollbar-gutter: stable;
-}
+} */
 @layer base {
   body {
     font-family: var(--font-inter);
@@ -132,11 +132,10 @@ html {
   border-radius: 3px;
 }
 
-/* Hide vertical scrollbar but keep scrolling */
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
+  display: none;
 }
 .scrollbar-hide {
-  -ms-overflow-style: none; /* IE & Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

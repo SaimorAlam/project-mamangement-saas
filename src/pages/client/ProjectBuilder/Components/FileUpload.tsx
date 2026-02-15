@@ -20,11 +20,18 @@ import { useNavigate } from "react-router-dom";
 
 interface FileUploadProps {
   onFileUpload?: (file: File) => void;
+  projectId?: string;
+  isModal?: boolean;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
+const FileUpload: React.FC<FileUploadProps> = ({
+  onFileUpload,
+  projectId: propProjectId,
+  isModal = false,
+}) => {
   const [uploadChartData] = useUploadChartDataMutation();
-  const projectId = useAppSelector((state) => state.chartSlice.projectId);
+  const reduxProjectId = useAppSelector((state) => state.chartSlice.projectId);
+  const projectId = propProjectId || reduxProjectId;
   const navigate = useNavigate();
 
   const [file, setFile] = useState<File | null>(null);
@@ -167,9 +174,17 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
 
   return (
     <>
-      <div className="flex gap-6 min-h-[80vh] font-sans text-[#111827]">
+      <div
+        className={`flex gap-6 font-sans text-[#111827] ${
+          isModal ? "h-full" : "min-h-[80vh]"
+        }`}
+      >
         {/* Main Upload Area */}
-        <div className="flex-1 p-12 flex flex-col items-center justify-center bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div
+          className={`flex-1 p-12 flex flex-col items-center justify-center bg-white rounded-xl border border-gray-200 shadow-sm ${
+            isModal ? "border-none shadow-none p-4" : ""
+          }`}
+        >
           <div className="w-full max-w-[600px] flex flex-col items-center">
             {/* Header Section */}
             <div className="text-center mb-8">
@@ -329,7 +344,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
         </div>
 
         {/* Right Sidebar - Preserved */}
-        <div className="w-96 h-fit hidden xl:block overflow-y-auto">
+        <div className={`w-96 h-fit overflow-y-auto ${
+          isModal ? "hidden" : "hidden xl:block"
+        }`}>
           <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm h-full">
             {/* Program Manager */}
             <div className="mb-8">

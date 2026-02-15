@@ -1,13 +1,35 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Outlet } from "react-router-dom";
-import { Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import ClientDashboardHeader from "./ClientDashboardHeader";
 import ClientSidebar from "./ClientSidebar";
 import GlobalLoader from "@/common/GlobalLoader";
 
 export default function ClientDashboardLayout() {
+  const [open, setOpen] = useState(
+    () => window.innerWidth >= 1280 || window.innerWidth < 1024,
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024 && window.innerWidth < 1280) {
+        setOpen(false);
+      } else {
+        setOpen(true);
+      }
+    };
+
+    // Initial check
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <SidebarProvider
+      open={open}
+      onOpenChange={setOpen}
       defaultOpen={true}
       style={
         {

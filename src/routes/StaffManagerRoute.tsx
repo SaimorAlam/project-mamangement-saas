@@ -25,21 +25,22 @@ import StaffManagerContactUs from "@/pages/staffManager/StaffManagerContactUs";
 import StaffManagerStateCardDetails from "@/pages/staffManager/StaffManagerStateCardDetails";
 import StaffManagerUploadSubmission from "@/pages/staffManager/StaffManagerUploadSubmission";
 import AllProjectsReview from "@/pages/staffManager/AllProjectsReview";
-import StaffManagerProjectDetail from "@/pages/staffManager/StaffManagerProjectDetail";
+// import StaffManagerProjectDetail from "@/pages/staffManager/StaffManagerProjectDetail";
 import ProgramDetailsPage from "@/pages/staffManager/ProgramDetailsPage";
 import DashboardCardProjects from "@/pages/staffManager/DashboardCardProjects";
 import ClientProjectBuilder from "@/pages/client/ProjectBuilder/ClientProjectBuilder";
 import ProfilePage from "@/pages/commonPage/ProfilePage";
 import ClientProjectBuilderContainer from "@/pages/client/ProjectBuilder/ClientProjectBuilderContainer";
 import PublishProject from "@/pages/client/ProjectBuilder/Components/PublishProject";
-import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
 import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
+import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
 
 export function getStaffManagerRoutes() {
   return [
     { index: true, element: <StaffManagerOverview /> },
     { path: "projects", element: <StaffManagerProjects /> },
-    { path: "projects/:id", element: <StaffManagerProjectDetail /> },
+    // { path: "projects/:id", element: <StaffManagerProjectDetail /> },
+    { path: "projects/:id", element: <ProjectDetails /> },
     { path: "projects/status/:status", element: <DashboardCardProjects /> },
     {
       path: "projects/upload-submission",
