@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
-import { useCreateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
+import { useCreateProjectMutation, useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import {
   useGetAllManagersQuery,
   useGetAllViewersQuery,
@@ -71,12 +71,17 @@ const CreateProject = ({
   programId,
   onClose,
   onSuccess,
+  project,
 }: {
   programId: string;
   onClose: () => void;
   onSuccess?: (projectName: string, projectId: string) => void;
+  project?: any;
 }) => {
-  const [createProject, { isLoading }] = useCreateProjectMutation();
+  const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
+  const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
+  const isLoading = isCreating || isUpdating;
+  const isUpdate = !!project;
   const { data: managersData } = useGetAllManagersQuery({});
   const allManagers = managersData?.data?.data || [];
   const { data: employeesData } = useGetAllEmployeesQuery({});
@@ -93,7 +98,7 @@ const CreateProject = ({
     "COMPLETED",
   ]);
 
-  const { register, handleSubmit, watch, setValue, control } =
+  const { register, handleSubmit, watch, setValue, control, reset } =
     useForm<CreateProjectForm>({
       defaultValues: {
         programId,
@@ -143,7 +148,11 @@ const CreateProject = ({
     const apiDay = map[day] || (day.toUpperCase() as any);
     let current: DaysEnum[] = [];
     try {
-      current = JSON.parse(SelectDays || "[]");
+      if (Array.isArray(SelectDays)) {
+        current = SelectDays;
+      } else {
+        current = JSON.parse(SelectDays || "[]");
+      }
     } catch {
       current = [];
     }
@@ -165,7 +174,11 @@ const CreateProject = ({
     };
     let current: DaysEnum[] = [];
     try {
-      current = JSON.parse(SelectDays || "[]");
+      if (Array.isArray(SelectDays)) {
+        current = SelectDays;
+      } else {
+        current = JSON.parse(SelectDays || "[]");
+      }
     } catch {
       current = [];
     }
@@ -185,7 +198,11 @@ const CreateProject = ({
     const apiDay = map[day] || (day.toUpperCase() as any);
     let current: DaysEnum[] = [];
     try {
-      current = JSON.parse(workingDay || "[]");
+      if (Array.isArray(workingDay)) {
+        current = workingDay;
+      } else {
+        current = JSON.parse(workingDay || "[]");
+      }
     } catch {
       current = [];
     }
@@ -207,7 +224,11 @@ const CreateProject = ({
     };
     let current: DaysEnum[] = [];
     try {
-      current = JSON.parse(workingDay || "[]");
+      if (Array.isArray(workingDay)) {
+        current = workingDay;
+      } else {
+        current = JSON.parse(workingDay || "[]");
+      }
     } catch {
       current = [];
     }
@@ -231,6 +252,41 @@ const CreateProject = ({
     });
     return newObj;
   };
+
+  useEffect(() => {
+    if (project) {
+      const dateDate = project.dateDate || project.dataDate || new Date().toISOString();
+      const startDate = project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : "";
+      const deadline = project.deadline ? new Date(project.deadline).toISOString().split('T')[0] : "";
+      
+      reset({
+        programId: project.programId || programId,
+        name: project.name || "",
+        shareWith: (project.employeeIds?.length > 0 || project.viewerIds?.length > 0) ? "Invite_Staff" : "Only_Me",
+        managerId: project.managerId || "",
+        viewerIds: project.viewerIds || [],
+        employeeIds: project.employeeIds || [],
+        dateDate: dateDate,
+        uploadCycle: project.uploadCycle || "Weekly",
+        SelectDays: project.SelectDays ? (Array.isArray(project.SelectDays) ? JSON.stringify(project.SelectDays) : project.SelectDays) : "[]",
+        selectDate: project.selectDate ? (Array.isArray(project.selectDate) ? JSON.stringify(project.selectDate) : project.selectDate) : "[]",
+        UploadData: String(project.UploadData || "3"),
+        description: project.description || "",
+        startDate: startDate,
+        workingDay: project.workingDay ? (Array.isArray(project.workingDay) ? JSON.stringify(project.workingDay) : project.workingDay) : "[]",
+        sortName: project.sortName || "",
+        deadline: deadline,
+        priority: project.priority || "MEDIUM",
+        status: project.status || "",
+        budget: project.budget || "",
+        currentRate: project.currentRate || "",
+      });
+      if (project.description || project.budget || project.managerId) {
+        setEnableDetails(true);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project, programId]);
 
   const onSubmit = async (data: CreateProjectForm) => {
     try {
@@ -282,12 +338,23 @@ const CreateProject = ({
       }
 
       const cleaned = cleanPayload(payload);
-      const res = await createProject(cleaned).unwrap();
-      console.log(res);
-      if (res.success) {
-        const pId = res.data?.project?.id || res.data?.id;
-        if (onSuccess) {
-          onSuccess(data.name, pId);
+      
+      if (isUpdate) {
+        const res = await updateProject({
+          id: project.id,
+          ...cleaned
+        }).unwrap();
+        if (res.success) {
+          toast.success("Project updated successfully");
+          onClose();
+        }
+      } else {
+        const res = await createProject(cleaned).unwrap();
+        if (res.success) {
+          const pId = res.data?.project?.id || res.data?.id;
+          if (onSuccess) {
+            onSuccess(data.name, pId);
+          }
         }
       }
     } catch (error: any) {
@@ -300,7 +367,7 @@ const CreateProject = ({
       <div className="bg-white shadow-xl rounded-lg w-full max-w-4xl max-h-[98vh] overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-2 border-gray-200 border-b">
-          <h2 className="font-semibold text-lg">Create New Project</h2>
+          <h2 className="font-semibold text-lg">{isUpdate ? "Update Project" : "Create New Project"}</h2>
           <button
             onClick={onClose}
             className="hover:bg-slate-50 p-2 rounded-lg text-slate-400 hover:text-slate-600 transition-all"
@@ -1339,7 +1406,7 @@ const CreateProject = ({
               disabled={isLoading}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 shadow-blue-500/20 shadow-lg px-10 py-3.5 rounded-lg font-bold text-white text-sm active:scale-95 disabled:active:scale-100 transition-all"
             >
-              {isLoading ? "Creating..." : "Create Project"}
+              {isLoading ? (isUpdate ? "Updating..." : "Creating...") : (isUpdate ? "Update Project" : "Create Project")}
             </button>
           </div>
         </form>

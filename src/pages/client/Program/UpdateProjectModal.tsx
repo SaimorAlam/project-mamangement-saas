@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import UpdateProject from "@/Layout/clientPanel/UpdateProject";
+import CreateProject from "@/Layout/clientPanel/CreateProject/CreateProject";
 
 interface UpdateProjectModalProps {
   open: boolean;
@@ -16,5 +16,5 @@ export default function UpdateProjectModal({
   
   if (!open) return null;
 
-  return <UpdateProject project={project} onClose={onClose} />;
+  return <CreateProject project={project} onClose={onClose} programId={project?.programId} />;
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
-import { useGetManagerByIdQuery } from "@/store/Api/UserApi/UserApi";
+import { useGetUserByIdQuery } from "@/store/Api/UserApi/UserApi";
 
 interface Tag {
   id: number;
@@ -18,9 +18,10 @@ interface Alert {
 }
 
 const ProgramManager = ({ managerId }: { managerId: string }) => {
-  const { data, isLoading } = useGetManagerByIdQuery(managerId);
-  console.log(data?.data);
-  console.log(managerId);
+  const { data, isLoading } = useGetUserByIdQuery(managerId, {
+    skip: !managerId,
+  });
+
   const [tags, setTags] = useState<Tag[]>([
     { id: 1, label: "Infrastructure", color: "blue" },
     { id: 2, label: "Highway", color: "green" },
@@ -30,7 +31,22 @@ const ProgramManager = ({ managerId }: { managerId: string }) => {
     { id: 6, label: "Priority", color: "red" },
   ]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border border-gray-200 p-7 animate-pulse">
+        <div className="h-4 w-24 bg-gray-200 mb-4 rounded" />
+        <div className="flex gap-3 items-center">
+          <div className="w-10 h-10 bg-gray-200 rounded-full" />
+          <div className="space-y-2 flex-1">
+            <div className="h-4 bg-gray-200 rounded w-1/2" />
+            <div className="h-3 bg-gray-200 rounded w-3/4" />
+          </div>
+        </div>
+      </div>
+    );
+
+  const manager = data?.data;
+
   const alerts: Alert[] = [
     {
       id: 1,
@@ -120,21 +136,27 @@ const ProgramManager = ({ managerId }: { managerId: string }) => {
     <div className="w-full max-w-sm bg-white rounded-lg shadow-sm border border-gray-200 p-7">
       {/* Program Manager Section */}
       <div className="mb-6">
-        <h3 className="text-xs font-semibold text-gray-600 mb-3">
+        <h3 className="text-xs font-semibold text-gray-600 mb-3 uppercase tracking-wider">
           Program Manager
         </h3>
         <div className="flex items-center gap-3">
-          <img
-            src="https://i.pravatar.cc/150?img=1"
-            alt="Alex Thompson"
-            className="w-10 h-10 rounded-full"
-          />
+          {manager?.profileImage ? (
+            <img
+              src={manager.profileImage}
+              alt={manager.name}
+              className="w-10 h-10 rounded-full object-cover border border-gray-100"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-semibold text-sm border border-blue-100">
+              {manager?.name?.substring(0, 2).toUpperCase() || "NA"}
+            </div>
+          )}
           <div>
             <div className="text-sm font-semibold text-gray-900">
-              Alex Thompson
+              {manager?.name || "Unknown Manager"}
             </div>
             <div className="text-xs text-gray-500">
-              alex.thompson@example.com
+              {manager?.email || "No email available"}
             </div>
           </div>
         </div>
@@ -215,7 +237,7 @@ const ProgramManager = ({ managerId }: { managerId: string }) => {
           {alerts.map((alert) => (
             <div key={alert.id} className="flex gap-3">
               <div
-                className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${getAlertColor(
+                className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${getAlertColor(
                   alert.type,
                 )}`}
               />

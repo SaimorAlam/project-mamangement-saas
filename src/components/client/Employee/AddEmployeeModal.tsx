@@ -14,8 +14,7 @@ import {
 } from "@/components/ui/select";
 import {
   useAddEmployeeMutation,
-  // useAddManagerMutation,
-  // useAddViewerMutation,
+  useUpdateEmployeeMutation,
 } from "@/store/Api/EmployeeApi/EmployeeApi";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,7 +24,7 @@ import { EyeOff } from "lucide-react";
 interface IAddEmployeeModalProps {
   open: boolean;
   onClose: () => void;
-  employee?: IAddEmployeePayload;
+  employee?: any;
 }
 
 const today = new Date().toISOString().split("T")[0];
@@ -59,7 +58,38 @@ const AddEmployeeModal = ({
   useEffect(() => {
     if (employee) {
       const { password, ...rest } = employee;
-      reset(rest);
+      let projects: string[] = [];
+      let skills: string[] = [];
+      let description = "";
+      let joinedDate = today;
+
+      if (employee.role === "MANAGER" && employee.manager) {
+        projects = employee.manager.projects?.map((p: any) => p.id) || [];
+        skills = employee.manager.skills || [];
+        description = employee.manager.description || "";
+        joinedDate = employee.manager.joinedDate || today;
+      } else if (employee.role === "EMPLOYEE" && employee.employee) {
+        projects =
+          employee.employee.projectEmployees?.map((pe: any) => pe.projectId) ||
+          [];
+        skills = employee.employee.skills || [];
+        description = employee.employee.description || "";
+        joinedDate = employee.employee.joinedDate || today;
+      } else if (employee.role === "VIEWER" && employee.viewer) {
+        projects =
+          employee.viewer.projectViewers?.map((pv: any) => pv.projectId) || [];
+        skills = employee.viewer.skills || [];
+        description = employee.viewer.description || "";
+        joinedDate = employee.viewer.joinedDate || today;
+      }
+
+      reset({
+        ...rest,
+        projects,
+        skills,
+        description,
+        joinedDate,
+      });
     }
   }, [employee, reset, open]);
   const selectedRole = watch("role");
@@ -70,8 +100,11 @@ const AddEmployeeModal = ({
   const joinedDateRef = useRef<HTMLInputElement>(null);
   const [addEmployee, { isLoading: employeeLoading }] =
     useAddEmployeeMutation();
-  // const [addManager, { isLoading: managerloading }] = useAddManagerMutation();
-  // const [addViewer, { isLoading: viewerloading }] = useAddViewerMutation();
+  const [updateEmployee, { isLoading: updateLoading }] =
+    useUpdateEmployeeMutation();
+
+  const isUpdate = !!employee;
+  const isLoading = employeeLoading || updateLoading;
   const { data: allProjects } = useGetAllProjectsQuery({});
   const projectsData = allProjects?.data?.projects?.data?.map(
     (project: { name: string; id: string }) => ({
@@ -124,7 +157,7 @@ const AddEmployeeModal = ({
       payload = {
         name: data.name,
         email: data.email,
-        ...(!employee?.password && { password: data.password }),
+        ...(!isUpdate && { password: data.password }),
         role: data.role,
         skills: data.skills,
         description: data.description,
@@ -134,15 +167,21 @@ const AddEmployeeModal = ({
         notifyProjectManager: data.notifyProjectManager,
       };
       const cleanedPayload = cleanObject(payload);
-      await addEmployee(cleanedPayload).unwrap();
-      toast.success(`${selectedRole} added successfully!`);
+
+      if (isUpdate) {
+        await updateEmployee({ id: employee.id, ...cleanedPayload }).unwrap();
+        toast.success(`${selectedRole} updated successfully!`);
+      } else {
+        await addEmployee(cleanedPayload).unwrap();
+        toast.success(`${selectedRole} added successfully!`);
+      }
       onClose();
     } catch (err: unknown) {
       if (err && typeof err === "object" && "data" in err) {
         const errorData = (err as { data?: { message?: string } }).data;
         toast.error(
           errorData?.message ||
-            `Failed to add ${selectedRole}. Please try again.`,
+            `Failed to ${isUpdate ? "update" : "add"} ${selectedRole}. Please try again.`,
         );
       } else {
         toast.error("Something went wrong. Please try again.");
@@ -157,7 +196,7 @@ const AddEmployeeModal = ({
       <div className="bg-white shadow-xl rounded-lg w-full min-w-xl max-w-2xl max-h-[90vh]">
         <div className="flex justify-between items-center px-6 py-4 border-gray-200 border-b">
           <h2 className="font-semibold text-gray-900 text-lg">
-            Add New Employee
+            {isUpdate ? "Update Employee" : "Add New Employee"}
           </h2>
           <button
             onClick={onClose}
@@ -175,11 +214,11 @@ const AddEmployeeModal = ({
           <div className="gap-4 grid grid-cols-2">
             <div>
               <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                Employee Name <span className="text-red-500">*</span>
+                Employee Name {!isUpdate && <span className="text-red-500">*</span>}
               </label>
               <input
                 {...register("name", {
-                  required: "Name is required",
+                  required: isUpdate ? false : "Name is required",
                 })}
                 placeholder="Enter employee name"
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none w-full text-sm"
@@ -193,7 +232,7 @@ const AddEmployeeModal = ({
 
             <div>
               <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                Employee Email <span className="text-red-500">*</span>
+                Employee Email {!isUpdate && <span className="text-red-500">*</span>}
               </label>
               <div className="relative">
                 <Mail
@@ -203,7 +242,7 @@ const AddEmployeeModal = ({
                 <input
                   type="email"
                   {...register("email", {
-                    required: "Email is required",
+                    required: isUpdate ? false : "Email is required",
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                       message: "Invalid email",
@@ -247,13 +286,13 @@ const AddEmployeeModal = ({
             {/* Role Selection */}
             <div>
               <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                Select Role <span className="text-red-500">*</span>
+                Select Role {!isUpdate && <span className="text-red-500">*</span>}
               </label>
 
               <Controller
                 name="role"
                 control={control}
-                rules={{ required: "Role is required" }}
+                rules={{ required: isUpdate ? false : "Role is required" }}
                 render={({ field }) => (
                   <Select
                     key={field.value}
@@ -282,13 +321,13 @@ const AddEmployeeModal = ({
 
             <div>
               <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                Employee Password <span className="text-red-500">*</span>
+                Employee Password {!isUpdate && <span className="text-red-500">*</span>}
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   {...register("password", {
-                    required: "Password is required",
+                    required: isUpdate ? false : "Password is required",
                     minLength: {
                       value: 6,
                       message: "Password must be at least 6 characters",
@@ -329,7 +368,7 @@ const AddEmployeeModal = ({
             <Controller
               name="joinedDate"
               control={control}
-              rules={{ required: "Joined date is required" }}
+              rules={{ required: isUpdate ? false : "Joined date is required" }}
               render={({ field }) => {
                 const openPicker = () => {
                   joinedDateRef.current?.showPicker?.();
@@ -338,7 +377,7 @@ const AddEmployeeModal = ({
                 return (
                   <div>
                     <label className="block mb-1.5 font-medium text-gray-700 text-sm">
-                      Joined Date <span className="text-red-500">*</span>
+                      Joined Date {!isUpdate && <span className="text-red-500">*</span>}
                     </label>
                     <div className="relative">
                       <input
@@ -582,16 +621,16 @@ const AddEmployeeModal = ({
             </button>
             <button
               type="submit"
-              disabled={employeeLoading}
+              disabled={isLoading}
               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
-                employeeLoading
+                isLoading
                   ? "bg-blue-400 text-white cursor-not-allowed"
                   : "bg-blue-600 text-white hover:bg-blue-700"
               }`}
             >
-              {employeeLoading
-                ? `Adding ${selectedRole}...`
-                : `Add ${selectedRole}`}
+              {isLoading
+                ? `${isUpdate ? "Updating" : "Adding"} ${selectedRole}...`
+                : `${isUpdate ? "Update" : "Add"} ${selectedRole}`}
             </button>
           </div>
         </form>
