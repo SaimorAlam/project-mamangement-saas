@@ -27,6 +27,8 @@ import { FaSpinner } from "react-icons/fa";
 import { ConfirmAlertModal } from "@/common/Modal/ConfirmAlertModal";
 import { Badge } from "@/components/ui/badge";
 import DeleteModal from "@/common/Modal/DeleteModal";
+import { useSelector } from "react-redux";
+import { useGetUser } from "@/hooks/useGetUser";
 
 const formatDate = (date: string | null) => {
   if (!date) return "Not Set";
@@ -65,6 +67,11 @@ export default function StaffManagerProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
+  const { name } = useGetUser();
+
+  // getting my info 
+  const myInfo = useSelector((state: any) => state.auth.user);
+  console.log(myInfo);
 
   const {
     data: projectData,
@@ -274,6 +281,10 @@ export default function StaffManagerProjectDetail() {
               <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-3 border border-slate-700">
                 <User size={32} className="text-slate-400" />
               </div>
+
+              <h4 className="font-bold text-slate-800">
+                {name}
+              </h4>
               <p className="text-sm text-slate-400 mb-4">
                 {project.manager?.description}
               </p>
