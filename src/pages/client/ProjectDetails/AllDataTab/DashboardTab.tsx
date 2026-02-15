@@ -13,6 +13,8 @@ import { useGetRootChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import StackedBarChart, {
   parseXAxisData,
 } from "@/common/Charts/StackedBarChart";
+import MultiAxisLineChart from "@/common/Charts/LineChart";
+import { parseLineChartData } from "@/utils/parseLineChartData";
 
 const DashboardTab = () => {
   const { projectId } = useParams();
@@ -27,8 +29,42 @@ const DashboardTab = () => {
 
     if (hasData) {
       return rootChartData?.data
-        ?.filter((chart: any) => chart.category === "BAR")
+        ?.filter((chart: any) => chart.category === "BAR" || chart.category === "LINE")
         .map((chart: any) => {
+          if (chart.category === "LINE") {
+            // Handle LINE charts
+            const widgets = chart?.lineChart?.widgets || [];
+            const legendValues = widgets.map((w: any) => ({
+              label: w.legendName,
+              field: w.legendName?.toLowerCase().replace(/\s+/g, ""),
+              color: w.color,
+            }));
+
+            const { labels, data } = parseLineChartData(
+              chart.xAxis,
+              legendValues,
+              chart.title,
+            );
+
+            return (
+              <MultiAxisLineChart
+                key={chart.id}
+                widgetTitle={chart.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                numOfLegendDataSet={legendValues.length}
+                startingRange={chart.lineChart?.firstFiledDataset || 0}
+                endingRange={chart.lineChart?.lastFiledDAtaset || 100}
+                chartId={chart.id}
+                projectId={projectId}
+                allUploadedData={data}
+                tierLevel={0}
+                isPreview={true}
+              />
+            );
+          }
+
+          // Handle BAR charts
           const widgets = chart?.barChart?.widgets || [];
           const legendValues = widgets.map((w: any) => ({
             label: w.legendName,

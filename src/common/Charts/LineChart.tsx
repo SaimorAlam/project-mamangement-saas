@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LineChart,
   Line,
@@ -9,12 +9,24 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import { generateLineChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import ChartCardWrapper from "./components/ChartCardWrapper";
+import {
+  useLazyFindChildrenValueQuery,
+  useLazyGetAllTheLeafChartQuery,
+} from "@/store/Api/ChartApi/ChartApi";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import {
+  setChildPayload,
+  setGroupTitle,
+} from "@/store/Slices/ChartSlice/ChartSlice";
+import { parseLineChartData } from "@/utils/parseLineChartData";
 
 /*       TYPES       */
 
@@ -37,6 +49,12 @@ export type TierChart = {
   children: TierChart[];
 };
 
+export type BreadcrumbItem = {
+  id: string;
+  name: string;
+  level: number;
+};
+
 type Props = {
   widgetTitle?: string;
   xAxisValues?: string[];
@@ -49,6 +67,11 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
   isPreview?: boolean;
+  projectId?: string;
+  allUploadedData?: { [key: string]: ChartData[] };
+  breadcrumbPath?: BreadcrumbItem[];
+  onNavigate?: (level: number) => void;
+  widgets?: any[];
 };
 
 /*       COMPONENT       */
@@ -65,18 +88,40 @@ export default function MultiAxisLineChart({
   tierLevel = 0,
   chartId = "root",
   isPreview = false,
+  projectId,
+  allUploadedData,
+  breadcrumbPath = [],
+  onNavigate,
 }: Props) {
 
   const [showLineOnly, setShowLineOnly] = useState(false);
   const [hoveredLine, setHoveredLine] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [localUploadedData, setLocalUploadedData] = useState<
+    { [key: string]: ChartData[] } | undefined
+  >(allUploadedData);
+
+  // API hooks for tier management
+  const [findChildrenValue, { data, isLoading }] =
+    useLazyFindChildrenValueQuery();
+  const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
+  
+  const dispatch = useAppDispatch();
+  const groupTitle = useAppSelector((state) => state.chartSlice.groupTitle);
+  const childTiers = data?.data;
 
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
-  const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
+
+  // Fetch children when chartId changes
+  useEffect(() => {
+    if (chartId && chartId !== "root") {
+      findChildrenValue(chartId);
+    }
+  }, [chartId, findChildrenValue]);
 
   /*   DATA   */
   const chartData: ChartData[] = useMemo(() => {
@@ -93,6 +138,34 @@ export default function MultiAxisLineChart({
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
+  };
+
+  const currentBreadcrumbs = useMemo(() => {
+    const base =
+      breadcrumbPath.length === 0
+        ? [{ id: "dashboard", name: "Dashboard", level: -1 }]
+        : breadcrumbPath;
+    return [
+      ...base,
+      { id: chartId || "root", name: widgetTitle, level: tierLevel },
+    ];
+  }, [breadcrumbPath, chartId, widgetTitle, tierLevel]);
+
+  const handleChildNavigate = (targetLevel: number) => {
+    if (targetLevel < tierLevel) {
+      setShowChildrenModal(false);
+      if (onNavigate) onNavigate(targetLevel);
+    }
+  };
+
+  const handleBreadcrumbClick = (index: number) => {
+    const target = currentBreadcrumbs[index];
+    if (index < currentBreadcrumbs.length - 1) {
+      if (onNavigate) {
+        onNavigate(target.level);
+      }
+      setShowChildrenModal(false);
+    }
   };
 
   const handleDownload = () => {
@@ -127,25 +200,46 @@ export default function MultiAxisLineChart({
     setIsDownloading(false);
   };
 
-  const handleAddTierClick = () => {
+  const handleAddTierClick = (title: string) => {
+    if (tierLevel === 0) {
+      dispatch(setGroupTitle(title));
+    }
+    const childPayload = {
+      numberOfDataset: numOfLegendDataSet,
+      firstFiledDataset: startingRange,
+      lastFiledDAtaset: endingRange,
+      widgets: legendValues.map((l) => ({
+        legendName: l.label,
+        color: l.color,
+      })),
+      title: "",
+      status: "ACTIVE",
+      category: "LINE",
+      xAxis: JSON.stringify([
+        ["Label", ...legendValues.map((l) => l.label)],
+        ...xAxisValues.map((label) => [
+          label,
+          ...Array(numOfLegendDataSet).fill(0),
+        ]),
+      ]),
+      yAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({}),
+      projectId: projectId,
+      parentId: chartId,
+      rootchart: false,
+      roottitle: widgetTitle,
+      grouptitle: groupTitle,
+    };
+    dispatch(setChildPayload(childPayload));
     setShowAddTierModal(true);
   };
 
-  const handleSaveTier = (tierName: string) => {
-    const newTier: TierChart = {
-      id: `${chartId}-tier-${Date.now()}`,
-      name: tierName,
-      xAxisValues: xAxisValues,
-      legendValues: legendValues,
-      children: [],
-    };
-    setChildTiers([...childTiers, newTier]);
-    setShowAddTierModal(false);
-  };
-
   const handleChartClick = () => {
-    if (childTiers.length > 0) {
+    if (childTiers?.length > 0) {
       setShowChildrenModal(true);
+      if (tierLevel === 0) {
+        dispatch(setGroupTitle(widgetTitle));
+      }
     }
   };
 
@@ -172,6 +266,10 @@ export default function MultiAxisLineChart({
     );
   };
 
+  if (isLoading) {
+    return <div>Loading child tiers...</div>;
+  }
+
   /*   RENDER   */
 
   return (
@@ -186,7 +284,7 @@ export default function MultiAxisLineChart({
           onCopy: handleCopy,
           onDownload: handleDownload,
           onDelete: onDelete,
-          onAddTier: handleAddTierClick,
+          onAddTier: () => handleAddTierClick(widgetTitle),
           onToggleWidget: onToggleWidget,
         }}
         isDownloading={isDownloading}
@@ -219,9 +317,9 @@ export default function MultiAxisLineChart({
           </div>
         }
         footer={
-          childTiers.length > 0 ? (
+          childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
@@ -273,8 +371,8 @@ export default function MultiAxisLineChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        onSave={handleSaveTier}
-        parentChartName={widgetTitle}
+        chartId={chartId}
+        parentChartName={groupTitle}
       />
 
       {showChildrenModal && (
@@ -283,22 +381,51 @@ export default function MultiAxisLineChart({
           onClose={() => setShowChildrenModal(false)}
           tierLevel={tierLevel + 1}
           title={widgetTitle}
+          breadcrumbs={currentBreadcrumbs}
+          onBreadcrumbClick={handleBreadcrumbClick}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers.map((tier) => (
-              <MultiAxisLineChart
-                key={tier.id}
-                widgetTitle={tier.name}
-                xAxisValues={tier.xAxisValues}
-                legendValues={tier.legendValues}
-                numOfLegendDataSet={tier.legendValues.length}
-                startingRange={startingRange}
-                endingRange={endingRange}
-                tierLevel={tierLevel + 1}
-                chartId={tier.id}
-                isPreview={isPreview}
-              />
-            ))}
+            {childTiers &&
+              childTiers?.map((tier: any) => {
+                const tierLegends = (tier?.lineChart?.widgets || tier?.widgets || []).map(
+                  (w: any) => ({
+                    label: w.legendName || w.label,
+                    field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
+                    color: w.color,
+                  }),
+                );
+
+                const { labels, data } = parseLineChartData(
+                  tier.xAxis,
+                  tierLegends,
+                  tier.title,
+                );
+
+                return (
+                  <MultiAxisLineChart
+                    key={tier?.id}
+                    widgetTitle={
+                      tier?.title ||
+                      tier?.name ||
+                      tier?.taskName ||
+                      "Untitled Tier"
+                    }
+                    xAxisValues={labels}
+                    legendValues={tierLegends}
+                    numOfLegendDataSet={tierLegends.length}
+                    startingRange={startingRange}
+                    endingRange={endingRange}
+                    tierLevel={tierLevel + 1}
+                    chartId={tier?.id}
+                    allUploadedData={data}
+                    isPreview={isPreview}
+                    widgets={tier?.widgets}
+                    projectId={tier?.projectId || projectId}
+                    breadcrumbPath={currentBreadcrumbs}
+                    onNavigate={handleChildNavigate}
+                  />
+                );
+              })}
           </div>
         </TierChartModal>
       )}
