@@ -45,6 +45,12 @@ import {
 import { Download } from "lucide-react";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
+import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import { useDebounce } from "@/hooks/useDebounce";
+import { Layers, Briefcase } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
 
 interface ClientDashboardHeaderProps {
   name?: string;
@@ -165,11 +171,41 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
     projectId: string;
   } | null>(null);
   const [projectSuccessOpen, setProjectSuccessOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isPreview, isPublished } = useAppSelector(
     (state) => state.chartSlice,
   );
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const { data: allProgramsData } = useGetAllProgramQuery({});
+  const { data: allProjectsData } = useGetAllProjectsQuery({});
+
+  const filteredPrograms = React.useMemo(() => {
+    if (!debouncedSearchTerm) return [];
+    const programs = allProgramsData?.data?.data || [];
+    return Array.isArray(programs)
+      ? programs.filter((p: any) =>
+          p.programName
+            ?.toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()),
+        )
+      : [];
+  }, [debouncedSearchTerm, allProgramsData]);
+
+  const filteredProjects = React.useMemo(() => {
+    if (!debouncedSearchTerm) return [];
+    const projects =
+      allProjectsData?.data?.projects?.data ||
+      allProjectsData?.data?.data ||
+      [];
+    return Array.isArray(projects)
+      ? projects.filter((p: any) =>
+          p.name?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
+        )
+      : [];
+  }, [debouncedSearchTerm, allProjectsData]);
 
   useEffect(() => {
     setIsEmployeeModalOpen(false);
@@ -443,8 +479,8 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-wrap items-center py-5 justify-between">
-        <div className="flex items-center gap-4 min-w-0">
+      <div className="flex flex-col lg:flex-row items-center py-5 justify-between gap-4 lg:gap-0">
+        <div className="flex items-center gap-4 w-full lg:w-auto min-w-0">
           <SidebarTrigger className="md:hidden shrink-0" />
           {currentPath.includes("/client-panel") && (
             <div className="min-w-0">
@@ -458,17 +494,98 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           )}
         </div>
 
-        <div className="flex-1 min-w-[200px] grid place-content-center order-2  w-full sm:w-auto mt-2 sm:mt-0">
+        <div className="flex-1 w-full lg:w-auto flex justify-center mt-2 lg:mt-0 relative group px-0 lg:px-4">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+
+          {searchTerm && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 max-h-[400px] overflow-y-auto z-50 py-2">
+              {filteredPrograms.length === 0 &&
+              filteredProjects.length === 0 ? (
+                <div className="p-4 text-center text-gray-500 text-sm">
+                  No results found
+                </div>
+              ) : (
+                <>
+                  {filteredPrograms.length > 0 && (
+                    <div className="mb-2">
+                      <h3 className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Programs
+                      </h3>
+                      {filteredPrograms.map((program: any) => (
+                        <div
+                          key={program.id}
+                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition-colors"
+                          onClick={() => {
+                            setSearchTerm("");
+                            navigate(
+                              `/client-panel/all-program/program-overview/${program.id}`,
+                            );
+                          }}
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                            <Layers className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {program.name}
+                            </p>
+                            <p className="text-xs text-gray-500">Program</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {filteredProjects.length > 0 && (
+                    <div>
+                      <h3 className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Projects
+                      </h3>
+                      {filteredProjects.map((project: any) => (
+                        <div
+                          key={project.id}
+                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition-colors"
+                          onClick={() => {
+                            setSearchTerm("");
+                            navigate(
+                              `/client-panel/all-program/program-overview/${project.programId}/project-details/${project.id}`,
+                            );
+                          }}
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+                            <Briefcase className="w-4 h-4 text-indigo-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {project.name}
+                            </p>
+                            <p className="text-xs text-gray-500">Project</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center justify-end gap-2 md:gap-4 lg:gap-6 relative order-3 lg:order-3 ml-auto lg:ml-0">
+        <div className="flex items-center justify-end gap-2 md:gap-4 lg:gap-6 relative w-full lg:w-auto mt-2 lg:mt-0">
           <PrimaryButton
             leftIcon={<Bell className="text-xl md:text-2xl" />}
             type="Outline"
             onClick={() => setIsNotificationOpen(true)}
             className="p-2 md:p-3"
           />
+          {isProjectDetailsPage && (
+            <PrimaryButton
+              leftIcon={<Upload className="text-xl md:text-2xl" />}
+              type="Outline"
+              onClick={() => setIsUploadModalOpen(true)}
+              className="p-2 md:p-3"
+            />
+          )}
           <NotificationModal
             isOpen={isNotificationOpen}
             onClose={() => setIsNotificationOpen(false)}
@@ -692,6 +809,18 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
+
+      {isProjectDetailsPage && (
+        <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
+          <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] overflow-y-auto p-0 border-0 bg-transparent shadow-none [&>button]:right-4 [&>button]:top-4 [&>button]:bg-white [&>button]:rounded-full [&>button]:p-1">
+            <FileUpload
+              isModal
+              projectId={projectId as string}
+              onFileUpload={() => setIsUploadModalOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
