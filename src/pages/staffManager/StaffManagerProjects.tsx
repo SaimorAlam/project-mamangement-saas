@@ -415,12 +415,12 @@ const StaffManagerProjects = ({
             onPageChange={setCurrentPage}
           />
         </div>
-        <SideManagerMain sidebar={programDetails} />
+        {/* <SideManagerMain sidebar={programDetails} /> */}
       </div>
 
       {/* <div className="bg-green-200 h-[80vh]"></div> */}
       {/* google map according to longitude and latitude  */}
-      <ProjectLocationsMap projects={projects} />
+      {/* <ProjectLocationsMap projects={projects} /> */}
 
       {editModalOpen && editProject && (
         <UpdateProjectModal

@@ -14,7 +14,10 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { FaSpinner } from "react-icons/fa";
-import { useGetProgramByIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
+import {
+  useGetProgramByIdQuery,
+  useGetProjectsByProgramIdQuery,
+} from "@/store/Api/ProgramApi/ProgramApi";
 import ErrorPage from "@/common/ErrorPage";
 
 const formatDate = (date: string | null) => {
@@ -46,6 +49,17 @@ export default function ProgramDetailsPage() {
 
   const program = data?.data;
 
+  const { data: projectsData, isLoading: isProjectsLoading } =
+    useGetProjectsByProgramIdQuery(
+      {
+        programId: id,
+        args: {},
+      },
+      { skip: !id },
+    );
+
+  const projects = projectsData?.data?.data || [];
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -60,12 +74,6 @@ export default function ProgramDetailsPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-6xl">
-      {/* Header Actions */}
-      <div className="flex items-center justify-between mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-      </div>
 
       {/* Title & Progress Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -148,9 +156,86 @@ export default function ProgramDetailsPage() {
         </section>
       </div>
 
+      {/* Projects Section */}
+      <div className="mt-8">
+        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <Layers className="w-5 h-5 text-primary" />
+          Projects ({projects?.length || 0})
+        </h3>
+
+        {isProjectsLoading ? (
+          <div className="flex justify-center p-8">
+            <FaSpinner className="animate-spin text-primary" size={24} />
+          </div>
+        ) : projects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project: any) => (
+              <div
+                key={project.id}
+                onClick={() =>
+                  navigate(`/staff-manager-panel/projects/${project.id}`)
+                }
+                className="group p-5 rounded-xl border border-slate-100 bg-white hover:shadow-lg hover:border-primary/20 transition-all duration-300 cursor-pointer relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 p-3">
+                  <span
+                    className={`text-[10px] font-bold px-2 py-1 rounded-full border ${getPriorityStyles(project.priority)}`}
+                  >
+                    {project.priority}
+                  </span>
+                </div>
+                <h4 className="font-bold text-slate-800 mb-2 truncate pr-16 group-hover:text-primary transition-colors">
+                  {project.name}
+                </h4>
+                <div className="flex items-center gap-2 mb-4">
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium`}
+                  >
+                    {project.status?.replace("_", " ")}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span>Progress</span>
+                    <span className="font-semibold text-slate-700">
+                      {project.progress}%
+                    </span>
+                  </div>
+                  <Progress value={project.progress} className="h-1.5" />
+
+                  <div className="pt-3 mt-3 border-t border-slate-50 flex items-center gap-2 text-xs text-slate-400">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>
+                      Deadline:{" "}
+                      <span className="text-slate-600 font-medium">
+                        {formatDate(project.deadline)}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center p-8 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+            <p className="text-slate-500 text-sm">
+              No projects found in this program.
+            </p>
+          </div>
+        )}
+      </div>
+
+
       {/* Footer */}
-      <div className="mt-8 pt-4 border-t border-slate-100 text-right text-xs text-slate-400">
-        Last updated {formatDate(program.updatedAt)}
+      <div className="flex justify-between items-center mt-8 pt-4 border-t border-slate-100">
+        <Button onClick={() => navigate(-1)} variant="outline" className="flex items-center gap-2 text-gray-600">
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </Button>
+        <div className=" text-right text-xs text-slate-400">
+          Last updated {formatDate(program.updatedAt)}
+        </div>
       </div>
     </div>
   );
@@ -181,3 +266,4 @@ const InfoItem = ({
     </div>
   </div>
 );
+
