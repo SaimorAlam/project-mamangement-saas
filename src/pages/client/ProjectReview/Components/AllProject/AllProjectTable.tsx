@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Edit, Eye, Flag, Trash2, ArrowUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
+import Swal from "sweetalert2";
+import { useDeleteProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -89,6 +92,7 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [deleteProject] = useDeleteProjectMutation();
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -133,6 +137,32 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
       setSelectedIds((prev) => [...prev, id]);
     } else {
       setSelectedIds((prev) => prev.filter((pId) => pId !== id));
+    }
+  };
+
+  const handleDelete = async (projectId: string, projectName: string) => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: `Do you want to delete "${projectName}"? This action cannot be undone!`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+      });
+
+      if (result.isConfirmed) {
+        await deleteProject(projectId).unwrap();
+        Swal.fire("Deleted!", "Project has been deleted.", "success");
+      }
+    } catch (err: unknown) {
+      Swal.fire(
+        "Error",
+        (err as any)?.data?.message || "Failed to delete project",
+        "error",
+      );
     }
   };
 
@@ -262,7 +292,15 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
                         <Edit className="w-4 h-4 text-[#10B981]" />
                       </Button>
 
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(project.id, project.name);
+                        }}
+                        className="h-8 w-8 p-0"
+                      >
                         <Trash2 className="w-4 h-4 text-[#EF4444]" />
                       </Button>
                     </div>

@@ -255,7 +255,6 @@ const AllProject = ({
 
           <tbody className="">
             {sortedProjects.map((project) => {
-              console.log(project);
               return (
                 <tr
                   key={project.id}
