@@ -102,17 +102,16 @@ const StaffEmployeeDashboardHeader = () => {
                 leftIcon={<FileText className="text-2xl" />}
                 title="Save Draft"
                 type={"Outline"}
-                onClick={() => setIsOpen(true)}
               />
             )}
-            {publishButtonPaths.includes(currentPath) && (
+            {/* {publishButtonPaths.includes(currentPath) && (
               <PrimaryButton
                 leftIcon={<Upload className="text-2xl" />}
                 title="Submit for Review"
                 type={"Primary"}
                 onClick={() => setIsOpen(true)}
               />
-            )}
+            )} */}
 
             {uploadSubmissionButtonPaths.includes(currentPath) && (
               <PrimaryButton
