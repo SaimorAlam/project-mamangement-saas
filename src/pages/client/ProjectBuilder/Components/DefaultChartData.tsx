@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import StackedBarChart from "@/common/Charts/StackedBarChart";
 import { ChartData } from "@/common/Charts/StackedBarChart";
+import HorizontalBarChart, {
+  parseHorizontalBarData,
+} from "@/common/Charts/HorizontalBarChart";
 
 /**
  * Parse xAxis 2D array format from API
@@ -88,6 +91,42 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                   numOfLegendDataSet={item?.barChart?.numberOfDataset}
                   startingRange={item?.barChart?.firstFiledDataset}
                   endingRange={item?.barChart?.lastFiledDAtaset}
+                  chartId={item?.id}
+                  projectId={item?.projectId}
+                  allUploadedData={data}
+                />
+              </div>
+            );
+          }
+          if (item.category === "HORIZONTAL_BAR") {
+            const legendValues = (
+              item?.horizontalBarChart?.widgets ||
+              item?.widgets ||
+              []
+            ).map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            }));
+
+            const { labels, data } = parseHorizontalBarData(
+              item?.xAxis,
+              legendValues,
+              item?.title,
+            );
+
+            return (
+              <div key={item.id} className="w-full">
+                <HorizontalBarChart
+                  widgetTitle={item?.title}
+                  xAxisValues={labels}
+                  legendValues={legendValues}
+                  widgets={item?.horizontalBarChart?.widgets}
+                  numOfLegendDataSet={item?.horizontalBarChart?.numberOfDataset}
+                  startingRange={item?.horizontalBarChart?.firstFiledDataset}
+                  endingRange={item?.horizontalBarChart?.lastFiledDAtaset}
                   chartId={item?.id}
                   projectId={item?.projectId}
                   allUploadedData={data}

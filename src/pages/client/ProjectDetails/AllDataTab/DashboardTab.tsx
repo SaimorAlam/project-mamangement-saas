@@ -15,6 +15,9 @@ import StackedBarChart, {
 } from "@/common/Charts/StackedBarChart";
 import MultiAxisLineChart from "@/common/Charts/LineChart";
 import { parseLineChartData } from "@/utils/parseLineChartData";
+import HorizontalBarChart, {
+  parseHorizontalBarData,
+} from "@/common/Charts/HorizontalBarChart";
 
 const DashboardTab = () => {
   const { projectId } = useParams();
@@ -29,7 +32,12 @@ const DashboardTab = () => {
 
     if (hasData) {
       return rootChartData?.data
-        ?.filter((chart: any) => chart.category === "BAR" || chart.category === "LINE")
+        ?.filter(
+          (chart: any) =>
+            chart.category === "BAR" ||
+            chart.category === "LINE" ||
+            chart.category === "HORIZONTAL_BAR",
+        )
         .map((chart: any) => {
           if (chart.category === "LINE") {
             // Handle LINE charts
@@ -55,6 +63,41 @@ const DashboardTab = () => {
                 numOfLegendDataSet={legendValues.length}
                 startingRange={chart.lineChart?.firstFiledDataset || 0}
                 endingRange={chart.lineChart?.lastFiledDAtaset || 100}
+                chartId={chart.id}
+                projectId={projectId}
+                allUploadedData={data}
+                tierLevel={0}
+                isPreview={true}
+              />
+            );
+          }
+
+          if (chart.category === "HORIZONTAL_BAR") {
+            const widgets =
+              chart?.horizontalBarChart?.widgets || chart?.widgets || [];
+            const legendValues = widgets.map((w: any) => ({
+              label: w.legendName || w.label,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+              color: w.color,
+            }));
+
+            const { labels, data } = parseHorizontalBarData(
+              chart.xAxis,
+              legendValues,
+              chart.title,
+            );
+
+            return (
+              <HorizontalBarChart
+                key={chart.id}
+                widgetTitle={chart.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                numOfLegendDataSet={legendValues.length}
+                startingRange={chart.horizontalBarChart?.firstFiledDataset || 0}
+                endingRange={chart.horizontalBarChart?.lastFiledDAtaset || 100}
                 chartId={chart.id}
                 projectId={projectId}
                 allUploadedData={data}

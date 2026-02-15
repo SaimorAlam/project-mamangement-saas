@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ProjectConfiguration, {
-  LegendValue,
-} from "../WidgetForChartModuleOne";
+import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
 import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
@@ -17,12 +15,10 @@ const HorizontalBarChartModule = ({
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
-    useState<number>(1);
+  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] =
-    useState<number>(3);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#13A490" },
@@ -59,7 +55,7 @@ const HorizontalBarChartModule = ({
   const minXaxisField = 1;
   const maxXaxisField = 7;
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -69,7 +65,7 @@ const HorizontalBarChartModule = ({
     } else {
       setNumOfXAxisDataSet(1);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 
@@ -116,6 +112,7 @@ const HorizontalBarChartModule = ({
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
           isPreview={isPreview}
+          isCreationMode={true}
         />
       </div>
       {!isPreview && showWidget && (
