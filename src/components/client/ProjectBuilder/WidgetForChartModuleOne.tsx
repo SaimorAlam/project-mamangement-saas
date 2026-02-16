@@ -81,7 +81,7 @@ const WidgetForChartModuleOne = ({
   };
 
   // handler for Legend inputs
-  const minLegend = 3;
+  const minLegend = 1;
   const maxLegend = 5;
   const handleSetNumOfLegendDataSet = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -152,8 +152,8 @@ const WidgetForChartModuleOne = ({
       }
     }
 
-    if (legendValues.length < 3) {
-      toast.error(`Please add at least ${minLegend} legend values`);
+    if (legendValues.length < minLegend) {
+      toast.error(`Please add at least ${minLegend} legend value${minLegend > 1 ? "s" : ""}`);
       return;
     }
     if (xAxisValues.length < 1) {

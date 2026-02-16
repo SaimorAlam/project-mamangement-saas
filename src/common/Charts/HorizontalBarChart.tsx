@@ -168,7 +168,7 @@ export default function HorizontalBarChart({
         field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
       }));
     }
-    return [{ label: "Sample", field: "field1", color: "#6366f1" }];
+    return [{ label: "Sample", field: "field1", color: "#13A490" }];
   }, [legendValues]);
 
   const effectiveXAxisValues = useMemo(() => {
@@ -244,23 +244,39 @@ export default function HorizontalBarChart({
     effectiveLegendValues,
   ]);
 
-  const barData = useMemo(() => {
+  const barRows = useMemo(() => {
     if (!chartData.length || !effectiveLegendValues.length) return [];
-    const firstLegend = effectiveLegendValues[0];
-    return chartData.map((row) => ({
-      label: row.name,
-      value: Number(row[firstLegend.field] || 0),
-    }));
+    
+    return chartData.map((row) => {
+      let rowTotal = 0;
+      const segments = effectiveLegendValues.map((l) => {
+        const value = Number(row[l.field] || 0);
+        const start = rowTotal;
+        rowTotal += value;
+        return {
+          field: l.field,
+          label: l.label,
+          color: l.color,
+          value,
+          start,
+        };
+      });
+      return {
+        name: row.name,
+        total: rowTotal,
+        segments,
+      };
+    });
   }, [chartData, effectiveLegendValues]);
 
   const totalValue = useMemo(() => {
-    return barData.reduce((sum, item) => sum + item.value, 0);
-  }, [barData]);
+    return barRows.reduce((sum, item) => sum + item.total, 0);
+  }, [barRows]);
 
   const maxValue = useMemo(() => {
-    const maxInBars = Math.max(...barData.map((b) => b.value), 0);
+    const maxInBars = Math.max(...barRows.map((b) => b.total), 0);
     return Math.max(maxInBars, safeEndingRange, 1);
-  }, [barData, safeEndingRange]);
+  }, [barRows, safeEndingRange]);
 
   /*   ACTIONS   */
 
@@ -498,7 +514,9 @@ export default function HorizontalBarChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`${isSampleData ? "(Sample Data) " : ""}${
-          effectiveLegendValues.length > 0 ? effectiveLegendValues[0].label : "Distribution"
+          effectiveLegendValues.length === 1 
+            ? effectiveLegendValues[0].label 
+            : "Stacked Distribution"
         }`}
         chartId={chartId}
         tierLevel={tierLevel}
@@ -537,30 +555,31 @@ export default function HorizontalBarChart({
         }
       >
         <div className="relative">
-          {barData.length > 0 ? (
+          {barRows.length > 0 ? (
             <>
               <div className="space-y-4 mb-6">
-                {barData.map((item, index) => (
+                {barRows.map((row, index) => (
                   <div key={index} className="flex items-center gap-4">
                     <div className="w-24 text-right text-sm text-gray-600 truncate">
-                      {item.label}
+                      {row.name}
                     </div>
                     <div className="flex-1 relative">
-                      <div className="h-6 bg-gray-100 rounded-lg overflow-hidden">
-                        <div
-                          className="h-full rounded-lg transition-all duration-500 ease-out"
-                          style={{
-                            width: `${maxValue > 0 ? (item.value / maxValue) * 100 : 0}%`,
-                            backgroundColor:
-                              effectiveLegendValues.length > 0
-                                ? effectiveLegendValues[0].color
-                                : "#6366f1",
-                          }}
-                        />
+                      <div className="h-6 bg-gray-100 rounded-lg overflow-hidden flex">
+                        {row.segments.map((segment, sIndex) => (
+                          <div
+                            key={sIndex}
+                            className="h-full transition-all duration-500 ease-out"
+                            style={{
+                              width: `${maxValue > 0 ? (segment.value / maxValue) * 100 : 0}%`,
+                              backgroundColor: segment.color,
+                            }}
+                            title={`${segment.label}: ${segment.value}`}
+                          />
+                        ))}
                       </div>
                     </div>
                     <div className="w-12 text-sm font-medium text-gray-700">
-                      {item.value}
+                      {row.total}
                     </div>
                   </div>
                 ))}

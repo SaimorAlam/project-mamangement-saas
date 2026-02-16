@@ -50,7 +50,7 @@ const WidgetForChartModuleTwo = ({
 
 
     // handler for Legend inputs
-    const minLegend = 3;
+    const minLegend = 1;
     const maxLegend = 5;
     const handleSetNumOfLegendDataSet = (
         e: React.ChangeEvent<HTMLInputElement>
