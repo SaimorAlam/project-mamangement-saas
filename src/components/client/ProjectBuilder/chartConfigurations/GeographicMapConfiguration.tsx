@@ -67,8 +67,8 @@ const GeographicMapConfiguration = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const payload: Record<string, any> = {
       numberOfDataset: points.length,
-      firstFiledDataset: startingZoom,
-      lastFiledDAtaset: 0,
+      firstFieldDataset: startingZoom,
+      lastFieldDAtaset: 0,
       widgets: points.map((p) => ({
         legendName: p.name,
         color: p.color,

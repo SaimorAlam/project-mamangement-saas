@@ -78,7 +78,7 @@ export default function ScatterChart({
   const generateScatterData = (seed: number, count: number = 6): ScatterData[] => {
     const data: ScatterData[] = [];
     const range = endingRange - startingRange;
-    
+
     for (let i = 0; i < count; i++) {
       const randomFactor = (seed * 7 + i * 13) % 100;
       data.push({
@@ -92,7 +92,7 @@ export default function ScatterChart({
 
   const scatterDataSets = useMemo(() => {
     if (!legendValues.length) return [];
-    
+
     return legendValues
       .filter((l) => l.label)
       .map((legend, index) => ({
@@ -120,8 +120,8 @@ export default function ScatterChart({
   const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDAtaset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -261,7 +261,7 @@ export default function ScatterChart({
           </ResponsiveContainer>
         ) : (
           <div className="h-[400px] flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
-             No data available. Please configure legend values.
+            No data available. Please configure legend values.
           </div>
         )}
       </ChartCardWrapper>

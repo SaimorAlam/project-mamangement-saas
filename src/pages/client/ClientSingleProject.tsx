@@ -258,8 +258,8 @@ export default function ClientSingleProject() {
                       })) || []
                     }
                     numOfLegendDataSet={item.numberOfDataset}
-                    startingRange={item.firstFiledDataset}
-                    endingRange={item.lastFiledDAtaset}
+                    startingRange={item.firstFieldDataset}
+                    endingRange={item.lastFieldDAtaset}
                     allUploadedData={uploadedExcelData || {}}
                   />
                 </div>

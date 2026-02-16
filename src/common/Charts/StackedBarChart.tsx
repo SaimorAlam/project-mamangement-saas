@@ -421,8 +421,8 @@ export default function StackedBarChart({
     }
     const childPayload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: safeStartingRange,
-      lastFiledDAtaset: safeEndingRange,
+      firstFieldDataset: safeStartingRange,
+      lastFieldDataset: safeEndingRange,
       widgets: legendValues.map((l) => ({
         legendName: l.label,
         color: l.color,
@@ -537,9 +537,9 @@ export default function StackedBarChart({
           onUpload:
             tierLevel === 0
               ? () =>
-                  document
-                    .getElementById(`upload-input-${chartId || widgetTitle}`)
-                    ?.click()
+                document
+                  .getElementById(`upload-input-${chartId || widgetTitle}`)
+                  ?.click()
               : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode

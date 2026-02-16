@@ -94,8 +94,8 @@ export default function PieChartWidget({
   const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: 0,
-      lastFiledDAtaset: 100,
+      firstFieldDataset: 0,
+      lastFieldDAtaset: 100,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,

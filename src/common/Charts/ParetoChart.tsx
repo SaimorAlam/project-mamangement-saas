@@ -160,8 +160,8 @@ export default function ParetoChart({
   const handleDownload = () => {
     const payload = {
       numberOfDataset: 1,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDAtaset: endingRange,
       showWidgets: [{ legend_name: "Pareto", color: "#4F81BC" }],
       title: widgetTitle,
       status: "ACTIVE",

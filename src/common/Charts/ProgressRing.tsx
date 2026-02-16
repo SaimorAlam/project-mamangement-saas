@@ -102,8 +102,8 @@ export default function ProgressRing({
 
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDAtaset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,

@@ -136,8 +136,8 @@ export default function WaterfallChart({
   const handleDownload = async () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDAtaset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -246,7 +246,7 @@ export default function WaterfallChart({
             {childTiers.map((tier) => (
               <WaterfallChart
                 key={tier.id}
-                widgetTitle={tier.name}               
+                widgetTitle={tier.name}
                 xAxisValues={tier.xAxisValues}
                 legendValues={tier.legendValues}
                 numOfLegendDataSet={tier.legendValues.length}

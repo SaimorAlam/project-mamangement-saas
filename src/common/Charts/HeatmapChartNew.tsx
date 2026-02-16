@@ -131,8 +131,8 @@ export default function HeatmapChartNew({
   const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDAtaset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -195,11 +195,10 @@ export default function HeatmapChartNew({
   return (
     <>
       <div
-        className={`w-full bg-white border border-gray-200 rounded-lg p-6 relative ${
-          childTiers.length > 0
+        className={`w-full bg-white border border-gray-200 rounded-lg p-6 relative ${childTiers.length > 0
             ? "cursor-pointer hover:shadow-lg transition-shadow"
             : ""
-        }`}
+          }`}
         onClick={handleChartClick}
       >
         {/* Header */}

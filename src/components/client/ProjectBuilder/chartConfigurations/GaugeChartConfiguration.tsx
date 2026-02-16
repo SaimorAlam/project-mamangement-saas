@@ -124,8 +124,8 @@ const GaugeChartConfiguration = ({
 
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDAtaset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -389,14 +389,12 @@ const GaugeChartConfiguration = ({
                 />
                 <div
                   onClick={() => setShowLegend(!showLegend)}
-                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
-                    showLegend ? "bg-blue-600" : "bg-gray-300"
-                  }`}
+                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showLegend ? "bg-blue-600" : "bg-gray-300"
+                    }`}
                 >
                   <div
-                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
-                      showLegend ? "translate-x-5" : "translate-x-0"
-                    }`}
+                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showLegend ? "translate-x-5" : "translate-x-0"
+                      }`}
                   />
                 </div>
               </div>

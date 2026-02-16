@@ -246,7 +246,7 @@ export default function HorizontalBarChart({
 
   const barRows = useMemo(() => {
     if (!chartData.length || !effectiveLegendValues.length) return [];
-    
+
     return chartData.map((row) => {
       let rowTotal = 0;
       const segments = effectiveLegendValues.map((l) => {
@@ -458,8 +458,8 @@ export default function HorizontalBarChart({
     }
     const childPayload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: safeStartingRange,
-      lastFiledDAtaset: safeEndingRange,
+      firstFieldDataset: safeStartingRange,
+      lastFieldDAtaset: safeEndingRange,
       widgets: legendValues.map((l) => ({
         legendName: l.label,
         color: l.color,
@@ -513,11 +513,10 @@ export default function HorizontalBarChart({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        subtitle={`${isSampleData ? "(Sample Data) " : ""}${
-          effectiveLegendValues.length === 1 
-            ? effectiveLegendValues[0].label 
+        subtitle={`${isSampleData ? "(Sample Data) " : ""}${effectiveLegendValues.length === 1
+            ? effectiveLegendValues[0].label
             : "Stacked Distribution"
-        }`}
+          }`}
         chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
@@ -528,9 +527,9 @@ export default function HorizontalBarChart({
           onUpload:
             tierLevel === 0
               ? () =>
-                  document
-                    .getElementById(`upload-input-horizontal-${chartId || widgetTitle}`)
-                    ?.click()
+                document
+                  .getElementById(`upload-input-horizontal-${chartId || widgetTitle}`)
+                  ?.click()
               : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode

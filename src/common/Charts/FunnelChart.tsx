@@ -54,10 +54,10 @@ export default function FunnelChart({
   /*   DATA   */
   const chartData = useMemo(() => {
     if (!xAxisValues.length) return [];
-    
+
     // Generate descending values for funnel effect
     const step = (endingRange - startingRange) / (xAxisValues.length - 1 || 1);
-    return xAxisValues.map((_, index) => 
+    return xAxisValues.map((_, index) =>
       Math.round(endingRange - (step * index))
     );
   }, [xAxisValues, startingRange, endingRange]);
@@ -125,8 +125,8 @@ export default function FunnelChart({
   const handleDownload = () => {
     const payload = {
       numberOfDataset: xAxisValues.length,
-      firstFiledDataset: 0,
-      lastFiledDAtaset: 100,
+      firstFieldDataset: 0,
+      lastFieldDAtaset: 100,
       showWidgets: xAxisValues.map((l) => ({
         legend_name: l,
       })),
@@ -228,28 +228,28 @@ export default function FunnelChart({
       />
 
       {/* Children Grid Modal */}
-        <TierChartModal
-          isOpen={showChildrenModal}
-          onClose={() => setShowChildrenModal(false)}
-          tierLevel={tierLevel + 1}
-          title={widgetTitle}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers.map((tier) => (
-              <FunnelChart
-                key={tier.id}
-                widgetTitle={tier.name}
-                xAxisValues={tier.xAxisValues}
-                startingRange={startingRange}
-                endingRange={endingRange}
-                tierLevel={tierLevel + 1}
-                chartId={tier.id}
-                isPreview={isPreview}
-                onDelete={onDelete}
-              />
-            ))}
-          </div>
-        </TierChartModal>
+      <TierChartModal
+        isOpen={showChildrenModal}
+        onClose={() => setShowChildrenModal(false)}
+        tierLevel={tierLevel + 1}
+        title={widgetTitle}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {childTiers.map((tier) => (
+            <FunnelChart
+              key={tier.id}
+              widgetTitle={tier.name}
+              xAxisValues={tier.xAxisValues}
+              startingRange={startingRange}
+              endingRange={endingRange}
+              tierLevel={tierLevel + 1}
+              chartId={tier.id}
+              isPreview={isPreview}
+              onDelete={onDelete}
+            />
+          ))}
+        </div>
+      </TierChartModal>
     </>
   );
 }

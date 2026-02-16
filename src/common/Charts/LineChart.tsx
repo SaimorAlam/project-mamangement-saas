@@ -105,7 +105,7 @@ export default function MultiAxisLineChart({
   const [findChildrenValue, { data, isLoading }] =
     useLazyFindChildrenValueQuery();
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
-  
+
   const dispatch = useAppDispatch();
   const groupTitle = useAppSelector((state) => state.chartSlice.groupTitle);
   const childTiers = data?.data;
@@ -396,8 +396,8 @@ export default function MultiAxisLineChart({
     }
     const childPayload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: safeStartingRange,
-      lastFiledDAtaset: safeEndingRange,
+      firstFieldDataset: safeStartingRange,
+      lastFieldDAtaset: safeEndingRange,
       widgets: legendValues.map((l) => ({
         legendName: l.label,
         color: l.color,
@@ -476,9 +476,9 @@ export default function MultiAxisLineChart({
           onUpload:
             tierLevel === 0
               ? () =>
-                  document
-                    .getElementById(`upload-input-line-${chartId || widgetTitle}`)
-                    ?.click()
+                document
+                  .getElementById(`upload-input-line-${chartId || widgetTitle}`)
+                  ?.click()
               : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode
@@ -510,11 +510,10 @@ export default function MultiAxisLineChart({
                 e.stopPropagation();
                 setShowLineOnly(!showLineOnly);
               }}
-              className={`text-xs px-2 py-1 rounded transition-colors ${
-                showLineOnly 
-                  ? "bg-blue-50 text-blue-600 border border-blue-100" 
+              className={`text-xs px-2 py-1 rounded transition-colors ${showLineOnly
+                  ? "bg-blue-50 text-blue-600 border border-blue-100"
                   : "bg-gray-50 text-gray-600 border border-gray-100 hover:bg-gray-100"
-              }`}
+                }`}
             >
               Line Only {showLineOnly ? "✓" : ""}
             </button>
@@ -533,16 +532,16 @@ export default function MultiAxisLineChart({
             <ResponsiveContainer width="100%" height={350}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
                   tick={{ fontSize: 12, fill: '#9ca3af' }}
                 />
-                <YAxis 
-                  domain={[safeStartingRange, safeEndingRange]} 
-                  axisLine={false} 
-                  tickLine={false} 
+                <YAxis
+                  domain={[safeStartingRange, safeEndingRange]}
+                  axisLine={false}
+                  tickLine={false}
                   tick={{ fontSize: 12, fill: '#9ca3af' }}
                 />
                 <Tooltip content={<CustomTooltip />} />
@@ -568,7 +567,7 @@ export default function MultiAxisLineChart({
             </ResponsiveContainer>
           ) : (
             <div className="h-80 flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
-               No data available. Please configure the chart.
+              No data available. Please configure the chart.
             </div>
           )}
 

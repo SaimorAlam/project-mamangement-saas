@@ -49,11 +49,11 @@ const generateCandlestickData = (
 
   for (let i = 0; i < count; i++) {
     const timestamp = baseTime + i * interval;
-    
+
     // Generate OHLC values (Open, High, Low, Close)
     const open = Math.random() * (yrange.max - yrange.min) + yrange.min;
     const variance = (yrange.max - yrange.min) * 0.05; // 5% variance
-    
+
     const high = open + Math.random() * variance;
     const low = open - Math.random() * variance;
     const close = low + Math.random() * (high - low);
@@ -171,8 +171,8 @@ export default function CandleChart({
 
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDAtaset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,

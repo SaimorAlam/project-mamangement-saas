@@ -34,7 +34,7 @@ const WidgetForChartModuleTwo = ({
     setStartingRange?: React.Dispatch<React.SetStateAction<number>>,
     endingRange?: number,
     setEndingRange?: React.Dispatch<React.SetStateAction<number>>,
-    onClose?: ()=> void
+    onClose?: () => void
 }) => {
 
     const [filter, setFilter] = useState<string>("");
@@ -110,22 +110,22 @@ const WidgetForChartModuleTwo = ({
     };
 
     console.log(widgetCategory);
-    
 
-        // const payload = {
-        //   numberOfDataset: numOfLegendDataSet,
-        //   firstFiledDataset: startingRange,
-        //   lastFiledDAtaset: endingRange,
-        //   showWidgets: legendValues.map(l => ({
-        //     legend_name: l.label,
-        //     color: l.color,
-        //   })),
-        //   title: widgetTitle,
-        //   status: "ACTIVE",
-        //   category: widgetCategory,
-        // };
-        // DownloadAndSaveCSVforModuleOneWidget(payload, getChartTitleId, widgetTitle, xAxisValues, legendValues)
-    
+
+    // const payload = {
+    //   numberOfDataset: numOfLegendDataSet,
+    //   firstFieldDataset: startingRange,
+    //   lastFieldDAtaset: endingRange,
+    //   showWidgets: legendValues.map(l => ({
+    //     legend_name: l.label,
+    //     color: l.color,
+    //   })),
+    //   title: widgetTitle,
+    //   status: "ACTIVE",
+    //   category: widgetCategory,
+    // };
+    // DownloadAndSaveCSVforModuleOneWidget(payload, getChartTitleId, widgetTitle, xAxisValues, legendValues)
+
 
 
     return (
