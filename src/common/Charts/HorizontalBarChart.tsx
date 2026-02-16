@@ -15,6 +15,7 @@ import {
   setChildPayload,
   setGroupTitle,
 } from "@/store/Slices/ChartSlice/ChartSlice";
+import { chartTypes } from "@/utils/ChartCategory";
 
 /**
  * Parse xAxis 2D array format from API for Horizontal Bar
@@ -456,6 +457,7 @@ export default function HorizontalBarChart({
     if (tierLevel === 0) {
       dispatch(setGroupTitle(title));
     }
+    console.log(legendValues, "LegendValues");
     const childPayload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: safeStartingRange,
@@ -638,8 +640,9 @@ export default function HorizontalBarChart({
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers?.map((tier: any) => {
+              const category = chartTypes[tier.category];
               const tierLegends = (
-                tier?.horizontalBarChart?.widgets ||
+                tier?.[category]?.widgets ||
                 tier?.widgets ||
                 []
               ).map((w: any) => ({
@@ -672,6 +675,7 @@ export default function HorizontalBarChart({
                   projectId={tier.projectId || projectId}
                   breadcrumbPath={currentBreadcrumbs}
                   onNavigate={handleChildNavigate}
+                  onDelete={onDelete}
                 />
               );
             })}
