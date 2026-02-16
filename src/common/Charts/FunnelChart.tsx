@@ -58,55 +58,63 @@ export default function FunnelChart({
     // Generate descending values for funnel effect
     const step = (endingRange - startingRange) / (xAxisValues.length - 1 || 1);
     return xAxisValues.map((_, index) =>
-      Math.round(endingRange - (step * index))
+      Math.round(endingRange - step * index),
     );
   }, [xAxisValues, startingRange, endingRange]);
 
-  const chartOptions: any = useMemo(() => ({
-    chart: {
-      type: 'bar',
-      height: 350,
-      toolbar: {
+  const chartOptions: any = useMemo(
+    () => ({
+      chart: {
+        type: "bar",
+        height: 350,
+        toolbar: {
+          show: false,
+        },
+        dropShadow: {
+          enabled: true,
+          top: 2,
+          left: 2,
+          blur: 4,
+          opacity: 0.2,
+        },
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 0,
+          horizontal: true,
+          barHeight: "80%",
+          isFunnel: true,
+        },
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val: any, opt: any) {
+          return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val;
+        },
+        dropShadow: {
+          enabled: true,
+        },
+      },
+      colors: ["#00E396"],
+      xaxis: {
+        categories: xAxisValues.filter(Boolean),
+      },
+      legend: {
         show: false,
       },
-      dropShadow: {
-        enabled: true,
-        top: 2,
-        left: 2,
-        blur: 4,
-        opacity: 0.2,
-      },
-    },
-    plotOptions: {
-      bar: {
-        borderRadius: 0,
-        horizontal: true,
-        barHeight: '80%',
-        isFunnel: true,
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val: any, opt: any) {
-        return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
-      },
-      dropShadow: {
-        enabled: true,
-      },
-    },
-    colors: ['#00E396'],
-    xaxis: {
-      categories: xAxisValues.filter(Boolean),
-    },
-    legend: {
-      show: false,
-    },
-  }), [xAxisValues]);
+    }),
+    [xAxisValues],
+  );
 
-  const series = useMemo(() => [{
-    name: "Funnel Series",
-    data: chartData,
-  }], [chartData]);
+  const series = useMemo(
+    () => [
+      {
+        name: "Funnel Series",
+        data: chartData,
+      },
+    ],
+    [chartData],
+  );
 
   const totalValue = useMemo(() => {
     return chartData.reduce((sum, val) => sum + val, 0);
@@ -126,7 +134,7 @@ export default function FunnelChart({
     const payload = {
       numberOfDataset: xAxisValues.length,
       firstFieldDataset: 0,
-      lastFieldDAtaset: 100,
+      lastFieldDataset: 100,
       showWidgets: xAxisValues.map((l) => ({
         legend_name: l,
       })),
@@ -146,7 +154,7 @@ export default function FunnelChart({
       payload,
       getChartTitleId,
       widgetTitle,
-      xAxisValues
+      xAxisValues,
     );
 
     setIsDownloading(false);

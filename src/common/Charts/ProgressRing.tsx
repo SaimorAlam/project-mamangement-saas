@@ -1,11 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
@@ -68,7 +62,6 @@ export default function ProgressRing({
   chartId = "root",
   isPreview = false,
 }: Props) {
-
   const [isDownloading, setIsDownloading] = useState(false);
 
   // Tier management states
@@ -103,7 +96,7 @@ export default function ProgressRing({
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: startingRange,
-      lastFieldDAtaset: endingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -142,7 +135,7 @@ export default function ProgressRing({
       getChartTitleId,
       widgetTitle,
       [],
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -199,14 +192,15 @@ export default function ProgressRing({
                     />
                     <span className="text-sm">{l.label}</span>
                   </div>
-                )
+                ),
             )}
           </div>
         }
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium text-center">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }

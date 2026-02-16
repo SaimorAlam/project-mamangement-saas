@@ -93,7 +93,6 @@ export default function MultiAxisLineChart({
   breadcrumbPath = [],
   onNavigate,
 }: Props) {
-
   const [showLineOnly, setShowLineOnly] = useState(false);
   const [hoveredLine, setHoveredLine] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -397,7 +396,7 @@ export default function MultiAxisLineChart({
     const childPayload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: safeStartingRange,
-      lastFieldDAtaset: safeEndingRange,
+      lastFieldDataset: safeEndingRange,
       widgets: legendValues.map((l) => ({
         legendName: l.label,
         color: l.color,
@@ -439,15 +438,9 @@ export default function MultiAxisLineChart({
 
     return (
       <div className="bg-white p-3 border rounded shadow-lg">
-        <p className="font-semibold mb-2">
-          {payload[0].payload.name}
-        </p>
+        <p className="font-semibold mb-2">{payload[0].payload.name}</p>
         {effectiveLegendValues.map((l) => (
-          <p
-            key={l.field}
-            style={{ color: l.color }}
-            className="text-sm"
-          >
+          <p key={l.field} style={{ color: l.color }} className="text-sm">
             {l.label}: {payload[0].payload[l.field]}
           </p>
         ))}
@@ -476,9 +469,11 @@ export default function MultiAxisLineChart({
           onUpload:
             tierLevel === 0
               ? () =>
-                document
-                  .getElementById(`upload-input-line-${chartId || widgetTitle}`)
-                  ?.click()
+                  document
+                    .getElementById(
+                      `upload-input-line-${chartId || widgetTitle}`,
+                    )
+                    ?.click()
               : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode
@@ -494,10 +489,13 @@ export default function MultiAxisLineChart({
               {effectiveLegendValues.slice(0, 3).map((l) =>
                 l.label ? (
                   <div key={l.field} className="flex items-center gap-1.5">
-                    <div className="w-3 h-1 rounded-full" style={{ backgroundColor: l.color }} />
+                    <div
+                      className="w-3 h-1 rounded-full"
+                      style={{ backgroundColor: l.color }}
+                    />
                     <span className="text-xs text-gray-500">{l.label}</span>
                   </div>
-                ) : null
+                ) : null,
               )}
               {effectiveLegendValues.length > 3 && (
                 <span className="text-xs text-gray-400">
@@ -510,10 +508,11 @@ export default function MultiAxisLineChart({
                 e.stopPropagation();
                 setShowLineOnly(!showLineOnly);
               }}
-              className={`text-xs px-2 py-1 rounded transition-colors ${showLineOnly
+              className={`text-xs px-2 py-1 rounded transition-colors ${
+                showLineOnly
                   ? "bg-blue-50 text-blue-600 border border-blue-100"
                   : "bg-gray-50 text-gray-600 border border-gray-100 hover:bg-gray-100"
-                }`}
+              }`}
             >
               Line Only {showLineOnly ? "✓" : ""}
             </button>
@@ -522,7 +521,8 @@ export default function MultiAxisLineChart({
         footer={
           childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier
+              {childTiers?.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
@@ -531,18 +531,22 @@ export default function MultiAxisLineChart({
           {chartData.length ? (
             <ResponsiveContainer width="100%" height={350}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#f0f0f0"
+                />
                 <XAxis
                   dataKey="name"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  tick={{ fontSize: 12, fill: "#9ca3af" }}
                 />
                 <YAxis
                   domain={[safeStartingRange, safeEndingRange]}
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  tick={{ fontSize: 12, fill: "#9ca3af" }}
                 />
                 <Tooltip content={<CustomTooltip />} />
 
@@ -555,9 +559,7 @@ export default function MultiAxisLineChart({
                     dot={!showLineOnly}
                     strokeWidth={2}
                     opacity={
-                      hoveredLine === null || hoveredLine === l.field
-                        ? 1
-                        : 0.3
+                      hoveredLine === null || hoveredLine === l.field ? 1 : 0.3
                     }
                     onMouseEnter={() => setHoveredLine(l.field)}
                     onMouseLeave={() => setHoveredLine(null)}
@@ -583,7 +585,6 @@ export default function MultiAxisLineChart({
         </div>
       </ChartCardWrapper>
 
-
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
@@ -603,13 +604,17 @@ export default function MultiAxisLineChart({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers &&
               childTiers?.map((tier: any) => {
-                const tierLegends = (tier?.lineChart?.widgets || tier?.widgets || []).map(
-                  (w: any) => ({
-                    label: w.legendName || w.label,
-                    field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
-                    color: w.color,
-                  }),
-                );
+                const tierLegends = (
+                  tier?.lineChart?.widgets ||
+                  tier?.widgets ||
+                  []
+                ).map((w: any) => ({
+                  label: w.legendName || w.label,
+                  field: (w.legendName || w.label)
+                    ?.toLowerCase()
+                    .replace(/\s+/g, ""),
+                  color: w.color,
+                }));
 
                 const { labels, data } = parseLineChartData(
                   tier.xAxis,

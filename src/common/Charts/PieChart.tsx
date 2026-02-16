@@ -50,7 +50,6 @@ type Props = {
 const getRandomValue = (min = 0, max = 100) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-
 /*       COMPONENT       */
 
 export default function PieChartWidget({
@@ -95,7 +94,7 @@ export default function PieChartWidget({
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: 0,
-      lastFieldDAtaset: 100,
+      lastFieldDataset: 100,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -117,7 +116,7 @@ export default function PieChartWidget({
       getChartTitleId,
       widgetTitle,
       [],
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -173,19 +172,27 @@ export default function PieChartWidget({
           <div className="flex gap-4">
             {chartData.slice(0, 3).map((item) => (
               <div key={item.name} className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                <span className="text-xs text-gray-500 font-medium">{item.name}</span>
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="text-xs text-gray-500 font-medium">
+                  {item.name}
+                </span>
               </div>
             ))}
             {chartData.length > 3 && (
-              <span className="text-xs text-gray-400">+{chartData.length - 3} more</span>
+              <span className="text-xs text-gray-400">
+                +{chartData.length - 3} more
+              </span>
             )}
           </div>
         }
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }

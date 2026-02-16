@@ -62,7 +62,7 @@ const DashboardTab = () => {
                 legendValues={legendValues}
                 numOfLegendDataSet={legendValues.length}
                 startingRange={chart.lineChart?.firstFieldDataset || 0}
-                endingRange={chart.lineChart?.lastFieldDAtaset || 100}
+                endingRange={chart.lineChart?.lastFieldDataset || 100}
                 chartId={chart.id}
                 projectId={projectId}
                 allUploadedData={data}
@@ -97,7 +97,7 @@ const DashboardTab = () => {
                 legendValues={legendValues}
                 numOfLegendDataSet={legendValues.length}
                 startingRange={chart.horizontalBarChart?.firstFieldDataset || 0}
-                endingRange={chart.horizontalBarChart?.lastFieldDAtaset || 100}
+                endingRange={chart.horizontalBarChart?.lastFieldDataset || 100}
                 chartId={chart.id}
                 projectId={projectId}
                 allUploadedData={data}
@@ -129,7 +129,7 @@ const DashboardTab = () => {
               legendValues={legendValues}
               numOfLegendDataSet={legendValues.length}
               startingRange={chart.barChart?.firstFieldDataset || 0}
-              endingRange={chart.barChart?.lastFieldDAtaset || 100}
+              endingRange={chart.barChart?.lastFieldDataset || 100}
               chartId={chart.id}
               projectId={projectId}
               allUploadedData={data}
@@ -194,8 +194,9 @@ const DashboardTab = () => {
         chartRows.map((row) => (
           <div
             key={row.key}
-            className={`grid grid-cols-1 md:${row.cols === 2 ? "grid-cols-2" : "grid-cols-3"
-              } gap-6 mt-6`}
+            className={`grid grid-cols-1 md:${
+              row.cols === 2 ? "grid-cols-2" : "grid-cols-3"
+            } gap-6 mt-6`}
           >
             {row.items}
           </div>

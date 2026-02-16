@@ -459,7 +459,7 @@ export default function HorizontalBarChart({
     const childPayload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: safeStartingRange,
-      lastFieldDAtaset: safeEndingRange,
+      lastFieldDataset: safeEndingRange,
       widgets: legendValues.map((l) => ({
         legendName: l.label,
         color: l.color,
@@ -513,10 +513,11 @@ export default function HorizontalBarChart({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        subtitle={`${isSampleData ? "(Sample Data) " : ""}${effectiveLegendValues.length === 1
+        subtitle={`${isSampleData ? "(Sample Data) " : ""}${
+          effectiveLegendValues.length === 1
             ? effectiveLegendValues[0].label
             : "Stacked Distribution"
-          }`}
+        }`}
         chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
@@ -527,9 +528,11 @@ export default function HorizontalBarChart({
           onUpload:
             tierLevel === 0
               ? () =>
-                document
-                  .getElementById(`upload-input-horizontal-${chartId || widgetTitle}`)
-                  ?.click()
+                  document
+                    .getElementById(
+                      `upload-input-horizontal-${chartId || widgetTitle}`,
+                    )
+                    ?.click()
               : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode
@@ -541,7 +544,8 @@ export default function HorizontalBarChart({
         isPreview={isPreview}
         customHeaderContent={
           <div className="text-sm text-gray-600">
-            Total <span className="font-semibold text-gray-900">{totalValue}</span>
+            Total{" "}
+            <span className="font-semibold text-gray-900">{totalValue}</span>
           </div>
         }
         footer={
@@ -587,7 +591,10 @@ export default function HorizontalBarChart({
               <div className="relative ml-28 mr-16 h-8">
                 <div className="absolute inset-x-0 top-0 flex justify-between text-[10px] text-gray-400">
                   {scaleTicks.map((tick) => (
-                    <div key={tick} className="relative flex flex-col items-center">
+                    <div
+                      key={tick}
+                      className="relative flex flex-col items-center"
+                    >
                       <div className="w-px h-1.5 bg-gray-300" />
                       <div className="mt-1">{tick}</div>
                     </div>

@@ -105,7 +105,7 @@ export default function AreaChart({
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: startingRange,
-      lastFieldDAtaset: endingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,

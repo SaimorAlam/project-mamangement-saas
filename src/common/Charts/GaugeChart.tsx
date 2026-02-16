@@ -58,13 +58,12 @@ const simpleHash = (str: string): number => {
 const deterministicRandom = (
   seed: number,
   min: number,
-  max: number
+  max: number,
 ): number => {
   const x = Math.sin(seed) * 10000;
   const random = x - Math.floor(x);
   return Math.floor(random * (max - min + 1)) + min;
 };
-
 
 /*       COMPONENT       */
 
@@ -101,15 +100,11 @@ export default function GaugeChart({
     if (gaugeValue !== undefined) {
       return gaugeValue;
     }
-    const seed = simpleHash(
-      `${widgetTitle}-${startingRange}-${endingRange}`
-    );
+    const seed = simpleHash(`${widgetTitle}-${startingRange}-${endingRange}`);
     return deterministicRandom(seed, startingRange, endingRange);
   }, [gaugeValue, widgetTitle, startingRange, endingRange]);
 
-  const isAllLegendFieldEmpty = legendValues.filter(
-    (l) => l.field !== ""
-  );
+  const isAllLegendFieldEmpty = legendValues.filter((l) => l.field !== "");
 
   /*   APEX CHART STATE   */
   const chartOptions: any = useMemo(() => {
@@ -213,7 +208,7 @@ export default function GaugeChart({
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: startingRange,
-      lastFieldDAtaset: endingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -244,7 +239,7 @@ export default function GaugeChart({
       getChartTitleId,
       widgetTitle,
       [],
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -293,15 +288,21 @@ export default function GaugeChart({
         customHeaderContent={
           legendValues.length > 0 && legendValues[0].label ? (
             <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: legendValues[0].color }} />
-              <span className="text-xs text-gray-500 font-medium">{legendValues[0].label}</span>
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: legendValues[0].color }}
+              />
+              <span className="text-xs text-gray-500 font-medium">
+                {legendValues[0].label}
+              </span>
             </div>
           ) : undefined
         }
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }

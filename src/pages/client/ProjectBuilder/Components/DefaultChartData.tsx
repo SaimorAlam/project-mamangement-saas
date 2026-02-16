@@ -92,7 +92,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                   widgets={item?.barChart?.widgets}
                   numOfLegendDataSet={item?.barChart?.numberOfDataset}
                   startingRange={item?.barChart?.firstFieldDataset}
-                  endingRange={item?.barChart?.lastFieldDAtaset}
+                  endingRange={item?.barChart?.lastFieldDataset}
                   chartId={item?.id}
                   projectId={item?.projectId}
                   allUploadedData={data}
@@ -128,7 +128,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                   widgets={item?.horizontalBarChart?.widgets}
                   numOfLegendDataSet={item?.horizontalBarChart?.numberOfDataset}
                   startingRange={item?.horizontalBarChart?.firstFieldDataset}
-                  endingRange={item?.horizontalBarChart?.lastFieldDAtaset}
+                  endingRange={item?.horizontalBarChart?.lastFieldDataset}
                   chartId={item?.id}
                   projectId={item?.projectId}
                   allUploadedData={data}
@@ -137,15 +137,14 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             );
           }
           if (item.category === "Line" || item.category === "LINE") {
-            const legendValues = (item?.lineChart?.widgets || item?.widgets)?.map(
-              (w: any) => ({
+            const legendValues =
+              (item?.lineChart?.widgets || item?.widgets)?.map((w: any) => ({
                 label: w.legendName || w.label,
                 color: w.color,
                 field: (w.legendName || w.label)
                   ?.toLowerCase()
                   .replace(/\s+/g, ""),
-              }),
-            ) || [];
+              })) || [];
 
             const { labels, data } = parseLineChartData(
               item?.xAxis,
@@ -162,7 +161,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                   widgets={item?.lineChart?.widgets}
                   numOfLegendDataSet={item?.lineChart?.numberOfDataset}
                   startingRange={item?.lineChart?.firstFieldDataset}
-                  endingRange={item?.lineChart?.lastFieldDAtaset}
+                  endingRange={item?.lineChart?.lastFieldDataset}
                   chartId={item?.id}
                   projectId={item?.projectId}
                   allUploadedData={data}

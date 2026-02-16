@@ -82,9 +82,15 @@ export default function ColumnBarChart({
       legendValues,
       numOfLegendDataSet,
       startingRange,
-      endingRange
+      endingRange,
     );
-  }, [xAxisValues, legendValues, numOfLegendDataSet, startingRange, endingRange]);
+  }, [
+    xAxisValues,
+    legendValues,
+    numOfLegendDataSet,
+    startingRange,
+    endingRange,
+  ]);
 
   /*   TOTAL   */
   const totalEmployees = useMemo(() => {
@@ -106,7 +112,7 @@ export default function ColumnBarChart({
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: startingRange,
-      lastFieldDAtaset: endingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -128,7 +134,7 @@ export default function ColumnBarChart({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -194,15 +200,22 @@ export default function ColumnBarChart({
         isPreview={isPreview}
         customHeaderContent={
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-gray-500">Total: {totalEmployees}</span>
+            <span className="text-sm font-medium text-gray-500">
+              Total: {totalEmployees}
+            </span>
             <div className="flex gap-3">
               {legendValues.slice(0, 3).map((l) =>
                 l.label ? (
                   <div key={l.field} className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: l.color }} />
-                    <span className="text-xs text-gray-500 font-medium">{l.label}</span>
+                    <div
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: l.color }}
+                    />
+                    <span className="text-xs text-gray-500 font-medium">
+                      {l.label}
+                    </span>
                   </div>
-                ) : null
+                ) : null,
               )}
             </div>
           </div>
@@ -210,7 +223,8 @@ export default function ColumnBarChart({
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }

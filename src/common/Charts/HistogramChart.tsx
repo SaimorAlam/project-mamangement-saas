@@ -10,7 +10,7 @@ import ChartCardWrapper from "./components/ChartCardWrapper";
 
 import {
   AnimationModule,
-  // ContextMenuModule,  
+  // ContextMenuModule,
   CrosshairModule,
   HistogramSeriesModule,
   // LegendModule,
@@ -78,7 +78,7 @@ const simpleHash = (str: string): number => {
 const deterministicRandom = (
   seed: number,
   min: number,
-  max: number
+  max: number,
 ): number => {
   const x = Math.sin(seed) * 10000;
   const random = x - Math.floor(x);
@@ -89,22 +89,18 @@ const generateHistogramDataForLegend = (
   startingRange: number,
   endingRange: number,
   dataPointsPerSeries: number,
-  legendIndex: number = 0
+  legendIndex: number = 0,
 ) => {
   const dataPoints: { value: number; series: string }[] = [];
   for (let i = 0; i < dataPointsPerSeries; i++) {
     const seed = simpleHash(
-      `${legendIndex}-${i}-${startingRange}-${endingRange}`
+      `${legendIndex}-${i}-${startingRange}-${endingRange}`,
     );
     const variation = legendIndex * 10;
-    const baseValue = deterministicRandom(
-      seed,
-      startingRange,
-      endingRange
-    );
+    const baseValue = deterministicRandom(seed, startingRange, endingRange);
     const value = Math.max(
       startingRange,
-      Math.min(endingRange, baseValue + variation)
+      Math.min(endingRange, baseValue + variation),
     );
     dataPoints.push({ value, series: `series_${legendIndex}` });
   }
@@ -115,7 +111,7 @@ const generateCombinedHistogramData = (
   startingRange: number,
   endingRange: number,
   legendCount: number,
-  dataPointsPerSeries: number
+  dataPointsPerSeries: number,
 ) => {
   const allData: { value: number; series: string }[] = [];
   for (let i = 0; i < legendCount; i++) {
@@ -123,7 +119,7 @@ const generateCombinedHistogramData = (
       startingRange,
       endingRange,
       dataPointsPerSeries,
-      i
+      i,
     );
     allData.push(...seriesData);
   }
@@ -168,14 +164,9 @@ export default function HistogramChart({
       startingRange,
       endingRange,
       legendValues.length || 1,
-      dataPointsPerSeries
+      dataPointsPerSeries,
     );
-  }, [
-    startingRange,
-    endingRange,
-    legendValues.length,
-    dataPointsPerSeries,
-  ]);
+  }, [startingRange, endingRange, legendValues.length, dataPointsPerSeries]);
 
   /*   AG CHARTS OPTIONS   */
   const chartOptions = useMemo((): AgChartOptions | null => {
@@ -191,9 +182,7 @@ export default function HistogramChart({
       fillOpacity: fillOpacity - index * 0.1,
       strokeWidth: strokeWidth,
       title: legend.label || `Series ${index + 1}`,
-      data: histogramData.filter(
-        (item) => item.series === `series_${index}`
-      ),
+      data: histogramData.filter((item) => item.series === `series_${index}`),
     }));
 
     if (series.length === 0) {
@@ -245,8 +234,7 @@ export default function HistogramChart({
       ],
       legend: {
         enabled:
-          legendValues.length > 1 ||
-          legendValues[0]?.label?.trim().length > 0,
+          legendValues.length > 1 || legendValues[0]?.label?.trim().length > 0,
         position: "right",
         item: {
           marker: {
@@ -278,9 +266,7 @@ export default function HistogramChart({
   /*   ACTIONS   */
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(
-      JSON.stringify(histogramData, null, 2)
-    );
+    navigator.clipboard.writeText(JSON.stringify(histogramData, null, 2));
   };
 
   const handleDownload = () => {
@@ -289,7 +275,7 @@ export default function HistogramChart({
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: startingRange,
-      lastFieldDAtaset: endingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -317,7 +303,7 @@ export default function HistogramChart({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -369,20 +355,28 @@ export default function HistogramChart({
             {legendValues.slice(0, 3).map((l, index) =>
               l.label ? (
                 <div key={index} className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: l.color }} />
-                  <span className="text-xs text-gray-500 font-medium">{l.label}</span>
+                  <div
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-xs text-gray-500 font-medium">
+                    {l.label}
+                  </span>
                 </div>
-              ) : null
+              ) : null,
             )}
             {legendValues.length > 3 && (
-              <span className="text-xs text-gray-400">+{legendValues.length - 3} more</span>
+              <span className="text-xs text-gray-400">
+                +{legendValues.length - 3} more
+              </span>
             )}
           </div>
         }
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : (
             <div className="text-xs text-gray-500">

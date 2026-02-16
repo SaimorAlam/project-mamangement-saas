@@ -15,17 +15,13 @@ interface IWidgetPropsType {
   widgetCategory: string;
   setWidgetTitle: React.Dispatch<React.SetStateAction<string>>;
   numOfXAxisDataSet: number;
-  handleSetNumOfXAxisDataSet: (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => void;
+  handleSetNumOfXAxisDataSet: (e: React.ChangeEvent<HTMLInputElement>) => void;
   xAxisValues: string[];
   handleXAxisValueChange: (index: number, value: string) => void;
   numOfLegendDataSet: number;
   setNumOfLegendDataSet: React.Dispatch<React.SetStateAction<number>>;
   legendValues: LegendValue[];
-  setLegendValues: React.Dispatch<
-    React.SetStateAction<LegendValue[]>
-  >;
+  setLegendValues: React.Dispatch<React.SetStateAction<LegendValue[]>>;
   startingRange: number;
   setStartingRange: React.Dispatch<React.SetStateAction<number>>;
   endingRange: number;
@@ -82,14 +78,12 @@ const BubbleChartConfigurationWidget = ({
   const minLegend = 3;
   const maxLegend = 5;
   const handleSetNumOfLegendDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
 
     if (isNaN(value) || value < minLegend || value > maxLegend) {
-      alert(
-        `Please enter a number between ${minLegend} and ${maxLegend}`
-      );
+      alert(`Please enter a number between ${minLegend} and ${maxLegend}`);
       return;
     }
 
@@ -133,8 +127,7 @@ const BubbleChartConfigurationWidget = ({
     });
   };
 
-  const [getChartTitleId, { isLoading }] =
-    useGetChartTitleIdMutation();
+  const [getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const downloadCSV = () => {
     // validating that if any of the legend labels or xAxisValues are empty, alert the user
@@ -168,7 +161,7 @@ const BubbleChartConfigurationWidget = ({
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: startingRange,
-      lastFieldDAtaset: endingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -193,7 +186,7 @@ const BubbleChartConfigurationWidget = ({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      legendValues
+      legendValues,
     );
   };
 
@@ -204,10 +197,7 @@ const BubbleChartConfigurationWidget = ({
         <h2 className="text-lg font-semibold text-gray-900">
           Widget Configuration
         </h2>
-        <button
-          onClick={onClose}
-          className="text-gray-500 hover:text-gray-700"
-        >
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           <X size={18} />
         </button>
       </div>
@@ -259,28 +249,27 @@ const BubbleChartConfigurationWidget = ({
               Input {numOfXAxisDataSet >= 2 && "all"} field Data:
             </label>
             <div className="space-y-2">
-              {Array.from({ length: numOfXAxisDataSet }).map(
-                (_, index) => (
-                  <input
-                    key={index}
-                    type="text"
-                    required
-                    placeholder={`Enter ${index + 1}${index === 0
-                        ? "st"
-                        : index === 1
-                          ? "nd"
-                          : index === 2
-                            ? "rd"
-                            : "th"
-                      } field name here...`}
-                    value={xAxisValues[index] || ""}
-                    onChange={(e) =>
-                      handleXAxisValueChange(index, e.target.value)
-                    }
-                    className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
-                  />
-                )
-              )}
+              {Array.from({ length: numOfXAxisDataSet }).map((_, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  required
+                  placeholder={`Enter ${index + 1}${
+                    index === 0
+                      ? "st"
+                      : index === 1
+                        ? "nd"
+                        : index === 2
+                          ? "rd"
+                          : "th"
+                  } field name here...`}
+                  value={xAxisValues[index] || ""}
+                  onChange={(e) =>
+                    handleXAxisValueChange(index, e.target.value)
+                  }
+                  className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -299,12 +288,14 @@ const BubbleChartConfigurationWidget = ({
             />
             <div
               onClick={() => setShowFilter(!showFilter)}
-              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showFilter ? "bg-blue-600" : "bg-gray-300"
-                }`}
+              className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
+                showFilter ? "bg-blue-600" : "bg-gray-300"
+              }`}
             >
               <div
-                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showFilter ? "translate-x-5" : "translate-x-0"
-                  }`}
+                className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
+                  showFilter ? "translate-x-5" : "translate-x-0"
+                }`}
               />
             </div>
           </div>
@@ -313,9 +304,7 @@ const BubbleChartConfigurationWidget = ({
         {/* Filter By */}
         {showFilter && (
           <div className="flex items-center">
-            <label className="text-xs text-gray-700 flex-1">
-              Filter By:
-            </label>
+            <label className="text-xs text-gray-700 flex-1">Filter By:</label>
             <div className="relative">
               <select
                 value={filter}
@@ -375,9 +364,7 @@ const BubbleChartConfigurationWidget = ({
             <input
               type="number"
               value={startingRange}
-              onChange={(e) =>
-                setStartingRange(Number(e.target.value))
-              }
+              onChange={(e) => setStartingRange(Number(e.target.value))}
               className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
@@ -412,9 +399,7 @@ const BubbleChartConfigurationWidget = ({
               min={1}
               max={100}
               value={minBubbleSize}
-              onChange={(e) =>
-                setMinBubbleSize(Number(e.target.value))
-              }
+              onChange={(e) => setMinBubbleSize(Number(e.target.value))}
               className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
@@ -429,9 +414,7 @@ const BubbleChartConfigurationWidget = ({
               min={1}
               max={100}
               value={maxBubbleSize}
-              onChange={(e) =>
-                setMaxBubbleSize(Number(e.target.value))
-              }
+              onChange={(e) => setMaxBubbleSize(Number(e.target.value))}
               className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
@@ -489,12 +472,14 @@ const BubbleChartConfigurationWidget = ({
                 />
                 <div
                   onClick={() => setShowLegend(!showLegend)}
-                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${showLegend ? "bg-blue-600" : "bg-gray-300"
-                    }`}
+                  className={`w-10 h-5 rounded-full cursor-pointer transition-colors ${
+                    showLegend ? "bg-blue-600" : "bg-gray-300"
+                  }`}
                 >
                   <div
-                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${showLegend ? "translate-x-5" : "translate-x-0"
-                      }`}
+                    className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
+                      showLegend ? "translate-x-5" : "translate-x-0"
+                    }`}
                   />
                 </div>
               </div>
@@ -502,11 +487,39 @@ const BubbleChartConfigurationWidget = ({
           </div>
 
           {showLegend &&
-            Array.from({ length: numOfLegendDataSet }).map(
-              (_, index) => (
-                <div key={index}>
-                  {/* Legend Name */}
-                  <div className="flex items-center justify-between mb-2">
+            Array.from({ length: numOfLegendDataSet }).map((_, index) => (
+              <div key={index}>
+                {/* Legend Name */}
+                <div className="flex items-center justify-between mb-2">
+                  <label
+                    className="text-xs text-gray-700"
+                    style={{ width: "110px" }}
+                  >
+                    {index + 1}
+                    {index === 0
+                      ? "st"
+                      : index === 1
+                        ? "nd"
+                        : index === 2
+                          ? "rd"
+                          : "th"}{" "}
+                    Legend Name:
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="Enter name here"
+                    value={legendValues[index]?.label || ""}
+                    onChange={(e) =>
+                      handleLegendLabelChange(index, e.target.value)
+                    }
+                    className="w-[50%] px-2 py-1 text-xs border border-gray-300 rounded"
+                  />
+                </div>
+
+                {/* Legend Color */}
+                {widgedName === "Heatmap Chart" ? null : (
+                  <div className="flex items-center mb-3">
                     <label
                       className="text-xs text-gray-700"
                       style={{ width: "110px" }}
@@ -519,72 +532,32 @@ const BubbleChartConfigurationWidget = ({
                           : index === 2
                             ? "rd"
                             : "th"}{" "}
-                      Legend Name:
+                      Legend Color:
                     </label>
 
-                    <input
-                      type="text"
-                      placeholder="Enter name here"
-                      value={legendValues[index]?.label || ""}
-                      onChange={(e) =>
-                        handleLegendLabelChange(index, e.target.value)
-                      }
-                      className="w-[50%] px-2 py-1 text-xs border border-gray-300 rounded"
-                    />
-                  </div>
+                    <div className="flex items-center justify-end gap-2 flex-1">
+                      <input
+                        type="text"
+                        value={legendValues[index]?.color || "#000000"}
+                        onChange={(e) =>
+                          handleLegendColorChange(index, e.target.value)
+                        }
+                        className="text-xs px-2 py-1 border border-gray-200 rounded w-22"
+                      />
 
-                  {/* Legend Color */}
-                  {widgedName === "Heatmap Chart" ? null : (
-                    <div className="flex items-center mb-3">
-                      <label
-                        className="text-xs text-gray-700"
-                        style={{ width: "110px" }}
-                      >
-                        {index + 1}
-                        {index === 0
-                          ? "st"
-                          : index === 1
-                            ? "nd"
-                            : index === 2
-                              ? "rd"
-                              : "th"}{" "}
-                        Legend Color:
-                      </label>
-
-                      <div className="flex items-center justify-end gap-2 flex-1">
-                        <input
-                          type="text"
-                          value={
-                            legendValues[index]?.color || "#000000"
-                          }
-                          onChange={(e) =>
-                            handleLegendColorChange(
-                              index,
-                              e.target.value
-                            )
-                          }
-                          className="text-xs px-2 py-1 border border-gray-200 rounded w-22"
-                        />
-
-                        <input
-                          type="color"
-                          value={
-                            legendValues[index]?.color || "#000000"
-                          }
-                          onChange={(e) =>
-                            handleLegendColorChange(
-                              index,
-                              e.target.value
-                            )
-                          }
-                          className="w-14 h-6 rounded border border-gray-200 cursor-pointer"
-                        />
-                      </div>
+                      <input
+                        type="color"
+                        value={legendValues[index]?.color || "#000000"}
+                        onChange={(e) =>
+                          handleLegendColorChange(index, e.target.value)
+                        }
+                        className="w-14 h-6 rounded border border-gray-200 cursor-pointer"
+                      />
                     </div>
-                  )}
-                </div>
-              )
-            )}
+                  </div>
+                )}
+              </div>
+            ))}
         </div>
 
         {/* Assigned By */}
@@ -602,9 +575,7 @@ const BubbleChartConfigurationWidget = ({
               <p className="text-xs font-medium text-gray-900">
                 {assignedBy.name}
               </p>
-              <p className="text-xs text-gray-500">
-                {assignedBy.role}
-              </p>
+              <p className="text-xs text-gray-500">{assignedBy.role}</p>
             </div>
           </div>
         </div>

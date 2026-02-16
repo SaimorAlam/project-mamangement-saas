@@ -28,7 +28,7 @@ export type TierChart = {
 };
 
 type Props = {
-  widgetTitle?: string;          // Title for root or tier name for children
+  widgetTitle?: string; // Title for root or tier name for children
   xAxisValues?: string[];
   legendValues?: LegendValue[];
   numOfLegendDataSet?: number;
@@ -63,29 +63,37 @@ export default function WaterfallChart({
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
   /*   DATA GENERATION   */
-  const generateRangeData = useCallback((xValues: string[], seed: number): RangeData[] => {
-    const range = endingRange - startingRange;
-    const rangeWidth = Math.floor(range / 4);
+  const generateRangeData = useCallback(
+    (xValues: string[], seed: number): RangeData[] => {
+      const range = endingRange - startingRange;
+      const rangeWidth = Math.floor(range / 4);
 
-    return xValues.filter(Boolean).map((x, index) => {
-      const baseValue = startingRange + ((seed * 17 + index * 23) % range);
-      const lowerBound = Math.max(startingRange, baseValue - rangeWidth / 2);
-      const upperBound = Math.min(endingRange, baseValue + rangeWidth / 2);
+      return xValues.filter(Boolean).map((x, index) => {
+        const baseValue = startingRange + ((seed * 17 + index * 23) % range);
+        const lowerBound = Math.max(startingRange, baseValue - rangeWidth / 2);
+        const upperBound = Math.min(endingRange, baseValue + rangeWidth / 2);
 
-      return {
-        x,
-        y: [Math.round(lowerBound), Math.round(upperBound)] as [number, number],
-      };
-    });
-  }, [startingRange, endingRange]);
+        return {
+          x,
+          y: [Math.round(lowerBound), Math.round(upperBound)] as [
+            number,
+            number,
+          ],
+        };
+      });
+    },
+    [startingRange, endingRange],
+  );
 
   const series = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
 
-    return legendValues.filter((l) => l.label).map((legend, index) => ({
-      name: legend.label,
-      data: generateRangeData(xAxisValues, index * 37),
-    }));
+    return legendValues
+      .filter((l) => l.label)
+      .map((legend, index) => ({
+        name: legend.label,
+        data: generateRangeData(xAxisValues, index * 37),
+      }));
   }, [xAxisValues, legendValues, generateRangeData]);
 
   /*   CHART OPTIONS   */
@@ -120,7 +128,7 @@ export default function WaterfallChart({
       },
       legend: { position: "top", horizontalAlign: "left" },
     }),
-    [xAxisValues, legendValues, startingRange, endingRange]
+    [xAxisValues, legendValues, startingRange, endingRange],
   );
 
   const totalRanges = useMemo(() => {
@@ -137,7 +145,7 @@ export default function WaterfallChart({
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: startingRange,
-      lastFieldDAtaset: endingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -156,7 +164,7 @@ export default function WaterfallChart({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      legendValues
+      legendValues,
     );
     setIsDownloading(false);
   };
@@ -208,7 +216,8 @@ export default function WaterfallChart({
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium text-center">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }

@@ -173,7 +173,6 @@ export default function StackedBarChart({
   }, [chartId, findChildrenValue]);
   const dispatch = useAppDispatch();
   const childTiers = data?.data;
-  console.log(childTiers);
   const [isDownloading, setIsDownloading] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
@@ -537,9 +536,9 @@ export default function StackedBarChart({
           onUpload:
             tierLevel === 0
               ? () =>
-                document
-                  .getElementById(`upload-input-${chartId || widgetTitle}`)
-                  ?.click()
+                  document
+                    .getElementById(`upload-input-${chartId || widgetTitle}`)
+                    ?.click()
               : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode
