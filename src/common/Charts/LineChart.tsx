@@ -25,6 +25,7 @@ import {
   setGroupTitle,
 } from "@/store/Slices/ChartSlice/ChartSlice";
 import { parseLineChartData } from "@/utils/parseLineChartData";
+import { chartTypes } from "@/utils/ChartCategory";
 
 /*       TYPES       */
 
@@ -393,6 +394,7 @@ export default function MultiAxisLineChart({
     if (tierLevel === 0) {
       dispatch(setGroupTitle(title));
     }
+    console.log(legendValues, "LegendValues");
     const childPayload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: safeStartingRange,
@@ -604,8 +606,9 @@ export default function MultiAxisLineChart({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers &&
               childTiers?.map((tier: any) => {
+                const category = chartTypes[tier.category];
                 const tierLegends = (
-                  tier?.lineChart?.widgets ||
+                  tier?.[category]?.widgets ||
                   tier?.widgets ||
                   []
                 ).map((w: any) => ({

@@ -73,7 +73,6 @@ const WidgetForChartModuleTwo = ({
           color: "#000000",
         });
       }
-
       return updated.slice(0, value);
     });
   };
@@ -86,7 +85,6 @@ const WidgetForChartModuleTwo = ({
         label: value,
         field: value.toLowerCase().replace(/\s+/g, ""),
       };
-
       return updated;
     });
   };
@@ -103,20 +101,6 @@ const WidgetForChartModuleTwo = ({
   };
 
   console.log(widgetCategory);
-
-  // const payload = {
-  //   numberOfDataset: numOfLegendDataSet,
-  //   firstFieldDataset: startingRange,
-  //   lastFieldDataset: endingRange,
-  //   showWidgets: legendValues.map(l => ({
-  //     legend_name: l.label,
-  //     color: l.color,
-  //   })),
-  //   title: widgetTitle,
-  //   status: "ACTIVE",
-  //   category: widgetCategory,
-  // };
-  // DownloadAndSaveCSVforModuleOneWidget(payload, getChartTitleId, widgetTitle, xAxisValues, legendValues)
 
   return (
     <div className="max-w-78 min-w-78 h-full   bg-white border border-gray-100 rounded-lg shadow-lg">

@@ -18,6 +18,7 @@ import { parseLineChartData } from "@/utils/parseLineChartData";
 import HorizontalBarChart, {
   parseHorizontalBarData,
 } from "@/common/Charts/HorizontalBarChart";
+import { chartTypes } from "@/utils/ChartCategory";
 
 const DashboardTab = () => {
   const { projectId } = useParams();
@@ -39,9 +40,10 @@ const DashboardTab = () => {
             chart.category === "HORIZONTAL_BAR",
         )
         .map((chart: any) => {
+          const category = chartTypes[chart.category];
           if (chart.category === "LINE") {
             // Handle LINE charts
-            const widgets = chart?.lineChart?.widgets || [];
+            const widgets = chart?.[category]?.widgets || [];
             const legendValues = widgets.map((w: any) => ({
               label: w.legendName,
               field: w.legendName?.toLowerCase().replace(/\s+/g, ""),
@@ -61,8 +63,8 @@ const DashboardTab = () => {
                 xAxisValues={labels}
                 legendValues={legendValues}
                 numOfLegendDataSet={legendValues.length}
-                startingRange={chart.lineChart?.firstFieldDataset || 0}
-                endingRange={chart.lineChart?.lastFieldDataset || 100}
+                startingRange={chart[category]?.firstFieldDataset || 0}
+                endingRange={chart[category]?.lastFieldDataset || 100}
                 chartId={chart.id}
                 projectId={projectId}
                 allUploadedData={data}
@@ -73,8 +75,7 @@ const DashboardTab = () => {
           }
 
           if (chart.category === "HORIZONTAL_BAR") {
-            const widgets =
-              chart?.horizontalBarChart?.widgets || chart?.widgets || [];
+            const widgets = chart?.[category]?.widgets || chart?.widgets || [];
             const legendValues = widgets.map((w: any) => ({
               label: w.legendName || w.label,
               field: (w.legendName || w.label)
@@ -96,8 +97,8 @@ const DashboardTab = () => {
                 xAxisValues={labels}
                 legendValues={legendValues}
                 numOfLegendDataSet={legendValues.length}
-                startingRange={chart.horizontalBarChart?.firstFieldDataset || 0}
-                endingRange={chart.horizontalBarChart?.lastFieldDataset || 100}
+                startingRange={chart[category]?.firstFieldDataset || 0}
+                endingRange={chart[category]?.lastFieldDataset || 100}
                 chartId={chart.id}
                 projectId={projectId}
                 allUploadedData={data}
@@ -108,7 +109,7 @@ const DashboardTab = () => {
           }
 
           // Handle BAR charts
-          const widgets = chart?.barChart?.widgets || [];
+          const widgets = chart?.[category]?.widgets || [];
           const legendValues = widgets.map((w: any) => ({
             label: w.legendName,
             field: w.legendName?.toLowerCase().replace(/\s+/g, ""),
@@ -128,8 +129,8 @@ const DashboardTab = () => {
               xAxisValues={labels}
               legendValues={legendValues}
               numOfLegendDataSet={legendValues.length}
-              startingRange={chart.barChart?.firstFieldDataset || 0}
-              endingRange={chart.barChart?.lastFieldDataset || 100}
+              startingRange={chart[category]?.firstFieldDataset || 0}
+              endingRange={chart[category]?.lastFieldDataset || 100}
               chartId={chart.id}
               projectId={projectId}
               allUploadedData={data}

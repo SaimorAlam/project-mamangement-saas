@@ -199,6 +199,7 @@ const WidgetForChartModuleOne = ({
       if (res?.success) {
         toast.success("Chart created successfully", { id: toastId });
         onDelete?.();
+        onClose?.();
       }
     } catch {
       toast.error("Chart creation failed", { id: toastId });

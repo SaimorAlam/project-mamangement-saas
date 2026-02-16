@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { X, Save } from "lucide-react";
 import { useAppSelector } from "@/hooks/useRedux";
 import { toast } from "sonner";
@@ -22,6 +22,16 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
   const { childPayload } = useAppSelector((state) => state.chartSlice);
   const [createChart] = useCreateChartMutation();
   const [tierName, setTierName] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, [isOpen]);
+
   const handleSave = async () => {
     const toastId = toast.loading("Creating Child Tier...");
     try {
@@ -81,10 +91,16 @@ const AddTierModal: React.FC<AddTierModalProps> = ({
 
           <div>
             <input
+              ref={inputRef}
               type="text"
               placeholder="New Tier name"
               value={tierName}
               onChange={(e) => setTierName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSave();
+                }
+              }}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
             />
           </div>

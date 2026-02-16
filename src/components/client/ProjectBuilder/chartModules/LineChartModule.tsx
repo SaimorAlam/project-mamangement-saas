@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ProjectConfiguration, {
-  LegendValue,
-} from "../WidgetForChartModuleOne";
+import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
 import MultiAxisLineChart from "@/common/Charts/LineChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
@@ -133,6 +131,7 @@ const LineChartModule = ({
           endingRange={endingRange}
           setEndingRange={setEndingRange}
           onClose={handleCloseWidget}
+          onDelete={onDelete}
         />
       )}
     </div>

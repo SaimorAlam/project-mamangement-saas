@@ -21,27 +21,7 @@ import WaterfallChart from "@/common/Charts/WaterfallChart";
 import HorizontalStackedBarChart from "@/common/Charts/HorizontalStackedBarChart";
 import ComboChart from "@/common/Charts/ComboChart";
 import CandleChart from "@/common/Charts/CandleChart";
-
-const chartTypes: { [key: string]: string } = {
-  BAR: "barChart",
-  LINE: "multiAxisChart",
-  HORIZONTAL_BAR: "horizontalBarChart",
-  STACK_BAR_HORIZONTAL: "stackedBarChart",
-  COLUMN: "columnChart",
-  PIE: "pieChart",
-  DOUGHNUT: "doughnutChart",
-  RADAR: "radarChart",
-  HEATMAP: "heatMapChart",
-  AREA: "areaChart",
-  MIXED: "multiAxisChart",
-  PARETO: "paretoChart",
-  HISTOGRAM: "histogramChart",
-  SCATTER: "scatterChart",
-  GAUGE: "solidGaugeChart",
-  FUNNEL: "funnelChart",
-  WATERFALL: "waterfallChart",
-  CANDLESTICK: "candlestickChart",
-};
+import { chartTypes } from "@/utils/ChartCategory";
 
 const parseXAxisData = (
   xAxis: any[][] | string,

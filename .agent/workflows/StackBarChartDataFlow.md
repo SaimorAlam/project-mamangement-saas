@@ -1,5 +1,5 @@
 ---
-description:  how the StackBarChart work from project builder to fetch default data and show on the project details dashboard tab
+description: how the StackBarChart work from project builder to fetch default data and show on the project details dashboard tab
 ---
 
 # StackedBarChart Data Flow Workflow
