@@ -415,7 +415,9 @@ const StaffManagerProjects = ({
       {/* <div className="bg-green-200 h-[80vh]"></div> */}
       {/* google map according to longitude and latitude  */}
       {/* <ProjectLocationsMap projects={projects} /> */}
-      <ProjectLocationsMap />
+      {sortedProjects?.length > 0 && (
+        <ProjectLocationsMap allFilteredProjects={sortedProjects} />
+      )}
 
       {editModalOpen && editProject && (
         <UpdateProjectModal

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import {
   useAddProjectToFavoriteMutation,
   useGetFavoriteProjectsQuery,
+  useRemoveProjectFromFavoriteMutation
 } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import RenderStaffAvatars from "../client/RenderStaffAvater";
 
@@ -141,6 +142,7 @@ const StaffManagerProjectCard = ({
 
   const { data } = useGetFavoriteProjectsQuery();
   const [addProjectToFavorite] = useAddProjectToFavoriteMutation();
+  const [removeProjectFromFavorite] = useRemoveProjectFromFavoriteMutation();
 
   const priorityColor =
     priority === "HIGH"
@@ -206,8 +208,12 @@ const StaffManagerProjectCard = ({
                 <span>{name || "Project Name"}</span>{" "}
                 {data.data.some((element: any) => element.projectId === id) ? (
                   <button
-                    title="You added this project in your favorite list."
-                    className="hover:cursor-not-allowed"
+                    title="Remove from favorite"
+                    className=""
+                    onClick={() => {
+                      removeProjectFromFavorite(id)
+                      toast.success("Succesfully removed from favorite.")
+                    }}
                   >
                     <FaStar className="text-yellow-500" size={18} />
                   </button>

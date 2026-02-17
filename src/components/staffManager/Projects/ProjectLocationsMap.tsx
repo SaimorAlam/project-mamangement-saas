@@ -1,179 +1,80 @@
-// import React, { useMemo } from "react";
-// import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
-
-// /* ---------------- TYPES ---------------- */
-
-// interface Project {
-//   id: string;
-//   name: string;
-//   latitude: number;
-//   longitude: number;
-// }
-
-// interface ProjectLocationsMapProps {
-//   projects: Project[];
-// }
-
-// const containerStyle = {
-//   width: "100%",
-//   height: "80vh",
-//   margin: "20px 0px",
-//   borderRadius: "8px",
-// };
-
-// const ProjectLocationsMap: React.FC<ProjectLocationsMapProps> = ({
-//   projects,
-// }) => {
-//   const { isLoaded } = useLoadScript({
-//     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-//   });
-
-//   console.log("ggle map data: ", projects);
-
-//   const center = useMemo(() => {
-//     if (projects.length === 0) {
-//       return { lat: 0, lng: 0 };
-//     }
-
-//     return {
-//       lat: projects[0].latitude,
-//       lng: projects[0].longitude,
-//     };
-//   }, [projects]);
-
-//   if (!isLoaded) {
-//     return (
-//       <div className="flex items-center justify-center h-[80vh]">
-//         <p className="text-gray-500 text-sm">Loading map...</p>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={6}>
-//       {projects.map((project) => (
-//         <Marker
-//           key={project.id}
-//           position={{
-//             lat: project.latitude,
-//             lng: project.longitude,
-//           }}
-//           title={project.name}
-//         />
-//       ))}
-//     </GoogleMap>
-//   );
-// };
-
-// export default ProjectLocationsMap;
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { ArrowRight } from "lucide-react";
+import { useGetProgramAllProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
-const projects = [
-  {
-    id: 1,
-    name: "Project A",
-    lat: 23.7461,
-    lng: 90.3742,
-    color: "#E53935",
-  },
-  {
-    id: 2,
-    name: "Project B",
-    lat: 23.7515,
-    lng: 90.3779,
-    color: "#E53935",
-  },
-  {
-    id: 3,
-    name: "Project C",
-    lat: 23.7545,
-    lng: 90.3825,
-    color: "#E53935",
-  },
-  {
-    id: 4,
-    name: "Project D",
-    lat: 23.7489,
-    lng: 90.3856,
-    color: "#E53935",
-  },
-  {
-    id: 5,
-    name: "Project E",
-    lat: 23.7425,
-    lng: 90.3812,
-    color: "#E53935",
-  },
-  {
-    id: 6,
-    name: "Project F",
-    lat: 23.7398,
-    lng: 90.3765,
-    color: "#E53935",
-  },
-  {
-    id: 7,
-    name: "Project G",
-    lat: 23.752,
-    lng: 90.3698,
-    color: "#E53935",
-  },
-];
-
-const ProjectLocationsMap: React.FC = () => {
+const ProjectLocationsMap = ({ allFilteredProjects }: { allFilteredProjects: any }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
+  const markersLayerRef = useRef<any>(null);
 
-  // const { data, isLoading, error } = useGetProgramAllProjectsQuery({
-  //     managerId,
-  //     priority: priorityFilter === "ALL" ? undefined : priorityFilter,
-  //     status: statusFilter === "ALL" ? undefined : statusFilter,
-  //     search: search || undefined,
-  //     page: currentPage,
-  //     limit,
-  //   });
+  // const { data } = useGetProgramAllProjectsQuery({});
+  const data = allFilteredProjects;
 
-  //   const projects = useMemo(() => data?.data?.projects?.data ?? [], [data]);
+  /*   Extract Projects   */
+
+  const projects = useMemo(() => {
+    return (
+      data?.data?.projects?.data?.filter(
+        (p: any) =>
+          p.latitude !== null &&
+          p.longitude !== null &&
+          !isNaN(p.latitude) &&
+          !isNaN(p.longitude)
+      ) ?? []
+    );
+  }, [data]);
+
+  /*   Map Init   */
 
   useEffect(() => {
     if (typeof window === "undefined" || !mapRef.current) return;
 
     const initializeMap = () => {
       const L = (window as any).L;
-      if (!L || mapInstanceRef.current) return;
+      if (!L) return;
 
-      // Fix for "Map container is being reused by another instance"
-      const container = L.DomUtil.get(mapRef.current);
-      if (container != null) {
-        container._leaflet_id = null;
+      if (!mapInstanceRef.current) {
+        const mapInstance = L.map(mapRef.current).setView(
+          [23.7461, 90.3779],
+          13
+        );
+
+        L.tileLayer(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          { attribution: "© OpenStreetMap contributors" }
+        ).addTo(mapInstance);
+
+        markersLayerRef.current = L.layerGroup().addTo(mapInstance);
+
+        mapInstanceRef.current = mapInstance;
       }
 
-      const mapInstance = L.map(mapRef.current).setView([23.7461, 90.3779], 15);
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap contributors",
-      }).addTo(mapInstance);
-
-      const customIcon = L.divIcon({
-        className: "custom-marker",
-        html: '<div style="background-color: #E53935; width: 28px; height: 28px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"><div style="width: 12px; height: 12px; background-color: white; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div></div>',
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-      });
-
-      projects.forEach((project) => {
-        L.marker([project.lat, project.lng], { icon: customIcon })
-          .addTo(mapInstance)
-          .bindPopup(`<strong>${project.name}</strong>`);
-      });
-
-      mapInstanceRef.current = mapInstance;
+      updateMarkers();
     };
 
-    // Load styles
+    const updateMarkers = () => {
+      const L = (window as any).L;
+      if (!L || !mapInstanceRef.current) return;
+
+      markersLayerRef.current.clearLayers();
+
+      if (projects.length === 0) return;
+
+      const bounds = L.latLngBounds([]);
+
+      projects.forEach((project: any) => {
+        const marker = L.marker([project.latitude, project.longitude])
+          .bindPopup(`<strong>${project.name}</strong>`)
+          .addTo(markersLayerRef.current);
+
+        bounds.extend([project.latitude, project.longitude]);
+      });
+
+      mapInstanceRef.current.fitBounds(bounds, { padding: [40, 40] });
+    };
+
+    // Load Leaflet CSS
     if (!document.querySelector('link[href*="leaflet.css"]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -182,15 +83,13 @@ const ProjectLocationsMap: React.FC = () => {
       document.head.appendChild(link);
     }
 
-    // Load script
+    // Load Leaflet JS
     if (!(window as any).L) {
-      if (!document.querySelector('script[src*="leaflet.js"]')) {
-        const script = document.createElement("script");
-        script.src =
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js";
-        script.onload = initializeMap;
-        document.body.appendChild(script);
-      }
+      const script = document.createElement("script");
+      script.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js";
+      script.onload = initializeMap;
+      document.body.appendChild(script);
     } else {
       initializeMap();
     }
@@ -201,89 +100,40 @@ const ProjectLocationsMap: React.FC = () => {
         mapInstanceRef.current = null;
       }
     };
-  }, []);
+  }, [projects]);
 
   return (
-    <div className="w-full h-[450px] rounded-xl bg-white flex flex-col mb-10">
+    <div className="w-full h-[80vh] rounded-xl bg-white flex flex-col my-10 overflow-hidden">
       {/* Header */}
-      <div className="bg-white  z-22  py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div>
-              <h1 className="text-lg font-medium text-gray-800">
-                All Project location of Highway Expansion Program
-              </h1>
-            </div>
-          </div>
-        </div>
+      <div className="py-4">
+        <h1 className="text-lg font-medium text-gray-800">
+          All Project Locations
+        </h1>
       </div>
 
-      {/* Map Container */}
-      <div className="flex-1 relative rounded-xl">
+      {/* Map */}
+      <div className="flex-1 relative rounded-xl overflow-hidden">
         <div ref={mapRef} className="w-full h-full z-20"></div>
 
-        {/* Info Card - Top Left */}
-        <div className="absolute top-4 left-15 bg-white rounded-lg shadow-lg p-4 w-64 z-20 pointer-events-auto">
-          {/* Building Name with Red Dot */}
-          <div className="flex items-start gap-2 mb-3">
-            <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5 shrink-0"></div>
-            <h3 className="text-sm font-semibold text-gray-800 leading-tight">
-              Carlyle Hall
+        {/* Static Info Card (Optional UI) */}
+        <div className="absolute top-4 left-6 bg-white rounded-lg shadow-lg p-4 w-64 z-20">
+          <div className="flex items-start gap-2 mb-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5" />
+            <h3 className="text-sm font-semibold text-gray-800">
+              Live Project Map
             </h3>
           </div>
 
-          {/* Address */}
-          <div className="text-xs text-gray-600 mb-1 pl-4">
-            25 Union Square W, New
-          </div>
-          <div className="text-xs text-gray-600 mb-1 pl-4">
-            York, NY 10003, USA
-          </div>
-          <div className="text-xs text-gray-600 mb-3 pl-4">DC3 Building</div>
+          <p className="text-xs text-gray-600 mb-2">
+            Showing {projects.length} active project locations.
+          </p>
 
-          {/* View Report Details Link */}
-          <div className="pl-4">
-            <a
-              href="#"
-              className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-            >
-              View Report Details
-              <ArrowRight className="w-3 h-3" />
-            </a>
-          </div>
-
-          {/* Circular Progress - Top Right Corner */}
-          <div className="absolute -top-3 -right-3 w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center z-10">
-            <div className="relative w-14 h-14">
-              {/* Background Circle */}
-              <svg className="w-full h-full transform -rotate-90">
-                <circle
-                  cx="28"
-                  cy="28"
-                  r="24"
-                  stroke="#E5E7EB"
-                  strokeWidth="4"
-                  fill="none"
-                />
-                {/* Progress Circle */}
-                <circle
-                  cx="28"
-                  cy="28"
-                  r="24"
-                  stroke="#3B82F6"
-                  strokeWidth="4"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 24}`}
-                  strokeDashoffset={`${2 * Math.PI * 24 * (1 - 0.75)}`}
-                  strokeLinecap="round"
-                />
-              </svg>
-              {/* Percentage Text */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-bold text-blue-600">75%</span>
-              </div>
-            </div>
-          </div>
+          <a
+            href="#"
+            className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+          >
+            View Details <ArrowRight className="w-3 h-3" />
+          </a>
         </div>
       </div>
     </div>
