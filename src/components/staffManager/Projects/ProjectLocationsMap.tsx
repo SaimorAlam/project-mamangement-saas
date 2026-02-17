@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { ArrowRight } from "lucide-react";
-import { useGetProgramAllProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 
 const ProjectLocationsMap = ({ allFilteredProjects }: { allFilteredProjects: any }) => {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -64,10 +63,6 @@ const ProjectLocationsMap = ({ allFilteredProjects }: { allFilteredProjects: any
       const bounds = L.latLngBounds([]);
 
       projects.forEach((project: any) => {
-        const marker = L.marker([project.latitude, project.longitude])
-          .bindPopup(`<strong>${project.name}</strong>`)
-          .addTo(markersLayerRef.current);
-
         bounds.extend([project.latitude, project.longitude]);
       });
 
