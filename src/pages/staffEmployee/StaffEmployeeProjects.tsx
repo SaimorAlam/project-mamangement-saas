@@ -22,6 +22,7 @@ import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import { useGetEmployeeAllProjectsQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 import { useEmployeeId } from "@/hooks/useEmployeeId";
+import { useNavigate } from "react-router-dom";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -44,6 +45,7 @@ const StaffEmployeeProjects = ({
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [priorityFilter, setPriorityFilter] = useState<string>("ALL");
+  const navigate = useNavigate();
 
   const [sortBy] = useState<string>("");
   const [sortOrder] = useState<"asc" | "desc">("asc");
@@ -254,7 +256,7 @@ const StaffEmployeeProjects = ({
 
                   <tbody>
                     {sortedProjects.map((project) => (
-                      <tr key={project.id} className="hover:bg-gray-50">
+                      <tr key={project.id} className="hover:bg-gray-50" onClick={() => navigate(`/staff-employee-panel/projects/${project.id}`)}>
                         <td className="px-6 py-4">{project.name}</td>
                         <td className="px-6 py-4">
                           {project.projectEmployees?.length > 0 ? (

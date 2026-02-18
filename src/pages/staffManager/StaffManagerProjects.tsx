@@ -23,6 +23,7 @@ import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import { useSelector } from "react-redux";
 import ProjectLocationsMap from "@/components/staffManager/Projects/ProjectLocationsMap";
+import { useNavigate } from "react-router-dom";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -75,6 +76,7 @@ const StaffManagerProjects = ({
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [priorityFilter, setPriorityFilter] = useState<string>("ALL");
+  const navigate = useNavigate();
 
   const [sortBy] = useState<string>("");
   const [sortOrder] = useState<"asc" | "desc">("asc");
@@ -345,7 +347,7 @@ const StaffManagerProjects = ({
                   )}
                 </tr>
                 {sortedProjects.map((project) => (
-                  <tr key={project.id} className="hover:bg-gray-50">
+                  <tr key={project.id} className="hover:bg-gray-50" onClick={() => navigate(`/staff-manager-panel/projects/${project.id}`)}>
                     <td className="px-6 py-4">{project.name}</td>
                     <td className="px-6 py-4">
                       {project.projectEmployees?.length > 0 ? (

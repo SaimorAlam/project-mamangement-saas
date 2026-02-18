@@ -24,7 +24,7 @@ import { useEmployeeId } from "@/hooks/useEmployeeId";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import DropdownSelect from "@/common/DropdownSelect";
 import PrimaryButton from "@/common/PrimaryButton";
-import StaffManagerProjectTable from "../staffManager/overview/StaffManagerProjectTable";
+import StaffEmployeeProjectTable from "./Overview/StaffEmployeeProjectTable";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -280,7 +280,7 @@ const AllProgramProject = () => {
       {/* Content */}
       {viewMode === "table" ? (
         <div className="">
-          <StaffManagerProjectTable
+          <StaffEmployeeProjectTable
             projects={projects as StaffEmployeeProject[]}
           />
 

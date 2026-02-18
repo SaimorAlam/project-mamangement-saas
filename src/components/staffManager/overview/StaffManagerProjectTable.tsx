@@ -22,9 +22,9 @@ import {
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
-import DeleteModal from "@/common/Modal/DeleteModal";
+// import DeleteModal from "@/common/Modal/DeleteModal";
 import { useDeleteManagerProjectMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import EditProjectModal from "./EditProjectModal";
+// import EditProjectModal from "./EditProjectModal";
 import { useNavigate } from "react-router-dom";
 
 export type ProjectStatus =
@@ -206,17 +206,17 @@ const StaffManagerProjectTable = ({
     useState<StaffEmployeeProject | null>(null);
   const [open, setOpen] = useState(false);
 
-  const handleViewProject = (project: StaffEmployeeProject) => {
-    setSelectedProject(project);
-    setOpen(true);
-  };
+  // const handleViewProject = (project: StaffEmployeeProject) => {
+  //   setSelectedProject(project);
+  //   setOpen(true);
+  // };
 
   const [deleteProject] = useDeleteManagerProjectMutation();
 
-  const handleDelete = (id: string) => {
-    deleteProject({ id });
-    setOpen(false);
-  };
+  // const handleDelete = (id: string) => {
+  //   deleteProject({ id });
+  //   setOpen(false);
+  // };
 
   return (
     <Card className="w-full shadow-none border-none">
@@ -241,9 +241,7 @@ const StaffManagerProjectTable = ({
               <TableRow
                 key={project.id}
                 className="border-b border-gray-200 hover:bg-gray-100 odd:bg-white even:bg-[#F7F9FA]"
-                onClick={() =>
-                  navigate(`/staff-manager-panel/projects/${project.id}`)
-                }
+                onClick={() => navigate(`/staff-manager-panel/projects/${project.id}`)}
               >
                 <TableCell className="px-6 py-3.5 font-medium">
                   {project.programName || "Program Name"}
@@ -289,18 +287,18 @@ const StaffManagerProjectTable = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleViewProject(project)}
+                      onClick={() => navigate(`/staff-manager-panel/projects/${project.id}`)}
                     >
                       <Eye className="w-4 h-4 text-[#1C73E0]" />
                     </Button>
 
-                    <EditProjectModal id={project.id} />
+                    {/* <EditProjectModal id={project.id} /> */}
 
-                    <DeleteModal
+                    {/* <DeleteModal
                       deletingItemTitle={project.name}
                       deletingItemId={project.id}
                       onDelete={handleDelete}
-                    />
+                    /> */}
                   </div>
                 </TableCell>
               </TableRow>
