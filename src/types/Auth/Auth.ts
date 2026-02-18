@@ -14,6 +14,7 @@ export interface User {
   id?: string;
   adminAccessToken?: string;
   adminRefreshToken?: string;
+  employeeId?: string;
 }
 
 export interface Role {

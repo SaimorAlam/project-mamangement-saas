@@ -37,6 +37,7 @@ const authSlice = createSlice({
           userEmail: decode?.userEmail,
           userId: decode?.userId,
           clientId: decode?.clientId,
+          employeeId: decode?.employeeId,
           role: decode?.role,
           accessToken: action.payload.accessToken,
           refreshToken: action.payload.refreshToken,

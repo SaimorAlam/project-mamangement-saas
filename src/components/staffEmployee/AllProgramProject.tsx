@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import StaffManagerProjectCard from "@/components/staffManager/StaffManagerProjectCard";
 import Pagination from "@/components/client/Pagination";
-import { useSelector } from "react-redux";
+import { useEmployeeId } from "@/hooks/useEmployeeId";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import DropdownSelect from "@/common/DropdownSelect";
 import PrimaryButton from "@/common/PrimaryButton";
@@ -95,7 +95,7 @@ const AllProgramProject = () => {
 
   const itemsPerPage = 10;
 
-  const employeeId = useSelector((state: any) => state.auth.user?.userId);
+  const employeeId = useEmployeeId();
 
   const { data, isLoading } = useGetAllProjectsQuery({
     employeeId,
@@ -165,22 +165,20 @@ const AllProgramProject = () => {
               type="Primary"
               title="Boards"
               leftIcon={<AlignStartHorizontal className="w-4 h-4" />}
-              className={`${
-                viewMode === "board"
-                  ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
-                  : "bg-white border-black text-black! hover:text-black!"
-              }`}
+              className={`${viewMode === "board"
+                ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
+                : "bg-white border-black text-black! hover:text-black!"
+                }`}
               onClick={() => setViewMode("board")}
             />
             <PrimaryButton
               type="Primary"
               title="Tables"
               leftIcon={<TableIcon className="w-4 h-4" />}
-              className={`${
-                viewMode === "table"
-                  ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
-                  : "bg-white border-black text-black! hover:text-black!"
-              }`}
+              className={`${viewMode === "table"
+                ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
+                : "bg-white border-black text-black! hover:text-black!"
+                }`}
               onClick={() => setViewMode("table")}
             />
           </div>
@@ -205,17 +203,15 @@ const AllProgramProject = () => {
                 Field
               </div>
               <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${
-                  sortBy === "startDate" ? "bg-indigo-50 text-indigo-600" : ""
-                }`}
+                className={`rounded-md cursor-pointer ${sortBy === "startDate" ? "bg-indigo-50 text-indigo-600" : ""
+                  }`}
                 onClick={() => setSortBy("startDate")}
               >
                 Starting Date
               </DropdownMenuItem>
               <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${
-                  sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""
-                }`}
+                className={`rounded-md cursor-pointer ${sortBy === "endDate" ? "bg-indigo-50 text-indigo-600" : ""
+                  }`}
                 onClick={() => setSortBy("endDate")}
               >
                 Ending Date
@@ -227,17 +223,15 @@ const AllProgramProject = () => {
                 Order
               </div>
               <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${
-                  sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
-                }`}
+                className={`rounded-md cursor-pointer ${sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
+                  }`}
                 onClick={() => setSortOrder("asc")}
               >
                 Ascending
               </DropdownMenuItem>
               <DropdownMenuItem
-                className={`rounded-md cursor-pointer ${
-                  sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
-                }`}
+                className={`rounded-md cursor-pointer ${sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
+                  }`}
                 onClick={() => setSortOrder("desc")}
               >
                 Descending

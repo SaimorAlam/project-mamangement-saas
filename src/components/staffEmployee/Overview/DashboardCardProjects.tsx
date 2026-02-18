@@ -5,14 +5,14 @@ import StaffManagerProjectCard, {
 } from "@/components/staffManager/StaffManagerProjectCard";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { ChevronLeft } from "lucide-react";
-import { useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useEmployeeId } from "@/hooks/useEmployeeId";
 
 // this is dynamic router component
 const DashboardCardProjects = () => {
   const { status } = useParams();
   const navigate = useNavigate();
-  const employeeId = useSelector((state: any) => state.auth.user?.userId);
+  const employeeId = useEmployeeId();
   const { data, isLoading, error } = useGetAllProjectsQuery({
     employeeId,
     status: status ? status : "ALL",

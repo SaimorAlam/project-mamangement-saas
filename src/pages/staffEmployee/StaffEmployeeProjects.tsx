@@ -21,7 +21,7 @@ import DropdownSelect from "@/common/DropdownSelect";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import { useGetEmployeeAllProjectsQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
-import { useSelector } from "react-redux";
+import { useEmployeeId } from "@/hooks/useEmployeeId";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -51,7 +51,7 @@ const StaffEmployeeProjects = ({
   const [editProject] = useState<UpdateProjectPayload | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
-  const employeeId = useSelector((state: any) => state.auth.user?.userId);
+  const employeeId = useEmployeeId();
 
   const { data, isLoading, error } = useGetEmployeeAllProjectsQuery({
     employeeId: employeeId || "",
@@ -126,10 +126,10 @@ const StaffEmployeeProjects = ({
   const formatDate = (date?: string) =>
     date
       ? new Date(date).toLocaleDateString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
       : "-";
 
   const handleUpdateProject = async (project: UpdateProjectPayload) => {
