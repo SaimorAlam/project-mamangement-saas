@@ -23,7 +23,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 // import DeleteModal from "@/common/Modal/DeleteModal";
-import { useDeleteManagerProjectMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
+// import { useDeleteManagerProjectMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
 // import EditProjectModal from "./EditProjectModal";
 import { useNavigate } from "react-router-dom";
 
@@ -202,7 +202,7 @@ const StaffEmployeeProjectTable = ({
     projects,
 }: StaffEmployeeProjectTableProps) => {
     const navigate = useNavigate();
-    const [selectedProject, setSelectedProject] =
+    const [selectedProject,] =
         useState<StaffEmployeeProject | null>(null);
     const [open, setOpen] = useState(false);
 
@@ -211,7 +211,7 @@ const StaffEmployeeProjectTable = ({
     //   setOpen(true);
     // };
 
-    const [deleteProject] = useDeleteManagerProjectMutation();
+    // const [deleteProject] = useDeleteManagerProjectMutation();
 
     // const handleDelete = (id: string) => {
     //   deleteProject({ id });
