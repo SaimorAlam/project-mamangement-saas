@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { generateLineChartData } from "@/utils";
+import { generateLineChartData } from "@/utils/clientPannelHelpers/programBuilderHelpers";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import ChartCardWrapper from "./components/ChartCardWrapper";
@@ -34,18 +34,10 @@ export type ChartData = {
   [key: string]: number | string;
 };
 
-type LegendValue = {
+export type LegendValue = {
   label: string;
   field: string;
   color: string;
-};
-
-export type TierChart = {
-  id: string;
-  name: string;
-  xAxisValues: string[];
-  legendValues: LegendValue[];
-  children: TierChart[];
 };
 
 export type BreadcrumbItem = {
@@ -101,7 +93,7 @@ export default function MultiAxisLineChart({
     { [key: string]: ChartData[] } | undefined
   >(allUploadedData);
 
-  // API hooks for tier management
+  // API hooks
   const [findChildrenValue, { data, isLoading }] =
     useLazyFindChildrenValueQuery();
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
@@ -110,30 +102,42 @@ export default function MultiAxisLineChart({
   const groupTitle = useAppSelector((state) => state.chartSlice.groupTitle);
   const childTiers = data?.data;
 
-  // Tier management states
+  // Modals
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
-  // Fetch children when chartId changes
+  // Sync with allUploadedData when it changes
+  useEffect(() => {
+    if (allUploadedData) {
+      setLocalUploadedData(allUploadedData);
+    }
+  }, [allUploadedData]);
+
+  // Fetch children
   useEffect(() => {
     if (chartId && chartId !== "root") {
       findChildrenValue(chartId);
     }
   }, [chartId, findChildrenValue]);
 
-  /*   EFFECTIVE DATA FOR RENDERING   */
+  /*   EFFECTIVE CONFIGURATIONS   */
 
   const effectiveLegendValues = useMemo(() => {
-    if (legendValues.length > 0 && legendValues.some((l) => l.label !== "")) {
-      return legendValues.map((l) => ({
+    // Filter to ensure we only process legends that actually have a label
+    const validLegends = legendValues.filter((l) => l.label && l.label.trim() !== "");
+    
+    if (validLegends.length > 0) {
+      return validLegends.map((l) => ({
         ...l,
         field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
       }));
     }
+    
+    // Fallback to sample data if no valid legends are found
     return [
       { label: "Sample A", field: "field1", color: "#13A490" },
       { label: "Sample B", field: "field2", color: "#35B6EE" },
-      { label: "Sample C", field: "field3", color: "#6F78F9" },
+      { label: "Sample C", field: "field3", color: "#6f78f9" },
     ];
   }, [legendValues]);
 
@@ -146,14 +150,16 @@ export default function MultiAxisLineChart({
   }, [xAxisValues]);
 
   const { safeStartingRange, safeEndingRange } = useMemo(() => {
-    let start = startingRange;
-    let end = endingRange;
+    let start = Number(startingRange);
+    let end = Number(endingRange);
     if (start === end) {
       start = 0;
       end = 100;
     }
     return { safeStartingRange: start, safeEndingRange: end };
   }, [startingRange, endingRange]);
+
+  /*   DATA MAPPING   */
 
   const { chartData, isSampleData } = useMemo(() => {
     const sheetName = (widgetTitle || "Sheet")
@@ -164,16 +170,23 @@ export default function MultiAxisLineChart({
     const dataToUse =
       localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
-    // Priority 1: Real Uploaded Data
-    if (dataToUse && dataToUse.length > 0) {
-      return { chartData: dataToUse, isSampleData: false };
+    // Priority 1: Real Uploaded Data (must have at least one non-zero value)
+    const hasRealData =
+      dataToUse &&
+      dataToUse.length > 0 &&
+      dataToUse.some((row) =>
+        effectiveLegendValues.some((l) => Number(row[l.field] || 0) > 0),
+      );
+
+    if (hasRealData) {
+      return { chartData: dataToUse as ChartData[], isSampleData: false };
     }
 
     const hasConfig =
       xAxisValues.length > 0 &&
       xAxisValues.some((v) => v !== "") &&
-      effectiveLegendValues.length > 0 &&
-      effectiveLegendValues.some((l) => l.label !== "");
+      legendValues.length > 0 &&
+      legendValues.some((l) => l.label !== "");
 
     // Priority 2: Sample Data based on Config
     if (hasConfig) {
@@ -200,6 +213,7 @@ export default function MultiAxisLineChart({
     };
   }, [
     xAxisValues,
+    legendValues,
     safeStartingRange,
     safeEndingRange,
     widgetTitle,
@@ -209,11 +223,7 @@ export default function MultiAxisLineChart({
     effectiveLegendValues,
   ]);
 
-  /*   ACTIONS   */
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
-  };
+  /*   NAVIGATION & BREADCRUMBS   */
 
   const currentBreadcrumbs = useMemo(() => {
     const base =
@@ -243,6 +253,13 @@ export default function MultiAxisLineChart({
     }
   };
 
+  /*   ACTIONS   */
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
+    toast.success("JSON copied to clipboard");
+  };
+
   const handleDownload = async (title: string) => {
     if (!projectId) {
       toast.error("Project ID is missing");
@@ -250,11 +267,18 @@ export default function MultiAxisLineChart({
     }
     setIsDownloading(true);
     try {
-      const res = await getAllTheLeafChart(projectId as string).unwrap();
-      const leafCharts =
-        res?.data?.find((item: any) => item.grouptitle === title) || [];
-      if (leafCharts.charts?.length === 0) {
-        toast.error("No data found to download");
+      const res = await getAllTheLeafChart(projectId).unwrap();
+      const leafCharts = res?.data?.find((item: any) => item.grouptitle === title);
+      
+      if (!leafCharts || !leafCharts.charts?.length) {
+        // Fallback: download just this chart if no tier group found
+        const wb = XLSX.utils.book_new();
+        const headers = ["Label", ...effectiveLegendValues.map((l) => l.label)];
+        const rows = effectiveXAxisValues.map((label) => [label, ...Array(effectiveLegendValues.length).fill("")]);
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        XLSX.utils.book_append_sheet(wb, ws, widgetTitle.substring(0, 31));
+        XLSX.writeFile(wb, `${widgetTitle}_template.xlsx`);
+        toast.info("Downloaded current chart template");
         return;
       }
 
@@ -265,84 +289,49 @@ export default function MultiAxisLineChart({
       const getUniqueSheetName = (name: string, id: string) => {
         const safeName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
         const fullName = `${safeName}_${id}`;
-        let finalName =
-          fullName.length > 31 ? fullName.substring(0, 31) : fullName;
-
+        let finalName = fullName.length > 31 ? fullName.substring(0, 31) : fullName;
         let counter = 1;
         while (usedNames.has(finalName.toLowerCase())) {
           const suffix = `_${counter}`;
-          const base = fullName.substring(0, 31 - suffix.length);
-          finalName = base + suffix;
+          finalName = fullName.substring(0, 31 - suffix.length) + suffix;
           counter++;
         }
-
         usedNames.add(finalName.toLowerCase());
         return finalName;
       };
 
-      leafCharts?.charts?.forEach((node: any) => {
+      leafCharts.charts.forEach((node: any) => {
         ids.push(node.id);
-        let xAxis = node.xAxisValues || [];
-        if (!xAxis.length && node.xAxis) {
-          try {
-            const parsed =
-              typeof node.xAxis === "string"
-                ? JSON.parse(node.xAxis)
-                : node.xAxis;
-
-            if (Array.isArray(parsed)) {
-              if (parsed.length > 0 && Array.isArray(parsed[0])) {
-                xAxis = parsed.slice(1).map((row: any) => row[0]);
-              } else {
-                xAxis = parsed;
-              }
-            } else {
-              xAxis = parsed.labels || [];
-            }
-          } catch {
-            // ignore
+        // Get xAxis from node project metadata or fallback
+        let xAxisItems: string[] = [];
+        try {
+          const parsed = typeof node.xAxis === "string" ? JSON.parse(node.xAxis) : node.xAxis;
+          if (Array.isArray(parsed) && parsed.length > 1) {
+            xAxisItems = parsed.slice(1).map((row: any) => String(row[0]));
+          } else if (parsed?.labels) {
+            xAxisItems = parsed.labels;
           }
-        }
+        } catch { /* ignore */ }
+        
+        if (!xAxisItems.length) xAxisItems = effectiveXAxisValues;
 
-        if (!xAxis.length) {
-          xAxis = effectiveXAxisValues;
-        }
-
-        let legends = node.legendValues || [];
-        const nodeWidgets = node.widgets || node.lineChart?.widgets;
-        if (!legends.length && nodeWidgets) {
-          legends = nodeWidgets.map((w: any) => ({
-            label: w.legendName || w.label || "Legend",
-            field: (w.legendName || w.label || "field")
-              .toLowerCase()
-              .replace(/\s+/g, ""),
-            color: w.color || "#000000",
-          }));
-        }
-
-        if (!legends.length) {
-          legends = effectiveLegendValues;
-        }
+        // Get legends
+        const nodeWidgets = node.widgets || node.lineChart?.widgets || [];
+        const legends = nodeWidgets.length > 0 
+          ? nodeWidgets.map((w: any) => ({ label: w.legendName || w.label }))
+          : effectiveLegendValues;
 
         const headers = ["Label", ...legends.map((l: any) => l.label)];
-        const rows = xAxis.map((label: string) => [
-          label,
-          ...Array(legends.length).fill(" "),
-        ]);
-        const data = [headers, ...rows];
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        const sheetName = getUniqueSheetName(
-          node.title || node.name || "Tier",
-          node.id,
-        );
+        const rows = xAxisItems.map((label) => [label, ...Array(legends.length).fill("")]);
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        const sheetName = getUniqueSheetName(node.title || node.name || "Tier", node.id);
         XLSX.utils.book_append_sheet(wb, ws, sheetName);
       });
 
-      const filename = `${widgetTitle}_ID_${ids.join("_")}.xlsx`;
-      XLSX.writeFile(wb, filename);
-      toast.success("Excel downloaded successfully");
+      XLSX.writeFile(wb, `${widgetTitle}_ID_${ids.join("_")}.xlsx`);
+      toast.success("Excel template downloaded");
     } catch (error) {
-      console.error("Excel download failed", error);
+      console.error("Download failed:", error);
       toast.error("Failed to download Excel");
     } finally {
       setIsDownloading(false);
@@ -363,38 +352,33 @@ export default function MultiAxisLineChart({
         wb.SheetNames.forEach((sheetName) => {
           const ws = wb.Sheets[sheetName];
           const rawData: any[] = XLSX.utils.sheet_to_json(ws);
-
           if (rawData.length > 0) {
-            const processedData = rawData.map((row: any) => {
-              const item: ChartData = { name: row["Label"] || "" };
+            const processed = rawData.map((row: any) => {
+              const item: ChartData = { name: String(row["Label"] || "") };
               effectiveLegendValues.forEach((l) => {
-                if (row[l.label] !== undefined) {
-                  item[l.field] = Number(row[l.label]);
-                } else if (row[l.field] !== undefined) {
-                  item[l.field] = Number(row[l.field]);
-                }
+                const val = row[l.label] !== undefined ? row[l.label] : row[l.field];
+                item[l.field] = val !== undefined ? Number(val) : 0;
               });
               return item;
             });
-            allData[sheetName] = processedData;
+            allData[sheetName] = processed;
           }
         });
 
         setLocalUploadedData(allData);
         toast.success("Data uploaded successfully");
       } catch (err) {
-        console.error("Upload failed", err);
-        toast.error("Failed to parse Excel file");
+        console.error("Upload Error:", err);
+        toast.error("Failed to parse file");
       }
     };
     reader.readAsBinaryString(file);
+    e.target.value = ""; // Reset
   };
 
   const handleAddTierClick = (title: string) => {
-    if (tierLevel === 0) {
-      dispatch(setGroupTitle(title));
-    }
-    console.log(legendValues, "LegendValues");
+    if (tierLevel === 0) dispatch(setGroupTitle(title));
+
     const childPayload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: safeStartingRange,
@@ -408,19 +392,20 @@ export default function MultiAxisLineChart({
       category: "LINE",
       xAxis: JSON.stringify([
         ["Label", ...legendValues.map((l) => l.label)],
-        ...xAxisValues.map((label) => [
+        ...effectiveXAxisValues.map((label) => [
           label,
-          ...Array(numOfLegendDataSet).fill(0),
+          ...Array(legendValues.length).fill(0),
         ]),
       ]),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
-      projectId: projectId,
+      projectId,
       parentId: chartId,
       rootchart: false,
       roottitle: widgetTitle,
-      grouptitle: groupTitle,
+      grouptitle: tierLevel === 0 ? title : groupTitle,
     };
+
     dispatch(setChildPayload(childPayload));
     setShowAddTierModal(true);
   };
@@ -428,156 +413,141 @@ export default function MultiAxisLineChart({
   const handleChartClick = () => {
     if (childTiers?.length > 0) {
       setShowChildrenModal(true);
-      if (tierLevel === 0) {
-        dispatch(setGroupTitle(widgetTitle));
-      }
+      if (tierLevel === 0) dispatch(setGroupTitle(widgetTitle));
     }
   };
 
-  /*   TOOLTIP   */
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (!active || !payload?.length) return null;
+  /*   TOOLTIP & UI   */
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
     return (
-      <div className="bg-white p-3 border rounded shadow-lg">
-        <p className="font-semibold mb-2">{payload[0].payload.name}</p>
-        {effectiveLegendValues.map((l) => (
-          <p key={l.field} style={{ color: l.color }} className="text-sm">
-            {l.label}: {payload[0].payload[l.field]}
-          </p>
-        ))}
+      <div className="bg-white/95 backdrop-blur-sm p-3 border border-gray-100 rounded-xl shadow-xl">
+        <p className="font-bold text-gray-700 mb-2 border-b border-gray-50 pb-1">{label}</p>
+        <div className="space-y-1.5">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+              <span className="text-xs font-medium text-gray-600 min-w-[60px]">{entry.name}:</span>
+              <span className="text-xs font-bold text-gray-900 ml-auto">{entry.value}</span>
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
 
   if (isLoading) {
-    return <div>Loading child tiers...</div>;
+    return (
+      <div className="w-full h-[400px] flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm animate-pulse">
+        <div className="text-gray-400 text-sm font-medium">Loading child tiers...</div>
+      </div>
+    );
   }
-
-  /*   RENDER   */
 
   return (
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        subtitle={`Multi-Axis Distribution ${isSampleData ? "(Sample Data)" : ""}`}
+        subtitle={`${isSampleData ? "(Sample Data)" : "Line Distribution Assessment"}`}
         chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
           onCopy: handleCopy,
-          onDownload:
-            tierLevel === 0 ? () => handleDownload(widgetTitle) : undefined,
-          onUpload:
-            tierLevel === 0
-              ? () =>
-                  document
-                    .getElementById(
-                      `upload-input-line-${chartId || widgetTitle}`,
-                    )
-                    ?.click()
-              : undefined,
+          onDownload: tierLevel === 0 ? () => handleDownload(widgetTitle) : undefined,
+          onUpload: tierLevel === 0 ? () => document.getElementById(`upload-line-${chartId}`)?.click() : undefined,
           onDelete: onDelete,
-          onAddTier: !isCreationMode
-            ? () => handleAddTierClick(widgetTitle)
-            : undefined,
+          onAddTier: !isCreationMode ? () => handleAddTierClick(widgetTitle) : undefined,
           onToggleWidget: onToggleWidget,
         }}
         isDownloading={isDownloading}
         isPreview={isPreview}
         customHeaderContent={
-          <div className="flex gap-4 items-center">
-            <div className="flex gap-3">
-              {effectiveLegendValues.slice(0, 3).map((l) =>
-                l.label ? (
-                  <div key={l.field} className="flex items-center gap-1.5">
-                    <div
-                      className="w-3 h-1 rounded-full"
-                      style={{ backgroundColor: l.color }}
-                    />
-                    <span className="text-xs text-gray-500">{l.label}</span>
-                  </div>
-                ) : null,
-              )}
-              {effectiveLegendValues.length > 3 && (
-                <span className="text-xs text-gray-400">
-                  +{effectiveLegendValues.length - 3} more
-                </span>
-              )}
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowLineOnly(!showLineOnly);
-              }}
-              className={`text-xs px-2 py-1 rounded transition-colors ${
-                showLineOnly
-                  ? "bg-blue-50 text-blue-600 border border-blue-100"
-                  : "bg-gray-50 text-gray-600 border border-gray-100 hover:bg-gray-100"
-              }`}
-            >
-              Line Only {showLineOnly ? "✓" : ""}
-            </button>
-          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowLineOnly(!showLineOnly); }}
+            className={`text-xs px-2 py-1 rounded-md transition-all ${
+              showLineOnly 
+                ? "bg-blue-50 text-blue-600 border border-blue-200" 
+                : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100"
+            }`}
+          >
+            Line Only {showLineOnly ? "✓" : ""}
+          </button>
         }
         footer={
           childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier
-              {childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
       >
         <div className="relative">
-          {chartData.length ? (
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={chartData}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="#f0f0f0"
+          {chartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={{ stroke: "#e5e7eb" }} 
+                  tickLine={false} 
+                  tick={{ fontSize: 12, fill: "#6b7280" }} 
+                  dy={10} 
                 />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "#9ca3af" }}
+                <YAxis 
+                  domain={[safeStartingRange, safeEndingRange]} 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 12, fill: "#6b7280" }} 
+                  dx={-10} 
                 />
-                <YAxis
-                  domain={[safeStartingRange, safeEndingRange]}
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "#9ca3af" }}
-                />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#d1d5db", strokeWidth: 1 }} />
 
                 {effectiveLegendValues.map((l) => (
                   <Line
                     key={l.field}
+                    name={l.label}
                     type="monotone"
                     dataKey={l.field}
                     stroke={l.color}
-                    dot={!showLineOnly}
-                    strokeWidth={2}
-                    opacity={
-                      hoveredLine === null || hoveredLine === l.field ? 1 : 0.3
-                    }
+                    dot={!showLineOnly ? { r: 5, fill: l.color, stroke: l.color, strokeWidth: 2 } : false}
+                    activeDot={{ r: 7, fill: l.color, stroke: "#fff", strokeWidth: 2 }}
+                    strokeWidth={3}
+                    connectNulls
+                    opacity={hoveredLine === null || hoveredLine === l.field ? 1 : 0.2}
                     onMouseEnter={() => setHoveredLine(l.field)}
                     onMouseLeave={() => setHoveredLine(null)}
+                    animationDuration={1500}
                   />
                 ))}
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-80 flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
-              No data available. Please configure the chart.
+            <div className="h-80 flex flex-col items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
+              <span className="mb-2 text-2xl">📊</span>
+              <p className="text-sm">No data available. Please configure the chart.</p>
+            </div>
+          )}
+
+          {/* Bottom Legend Alignment */}
+          {chartData.length > 0 && (
+            <div className="flex justify-center flex-wrap gap-6 mt-6 pb-2 border-t border-gray-50 pt-4">
+              {effectiveLegendValues.map((l) => (
+                <div key={l.field} className="flex items-center gap-2">
+                  <div className="flex items-center">
+                    <div className="w-4 h-1 rounded-full" style={{ backgroundColor: l.color }} />
+                    <div className="w-2.5 h-2.5 rounded-full -ml-1 border-2 border-white box-content shadow-sm" style={{ backgroundColor: l.color }} />
+                  </div>
+                  <span className="text-xs font-semibold text-gray-600">{l.label}</span>
+                </div>
+              ))}
             </div>
           )}
 
           {tierLevel === 0 && (
             <input
-              id={`upload-input-line-${chartId || widgetTitle}`}
+              id={`upload-line-${chartId}`}
               type="file"
               accept=".xlsx, .xls"
               className="hidden"
@@ -591,7 +561,7 @@ export default function MultiAxisLineChart({
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
         chartId={chartId}
-        parentChartName={groupTitle}
+        parentChartName={tierLevel === 0 ? widgetTitle : groupTitle}
       />
 
       {showChildrenModal && (
@@ -604,52 +574,35 @@ export default function MultiAxisLineChart({
           onBreadcrumbClick={handleBreadcrumbClick}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers &&
-              childTiers?.map((tier: any) => {
-                const category = chartTypes[tier.category];
-                const tierLegends = (
-                  tier?.[category]?.widgets ||
-                  tier?.widgets ||
-                  []
-                ).map((w: any) => ({
-                  label: w.legendName || w.label,
-                  field: (w.legendName || w.label)
-                    ?.toLowerCase()
-                    .replace(/\s+/g, ""),
-                  color: w.color,
-                }));
+            {childTiers?.map((tier: any) => {
+              const category = chartTypes[tier.category];
+              const tierLegends = (tier?.[category]?.widgets || tier?.widgets || []).map((w: any) => ({
+                label: w.legendName || w.label,
+                field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
+                color: w.color,
+              }));
 
-                const { labels, data } = parseLineChartData(
-                  tier.xAxis,
-                  tierLegends,
-                  tier.title,
-                );
+              const { labels, data } = parseLineChartData(tier.xAxis, tierLegends, tier.title);
 
-                return (
-                  <MultiAxisLineChart
-                    key={tier?.id}
-                    widgetTitle={
-                      tier?.title ||
-                      tier?.name ||
-                      tier?.taskName ||
-                      "Untitled Tier"
-                    }
-                    xAxisValues={labels}
-                    legendValues={tierLegends}
-                    numOfLegendDataSet={tierLegends.length}
-                    startingRange={startingRange}
-                    endingRange={endingRange}
-                    tierLevel={tierLevel + 1}
-                    chartId={tier?.id}
-                    allUploadedData={data}
-                    isPreview={isPreview}
-                    widgets={tier?.widgets}
-                    projectId={tier?.projectId || projectId}
-                    breadcrumbPath={currentBreadcrumbs}
-                    onNavigate={handleChildNavigate}
-                  />
-                );
-              })}
+              return (
+                <MultiAxisLineChart
+                  key={tier?.id}
+                  widgetTitle={tier?.title || tier?.name || "Untitled Tier"}
+                  xAxisValues={labels}
+                  legendValues={tierLegends}
+                  numOfLegendDataSet={tierLegends.length}
+                  startingRange={startingRange}
+                  endingRange={endingRange}
+                  tierLevel={tierLevel + 1}
+                  chartId={tier?.id}
+                  allUploadedData={data}
+                  isPreview={isPreview}
+                  projectId={tier?.projectId || projectId}
+                  breadcrumbPath={currentBreadcrumbs}
+                  onNavigate={handleChildNavigate}
+                />
+              );
+            })}
           </div>
         </TierChartModal>
       )}
