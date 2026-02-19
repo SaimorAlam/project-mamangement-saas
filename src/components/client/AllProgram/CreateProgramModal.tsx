@@ -59,16 +59,17 @@ export default function CreateProgramModal({
   const { data, isLoading } = useGetAllManagersQuery({});
   const managers = data?.data?.data?.map(
     (user: {
-      userId: string;
+      id: string;
       user: { name: string; profileImage: string; role: string };
     }) => ({
-      id: user?.userId,
+      id: user?.id,
       name: user?.user?.name,
       profileImage: user?.user?.profileImage,
       role: user?.user?.role,
     }),
   );
-  console.log(selectedManager);
+
+  console.log(data);
   const {
     register,
     handleSubmit,
@@ -295,11 +296,14 @@ export default function CreateProgramModal({
                       <Skeleton className="h-10 w-full" />
                     ) : (
                       <>
-                        {managers?.map((manager: Manager) => (
-                          <SelectItem key={manager.id} value={manager.id}>
-                            {manager.name}
-                          </SelectItem>
-                        ))}
+                        {managers?.map((manager: Manager) => {
+                          console.log(manager, "Manager");
+                          return (
+                            <SelectItem key={manager.id} value={manager.id}>
+                              {manager.name}
+                            </SelectItem>
+                          );
+                        })}
                       </>
                     )}
                   </SelectContent>

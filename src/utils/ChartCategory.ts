@@ -4,7 +4,7 @@ export const chartTypes: { [key: string]: string } = {
   HORIZONTAL_BAR: "horizontalBarChart",
   STACK_BAR_HORIZONTAL: "stackedBarChart",
   COLUMN: "columnChart",
-  PIE: "pieChart",
+  PIE: "pi",
   DOUGHNUT: "doughnutChart",
   RADAR: "radarChart",
   HEATMAP: "heatMapChart",

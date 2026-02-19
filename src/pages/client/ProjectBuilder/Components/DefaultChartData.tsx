@@ -22,6 +22,7 @@ import HorizontalStackedBarChart from "@/common/Charts/HorizontalStackedBarChart
 import ComboChart from "@/common/Charts/ComboChart";
 import CandleChart from "@/common/Charts/CandleChart";
 import { chartTypes } from "@/utils/ChartCategory";
+import { parsePieChartData } from "@/utils/parsePieChartData";
 
 const parseXAxisData = (
   xAxis: any[][] | string,
@@ -225,6 +226,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                   .replace(/\s+/g, ""),
               })) || [];
 
+            const pieData = parsePieChartData(item?.xAxis, legendValues);
+
             return (
               <div key={item.id} className="w-full">
                 <PieChartWidget
@@ -232,6 +235,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                   legendValues={legendValues}
                   numOfLegendDataSet={chartData?.numberOfDataset}
                   chartId={item?.id}
+                  allUploadedData={pieData}
+                  projectId={item?.projectId}
                 />
               </div>
             );
