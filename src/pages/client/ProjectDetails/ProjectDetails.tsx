@@ -8,7 +8,7 @@ import RaidLogTab from "./AllDataTab/RaidLogTab";
 
 const ProjectDetails: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>(() => {
-    return localStorage.getItem("activeCarlyleTab") || "gantt";
+    return localStorage.getItem("activeCarlyleTab") || "dashboard";
   });
 
   const tabs = [

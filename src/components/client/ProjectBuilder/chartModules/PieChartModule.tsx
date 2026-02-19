@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import ProjectConfiguration, {
-  LegendValue,
-} from "../WidgetForChartModuleOne";
+import PieChartConfiguration, { LegendValue } from "../chartConfigurations/PieChartConfiguration";
 import PieChartWidget from "@/common/Charts/PieChart";
-import { useAppDispatch } from "@/hooks/useRedux";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
 const PieChartModule = ({
@@ -14,23 +12,17 @@ const PieChartModule = ({
   isPreview?: boolean;
 }) => {
   const dispatch = useAppDispatch();
-  const [widgetTitle, setWidgetTitle] = useState("My-CSV");
+  const projectId = useAppSelector((state) => state.chartSlice.projectId);
+  const [widgetTitle, setWidgetTitle] = useState("My-Pie-Chart");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] =
-    useState<number>(3);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
-    { label: "", field: "", color: "#13A490" },
-    { label: "", field: "", color: "#35B6EE" },
-    { label: "", field: "", color: "#6F78F9" },
+    { label: "Category A", field: "categorya", color: "#13A490" },
+    { label: "Category B", field: "categoryb", color: "#35B6EE" },
+    { label: "Category C", field: "categoryc", color: "#6F78F9" },
   ]);
-
-  // Pie charts don't use X-axis values or Y-axis ranges, but we need placeholders for ProjectConfiguration
-  const [numOfXAxisDataSet] = useState<number>(0);
-  const [xAxisValues] = useState<string[]>([]);
-  const [startingRange] = useState<number>(0);
-  const [endingRange] = useState<number>(100);
 
   useEffect(() => {
     dispatch(
@@ -65,27 +57,19 @@ const PieChartModule = ({
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
           isPreview={isPreview}
+          projectId={projectId}
         />
       </div>
       {!isPreview && showWidget && (
-        <ProjectConfiguration
-          widgedName="Pie Chart"
+        <PieChartConfiguration
           widgetTitle={widgetTitle}
-          widgetCategory="PIE"
           setWidgetTitle={setWidgetTitle}
-          numOfXAxisDataSet={numOfXAxisDataSet}
-          handleSetNumOfXAxisDataSet={() => {}}
-          xAxisValues={xAxisValues}
-          handleXAxisValueChange={() => {}}
           numOfLegendDataSet={numOfLegendDataSet}
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
           setLegendValues={setLegendValues}
-          startingRange={startingRange}
-          setStartingRange={() => {}}
-          endingRange={endingRange}
-          setEndingRange={() => {}}
           onClose={handleCloseWidget}
+          onDelete={onDelete}
         />
       )}
     </div>

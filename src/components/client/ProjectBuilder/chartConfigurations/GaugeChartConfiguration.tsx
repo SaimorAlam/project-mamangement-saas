@@ -42,9 +42,7 @@ const GaugeChartConfiguration = ({
   numOfLegendDataSet: number;
   setNumOfLegendDataSet: React.Dispatch<React.SetStateAction<number>>;
   legendValues: LegendValue[];
-  setLegendValues: React.Dispatch<
-    React.SetStateAction<LegendValue[]>
-  >;
+  setLegendValues: React.Dispatch<React.SetStateAction<LegendValue[]>>;
   startingRange: number;
   setStartingRange: React.Dispatch<React.SetStateAction<number>>;
   endingRange: number;
@@ -98,8 +96,7 @@ const GaugeChartConfiguration = ({
     });
   };
 
-  const [getChartTitleId, { isLoading }] =
-    useGetChartTitleIdMutation();
+  const [getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const downloadCSV = () => {
     // Validate legend label
@@ -116,16 +113,14 @@ const GaugeChartConfiguration = ({
 
     // Validate gauge value is within range
     if (gaugeValue < startingRange || gaugeValue > endingRange) {
-      alert(
-        `Gauge value must be between ${startingRange} and ${endingRange}`
-      );
+      alert(`Gauge value must be between ${startingRange} and ${endingRange}`);
       return;
     }
 
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -155,7 +150,7 @@ const GaugeChartConfiguration = ({
       getChartTitleId,
       widgetTitle,
       [],
-      legendValues
+      legendValues,
     );
   };
 
@@ -166,10 +161,7 @@ const GaugeChartConfiguration = ({
         <h2 className="text-lg font-semibold text-gray-900">
           Widget Configuration
         </h2>
-        <button
-          onClick={onClose}
-          className="text-gray-500 hover:text-gray-700"
-        >
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           <X size={18} />
         </button>
       </div>
@@ -207,9 +199,7 @@ const GaugeChartConfiguration = ({
             </label>
             <input
               type="number"
-              onChange={(e) =>
-                setStartingRange(Number(e.target.value))
-              }
+              onChange={(e) => setStartingRange(Number(e.target.value))}
               value={startingRange}
               className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
@@ -230,9 +220,7 @@ const GaugeChartConfiguration = ({
 
           {/* NEW: Gauge Value */}
           <div className="flex items-center mb-2">
-            <label className="text-xs text-gray-700 flex-1">
-              Gauge Value:
-            </label>
+            <label className="text-xs text-gray-700 flex-1">Gauge Value:</label>
             <input
               type="number"
               min={startingRange}
@@ -244,8 +232,8 @@ const GaugeChartConfiguration = ({
           </div>
 
           <p className="text-xs text-gray-500 mt-2">
-            The gauge will display value: {gaugeValue} (between{" "}
-            {startingRange} and {endingRange})
+            The gauge will display value: {gaugeValue} (between {startingRange}{" "}
+            and {endingRange})
           </p>
         </div>
 
@@ -302,9 +290,7 @@ const GaugeChartConfiguration = ({
 
           {/* Track Color */}
           <div className="flex items-center mb-2">
-            <label className="text-xs text-gray-700 flex-1">
-              Track Color:
-            </label>
+            <label className="text-xs text-gray-700 flex-1">Track Color:</label>
             <div className="flex items-center justify-end gap-2 flex-1">
               <input
                 type="text"
@@ -360,9 +346,7 @@ const GaugeChartConfiguration = ({
               min={0}
               max={1}
               value={shadeIntensity}
-              onChange={(e) =>
-                setShadeIntensity(Number(e.target.value))
-              }
+              onChange={(e) => setShadeIntensity(Number(e.target.value))}
               className="w-20 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
             />
           </div>
@@ -418,9 +402,7 @@ const GaugeChartConfiguration = ({
                   type="text"
                   placeholder="Enter name here"
                   value={legendValues[0]?.label || ""}
-                  onChange={(e) =>
-                    handleLegendLabelChange(0, e.target.value)
-                  }
+                  onChange={(e) => handleLegendLabelChange(0, e.target.value)}
                   className="w-[50%] px-2 py-1 text-xs border border-gray-300 rounded"
                 />
               </div>
@@ -438,18 +420,14 @@ const GaugeChartConfiguration = ({
                   <input
                     type="text"
                     value={legendValues[0]?.color || "#8D79F6"}
-                    onChange={(e) =>
-                      handleLegendColorChange(0, e.target.value)
-                    }
+                    onChange={(e) => handleLegendColorChange(0, e.target.value)}
                     className="text-xs px-2 py-1 border border-gray-200 rounded w-22"
                   />
 
                   <input
                     type="color"
                     value={legendValues[0]?.color || "#8D79F6"}
-                    onChange={(e) =>
-                      handleLegendColorChange(0, e.target.value)
-                    }
+                    onChange={(e) => handleLegendColorChange(0, e.target.value)}
                     className="w-14 h-6 rounded border border-gray-200 cursor-pointer"
                   />
                 </div>
@@ -473,9 +451,7 @@ const GaugeChartConfiguration = ({
               <p className="text-xs font-medium text-gray-900">
                 {assignedBy.name}
               </p>
-              <p className="text-xs text-gray-500">
-                {assignedBy.role}
-              </p>
+              <p className="text-xs text-gray-500">{assignedBy.role}</p>
             </div>
           </div>
         </div>

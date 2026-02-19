@@ -56,7 +56,7 @@ const simpleHash = (str: string): number => {
 const deterministicRandom = (
   seed: number,
   min: number,
-  max: number
+  max: number,
 ): number => {
   const x = Math.sin(seed) * 10000;
   const random = x - Math.floor(x);
@@ -68,7 +68,7 @@ const generateBubbleData = (
   yrange: { min: number; max: number },
   minBubbleSize: number,
   maxBubbleSize: number,
-  legendIndex: number
+  legendIndex: number,
 ) => {
   const series = [];
   for (let i = 0; i < xAxisValues.length; i++) {
@@ -76,11 +76,7 @@ const generateBubbleData = (
     const x = !isNaN(Number(xValue)) ? Number(xValue) : i + 1;
     const seed = simpleHash(`${xValue}-${i}-${legendIndex}`);
     const y = deterministicRandom(seed + 1, yrange.min, yrange.max);
-    const z = deterministicRandom(
-      seed + 2,
-      minBubbleSize,
-      maxBubbleSize
-    );
+    const z = deterministicRandom(seed + 2, minBubbleSize, maxBubbleSize);
     series.push([x, y, z]);
   }
   return series;
@@ -134,13 +130,11 @@ export default function BubbleChart({
           yrange,
           minBubbleSize,
           maxBubbleSize,
-          legendIndex
+          legendIndex,
         ),
       }));
 
-    const colors = legendValues
-      .filter((l) => l.label)
-      .map((l) => l.color);
+    const colors = legendValues.filter((l) => l.label).map((l) => l.color);
 
     return {
       series,
@@ -193,16 +187,14 @@ export default function BubbleChart({
   /*   ACTIONS   */
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(
-      JSON.stringify(chartData.series, null, 2)
-    );
+    navigator.clipboard.writeText(JSON.stringify(chartData.series, null, 2));
   };
 
   const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -229,7 +221,7 @@ export default function BubbleChart({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -281,20 +273,28 @@ export default function BubbleChart({
             {legendValues.slice(0, 3).map((l, index) =>
               l.label ? (
                 <div key={index} className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: l.color }} />
-                  <span className="text-xs text-gray-500 font-medium">{l.label}</span>
+                  <div
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-xs text-gray-500 font-medium">
+                    {l.label}
+                  </span>
                 </div>
-              ) : null
+              ) : null,
             )}
             {legendValues.length > 3 && (
-              <span className="text-xs text-gray-400">+{legendValues.length - 3} more</span>
+              <span className="text-xs text-gray-400">
+                +{legendValues.length - 3} more
+              </span>
             )}
           </div>
         }
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }

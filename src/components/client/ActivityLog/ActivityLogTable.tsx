@@ -1,9 +1,5 @@
 import { ReactNode } from "react";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -94,10 +90,7 @@ const ActivityLogTable = ({
                       <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">
                           <AvatarImage
-                            src={
-                              entry?.user?.avatar ||
-                              "/placeholder.svg"
-                            }
+                            src={entry?.user?.avatar || "/placeholder.svg"}
                             alt={entry?.user?.name || "Unknown user"}
                           />
                           <AvatarFallback>
@@ -110,17 +103,14 @@ const ActivityLogTable = ({
                       <div className="flex items-center gap-1">
                         <span className="text-lg">
                           {entry.description
-                            ? getActionIconFromDescription(
-                                entry.description
-                              )
+                            ? getActionIconFromDescription(entry.description)
                             : null}
                         </span>
                         <span>{entry.description}</span>
                       </div>
                     ) : (
                       (() => {
-                        const value =
-                          entry[key as keyof typeof entry];
+                        const value = entry[key as keyof typeof entry];
                         return typeof value === "string" ||
                           typeof value === "number"
                           ? value

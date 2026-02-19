@@ -41,7 +41,7 @@ type Props = {
 
 const generateCandlestickData = (
   count: number,
-  yrange: { min: number; max: number }
+  yrange: { min: number; max: number },
 ) => {
   const seriesData = [];
   const baseTime = new Date("2024-01-01").getTime();
@@ -49,11 +49,11 @@ const generateCandlestickData = (
 
   for (let i = 0; i < count; i++) {
     const timestamp = baseTime + i * interval;
-    
+
     // Generate OHLC values (Open, High, Low, Close)
     const open = Math.random() * (yrange.max - yrange.min) + yrange.min;
     const variance = (yrange.max - yrange.min) * 0.05; // 5% variance
-    
+
     const high = open + Math.random() * variance;
     const low = open - Math.random() * variance;
     const close = low + Math.random() * (high - low);
@@ -109,12 +109,14 @@ export default function CandleChart({
     const seriesData = generateCandlestickData(xAxisValues.length, yrange);
 
     // Use first legend color for candlestick colors if available
-    const upColor = legendValues.length > 0 && legendValues[0].color
-      ? legendValues[0].color
-      : "#00B746";
-    const downColor = legendValues.length > 1 && legendValues[1].color
-      ? legendValues[1].color
-      : "#EF403C";
+    const upColor =
+      legendValues.length > 0 && legendValues[0].color
+        ? legendValues[0].color
+        : "#00B746";
+    const downColor =
+      legendValues.length > 1 && legendValues[1].color
+        ? legendValues[1].color
+        : "#EF403C";
 
     return {
       series: [
@@ -171,8 +173,8 @@ export default function CandleChart({
 
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -196,7 +198,7 @@ export default function CandleChart({
       chartData.series[0].data.forEach((point: any) => {
         const timestamp = new Date(point.x).toISOString();
         rows.push(
-          `${timestamp},${point.y[0]},${point.y[1]},${point.y[2]},${point.y[3]}`
+          `${timestamp},${point.y[0]},${point.y[1]},${point.y[2]},${point.y[3]}`,
         );
       });
     }
@@ -219,7 +221,7 @@ export default function CandleChart({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -274,7 +276,9 @@ export default function CandleChart({
                     className="w-2.5 h-2.5 rounded-full"
                     style={{ backgroundColor: legendValues[0].color }}
                   />
-                  <span className="text-xs text-gray-500 font-medium">Up: {legendValues[0].label}</span>
+                  <span className="text-xs text-gray-500 font-medium">
+                    Up: {legendValues[0].label}
+                  </span>
                 </div>
               )}
               {legendValues[1]?.label && (
@@ -283,7 +287,9 @@ export default function CandleChart({
                     className="w-2.5 h-2.5 rounded-full"
                     style={{ backgroundColor: legendValues[1].color }}
                   />
-                  <span className="text-xs text-gray-500 font-medium">Down: {legendValues[1].label}</span>
+                  <span className="text-xs text-gray-500 font-medium">
+                    Down: {legendValues[1].label}
+                  </span>
                 </div>
               )}
             </div>
@@ -292,7 +298,8 @@ export default function CandleChart({
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium text-center">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }

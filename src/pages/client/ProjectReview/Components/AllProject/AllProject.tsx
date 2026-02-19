@@ -227,6 +227,7 @@ const AllProject: React.FC = () => {
               <div className="relative">
                 <Button
                   variant="outline"
+                  size="lg"
                   className="h-10 border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                   onClick={() => setShowCalendar(!showCalendar)}
                 >
@@ -328,6 +329,7 @@ const AllProject: React.FC = () => {
               {/* Export */}
               <Button
                 variant="outline"
+                size="lg"
                 className="h-10 border-gray-200"
                 onClick={handleExport}
               >

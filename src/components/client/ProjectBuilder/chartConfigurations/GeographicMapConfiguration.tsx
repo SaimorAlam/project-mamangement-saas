@@ -54,21 +54,21 @@ const GeographicMapConfiguration = ({
   };
 
   const handleUpdatePoint = (id: string, updates: Partial<MapPoint>) => {
-    setPoints(points.map(p => p.id === id ? { ...p, ...updates } : p));
+    setPoints(points.map((p) => (p.id === id ? { ...p, ...updates } : p)));
   };
 
   const handleRemovePoint = (id: string) => {
-    setPoints(points.filter(p => p.id !== id));
+    setPoints(points.filter((p) => p.id !== id));
   };
 
   const handleSave = async () => {
     const toastId = toast.loading("Saving map configuration...");
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const payload: Record<string, any> = {
       numberOfDataset: points.length,
-      firstFiledDataset: startingZoom,
-      lastFiledDAtaset: 0,
+      firstFieldDataset: startingZoom,
+      lastFieldDataset: 0,
       widgets: points.map((p) => ({
         legendName: p.name,
         color: p.color,
@@ -98,7 +98,7 @@ const GeographicMapConfiguration = ({
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <MapPin size={18} className="text-blue-600"/> Map Settings
+          <MapPin size={18} className="text-blue-600" /> Map Settings
         </h2>
         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           <X size={18} />
@@ -107,7 +107,6 @@ const GeographicMapConfiguration = ({
 
       {/* Content */}
       <div className="px-4 py-4 space-y-6 overflow-y-auto flex-1">
-        
         {/* Widget Title */}
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1.5 uppercase tracking-wide">
@@ -123,108 +122,143 @@ const GeographicMapConfiguration = ({
 
         {/* Global Settings */}
         <div className="grid grid-cols-2 gap-4">
-            <div>
-                <label className="block text-[10px] text-gray-500 mb-1 uppercase">Zoom Level</label>
-                <input
-                    type="number"
-                    min={1}
-                    max={18}
-                    value={startingZoom}
-                    onChange={(e) => setStartingZoom(Number(e.target.value))}
-                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
-                />
-            </div>
-            <div>
-                <label className="block text-[10px] text-gray-500 mb-1 uppercase">Overlay</label>
-                <select 
-                    value={overlayType}
-                    onChange={(e) => setOverlayType(e.target.value as "bubble" | "choropleth")}
-                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
-                >
-                    <option value="bubble">Bubble</option>
-                    <option value="choropleth">Choropleth</option>
-                </select>
-            </div>
+          <div>
+            <label className="block text-[10px] text-gray-500 mb-1 uppercase">
+              Zoom Level
+            </label>
+            <input
+              type="number"
+              min={1}
+              max={18}
+              value={startingZoom}
+              onChange={(e) => setStartingZoom(Number(e.target.value))}
+              className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] text-gray-500 mb-1 uppercase">
+              Overlay
+            </label>
+            <select
+              value={overlayType}
+              onChange={(e) =>
+                setOverlayType(e.target.value as "bubble" | "choropleth")
+              }
+              className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
+            >
+              <option value="bubble">Bubble</option>
+              <option value="choropleth">Choropleth</option>
+            </select>
+          </div>
         </div>
 
         {/* Locations List */}
         <div>
-            <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Locations</h3>
-                <button 
-                    onClick={handleAddPoint}
-                    className="flex items-center gap-1 text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100 transition-colors"
-                >
-                    <Plus size={12}/> Add Location
-                </button>
-            </div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+              Locations
+            </h3>
+            <button
+              onClick={handleAddPoint}
+              className="flex items-center gap-1 text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100 transition-colors"
+            >
+              <Plus size={12} /> Add Location
+            </button>
+          </div>
 
-            <div className="space-y-3">
-                {points.map((point) => (
-                    <div key={point.id} className="p-3 border border-gray-200 rounded-lg bg-gray-50/50 space-y-2">
-                        <div className="flex items-center justify-between">
-                            <input
-                                type="text"
-                                value={point.name}
-                                onChange={(e) => handleUpdatePoint(point.id, { name: e.target.value })}
-                                className="flex-1 text-xs font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none"
-                            />
-                            <div className="flex items-center gap-2">
-                                <button 
-                                    onClick={() => setPickingId(pickingId === point.id ? null : point.id)}
-                                    className={`flex items-center gap-1.5 px-2 py-1 rounded border text-[10px] transition-all ${pickingId === point.id ? 'bg-orange-500 border-orange-600 text-white shadow-inner animate-pulse' : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100'}`}
-                                    title="Capture coordinates by clicking the map"
-                                >
-                                    <MapPin size={12}/> {pickingId === point.id ? 'Picking...' : 'Pick Spot'}
-                                </button>
-                                <button onClick={() => handleRemovePoint(point.id)} className="text-red-400 hover:text-red-600 p-1 hover:bg-red-50 rounded">
-                                    <Trash2 size={14}/>
-                                </button>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <label className="text-[10px] text-gray-400">Lat</label>
-                                <input
-                                    type="number"
-                                    value={point.lat}
-                                    onChange={(e) => handleUpdatePoint(point.id, { lat: Number(e.target.value) })}
-                                    className="w-full px-1.5 py-0.5 text-[10px] border border-gray-200 rounded"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-gray-400">Lng</label>
-                                <input
-                                    type="number"
-                                    value={point.lng}
-                                    onChange={(e) => handleUpdatePoint(point.id, { lng: Number(e.target.value) })}
-                                    className="w-full px-1.5 py-0.5 text-[10px] border border-gray-200 rounded"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-between gap-4">
-                            <div className="flex-1">
-                                <label className="text-[10px] text-gray-400">Value</label>
-                                <input
-                                    type="number"
-                                    value={point.value}
-                                    onChange={(e) => handleUpdatePoint(point.id, { value: Number(e.target.value) })}
-                                    className="w-full px-1.5 py-0.5 text-[10px] border border-gray-200 rounded"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-gray-400 block">Color</label>
-                                <input
-                                    type="color"
-                                    value={point.color}
-                                    onChange={(e) => handleUpdatePoint(point.id, { color: e.target.value })}
-                                    className="w-6 h-6 border-none cursor-pointer p-0"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+          <div className="space-y-3">
+            {points.map((point) => (
+              <div
+                key={point.id}
+                className="p-3 border border-gray-200 rounded-lg bg-gray-50/50 space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <input
+                    type="text"
+                    value={point.name}
+                    onChange={(e) =>
+                      handleUpdatePoint(point.id, { name: e.target.value })
+                    }
+                    className="flex-1 text-xs font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none"
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() =>
+                        setPickingId(pickingId === point.id ? null : point.id)
+                      }
+                      className={`flex items-center gap-1.5 px-2 py-1 rounded border text-[10px] transition-all ${pickingId === point.id ? "bg-orange-500 border-orange-600 text-white shadow-inner animate-pulse" : "bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100"}`}
+                      title="Capture coordinates by clicking the map"
+                    >
+                      <MapPin size={12} />{" "}
+                      {pickingId === point.id ? "Picking..." : "Pick Spot"}
+                    </button>
+                    <button
+                      onClick={() => handleRemovePoint(point.id)}
+                      className="text-red-400 hover:text-red-600 p-1 hover:bg-red-50 rounded"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] text-gray-400">Lat</label>
+                    <input
+                      type="number"
+                      value={point.lat}
+                      onChange={(e) =>
+                        handleUpdatePoint(point.id, {
+                          lat: Number(e.target.value),
+                        })
+                      }
+                      className="w-full px-1.5 py-0.5 text-[10px] border border-gray-200 rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-400">Lng</label>
+                    <input
+                      type="number"
+                      value={point.lng}
+                      onChange={(e) =>
+                        handleUpdatePoint(point.id, {
+                          lng: Number(e.target.value),
+                        })
+                      }
+                      className="w-full px-1.5 py-0.5 text-[10px] border border-gray-200 rounded"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <label className="text-[10px] text-gray-400">Value</label>
+                    <input
+                      type="number"
+                      value={point.value}
+                      onChange={(e) =>
+                        handleUpdatePoint(point.id, {
+                          value: Number(e.target.value),
+                        })
+                      }
+                      className="w-full px-1.5 py-0.5 text-[10px] border border-gray-200 rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-400 block">
+                      Color
+                    </label>
+                    <input
+                      type="color"
+                      value={point.color}
+                      onChange={(e) =>
+                        handleUpdatePoint(point.id, { color: e.target.value })
+                      }
+                      className="w-6 h-6 border-none cursor-pointer p-0"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

@@ -711,9 +711,7 @@ const flattenEntry = (entry: ActivityLogEntry) => {
       avatar: entry.user.avatar,
     },
     description: `${entry.description.action}${
-      entry.description.details
-        ? `: ${entry.description.details}`
-        : ""
+      entry.description.details ? `: ${entry.description.details}` : ""
     }`,
   };
 };
@@ -730,11 +728,8 @@ export default function ClientActivityLog() {
     Object.values(entry).some(
       (value) =>
         value &&
-        value
-          .toString()
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-    )
+        value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
+    ),
   );
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -750,9 +745,7 @@ export default function ClientActivityLog() {
     const csvContent = [
       headers.join(","),
       ...filteredData.map((entry) =>
-        headers
-          .map((key) => `"${entry[key as keyof typeof entry]}"`)
-          .join(",")
+        headers.map((key) => `"${entry[key as keyof typeof entry]}"`).join(","),
       ),
     ].join("\n");
 
@@ -775,11 +768,13 @@ export default function ClientActivityLog() {
           <SearchBar
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            className="max-w-[250px]"
           />
           <DateRange />
           <Button
             variant="outline"
             onClick={handleExport}
+            size="lg"
             className="gap-2 bg-transparent border border-[#E2E8F0]"
           >
             <Download className="h-4 w-4" />

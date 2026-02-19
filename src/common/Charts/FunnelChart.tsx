@@ -54,59 +54,67 @@ export default function FunnelChart({
   /*   DATA   */
   const chartData = useMemo(() => {
     if (!xAxisValues.length) return [];
-    
+
     // Generate descending values for funnel effect
     const step = (endingRange - startingRange) / (xAxisValues.length - 1 || 1);
-    return xAxisValues.map((_, index) => 
-      Math.round(endingRange - (step * index))
+    return xAxisValues.map((_, index) =>
+      Math.round(endingRange - step * index),
     );
   }, [xAxisValues, startingRange, endingRange]);
 
-  const chartOptions: any = useMemo(() => ({
-    chart: {
-      type: 'bar',
-      height: 350,
-      toolbar: {
+  const chartOptions: any = useMemo(
+    () => ({
+      chart: {
+        type: "bar",
+        height: 350,
+        toolbar: {
+          show: false,
+        },
+        dropShadow: {
+          enabled: true,
+          top: 2,
+          left: 2,
+          blur: 4,
+          opacity: 0.2,
+        },
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 0,
+          horizontal: true,
+          barHeight: "80%",
+          isFunnel: true,
+        },
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val: any, opt: any) {
+          return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val;
+        },
+        dropShadow: {
+          enabled: true,
+        },
+      },
+      colors: ["#00E396"],
+      xaxis: {
+        categories: xAxisValues.filter(Boolean),
+      },
+      legend: {
         show: false,
       },
-      dropShadow: {
-        enabled: true,
-        top: 2,
-        left: 2,
-        blur: 4,
-        opacity: 0.2,
-      },
-    },
-    plotOptions: {
-      bar: {
-        borderRadius: 0,
-        horizontal: true,
-        barHeight: '80%',
-        isFunnel: true,
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val: any, opt: any) {
-        return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
-      },
-      dropShadow: {
-        enabled: true,
-      },
-    },
-    colors: ['#00E396'],
-    xaxis: {
-      categories: xAxisValues.filter(Boolean),
-    },
-    legend: {
-      show: false,
-    },
-  }), [xAxisValues]);
+    }),
+    [xAxisValues],
+  );
 
-  const series = useMemo(() => [{
-    name: "Funnel Series",
-    data: chartData,
-  }], [chartData]);
+  const series = useMemo(
+    () => [
+      {
+        name: "Funnel Series",
+        data: chartData,
+      },
+    ],
+    [chartData],
+  );
 
   const totalValue = useMemo(() => {
     return chartData.reduce((sum, val) => sum + val, 0);
@@ -125,8 +133,8 @@ export default function FunnelChart({
   const handleDownload = () => {
     const payload = {
       numberOfDataset: xAxisValues.length,
-      firstFiledDataset: 0,
-      lastFiledDAtaset: 100,
+      firstFieldDataset: 0,
+      lastFieldDataset: 100,
       showWidgets: xAxisValues.map((l) => ({
         legend_name: l,
       })),
@@ -146,7 +154,7 @@ export default function FunnelChart({
       payload,
       getChartTitleId,
       widgetTitle,
-      xAxisValues
+      xAxisValues,
     );
 
     setIsDownloading(false);
@@ -228,28 +236,28 @@ export default function FunnelChart({
       />
 
       {/* Children Grid Modal */}
-        <TierChartModal
-          isOpen={showChildrenModal}
-          onClose={() => setShowChildrenModal(false)}
-          tierLevel={tierLevel + 1}
-          title={widgetTitle}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers.map((tier) => (
-              <FunnelChart
-                key={tier.id}
-                widgetTitle={tier.name}
-                xAxisValues={tier.xAxisValues}
-                startingRange={startingRange}
-                endingRange={endingRange}
-                tierLevel={tierLevel + 1}
-                chartId={tier.id}
-                isPreview={isPreview}
-                onDelete={onDelete}
-              />
-            ))}
-          </div>
-        </TierChartModal>
+      <TierChartModal
+        isOpen={showChildrenModal}
+        onClose={() => setShowChildrenModal(false)}
+        tierLevel={tierLevel + 1}
+        title={widgetTitle}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {childTiers.map((tier) => (
+            <FunnelChart
+              key={tier.id}
+              widgetTitle={tier.name}
+              xAxisValues={tier.xAxisValues}
+              startingRange={startingRange}
+              endingRange={endingRange}
+              tierLevel={tierLevel + 1}
+              chartId={tier.id}
+              isPreview={isPreview}
+              onDelete={onDelete}
+            />
+          ))}
+        </div>
+      </TierChartModal>
     </>
   );
 }

@@ -75,16 +75,23 @@ export default function ScatterChart({
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
   /*   DATA GENERATION   */
-  const generateScatterData = (seed: number, count: number = 6): ScatterData[] => {
+  const generateScatterData = (
+    seed: number,
+    count: number = 6,
+  ): ScatterData[] => {
     const data: ScatterData[] = [];
     const range = endingRange - startingRange;
-    
+
     for (let i = 0; i < count; i++) {
       const randomFactor = (seed * 7 + i * 13) % 100;
       data.push({
         x: startingRange + Math.floor((range * (randomFactor + i * 10)) / 100),
-        y: startingRange + Math.floor((range * ((randomFactor * 2 + i * 15) % 100)) / 100),
-        z: startingRange + Math.floor((range * ((randomFactor * 3 + i * 20) % 100)) / 100),
+        y:
+          startingRange +
+          Math.floor((range * ((randomFactor * 2 + i * 15) % 100)) / 100),
+        z:
+          startingRange +
+          Math.floor((range * ((randomFactor * 3 + i * 20) % 100)) / 100),
       });
     }
     return data;
@@ -92,7 +99,7 @@ export default function ScatterChart({
 
   const scatterDataSets = useMemo(() => {
     if (!legendValues.length) return [];
-    
+
     return legendValues
       .filter((l) => l.label)
       .map((legend, index) => ({
@@ -104,13 +111,16 @@ export default function ScatterChart({
 
   /*   TOTAL POINTS   */
   const totalPoints = useMemo(() => {
-    return scatterDataSets.reduce((sum, dataset) => sum + dataset.data.length, 0);
+    return scatterDataSets.reduce(
+      (sum, dataset) => sum + dataset.data.length,
+      0,
+    );
   }, [scatterDataSets]);
 
   /*   ACTIONS   */
 
   const handleCopy = () => {
-    const copyData = scatterDataSets.map(dataset => ({
+    const copyData = scatterDataSets.map((dataset) => ({
       name: dataset.name,
       data: dataset.data,
     }));
@@ -120,8 +130,8 @@ export default function ScatterChart({
   const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDataset: endingRange,
       showWidgets: legendValues.map((l) => ({
         legend_name: l.label,
         color: l.color,
@@ -142,7 +152,7 @@ export default function ScatterChart({
       payload,
       getChartTitleId,
       widgetTitle,
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
@@ -204,12 +214,15 @@ export default function ScatterChart({
         isDownloading={isDownloading}
         isPreview={isPreview}
         customHeaderContent={
-          <div className="text-sm text-gray-500">Total Points: {totalPoints}</div>
+          <div className="text-sm text-gray-500">
+            Total Points: {totalPoints}
+          </div>
         }
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
@@ -261,7 +274,7 @@ export default function ScatterChart({
           </ResponsiveContainer>
         ) : (
           <div className="h-[400px] flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
-             No data available. Please configure legend values.
+            No data available. Please configure legend values.
           </div>
         )}
       </ChartCardWrapper>

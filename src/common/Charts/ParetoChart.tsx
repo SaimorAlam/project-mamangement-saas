@@ -141,7 +141,7 @@ export default function ParetoChart({
         },
       ],
     }),
-    [dataPoints]
+    [dataPoints],
   );
 
   /*   EFFECT TO CREATE PARETO   */
@@ -160,8 +160,8 @@ export default function ParetoChart({
   const handleDownload = () => {
     const payload = {
       numberOfDataset: 1,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDataset: endingRange,
       showWidgets: [{ legend_name: "Pareto", color: "#4F81BC" }],
       title: widgetTitle,
       status: "ACTIVE",
@@ -180,7 +180,7 @@ export default function ParetoChart({
       getChartTitleId,
       widgetTitle,
       xAxisValues,
-      [{ label: "Pareto", field: "pareto", color: "#4F81BC" }]
+      [{ label: "Pareto", field: "pareto", color: "#4F81BC" }],
     );
 
     setIsDownloading(false);

@@ -472,38 +472,34 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
                   onWidgetSelect(widget.id);
                 }}
                 className={`flex items-start p-3 rounded-lg cursor-pointer transition-all border
-                  ${
-                    selectedWidgets.includes(widget.id)
-                      ? "bg-gray-200 border-transparent"
-                      : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
+                  ${selectedWidgets.includes(widget.id)
+                    ? "bg-gray-200 border-transparent"
+                    : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
                   }`}
               >
                 <div
-                  className={`mt-0.5 ${
-                    selectedWidgets.includes(widget.id)
-                      ? "text-website-color-darkGray"
-                      : "text-gray-600"
-                  }`}
+                  className={`mt-0.5 ${selectedWidgets.includes(widget.id)
+                    ? "text-website-color-darkGray"
+                    : "text-gray-600"
+                    }`}
                 >
                   {widget.icon}
                 </div>
                 <div className="ml-3 flex-1">
                   <h3
-                    className={`text-sm font-medium ${
-                      selectedWidgets.includes(widget.id) ||
+                    className={`text-sm font-medium ${selectedWidgets.includes(widget.id) ||
                       (widget.id === "kpi" && selectedWidgets.length === 0)
-                        ? "text-website-color-darkGray"
-                        : "text-gray-900"
-                    }`}
+                      ? "text-website-color-darkGray"
+                      : "text-gray-900"
+                      }`}
                   >
                     {widget.name}
                   </h3>
                   <p
-                    className={`text-xs mt-0.5 ${
-                      selectedWidgets.includes(widget.id)
-                        ? "text-website-color-darkGray"
-                        : "text-gray-500"
-                    }`}
+                    className={`text-xs mt-0.5 ${selectedWidgets.includes(widget.id)
+                      ? "text-website-color-darkGray"
+                      : "text-gray-500"
+                      }`}
                   >
                     {widget.description}
                   </p>

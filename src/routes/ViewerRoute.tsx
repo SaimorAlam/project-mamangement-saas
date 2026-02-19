@@ -19,9 +19,10 @@ import ViewerPanelCarlyleHall from "@/pages/viewerPanel/ViewerPanelCarlyleHall";
 import ViewerPanelEmployees from "@/pages/viewerPanel/ViewerPanelEmployees";
 import ViewerPanelAlfalaBuilders from "@/pages/viewerPanel/ViewerPanelAlfalaBuilders";
 import ViewerPanelAllProgram from "@/pages/viewerPanel/ViewerPanelAllProgram";
-import FavoriteProjects from "@/pages/viewerPanel/Favorite/FavoriteProjects";
+// import FavoriteProjects from "@/pages/viewerPanel/Favorite/FavoriteProjects";
 import AllProject from "@/pages/viewerPanel/ViewerPanelOverview/Components/AllProject";
 import ProfilePage from "@/pages/commonPage/ProfilePage";
+import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
 
 export default function getViewerPanelRoutes() {
   return [
@@ -32,11 +33,11 @@ export default function getViewerPanelRoutes() {
         { index: true, element: <AllProject /> },
         {
           path: "overview/project-details/:projectId",
-          element: <FavoriteProjects />,
+          element: <ProjectDetails />,
         },
       ],
     },
-    { path: "project-details/:projectId", element: <FavoriteProjects /> },
+    { path: "project-details/:projectId", element: <ProjectDetails /> },
     { path: "projects", element: <ViewerPanelProjects /> },
     { path: "carlyle-hall", element: <ViewerPanelCarlyleHall /> },
     { path: "employees", element: <ViewerPanelEmployees /> },

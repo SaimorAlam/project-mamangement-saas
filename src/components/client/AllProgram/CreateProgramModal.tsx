@@ -68,7 +68,8 @@ export default function CreateProgramModal({
       role: user?.user?.role,
     }),
   );
-  console.log(selectedManager);
+
+  console.log(data);
   const {
     register,
     handleSubmit,
@@ -295,11 +296,14 @@ export default function CreateProgramModal({
                       <Skeleton className="h-10 w-full" />
                     ) : (
                       <>
-                        {managers?.map((manager: Manager) => (
-                          <SelectItem key={manager.id} value={manager.id}>
-                            {manager.name}
-                          </SelectItem>
-                        ))}
+                        {managers?.map((manager: Manager) => {
+                          console.log(manager, "Manager");
+                          return (
+                            <SelectItem key={manager.id} value={manager.id}>
+                              {manager.name}
+                            </SelectItem>
+                          );
+                        })}
                       </>
                     )}
                   </SelectContent>

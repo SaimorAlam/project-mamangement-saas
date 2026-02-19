@@ -81,7 +81,7 @@ const WidgetForChartModuleOne = ({
   };
 
   // handler for Legend inputs
-  const minLegend = 3;
+  const minLegend = 1;
   const maxLegend = 5;
   const handleSetNumOfLegendDataSet = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -152,8 +152,10 @@ const WidgetForChartModuleOne = ({
       }
     }
 
-    if (legendValues.length < 3) {
-      toast.error(`Please add at least ${minLegend} legend values`);
+    if (legendValues.length < minLegend) {
+      toast.error(
+        `Please add at least ${minLegend} legend value${minLegend > 1 ? "s" : ""}`,
+      );
       return;
     }
     if (xAxisValues.length < 1) {
@@ -169,8 +171,8 @@ const WidgetForChartModuleOne = ({
     const toastId = toast.loading("Creating chart...");
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: startingRange,
-      lastFiledDAtaset: endingRange,
+      firstFieldDataset: startingRange,
+      lastFieldDataset: endingRange,
       widgets: legendValues.map((l) => ({
         legendName: l.label,
         color: l.color,
@@ -197,6 +199,7 @@ const WidgetForChartModuleOne = ({
       if (res?.success) {
         toast.success("Chart created successfully", { id: toastId });
         onDelete?.();
+        onClose?.();
       }
     } catch {
       toast.error("Chart creation failed", { id: toastId });

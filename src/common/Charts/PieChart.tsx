@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useMemo, useState, useEffect } from "react";
 import {
   PieChart as RechartsPieChart,
   Pie,
@@ -8,10 +9,20 @@ import {
   PieLabelRenderProps,
 } from "recharts";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
+import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import ChartCardWrapper from "./components/ChartCardWrapper";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { useLazyFindChildrenValueQuery } from "@/store/Api/ChartApi/ChartApi";
+import {
+  setChildPayload,
+  setGroupTitle,
+} from "@/store/Slices/ChartSlice/ChartSlice";
+import { parsePieChartData } from "@/utils/parsePieChartData";
+import { chartTypes } from "@/utils/ChartCategory";
+
+/*       TYPES       */
 
 /*       TYPES       */
 
@@ -34,6 +45,12 @@ export type TierChart = {
   children: TierChart[];
 };
 
+export type BreadcrumbItem = {
+  id: string;
+  name: string;
+  level: number;
+};
+
 type Props = {
   widgetTitle?: string;
   legendValues?: LegendValue[];
@@ -43,13 +60,16 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
   isPreview?: boolean;
+  allUploadedData?: ChartData[];
+  projectId?: string;
+  breadcrumbPath?: BreadcrumbItem[];
+  onNavigate?: (level: number) => void;
 };
 
 /*       HELPER FUNCTIONS       */
 
 const getRandomValue = (min = 0, max = 100) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
-
 
 /*       COMPONENT       */
 
@@ -62,18 +82,65 @@ export default function PieChartWidget({
   tierLevel = 0,
   chartId = "root",
   isPreview = false,
+  allUploadedData,
+  projectId,
+  breadcrumbPath = [],
+  onNavigate,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const dispatch = useAppDispatch();
+  const groupTitle = useAppSelector((state) => state.chartSlice.groupTitle);
+
+  const [findChildrenValue, { data, isLoading }] =
+    useLazyFindChildrenValueQuery();
+
+  const childTiers = data?.data;
+
+  useEffect(() => {
+    if (chartId && chartId !== "root") {
+      findChildrenValue(chartId);
+    }
+  }, [chartId, findChildrenValue]);
 
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
-  const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
   const [getChartTitleId] = useGetChartTitleIdMutation();
 
+  const currentBreadcrumbs = useMemo(() => {
+    const base =
+      breadcrumbPath.length === 0
+        ? [{ id: "dashboard", name: "Dashboard", level: -1 }]
+        : breadcrumbPath;
+    return [
+      ...base,
+      { id: chartId || "root", name: widgetTitle, level: tierLevel },
+    ];
+  }, [breadcrumbPath, chartId, widgetTitle, tierLevel]);
+
+  const handleChildNavigate = (targetLevel: number) => {
+    if (targetLevel < tierLevel) {
+      setShowChildrenModal(false);
+      if (onNavigate) onNavigate(targetLevel);
+    }
+  };
+
+  const handleBreadcrumbClick = (index: number) => {
+    const target = currentBreadcrumbs[index];
+    if (index < currentBreadcrumbs.length - 1) {
+      if (onNavigate) {
+        onNavigate(target.level);
+      }
+      setShowChildrenModal(false);
+    }
+  };
+
   /*   DATA   */
   const chartData: ChartData[] = useMemo(() => {
+    if (allUploadedData && allUploadedData.length > 0) {
+      return allUploadedData;
+    }
     return legendValues
       .filter((l) => l.label)
       .map((l) => ({
@@ -81,7 +148,7 @@ export default function PieChartWidget({
         value: getRandomValue(10, 100),
         color: l.color,
       }));
-  }, [legendValues]);
+  }, [legendValues, allUploadedData]);
 
   const isAllLegendFieldEmpty = legendValues.filter((l) => l.field !== "");
 
@@ -94,53 +161,72 @@ export default function PieChartWidget({
   const handleDownload = () => {
     const payload = {
       numberOfDataset: numOfLegendDataSet,
-      firstFiledDataset: 0,
-      lastFiledDAtaset: 100,
-      showWidgets: legendValues.map((l) => ({
-        legend_name: l.label,
+      firstFieldDataset: 0,
+      lastFieldDataset: 100,
+      widgets: legendValues.map((l) => ({
+        legendName: l.label,
         color: l.color,
       })),
       title: widgetTitle,
       status: "ACTIVE",
       category: "PIE",
-      xAxis: JSON.stringify({
-        labels: [],
-        values: [],
-      }),
+      xAxis: JSON.stringify([
+        ["Legend", "Value"],
+        ...legendValues.map((l) => [l.label, 0]),
+      ]),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
+      projectId: projectId,
     };
     setIsDownloading(true);
 
-    DownloadAndSaveCSVforModuleOneWidget(
+    DownloadAndSaveCSVforModuleTwoWidget(
       payload,
       getChartTitleId,
       widgetTitle,
-      [],
-      legendValues
+      legendValues,
     );
 
     setIsDownloading(false);
   };
 
   const handleAddTierClick = () => {
+    if (tierLevel === 0) {
+      dispatch(setGroupTitle(widgetTitle));
+    }
+    const childPayload = {
+      numberOfDataset: numOfLegendDataSet,
+      firstFieldDataset: 0,
+      lastFieldDataset: 100,
+      widgets: legendValues.map((l) => ({
+        legendName: l.label,
+        color: l.color,
+      })),
+      title: "",
+      status: "ACTIVE",
+      category: "PIE",
+      xAxis: JSON.stringify([
+        ["Legend", "Value"],
+        ...legendValues.map((l) => [l.label, 0]),
+      ]),
+      yAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({}),
+      projectId: projectId,
+      parentId: chartId,
+      rootchart: false,
+      roottitle: widgetTitle,
+      grouptitle: tierLevel === 0 ? widgetTitle : groupTitle,
+    };
+    dispatch(setChildPayload(childPayload));
     setShowAddTierModal(true);
   };
 
-  const handleSaveTier = (tierName: string) => {
-    const newTier: TierChart = {
-      id: `${chartId}-tier-${Date.now()}`,
-      name: tierName,
-      legendValues: legendValues,
-      children: [],
-    };
-    setChildTiers([...childTiers, newTier]);
-    setShowAddTierModal(false);
-  };
-
   const handleChartClick = () => {
-    if (childTiers.length > 0) {
+    if (childTiers?.length > 0) {
       setShowChildrenModal(true);
+      if (tierLevel === 0) {
+        dispatch(setGroupTitle(widgetTitle));
+      }
     }
   };
 
@@ -151,13 +237,22 @@ export default function PieChartWidget({
   };
 
   /*   RENDER   */
+  if (isLoading) {
+    return (
+      <div className="w-full h-[400px] flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm animate-pulse">
+        <div className="text-gray-400 text-sm font-medium">
+          Loading child tiers...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="Distribution Analysis"
-        chartId={chartId}
+        chartId={chartId || "root"}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
@@ -173,19 +268,27 @@ export default function PieChartWidget({
           <div className="flex gap-4">
             {chartData.slice(0, 3).map((item) => (
               <div key={item.name} className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                <span className="text-xs text-gray-500 font-medium">{item.name}</span>
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="text-xs text-gray-500 font-medium">
+                  {item.name}
+                </span>
               </div>
             ))}
             {chartData.length > 3 && (
-              <span className="text-xs text-gray-400">+{chartData.length - 3} more</span>
+              <span className="text-xs text-gray-400">
+                +{chartData.length - 3} more
+              </span>
             )}
           </div>
         }
         footer={
-          childTiers.length > 0 ? (
+          childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} child tier{childTiers.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier
+              {childTiers?.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
@@ -221,8 +324,8 @@ export default function PieChartWidget({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        onSave={handleSaveTier}
-        parentChartName={widgetTitle}
+        chartId={chartId}
+        parentChartName={tierLevel === 0 ? widgetTitle : groupTitle}
       />
 
       {showChildrenModal && (
@@ -231,19 +334,40 @@ export default function PieChartWidget({
           onClose={() => setShowChildrenModal(false)}
           tierLevel={tierLevel + 1}
           title={widgetTitle}
+          breadcrumbs={currentBreadcrumbs}
+          onBreadcrumbClick={handleBreadcrumbClick}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers.map((tier) => (
-              <PieChartWidget
-                key={tier.id}
-                widgetTitle={tier.name}
-                legendValues={tier.legendValues}
-                numOfLegendDataSet={tier.legendValues.length}
-                tierLevel={tierLevel + 1}
-                chartId={tier.id}
-                isPreview={isPreview}
-              />
-            ))}
+            {childTiers?.map((tier: any) => {
+              const chartWidget = chartTypes[tier.category];
+              const tierLegends = (tier?.[chartWidget]?.widgets || []).map(
+                (w: any) => ({
+                  label: w.legendName || w.label,
+                  field: (w.legendName || w.label)
+                    ?.toLowerCase()
+                    .replace(/\s+/g, ""),
+                  color: w.color,
+                }),
+              );
+
+              const pieData = parsePieChartData(tier.xAxis, tierLegends);
+
+              return (
+                <PieChartWidget
+                  key={tier.id}
+                  widgetTitle={tier.title || tier.name || "Untitled Tier"}
+                  legendValues={tierLegends}
+                  numOfLegendDataSet={tierLegends.length}
+                  tierLevel={tierLevel + 1}
+                  chartId={tier.id}
+                  isPreview={isPreview}
+                  allUploadedData={pieData}
+                  projectId={tier.projectId}
+                  breadcrumbPath={currentBreadcrumbs}
+                  onNavigate={handleChildNavigate}
+                />
+              );
+            })}
           </div>
         </TierChartModal>
       )}
