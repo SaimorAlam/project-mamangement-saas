@@ -1,8 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { generateChartData } from "@/utils";
+import { generateChartData } from "@/utils/clientPannelHelpers/programBuilderHelpers";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import ChartCardWrapper from "./components/ChartCardWrapper";
@@ -78,18 +87,10 @@ export type ChartData = {
   [key: string]: number | string;
 };
 
-type LegendValue = {
+export type LegendValue = {
   label: string;
   field: string;
   color: string;
-};
-
-export type TierChart = {
-  id: string;
-  name: string;
-  xAxisValues: string[];
-  legendValues: LegendValue[];
-  children: TierChart[];
 };
 
 export type BreadcrumbItem = {
@@ -102,7 +103,6 @@ type Props = {
   widgetTitle?: string;
   xAxisValues?: string[];
   legendValues?: LegendValue[];
-  numOfLegendDataSet?: number;
   startingRange: number;
   endingRange: number;
   onToggleWidget?: () => void;
@@ -124,7 +124,6 @@ export default function HorizontalBarChart({
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
-  numOfLegendDataSet = 1,
   startingRange,
   endingRange,
   onToggleWidget,
@@ -163,17 +162,21 @@ export default function HorizontalBarChart({
   /*   EFFECTIVE DATA FOR RENDERING   */
 
   const effectiveLegendValues = useMemo(() => {
-    if (legendValues.length > 0 && legendValues.some((l) => l.label !== "")) {
-      return legendValues.map((l) => ({
+    const validLegends = legendValues.filter(
+      (l) => l.label && l.label.trim() !== "",
+    );
+
+    if (validLegends.length > 0) {
+      return validLegends.map((l) => ({
         ...l,
         field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
       }));
     }
-    return [{ label: "Sample", field: "field1", color: "#13A490" }];
+    return [{ label: "Sample A", field: "field1", color: "#13A490" }];
   }, [legendValues]);
 
   const effectiveXAxisValues = useMemo(() => {
-    const validValues = xAxisValues.filter((v) => v !== "");
+    const validValues = xAxisValues.filter((v) => v && v.trim() !== "");
     if (validValues.length > 0) {
       return validValues;
     }
@@ -181,11 +184,11 @@ export default function HorizontalBarChart({
   }, [xAxisValues]);
 
   const { safeStartingRange, safeEndingRange } = useMemo(() => {
-    let start = startingRange;
-    let end = endingRange;
+    let start = Number(startingRange);
+    let end = Number(endingRange);
     if (start === end) {
       start = 0;
-      end = 100;
+      end = 1000; // Standardize range for horizontal bars
     }
     return { safeStartingRange: start, safeEndingRange: end };
   }, [startingRange, endingRange]);
@@ -199,22 +202,30 @@ export default function HorizontalBarChart({
     const dataToUse =
       localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
 
-    if (dataToUse && dataToUse.length > 0) {
-      return { chartData: dataToUse, isSampleData: false };
+    // Priority 1: Real Uploaded Data (must have at least one non-zero value)
+    const hasRealData =
+      dataToUse &&
+      dataToUse.length > 0 &&
+      dataToUse.some((row) =>
+        effectiveLegendValues.some((l) => Number(row[l.field] || 0) > 0),
+      );
+
+    if (hasRealData) {
+      return { chartData: dataToUse as ChartData[], isSampleData: false };
     }
 
     const hasConfig =
       xAxisValues.length > 0 &&
       xAxisValues.some((v) => v !== "") &&
-      legendValues.length > 0 &&
-      legendValues.some((l) => l.label !== "");
+      effectiveLegendValues.length > 0;
 
+    // Priority 2: Sample Data based on Config
     if (hasConfig) {
       return {
         chartData: generateChartData(
-          xAxisValues.filter((v) => v !== ""),
+          xAxisValues.filter((v) => v && v.trim() !== ""),
           effectiveLegendValues,
-          numOfLegendDataSet,
+          effectiveLegendValues.length,
           safeStartingRange,
           safeEndingRange,
         ),
@@ -222,11 +233,12 @@ export default function HorizontalBarChart({
       };
     }
 
+    // Priority 3: Default Sample Data (Generic fallback)
     return {
       chartData: generateChartData(
         effectiveXAxisValues,
         effectiveLegendValues,
-        1,
+        effectiveLegendValues.length,
         0,
         100,
       ),
@@ -234,8 +246,6 @@ export default function HorizontalBarChart({
     };
   }, [
     xAxisValues,
-    legendValues,
-    numOfLegendDataSet,
     safeStartingRange,
     safeEndingRange,
     widgetTitle,
@@ -245,44 +255,11 @@ export default function HorizontalBarChart({
     effectiveLegendValues,
   ]);
 
-  const barRows = useMemo(() => {
-    if (!chartData.length || !effectiveLegendValues.length) return [];
-
-    return chartData.map((row) => {
-      let rowTotal = 0;
-      const segments = effectiveLegendValues.map((l) => {
-        const value = Number(row[l.field] || 0);
-        const start = rowTotal;
-        rowTotal += value;
-        return {
-          field: l.field,
-          label: l.label,
-          color: l.color,
-          value,
-          start,
-        };
-      });
-      return {
-        name: row.name,
-        total: rowTotal,
-        segments,
-      };
-    });
-  }, [chartData, effectiveLegendValues]);
-
-  const totalValue = useMemo(() => {
-    return barRows.reduce((sum, item) => sum + item.total, 0);
-  }, [barRows]);
-
-  const maxValue = useMemo(() => {
-    const maxInBars = Math.max(...barRows.map((b) => b.total), 0);
-    return Math.max(maxInBars, safeEndingRange, 1);
-  }, [barRows, safeEndingRange]);
-
   /*   ACTIONS   */
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
+    toast.success("JSON copied to clipboard");
   };
 
   const currentBreadcrumbs = useMemo(() => {
@@ -451,18 +428,18 @@ export default function HorizontalBarChart({
       }
     };
     reader.readAsBinaryString(file);
+    e.target.value = ""; // Reset file input
   };
 
   const handleAddTierClick = (title: string) => {
     if (tierLevel === 0) {
       dispatch(setGroupTitle(title));
     }
-    console.log(legendValues, "LegendValues");
     const childPayload = {
-      numberOfDataset: numOfLegendDataSet,
+      numberOfDataset: effectiveLegendValues.length,
       firstFieldDataset: safeStartingRange,
       lastFieldDataset: safeEndingRange,
-      widgets: legendValues.map((l) => ({
+      widgets: effectiveLegendValues.map((l) => ({
         legendName: l.label,
         color: l.color,
       })),
@@ -470,10 +447,10 @@ export default function HorizontalBarChart({
       status: "ACTIVE",
       category: "HORIZONTAL_BAR",
       xAxis: JSON.stringify([
-        ["Label", ...legendValues.map((l) => l.label)],
-        ...xAxisValues.map((label) => [
+        ["Label", ...effectiveLegendValues.map((l) => l.label)],
+        ...effectiveXAxisValues.map((label) => [
           label,
-          ...Array(numOfLegendDataSet).fill(0),
+          ...Array(effectiveLegendValues.length).fill(0),
         ]),
       ]),
       yAxis: JSON.stringify({}),
@@ -482,7 +459,7 @@ export default function HorizontalBarChart({
       parentId: chartId,
       rootchart: false,
       roottitle: widgetTitle,
-      grouptitle: groupTitle,
+      grouptitle: tierLevel === 0 ? title : groupTitle,
     };
     dispatch(setChildPayload(childPayload));
     setShowAddTierModal(true);
@@ -497,29 +474,50 @@ export default function HorizontalBarChart({
     }
   };
 
-  const generateScaleTicks = () => {
-    const tickCount = 6;
-    const step = Math.ceil(maxValue / (tickCount - 1));
-    return Array.from({ length: tickCount }, (_, i) => i * (step || 1));
+  /*   TOOLTIP   */
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="bg-white/95 backdrop-blur-sm p-3 border border-gray-100 rounded-xl shadow-xl">
+        <p className="font-bold text-gray-700 mb-2 border-b border-gray-50 pb-1">
+          {label}
+        </p>
+        <div className="space-y-1.5">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center gap-3">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-xs font-medium text-gray-600 min-w-[60px]">
+                {entry.name}:
+              </span>
+              <span className="text-xs font-bold text-gray-900 ml-auto">
+                {entry.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
-  const scaleTicks = generateScaleTicks();
-
-  /*   RENDER   */
-
   if (isLoading) {
-    return <div>Loading tiers...</div>;
+    return (
+      <div className="w-full h-[400px] flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm animate-pulse">
+        <div className="text-gray-400 text-sm font-medium">
+          Loading child tiers...
+        </div>
+      </div>
+    );
   }
 
   return (
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        subtitle={`${isSampleData ? "(Sample Data) " : ""}${
-          effectiveLegendValues.length === 1
-            ? effectiveLegendValues[0].label
-            : "Stacked Distribution"
-        }`}
+        subtitle={`${isSampleData ? "(Sample Data) " : "Stacked Distribution Assessment"}`}
         chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
@@ -531,9 +529,7 @@ export default function HorizontalBarChart({
             tierLevel === 0
               ? () =>
                   document
-                    .getElementById(
-                      `upload-input-horizontal-${chartId || widgetTitle}`,
-                    )
+                    .getElementById(`upload-horizontal-${chartId}`)
                     ?.click()
               : undefined,
           onDelete: onDelete,
@@ -544,12 +540,6 @@ export default function HorizontalBarChart({
         }}
         isDownloading={isDownloading}
         isPreview={isPreview}
-        customHeaderContent={
-          <div className="text-sm text-gray-600">
-            Total{" "}
-            <span className="font-semibold text-gray-900">{totalValue}</span>
-          </div>
-        }
         footer={
           childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
@@ -560,59 +550,80 @@ export default function HorizontalBarChart({
         }
       >
         <div className="relative">
-          {barRows.length > 0 ? (
-            <>
-              <div className="space-y-4 mb-6">
-                {barRows.map((row, index) => (
-                  <div key={index} className="flex items-center gap-4">
-                    <div className="w-24 text-right text-sm text-gray-600 truncate">
-                      {row.name}
-                    </div>
-                    <div className="flex-1 relative">
-                      <div className="h-6 bg-gray-100 rounded-lg overflow-hidden flex">
-                        {row.segments.map((segment, sIndex) => (
-                          <div
-                            key={sIndex}
-                            className="h-full transition-all duration-500 ease-out"
-                            style={{
-                              width: `${maxValue > 0 ? (segment.value / maxValue) * 100 : 0}%`,
-                              backgroundColor: segment.color,
-                            }}
-                            title={`${segment.label}: ${segment.value}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="w-12 text-sm font-medium text-gray-700">
-                      {row.total}
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {chartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 50)}>
+              <BarChart
+                layout="vertical"
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="0"
+                  horizontal={false}
+                  stroke="#e5e7eb"
+                />
+                <XAxis
+                  type="number"
+                  domain={[safeStartingRange, safeEndingRange]}
+                  axisLine={{ stroke: "#e5e7eb" }}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: "#6b7280" }}
+                />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  axisLine={{ stroke: "#e5e7eb" }}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: "#6b7280" }}
+                  width={20}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: "#f3f4f6", opacity: 0.4 }}
+                />
 
-              <div className="relative ml-28 mr-16 h-8">
-                <div className="absolute inset-x-0 top-0 flex justify-between text-[10px] text-gray-400">
-                  {scaleTicks.map((tick) => (
-                    <div
-                      key={tick}
-                      className="relative flex flex-col items-center"
-                    >
-                      <div className="w-px h-1.5 bg-gray-300" />
-                      <div className="mt-1">{tick}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
+                {effectiveLegendValues.map((l) => (
+                  <Bar
+                    key={l.field}
+                    name={l.label}
+                    dataKey={l.field}
+                    stackId="a"
+                    fill={l.color}
+                    radius={[0, 4, 4, 0]}
+                    barSize={32}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
           ) : (
-            <div className="h-80 flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
-              No data available. Please configure the widget.
+            <div className="h-80 flex flex-col items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
+              <span className="mb-2 text-2xl">📊</span>
+              <p className="text-sm">
+                No data available. Please configure the chart.
+              </p>
+            </div>
+          )}
+
+          {/* Legend Display */}
+          {chartData.length > 0 && (
+            <div className="flex justify-center flex-wrap gap-6 mt-6 pb-2 border-t border-gray-50 pt-4">
+              {effectiveLegendValues.map((l) => (
+                <div key={l.field} className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full shadow-sm"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-xs font-semibold text-gray-600">
+                    {l.label}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
 
           {tierLevel === 0 && (
             <input
-              id={`upload-input-horizontal-${chartId || widgetTitle}`}
+              id={`upload-horizontal-${chartId}`}
               type="file"
               accept=".xlsx, .xls"
               className="hidden"
@@ -626,7 +637,7 @@ export default function HorizontalBarChart({
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
         chartId={chartId}
-        parentChartName={groupTitle}
+        parentChartName={tierLevel === 0 ? widgetTitle : groupTitle}
       />
 
       {showChildrenModal && (
@@ -665,7 +676,6 @@ export default function HorizontalBarChart({
                   widgetTitle={tier.title || tier.name || "Untitled Tier"}
                   xAxisValues={labels}
                   legendValues={tierLegends}
-                  numOfLegendDataSet={tierLegends.length}
                   startingRange={startingRange}
                   endingRange={endingRange}
                   tierLevel={tierLevel + 1}

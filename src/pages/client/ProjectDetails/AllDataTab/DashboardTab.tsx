@@ -114,7 +114,6 @@ const DashboardTab = () => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset || legendValues.length}
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}

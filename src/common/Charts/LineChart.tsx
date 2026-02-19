@@ -124,15 +124,17 @@ export default function MultiAxisLineChart({
 
   const effectiveLegendValues = useMemo(() => {
     // Filter to ensure we only process legends that actually have a label
-    const validLegends = legendValues.filter((l) => l.label && l.label.trim() !== "");
-    
+    const validLegends = legendValues.filter(
+      (l) => l.label && l.label.trim() !== "",
+    );
+
     if (validLegends.length > 0) {
       return validLegends.map((l) => ({
         ...l,
         field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
       }));
     }
-    
+
     // Fallback to sample data if no valid legends are found
     return [
       { label: "Sample A", field: "field1", color: "#13A490" },
@@ -268,13 +270,18 @@ export default function MultiAxisLineChart({
     setIsDownloading(true);
     try {
       const res = await getAllTheLeafChart(projectId).unwrap();
-      const leafCharts = res?.data?.find((item: any) => item.grouptitle === title);
-      
+      const leafCharts = res?.data?.find(
+        (item: any) => item.grouptitle === title,
+      );
+
       if (!leafCharts || !leafCharts.charts?.length) {
         // Fallback: download just this chart if no tier group found
         const wb = XLSX.utils.book_new();
         const headers = ["Label", ...effectiveLegendValues.map((l) => l.label)];
-        const rows = effectiveXAxisValues.map((label) => [label, ...Array(effectiveLegendValues.length).fill("")]);
+        const rows = effectiveXAxisValues.map((label) => [
+          label,
+          ...Array(effectiveLegendValues.length).fill(""),
+        ]);
         const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
         XLSX.utils.book_append_sheet(wb, ws, widgetTitle.substring(0, 31));
         XLSX.writeFile(wb, `${widgetTitle}_template.xlsx`);
@@ -289,7 +296,8 @@ export default function MultiAxisLineChart({
       const getUniqueSheetName = (name: string, id: string) => {
         const safeName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
         const fullName = `${safeName}_${id}`;
-        let finalName = fullName.length > 31 ? fullName.substring(0, 31) : fullName;
+        let finalName =
+          fullName.length > 31 ? fullName.substring(0, 31) : fullName;
         let counter = 1;
         while (usedNames.has(finalName.toLowerCase())) {
           const suffix = `_${counter}`;
@@ -305,26 +313,38 @@ export default function MultiAxisLineChart({
         // Get xAxis from node project metadata or fallback
         let xAxisItems: string[] = [];
         try {
-          const parsed = typeof node.xAxis === "string" ? JSON.parse(node.xAxis) : node.xAxis;
+          const parsed =
+            typeof node.xAxis === "string"
+              ? JSON.parse(node.xAxis)
+              : node.xAxis;
           if (Array.isArray(parsed) && parsed.length > 1) {
             xAxisItems = parsed.slice(1).map((row: any) => String(row[0]));
           } else if (parsed?.labels) {
             xAxisItems = parsed.labels;
           }
-        } catch { /* ignore */ }
-        
+        } catch {
+          /* ignore */
+        }
+
         if (!xAxisItems.length) xAxisItems = effectiveXAxisValues;
 
         // Get legends
         const nodeWidgets = node.widgets || node.lineChart?.widgets || [];
-        const legends = nodeWidgets.length > 0 
-          ? nodeWidgets.map((w: any) => ({ label: w.legendName || w.label }))
-          : effectiveLegendValues;
+        const legends =
+          nodeWidgets.length > 0
+            ? nodeWidgets.map((w: any) => ({ label: w.legendName || w.label }))
+            : effectiveLegendValues;
 
         const headers = ["Label", ...legends.map((l: any) => l.label)];
-        const rows = xAxisItems.map((label) => [label, ...Array(legends.length).fill("")]);
+        const rows = xAxisItems.map((label) => [
+          label,
+          ...Array(legends.length).fill(""),
+        ]);
         const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-        const sheetName = getUniqueSheetName(node.title || node.name || "Tier", node.id);
+        const sheetName = getUniqueSheetName(
+          node.title || node.name || "Tier",
+          node.id,
+        );
         XLSX.utils.book_append_sheet(wb, ws, sheetName);
       });
 
@@ -356,7 +376,8 @@ export default function MultiAxisLineChart({
             const processed = rawData.map((row: any) => {
               const item: ChartData = { name: String(row["Label"] || "") };
               effectiveLegendValues.forEach((l) => {
-                const val = row[l.label] !== undefined ? row[l.label] : row[l.field];
+                const val =
+                  row[l.label] !== undefined ? row[l.label] : row[l.field];
                 item[l.field] = val !== undefined ? Number(val) : 0;
               });
               return item;
@@ -423,13 +444,22 @@ export default function MultiAxisLineChart({
     if (!active || !payload?.length) return null;
     return (
       <div className="bg-white/95 backdrop-blur-sm p-3 border border-gray-100 rounded-xl shadow-xl">
-        <p className="font-bold text-gray-700 mb-2 border-b border-gray-50 pb-1">{label}</p>
+        <p className="font-bold text-gray-700 mb-2 border-b border-gray-50 pb-1">
+          {label}
+        </p>
         <div className="space-y-1.5">
           {payload.map((entry: any, index: number) => (
             <div key={index} className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-              <span className="text-xs font-medium text-gray-600 min-w-[60px]">{entry.name}:</span>
-              <span className="text-xs font-bold text-gray-900 ml-auto">{entry.value}</span>
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-xs font-medium text-gray-600 min-w-[60px]">
+                {entry.name}:
+              </span>
+              <span className="text-xs font-bold text-gray-900 ml-auto">
+                {entry.value}
+              </span>
             </div>
           ))}
         </div>
@@ -440,7 +470,9 @@ export default function MultiAxisLineChart({
   if (isLoading) {
     return (
       <div className="w-full h-[400px] flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm animate-pulse">
-        <div className="text-gray-400 text-sm font-medium">Loading child tiers...</div>
+        <div className="text-gray-400 text-sm font-medium">
+          Loading child tiers...
+        </div>
       </div>
     );
   }
@@ -455,20 +487,29 @@ export default function MultiAxisLineChart({
         onHeaderClick={handleChartClick}
         menuActions={{
           onCopy: handleCopy,
-          onDownload: tierLevel === 0 ? () => handleDownload(widgetTitle) : undefined,
-          onUpload: tierLevel === 0 ? () => document.getElementById(`upload-line-${chartId}`)?.click() : undefined,
+          onDownload:
+            tierLevel === 0 ? () => handleDownload(widgetTitle) : undefined,
+          onUpload:
+            tierLevel === 0
+              ? () => document.getElementById(`upload-line-${chartId}`)?.click()
+              : undefined,
           onDelete: onDelete,
-          onAddTier: !isCreationMode ? () => handleAddTierClick(widgetTitle) : undefined,
+          onAddTier: !isCreationMode
+            ? () => handleAddTierClick(widgetTitle)
+            : undefined,
           onToggleWidget: onToggleWidget,
         }}
         isDownloading={isDownloading}
         isPreview={isPreview}
         customHeaderContent={
           <button
-            onClick={(e) => { e.stopPropagation(); setShowLineOnly(!showLineOnly); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowLineOnly(!showLineOnly);
+            }}
             className={`text-xs px-2 py-1 rounded-md transition-all ${
-              showLineOnly 
-                ? "bg-blue-50 text-blue-600 border border-blue-200" 
+              showLineOnly
+                ? "bg-blue-50 text-blue-600 border border-blue-200"
                 : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100"
             }`}
           >
@@ -478,7 +519,8 @@ export default function MultiAxisLineChart({
         footer={
           childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier{childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers?.length} child tier
+              {childTiers?.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
@@ -486,23 +528,33 @@ export default function MultiAxisLineChart({
         <div className="relative">
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={{ stroke: "#e5e7eb" }} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: "#6b7280" }} 
-                  dy={10} 
+              <LineChart
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="0"
+                  vertical={false}
+                  stroke="#e5e7eb"
                 />
-                <YAxis 
-                  domain={[safeStartingRange, safeEndingRange]} 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: "#6b7280" }} 
-                  dx={-10} 
+                <XAxis
+                  dataKey="name"
+                  axisLine={{ stroke: "#e5e7eb" }}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: "#6b7280" }}
+                  dy={10}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#d1d5db", strokeWidth: 1 }} />
+                <YAxis
+                  domain={[safeStartingRange, safeEndingRange]}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: "#6b7280" }}
+                  dx={-10}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ stroke: "#d1d5db", strokeWidth: 1 }}
+                />
 
                 {effectiveLegendValues.map((l) => (
                   <Line
@@ -511,11 +563,27 @@ export default function MultiAxisLineChart({
                     type="monotone"
                     dataKey={l.field}
                     stroke={l.color}
-                    dot={!showLineOnly ? { r: 5, fill: l.color, stroke: l.color, strokeWidth: 2 } : false}
-                    activeDot={{ r: 7, fill: l.color, stroke: "#fff", strokeWidth: 2 }}
+                    dot={
+                      !showLineOnly
+                        ? {
+                            r: 5,
+                            fill: l.color,
+                            stroke: l.color,
+                            strokeWidth: 2,
+                          }
+                        : false
+                    }
+                    activeDot={{
+                      r: 7,
+                      fill: l.color,
+                      stroke: "#fff",
+                      strokeWidth: 2,
+                    }}
                     strokeWidth={3}
                     connectNulls
-                    opacity={hoveredLine === null || hoveredLine === l.field ? 1 : 0.2}
+                    opacity={
+                      hoveredLine === null || hoveredLine === l.field ? 1 : 0.2
+                    }
                     onMouseEnter={() => setHoveredLine(l.field)}
                     onMouseLeave={() => setHoveredLine(null)}
                     animationDuration={1500}
@@ -526,7 +594,9 @@ export default function MultiAxisLineChart({
           ) : (
             <div className="h-80 flex flex-col items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
               <span className="mb-2 text-2xl">📊</span>
-              <p className="text-sm">No data available. Please configure the chart.</p>
+              <p className="text-sm">
+                No data available. Please configure the chart.
+              </p>
             </div>
           )}
 
@@ -536,10 +606,18 @@ export default function MultiAxisLineChart({
               {effectiveLegendValues.map((l) => (
                 <div key={l.field} className="flex items-center gap-2">
                   <div className="flex items-center">
-                    <div className="w-4 h-1 rounded-full" style={{ backgroundColor: l.color }} />
-                    <div className="w-2.5 h-2.5 rounded-full -ml-1 border-2 border-white box-content shadow-sm" style={{ backgroundColor: l.color }} />
+                    <div
+                      className="w-4 h-1 rounded-full"
+                      style={{ backgroundColor: l.color }}
+                    />
+                    <div
+                      className="w-2.5 h-2.5 rounded-full -ml-1 border-2 border-white box-content shadow-sm"
+                      style={{ backgroundColor: l.color }}
+                    />
                   </div>
-                  <span className="text-xs font-semibold text-gray-600">{l.label}</span>
+                  <span className="text-xs font-semibold text-gray-600">
+                    {l.label}
+                  </span>
                 </div>
               ))}
             </div>
@@ -576,13 +654,23 @@ export default function MultiAxisLineChart({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers?.map((tier: any) => {
               const category = chartTypes[tier.category];
-              const tierLegends = (tier?.[category]?.widgets || tier?.widgets || []).map((w: any) => ({
+              const tierLegends = (
+                tier?.[category]?.widgets ||
+                tier?.widgets ||
+                []
+              ).map((w: any) => ({
                 label: w.legendName || w.label,
-                field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
+                field: (w.legendName || w.label)
+                  ?.toLowerCase()
+                  .replace(/\s+/g, ""),
                 color: w.color,
               }));
 
-              const { labels, data } = parseLineChartData(tier.xAxis, tierLegends, tier.title);
+              const { labels, data } = parseLineChartData(
+                tier.xAxis,
+                tierLegends,
+                tier.title,
+              );
 
               return (
                 <MultiAxisLineChart

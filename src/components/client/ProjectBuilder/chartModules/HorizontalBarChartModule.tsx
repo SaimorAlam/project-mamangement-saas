@@ -106,7 +106,6 @@ const HorizontalBarChartModule = ({
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
           legendValues={legendValues}
-          numOfLegendDataSet={numOfLegendDataSet}
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}

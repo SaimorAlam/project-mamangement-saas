@@ -149,7 +149,6 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                   xAxisValues={labels}
                   legendValues={legendValues}
                   widgets={chartData?.widgets}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
                   startingRange={chartData?.firstFieldDataset}
                   endingRange={chartData?.lastFieldDataset}
                   chartId={item?.id}
