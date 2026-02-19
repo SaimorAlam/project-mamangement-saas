@@ -77,7 +77,7 @@ const chartApi = baseApi.injectEndpoints({
       query: (data) => ({
         url: `/chart/bulk/value-change`,
         method: "PATCH",
-        body:data
+        body: data,
       }),
       invalidatesTags: ["Charts"],
     }),
@@ -96,6 +96,6 @@ export const {
   useLazyFindChildrenValueQuery,
   useGetAllTheLeafChartQuery,
   useLazyGetAllTheLeafChartQuery,
-  useUploadChartDataMutation
+  useUploadChartDataMutation,
 } = chartApi;
 export default chartApi;

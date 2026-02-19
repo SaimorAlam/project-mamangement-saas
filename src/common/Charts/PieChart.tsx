@@ -8,21 +8,23 @@ import {
   ResponsiveContainer,
   PieLabelRenderProps,
 } from "recharts";
-import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
+
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import ChartCardWrapper from "./components/ChartCardWrapper";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
-import { useLazyFindChildrenValueQuery } from "@/store/Api/ChartApi/ChartApi";
+import {
+  useLazyFindChildrenValueQuery,
+  useLazyGetAllTheLeafChartQuery,
+} from "@/store/Api/ChartApi/ChartApi";
 import {
   setChildPayload,
   setGroupTitle,
 } from "@/store/Slices/ChartSlice/ChartSlice";
 import { parsePieChartData } from "@/utils/parsePieChartData";
 import { chartTypes } from "@/utils/ChartCategory";
-
-/*       TYPES       */
 
 /*       TYPES       */
 
@@ -60,6 +62,7 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
   isPreview?: boolean;
+  isCreationMode?: boolean;
   allUploadedData?: ChartData[];
   projectId?: string;
   breadcrumbPath?: BreadcrumbItem[];
@@ -82,6 +85,7 @@ export default function PieChartWidget({
   tierLevel = 0,
   chartId = "root",
   isPreview = false,
+  isCreationMode = false,
   allUploadedData,
   projectId,
   breadcrumbPath = [],
@@ -105,8 +109,6 @@ export default function PieChartWidget({
   // Tier management states
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
-
-  const [getChartTitleId] = useGetChartTitleIdMutation();
 
   const currentBreadcrumbs = useMemo(() => {
     const base =
@@ -137,17 +139,25 @@ export default function PieChartWidget({
   };
 
   /*   DATA   */
-  const chartData: ChartData[] = useMemo(() => {
-    if (allUploadedData && allUploadedData.length > 0) {
-      return allUploadedData;
+  const { chartData, isSampleData } = useMemo(() => {
+    // Check if we have real data and at least one non-zero value
+    const hasRealData =
+      allUploadedData &&
+      allUploadedData.length > 0 &&
+      allUploadedData.some((item) => item.value > 0);
+
+    if (hasRealData) {
+      return { chartData: allUploadedData, isSampleData: false };
     }
-    return legendValues
+
+    const data = legendValues
       .filter((l) => l.label)
       .map((l) => ({
         name: l.label,
         value: getRandomValue(10, 100),
         color: l.color,
       }));
+    return { chartData: data, isSampleData: data.length > 0 };
   }, [legendValues, allUploadedData]);
 
   const isAllLegendFieldEmpty = legendValues.filter((l) => l.field !== "");
@@ -158,36 +168,115 @@ export default function PieChartWidget({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = () => {
-    const payload = {
-      numberOfDataset: numOfLegendDataSet,
-      firstFieldDataset: 0,
-      lastFieldDataset: 100,
-      widgets: legendValues.map((l) => ({
-        legendName: l.label,
-        color: l.color,
-      })),
-      title: widgetTitle,
-      status: "ACTIVE",
-      category: "PIE",
-      xAxis: JSON.stringify([
-        ["Legend", "Value"],
-        ...legendValues.map((l) => [l.label, 0]),
-      ]),
-      yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
-      projectId: projectId,
-    };
+  const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
+
+  const handleDownload = async (title: string) => {
+    if (!projectId) {
+      toast.error("Project ID is missing");
+      return;
+    }
     setIsDownloading(true);
+    try {
+      const res = await getAllTheLeafChart(projectId as string).unwrap();
+      const leafCharts =
+        res?.data?.find((item: any) => item.grouptitle === title) || [];
 
-    DownloadAndSaveCSVforModuleTwoWidget(
-      payload,
-      getChartTitleId,
-      widgetTitle,
-      legendValues,
-    );
+      if (leafCharts.charts?.length === 0) {
+        toast.error("No data found to download");
+        return;
+      }
 
-    setIsDownloading(false);
+      const wb = XLSX.utils.book_new();
+      const ids: string[] = [];
+      const usedNames = new Set<string>();
+
+      const getUniqueSheetName = (name: string, id: string) => {
+        const safeName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
+        const fullName = `${safeName}_${id}`;
+        let finalName =
+          fullName.length > 31 ? fullName.substring(0, 31) : fullName;
+        let counter = 1;
+        while (usedNames.has(finalName.toLowerCase())) {
+          const suffix = `_${counter}`;
+          const base = fullName.substring(0, 31 - suffix.length);
+          finalName = base + suffix;
+          counter++;
+        }
+        usedNames.add(finalName.toLowerCase());
+        return finalName;
+      };
+
+      leafCharts?.charts?.forEach((node: any) => {
+        ids.push(node.id);
+
+        let legends = (node.widgets || []).map((w: any) => ({
+          label: w.legendName || w.label || "Legend",
+          field: (w.legendName || w.label || "field")
+            .toLowerCase()
+            .replace(/\s+/g, ""),
+          color: w.color || "#000000",
+        }));
+
+        if (!legends.length) {
+          legends = legendValues;
+        }
+
+        // For Pie charts, we use a simple "Label" | "Value" format
+        const headers = ["Label", "Value"];
+
+        // For Pie chart, we typically have labels from the xAxis if available,
+        // fall back to default template row if not.
+        let xAxisLabels: string[] = [];
+        if (node.xAxis) {
+          try {
+            const parsed =
+              typeof node.xAxis === "string"
+                ? JSON.parse(node.xAxis)
+                : node.xAxis;
+            if (
+              Array.isArray(parsed) &&
+              parsed.length > 0 &&
+              Array.isArray(parsed[0])
+            ) {
+              xAxisLabels = parsed.slice(1).map((row: any) => row[0]);
+            }
+          } catch (e) {
+            console.error("Failed to parse xAxis for node", node.id, e);
+          }
+        }
+
+        if (xAxisLabels.length === 0) {
+          xAxisLabels = (node.widgets || []).map(
+            (w: any) => w.legendName || w.label || "Slice",
+          );
+          if (xAxisLabels.length === 0) {
+            xAxisLabels = legendValues.map((l) => l.label);
+          }
+        }
+
+        const rows = xAxisLabels.map((label: string) => [
+          label,
+          " ", // Single value column for Pie charts
+        ]);
+
+        const data = [headers, ...rows];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const sheetName = getUniqueSheetName(
+          node.title || node.name || "Tier",
+          node.id,
+        );
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      });
+
+      const filename = `${widgetTitle}_ID_${ids.join("_")}.xlsx`;
+      XLSX.writeFile(wb, filename);
+      toast.success("Excel downloaded successfully");
+    } catch (error) {
+      console.error("Excel download failed", error);
+      toast.error("Failed to download Excel");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleAddTierClick = () => {
@@ -233,7 +322,7 @@ export default function PieChartWidget({
   /*   TOOLTIP & LABEL   */
   const renderCustomLabel = (props: PieLabelRenderProps) => {
     const payload = props.payload as { name: string; value: number };
-    return `${payload.name}: ${payload.value}%`;
+    return `${payload.name}: ${payload.value}`;
   };
 
   /*   RENDER   */
@@ -251,15 +340,16 @@ export default function PieChartWidget({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        subtitle="Distribution Analysis"
+        subtitle={`Distribution Analysis ${isSampleData ? "(Sample Data)" : ""}`}
         chartId={chartId || "root"}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
           onCopy: handleCopy,
-          onDownload: handleDownload,
+          onDownload: () =>
+            handleDownload(tierLevel === 0 ? widgetTitle : groupTitle),
           onDelete: onDelete,
-          onAddTier: handleAddTierClick,
+          onAddTier: !isCreationMode ? handleAddTierClick : undefined,
           onToggleWidget: onToggleWidget,
         }}
         isDownloading={isDownloading}
@@ -300,16 +390,19 @@ export default function PieChartWidget({
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
+                labelLine={true}
                 label={renderCustomLabel}
-                outerRadius={"90%"}
+                innerRadius={60}
+                outerRadius={100} // Slightly reduced to give labels more perimeter room
+                paddingAngle={2} // Space between slices
                 dataKey="value"
+                minAngle={25} // Increased to ensure zero-value slices have enough arc to separate labels
               >
                 {chartData.map((entry, index) => (
                   <Cell key={index} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => `${value}%`} />
+              <Tooltip formatter={(value) => `${value}`} />
             </RechartsPieChart>
           </ResponsiveContainer>
 
@@ -361,6 +454,7 @@ export default function PieChartWidget({
                   tierLevel={tierLevel + 1}
                   chartId={tier.id}
                   isPreview={isPreview}
+                  isCreationMode={false}
                   allUploadedData={pieData}
                   projectId={tier.projectId}
                   breadcrumbPath={currentBreadcrumbs}

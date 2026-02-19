@@ -29,7 +29,7 @@ const parseXAxisData = (
   legendValues: any[],
   widgetTitle: string,
 ) => {
-  let parsedXAxis = xAxis;
+  let parsedXAxis: any = xAxis;
 
   if (typeof xAxis === "string") {
     try {
@@ -37,6 +37,13 @@ const parseXAxisData = (
     } catch (error) {
       console.error("Error parsing xAxis JSON:", error);
       parsedXAxis = [];
+    }
+  }
+
+  // Handle case where API returns { labels: [...] }
+  if (parsedXAxis && !Array.isArray(parsedXAxis) && typeof parsedXAxis === "object") {
+    if ("labels" in parsedXAxis) {
+      parsedXAxis = parsedXAxis.labels;
     }
   }
 
@@ -79,8 +86,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
   return (
     <div className="flex flex-wrap gap-6">
       {projectsChartsData
-        ?.filter((item: any) => item.parentId === null)
-        .map((item: any) => {
+        ?.map((item: any) => {
           const categoryKey = item.category?.toUpperCase();
           const chartProperty = chartTypes[categoryKey];
           const chartData = chartProperty ? item[chartProperty] : null;

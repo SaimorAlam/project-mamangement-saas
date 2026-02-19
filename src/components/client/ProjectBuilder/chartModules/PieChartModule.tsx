@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import PieChartConfiguration, { LegendValue } from "../chartConfigurations/PieChartConfiguration";
+import PieChartConfiguration, {
+  LegendValue,
+} from "../chartConfigurations/PieChartConfiguration";
 import PieChartWidget from "@/common/Charts/PieChart";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
@@ -58,6 +60,7 @@ const PieChartModule = ({
           onDelete={onDelete}
           isPreview={isPreview}
           projectId={projectId}
+          isCreationMode={true}
         />
       </div>
       {!isPreview && showWidget && (
