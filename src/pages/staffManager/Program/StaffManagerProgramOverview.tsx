@@ -6,8 +6,8 @@ import { useGetProgramByIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import StaffManagerAllProject from "./StaffManagerAllProject";
 
 const StaffManagerProgramOverview = () => {
-    const { id } = useParams();
-    const { data: program } = useGetProgramByIdQuery(id);
+    const { programId } = useParams();
+    const { data: program } = useGetProgramByIdQuery(programId);
 
     return (
         <div className="">
@@ -17,7 +17,7 @@ const StaffManagerProgramOverview = () => {
             <div>
                 <HighwayStats />
                 <div className="flex items-baseline gap-6">
-                    <StaffManagerAllProject title="All Project" programId={id as string} />
+                    <StaffManagerAllProject title="All Project" programId={programId as string} />
                     <ProgramManager managerId={program?.data?.managerId} />
                 </div>
                 <div className="z-0!">

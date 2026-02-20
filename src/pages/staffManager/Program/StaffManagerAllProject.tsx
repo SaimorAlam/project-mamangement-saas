@@ -235,7 +235,7 @@ const StaffManagerAllProject = ({
                                 <tr
                                     key={project.id}
                                     className="hover:bg-gray-50 cursor-pointer even:bg-gray-100"
-                                    onClick={() => navigate(`/staff-manager-panel/projects/${project.id}`)}
+                                    onClick={() => navigate(`/staff-manager-panel/all-program/program-overview/${programId}/project-details/${project.id}`)}
                                 >
                                     <td className="px-6 py-4 max-w-42">{project.name}</td>
                                     <td className="px-6 py-4">

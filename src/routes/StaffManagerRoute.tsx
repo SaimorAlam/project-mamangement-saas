@@ -34,6 +34,9 @@ import ClientProjectBuilderContainer from "@/pages/client/ProjectBuilder/ClientP
 import PublishProject from "@/pages/client/ProjectBuilder/Components/PublishProject";
 import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
 import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
+import ClientAllProgramContainer from "@/pages/client/ClientAllProgramContainer";
+import ProgramOverviewContainer from "@/pages/client/Program/ProgramOverviewContainer";
+import ProgramOverview from "@/pages/client/Program/ProgramOverview";
 
 export function getStaffManagerRoutes() {
   return [
@@ -57,8 +60,23 @@ export function getStaffManagerRoutes() {
       path: "timos-super-shop",
       element: <StaffManagerTimosSuperShop />,
     },
-    { path: "all-program", element: <StaffManagerAllProgram /> },
-    { path: "program/:id", element: <StaffManagerProgramOverview /> },
+    // { path: "all-program", element: <StaffManagerAllProgram /> },
+    {
+      path: "all-program",
+      element: <ClientAllProgramContainer />,
+      children: [
+        { index: true, element: <StaffManagerAllProgram /> },
+        {
+          path: "program-overview/:programId",
+          element: <ProgramOverviewContainer />,
+          children: [
+            { index: true, element: <StaffManagerProgramOverview /> },
+            { path: "project-details/:projectId", element: <ProjectDetails /> },
+          ],
+        },
+      ],
+    },
+    // { path: "program/:id", element: <StaffManagerProgramOverview /> },
 
     { path: "program-name", element: <StaffManagerProgramName /> },
     // {
