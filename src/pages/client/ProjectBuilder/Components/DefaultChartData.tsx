@@ -335,7 +335,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                   .replace(/\s+/g, ""),
               })) || [];
 
-            const { labels } = parseXAxisData(
+            const { labels, data } = parseXAxisData(
               item?.xAxis,
               legendValues,
               item?.title,
@@ -351,6 +351,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                   startingRange={chartData?.firstFieldDataset}
                   endingRange={chartData?.lastFieldDataset}
                   chartId={item?.id}
+                  projectId={item?.projectId}
+                  allUploadedData={data}
                 />
               </div>
             );

@@ -47,12 +47,13 @@ export const generateLineChartData = (
   min = 0,
   max = 100
 ) => {
+  const count = legend.length || 1;
   return xAxis.map(label => {
     const row: any = { name: label }
 
     legend.forEach(l => {
       row[l.field] =
-        Math.floor(Math.random() * (max - min + 1)) + min
+        Math.floor((Math.random() * (max - min + 1) + min) / count);
     })
 
     return row
@@ -65,12 +66,13 @@ export const generateAreaChartData = (
   min = 0,
   max = 100
 ): ChartData[] => {
+  const count = legend.length || 1;
   return xAxis.map(label => {
     const row: ChartData = { name: label };
 
     legend.forEach(l => {
       row[l.field] =
-        Math.floor(Math.random() * (max - min + 1)) + min;
+        Math.floor((Math.random() * (max - min + 1) + min) / count);
     });
 
     return row;

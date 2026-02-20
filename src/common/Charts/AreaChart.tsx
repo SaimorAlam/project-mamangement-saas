@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AreaChart as ReAreaChart,
   Area,
@@ -9,16 +9,83 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
-import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
 import { generateAreaChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import ChartCardWrapper from "./components/ChartCardWrapper";
+import {
+  useLazyFindChildrenValueQuery,
+  useLazyGetAllTheLeafChartQuery,
+} from "@/store/Api/ChartApi/ChartApi";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import {
+  setChildPayload,
+  setGroupTitle,
+} from "@/store/Slices/ChartSlice/ChartSlice";
+
+/**
+ * Parse xAxis 2D array format from API
+ * Format: [["day", "absent", "late", "ontime"], ["Sunday", 1, 2, 50], ...]
+ * Same logic as StackedBarChart
+ */
+export const parseAreaChartData = (
+  xAxis: any[][] | string | { labels: any[][] },
+  legendValues: any[],
+  widgetTitle: string,
+) => {
+  let parsedXAxis: any = xAxis;
+
+  if (typeof xAxis === "string") {
+    try {
+      parsedXAxis = JSON.parse(xAxis);
+    } catch (error) {
+      console.error("Error parsing xAxis JSON:", error);
+      parsedXAxis = [];
+    }
+  }
+
+  if (
+    parsedXAxis &&
+    !Array.isArray(parsedXAxis) &&
+    typeof parsedXAxis === "object" &&
+    "labels" in parsedXAxis
+  ) {
+    parsedXAxis = parsedXAxis.labels;
+  }
+
+  if (!parsedXAxis || !Array.isArray(parsedXAxis) || parsedXAxis.length === 0) {
+    return { labels: [], data: {} as { [key: string]: ChartData[] } };
+  }
+
+  const headers = parsedXAxis[0];
+  if (!Array.isArray(headers) || headers.length === 0) {
+    return { labels: [], data: {} as { [key: string]: ChartData[] } };
+  }
+
+  const labels = parsedXAxis.slice(1).map((row: any) => String(row[0] || ""));
+
+  const chartData: ChartData[] = parsedXAxis.slice(1).map((row: any) => {
+    const dataPoint: ChartData = { name: String(row[0] || "") };
+    legendValues.forEach((legend, index) => {
+      const columnIndex = index + 1;
+      dataPoint[legend.field] = Number(row[columnIndex]) || 0;
+    });
+    return dataPoint;
+  });
+
+  const sheetName = (widgetTitle || "Sheet")
+    .replace(/[:/?*[\]\\]/g, " ")
+    .trim()
+    .substring(0, 31);
+
+  return { labels, data: { [sheetName]: chartData } };
+};
 
 /*     TYPES     */
 
-type ChartData = {
+export type ChartData = {
   name: string;
   [key: string]: number | string;
 };
@@ -29,12 +96,10 @@ type LegendValue = {
   color: string;
 };
 
-export type TierChart = {
+export type BreadcrumbItem = {
   id: string;
   name: string;
-  xAxisValues: string[];
-  legendValues: LegendValue[];
-  children: TierChart[];
+  level: number;
 };
 
 type Props = {
@@ -48,7 +113,12 @@ type Props = {
   onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
+  projectId?: string;
+  isCreationMode?: boolean;
+  allUploadedData?: { [key: string]: ChartData[] };
   isPreview?: boolean;
+  breadcrumbPath?: BreadcrumbItem[];
+  onNavigate?: (level: number) => void;
 };
 
 /*     COMPONENT     */
@@ -63,37 +133,159 @@ export default function AreaChart({
   onToggleWidget,
   onDelete,
   tierLevel = 0,
-  chartId = "root",
+  chartId,
+  projectId,
+  isCreationMode = false,
+  allUploadedData,
   isPreview = false,
+  breadcrumbPath = [],
+  onNavigate,
 }: Props) {
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [localUploadedData, setLocalUploadedData] = useState<
+    { [key: string]: ChartData[] } | undefined
+  >(allUploadedData);
 
+  const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
+  const [findChildrenValue, { data, isLoading }] =
+    useLazyFindChildrenValueQuery();
+
+  const dispatch = useAppDispatch();
+  const groupTitle = useAppSelector((state) => state.chartSlice.groupTitle);
+
+  useEffect(() => {
+    if (chartId) {
+      findChildrenValue(chartId);
+    }
+  }, [chartId, findChildrenValue]);
+
+  const [isDownloading, setIsDownloading] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
-  const [childTiers, setChildTiers] = useState<TierChart[]>([]);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
-  const [getChartTitleId] = useGetChartTitleIdMutation();
+  const currentBreadcrumbs = useMemo(() => {
+    const base =
+      breadcrumbPath.length === 0
+        ? [{ id: "dashboard", name: "Dashboard", level: -1 }]
+        : breadcrumbPath;
+    return [
+      ...base,
+      { id: chartId || "root", name: widgetTitle, level: tierLevel },
+    ];
+  }, [breadcrumbPath, chartId, widgetTitle, tierLevel]);
 
-  /*   DATA   */
-  const chartData: ChartData[] = useMemo(() => {
-    if (!xAxisValues.length || !legendValues.length) return [];
-    return generateAreaChartData(
-      xAxisValues,
-      legendValues,
-      startingRange,
-      endingRange,
-    );
-  }, [xAxisValues, legendValues, startingRange, endingRange]);
+  const handleChildNavigate = (targetLevel: number) => {
+    if (targetLevel < tierLevel) {
+      setShowChildrenModal(false);
+      if (onNavigate) onNavigate(targetLevel);
+    }
+  };
 
-  /*   TOTAL   */
+  const handleBreadcrumbClick = (index: number) => {
+    const target = currentBreadcrumbs[index];
+    if (index < currentBreadcrumbs.length - 1) {
+      if (onNavigate) onNavigate(target.level);
+      setShowChildrenModal(false);
+    }
+  };
+
+  /*   EFFECTIVE DATA   */
+
+  const effectiveLegendValues = useMemo(() => {
+    if (legendValues.length > 0 && legendValues.some((l) => l.label !== "")) {
+      return legendValues.map((l) => ({
+        ...l,
+        field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
+      }));
+    }
+    return [
+      { label: "Sample A", field: "field1", color: "#13A490" },
+      { label: "Sample B", field: "field2", color: "#35B6EE" },
+      { label: "Sample C", field: "field3", color: "#6F78F9" },
+    ];
+  }, [legendValues]);
+
+  const effectiveXAxisValues = useMemo(() => {
+    const validValues = xAxisValues.filter((v) => v !== "");
+    if (validValues.length > 0) return validValues;
+    return ["Jan", "Feb", "Mar", "Apr", "May"];
+  }, [xAxisValues]);
+
+  const { safeStartingRange, safeEndingRange } = useMemo(() => {
+    let start = startingRange;
+    let end = endingRange;
+    if (start === end) {
+      start = 0;
+      end = 100;
+    }
+    return { safeStartingRange: start, safeEndingRange: end };
+  }, [startingRange, endingRange]);
+
+  const { chartData, isSampleData } = useMemo(() => {
+    const sheetName = (widgetTitle || "Sheet")
+      .replace(/[:/?*[\]\\]/g, " ")
+      .trim()
+      .substring(0, 31);
+
+    const dataToUse =
+      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+
+    // Priority 1: Real Uploaded Data
+    if (dataToUse && dataToUse.length > 0) {
+      return { chartData: dataToUse, isSampleData: false };
+    }
+
+    const hasConfig =
+      xAxisValues.length > 0 &&
+      xAxisValues.some((v) => v !== "") &&
+      legendValues.length > 0 &&
+      legendValues.some((l) => l.label !== "");
+
+    // Priority 2: Sample Data based on Config
+    if (hasConfig) {
+      return {
+        chartData: generateAreaChartData(
+          xAxisValues.filter((v) => v !== ""),
+          effectiveLegendValues,
+          safeStartingRange,
+          safeEndingRange,
+        ),
+        isSampleData: true,
+      };
+    }
+
+    // Priority 3: Fallback
+    return {
+      chartData: generateAreaChartData(
+        effectiveXAxisValues,
+        effectiveLegendValues,
+        0,
+        100,
+      ),
+      isSampleData: true,
+    };
+  }, [
+    xAxisValues,
+    legendValues,
+    safeStartingRange,
+    safeEndingRange,
+    widgetTitle,
+    localUploadedData,
+    allUploadedData,
+    effectiveXAxisValues,
+    effectiveLegendValues,
+  ]);
+
   const totalValue = useMemo(() => {
     return chartData.reduce((sum, row) => {
       return (
         sum +
-        legendValues.reduce((inner, l) => inner + Number(row[l.field] || 0), 0)
+        effectiveLegendValues.reduce(
+          (inner, l) => inner + Number(row[l.field] || 0),
+          0,
+        )
       );
     }, 0);
-  }, [chartData, legendValues]);
+  }, [chartData, effectiveLegendValues]);
 
   /*   ACTIONS   */
 
@@ -101,57 +293,184 @@ export default function AreaChart({
     navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
   };
 
-  const handleDownload = () => {
-    const payload = {
-      numberOfDataset: numOfLegendDataSet,
-      firstFieldDataset: startingRange,
-      lastFieldDataset: endingRange,
-      showWidgets: legendValues.map((l) => ({
-        legend_name: l.label,
-        color: l.color,
-      })),
-      title: widgetTitle,
-      status: "ACTIVE",
-      category: "BAR",
-      xAxis: JSON.stringify({
-        labels: xAxisValues,
-        values: [],
-      }),
-      yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
-    };
+  const handleDownload = async (title: string) => {
+    if (!projectId) {
+      toast.error("Project ID is missing");
+      return;
+    }
     setIsDownloading(true);
+    try {
+      const res = await getAllTheLeafChart(projectId).unwrap();
+      const leafCharts =
+        res?.data?.find((item: any) => item.grouptitle === title) || [];
+      if (leafCharts.charts?.length === 0) {
+        toast.error("No data found to download");
+        return;
+      }
 
-    DownloadAndSaveCSVforModuleOneWidget(
-      payload,
-      getChartTitleId,
-      widgetTitle,
-      xAxisValues,
-      legendValues,
-    );
+      const wb = XLSX.utils.book_new();
+      const ids: string[] = [];
+      const usedNames = new Set<string>();
 
-    setIsDownloading(false);
+      const getUniqueSheetName = (name: string, id: string) => {
+        const safeName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
+        const fullName = `${safeName}_${id}`;
+        let finalName =
+          fullName.length > 31 ? fullName.substring(0, 31) : fullName;
+        let counter = 1;
+        while (usedNames.has(finalName.toLowerCase())) {
+          const suffix = `_${counter}`;
+          const base = fullName.substring(0, 31 - suffix.length);
+          finalName = base + suffix;
+          counter++;
+        }
+        usedNames.add(finalName.toLowerCase());
+        return finalName;
+      };
+
+      leafCharts?.charts?.forEach((node: any) => {
+        ids.push(node.id);
+        let xAxis = node.xAxisValues || [];
+        if (!xAxis.length && node.xAxis) {
+          try {
+            const parsed =
+              typeof node.xAxis === "string"
+                ? JSON.parse(node.xAxis)
+                : node.xAxis;
+            if (Array.isArray(parsed)) {
+              if (parsed.length > 0 && Array.isArray(parsed[0])) {
+                xAxis = parsed.slice(1).map((row: any) => row[0]);
+              } else {
+                xAxis = parsed;
+              }
+            } else {
+              xAxis = parsed.labels || [];
+            }
+          } catch {
+            /* ignore */
+          }
+        }
+        if (!xAxis.length) xAxis = effectiveXAxisValues;
+
+        let legends = node.legendValues || [];
+        const nodeWidgets = node.widgets || node.areaChart?.widgets;
+        if (!legends.length && nodeWidgets) {
+          legends = nodeWidgets.map((w: any) => ({
+            label: w.legendName || w.label || "Legend",
+            field: (w.legendName || w.label || "field")
+              .toLowerCase()
+              .replace(/\s+/g, ""),
+            color: w.color || "#000000",
+          }));
+        }
+        if (!legends.length) legends = effectiveLegendValues;
+
+        const headers = ["Label", ...legends.map((l: any) => l.label)];
+        const rows = xAxis.map((label: string) => [
+          label,
+          ...Array(legends.length).fill(" "),
+        ]);
+        const data = [headers, ...rows];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const sheetName = getUniqueSheetName(
+          node.title || node.name || "Tier",
+          node.id,
+        );
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      });
+
+      const filename = `${widgetTitle}_ID_${ids.join("_")}.xlsx`;
+      XLSX.writeFile(wb, filename);
+      toast.success("Excel downloaded successfully");
+    } catch (error) {
+      console.error("Excel download failed", error);
+      toast.error("Failed to download Excel");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
-  const handleAddTierClick = () => {
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const bstr = evt.target?.result as string;
+        const wb = XLSX.read(bstr, { type: "binary" });
+        const allData: { [key: string]: ChartData[] } = {};
+
+        wb.SheetNames.forEach((sheetName) => {
+          const ws = wb.Sheets[sheetName];
+          const rawData: any[] = XLSX.utils.sheet_to_json(ws);
+
+          if (rawData.length > 0) {
+            const processedData = rawData.map((row: any) => {
+              const item: ChartData = { name: row["Label"] || "" };
+              legendValues.forEach((l) => {
+                if (row[l.label] !== undefined) {
+                  item[l.field] = Number(row[l.label]);
+                } else if (row[l.field] !== undefined) {
+                  item[l.field] = Number(row[l.field]);
+                }
+              });
+              return item;
+            });
+            allData[sheetName] = processedData;
+          }
+        });
+
+        setLocalUploadedData(allData);
+        toast.success("Data uploaded successfully");
+      } catch (err) {
+        console.error("Upload failed", err);
+        toast.error("Failed to parse Excel file");
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
+  const handleAddTierClick = (title: string) => {
+    if (tierLevel === 0) {
+      dispatch(setGroupTitle(title));
+    }
+    const childPayload = {
+      numberOfDataset: numOfLegendDataSet,
+      firstFieldDataset: safeStartingRange,
+      lastFieldDataset: safeEndingRange,
+      widgets: legendValues.map((l) => ({
+        legendName: l.label,
+        color: l.color,
+      })),
+      title: "",
+      status: "ACTIVE",
+      category: "AREA",
+      xAxis: JSON.stringify([
+        ["Label", ...legendValues.map((l) => l.label)],
+        ...xAxisValues.map((label) => [
+          label,
+          ...Array(numOfLegendDataSet).fill(0),
+        ]),
+      ]),
+      yAxis: JSON.stringify({}),
+      zAxis: JSON.stringify({}),
+      projectId: projectId,
+      parentId: chartId,
+      rootchart: false,
+      roottitle: widgetTitle,
+      grouptitle: tierLevel === 0 ? widgetTitle : groupTitle,
+    };
+    dispatch(setChildPayload(childPayload));
     setShowAddTierModal(true);
   };
 
-  const handleSaveTier = (tierName: string) => {
-    const newTier: TierChart = {
-      id: `${chartId}-tier-${Date.now()}`,
-      name: tierName,
-      xAxisValues: xAxisValues,
-      legendValues: legendValues,
-      children: [],
-    };
-    setChildTiers([...childTiers, newTier]);
-    setShowAddTierModal(false);
-  };
-
   const handleChartClick = () => {
-    if (childTiers.length > 0) {
+    if (data?.data && data.data.length > 0) {
       setShowChildrenModal(true);
+      if (tierLevel === 0) {
+        dispatch(setGroupTitle(widgetTitle));
+      }
     }
   };
 
@@ -163,7 +482,7 @@ export default function AreaChart({
     return (
       <div className="bg-white p-3 border rounded shadow-lg">
         <p className="font-semibold mb-2">{row.name}</p>
-        {legendValues.map((l) => (
+        {effectiveLegendValues.map((l) => (
           <p key={l.field} style={{ color: l.color }} className="text-sm">
             {l.label}: {row[l.field]}
           </p>
@@ -172,20 +491,39 @@ export default function AreaChart({
     );
   };
 
-  /*   RENDER   */
+  if (isLoading)
+    return (
+      <div className="h-[400px] flex items-center justify-center">
+        Loading...
+      </div>
+    );
+
+  const childTiers = data?.data;
 
   return (
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        chartId={chartId}
+        subtitle={`Area performance view ${isSampleData ? "(Sample Data)" : ""}`}
+        chartId={chartId || "root"}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
+        
         menuActions={{
           onCopy: handleCopy,
-          onDownload: handleDownload,
+          onDownload:
+            tierLevel === 0 ? () => handleDownload(widgetTitle) : undefined,
+          onUpload:
+            tierLevel === 0
+              ? () =>
+                  document
+                    .getElementById(`upload-area-${chartId || widgetTitle}`)
+                    ?.click()
+              : undefined,
           onDelete: onDelete,
-          onAddTier: handleAddTierClick,
+          onAddTier: !isCreationMode
+            ? () => handleAddTierClick(widgetTitle)
+            : undefined,
           onToggleWidget: onToggleWidget,
         }}
         isDownloading={isDownloading}
@@ -194,7 +532,7 @@ export default function AreaChart({
           <div className="flex items-center gap-4">
             <p className="text-sm text-gray-500">Total {totalValue}</p>
             <div className="flex gap-4">
-              {legendValues.map(
+              {effectiveLegendValues.slice(0, 3).map(
                 (l) =>
                   l.label && (
                     <div key={l.field} className="flex items-center gap-2">
@@ -208,11 +546,16 @@ export default function AreaChart({
                     </div>
                   ),
               )}
+              {effectiveLegendValues.length > 3 && (
+                <span className="text-xs text-gray-400">
+                  +{effectiveLegendValues.length - 3} more
+                </span>
+              )}
             </div>
           </div>
         }
         footer={
-          childTiers.length > 0 ? (
+          childTiers && childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
               Click chart to view {childTiers.length} child tier
               {childTiers.length > 1 ? "s" : ""}
@@ -220,7 +563,7 @@ export default function AreaChart({
           ) : undefined
         }
       >
-        <div className="h-[350px] w-full">
+        <div className="h-[400px] w-full relative">
           <ResponsiveContainer width="100%" height="100%">
             <ReAreaChart data={chartData}>
               <CartesianGrid
@@ -235,13 +578,13 @@ export default function AreaChart({
                 axisLine={false}
               />
               <YAxis
-                domain={[startingRange, endingRange]}
+                domain={[safeStartingRange, safeEndingRange]}
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
               <Tooltip content={<CustomTooltip />} />
-              {legendValues.map((l) => (
+              {effectiveLegendValues.map((l) => (
                 <Area
                   key={l.field}
                   dataKey={l.field}
@@ -254,14 +597,30 @@ export default function AreaChart({
               ))}
             </ReAreaChart>
           </ResponsiveContainer>
+
+          {tierLevel === 0 && (
+            <input
+              id={`upload-area-${chartId || widgetTitle}`}
+              type="file"
+              accept=".xlsx, .xls"
+              className="hidden"
+              onChange={handleUpload}
+            />
+          )}
+
+          {chartData.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
+              No data available. Please configure the widget.
+            </div>
+          )}
         </div>
       </ChartCardWrapper>
 
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        onSave={handleSaveTier}
-        parentChartName={widgetTitle}
+        chartId={chartId}
+        parentChartName={groupTitle}
       />
 
       {showChildrenModal && (
@@ -270,23 +629,46 @@ export default function AreaChart({
           onClose={() => setShowChildrenModal(false)}
           tierLevel={tierLevel + 1}
           title={widgetTitle}
+          breadcrumbs={currentBreadcrumbs}
+          onBreadcrumbClick={handleBreadcrumbClick}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers.map((tier) => (
-              <AreaChart
-                key={tier.id}
-                widgetTitle={tier.name}
-                xAxisValues={tier.xAxisValues}
-                legendValues={tier.legendValues}
-                numOfLegendDataSet={tier.legendValues.length}
-                startingRange={startingRange}
-                endingRange={endingRange}
-                tierLevel={tierLevel + 1}
-                chartId={tier.id}
-                isPreview={isPreview}
-                onDelete={onDelete}
-              />
-            ))}
+            {childTiers &&
+              childTiers.map((tier: any) => {
+                const tierLegends = (tier?.areaChart?.widgets || []).map(
+                  (w: any) => ({
+                    label: w.legendName,
+                    field: w.legendName?.toLowerCase().replace(/\s+/g, ""),
+                    color: w.color,
+                  }),
+                );
+
+                const { labels, data: tierUploadedData } = parseAreaChartData(
+                  tier.xAxis,
+                  tierLegends,
+                  tier.title,
+                );
+
+                return (
+                  <AreaChart
+                    key={tier.id}
+                    widgetTitle={tier.title || tier.name || "Untitled Tier"}
+                    xAxisValues={labels}
+                    legendValues={tierLegends}
+                    numOfLegendDataSet={tierLegends.length}
+                    startingRange={startingRange}
+                    endingRange={endingRange}
+                    tierLevel={tierLevel + 1}
+                    chartId={tier.id}
+                    projectId={tier.projectId}
+                    allUploadedData={tierUploadedData}
+                    isPreview={isPreview}
+                    onDelete={onDelete}
+                    breadcrumbPath={currentBreadcrumbs}
+                    onNavigate={handleChildNavigate}
+                  />
+                );
+              })}
           </div>
         </TierChartModal>
       )}

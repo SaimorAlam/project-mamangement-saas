@@ -100,17 +100,20 @@ const AreaChartModule = ({
 
   return (
     <div className="flex gap-3">
-      <AreaChart
-        widgetTitle={widgetTitle}
-        xAxisValues={xAxisValues}
-        legendValues={legendValues}
-        numOfLegendDataSet={numOfLegendDataSet}
-        startingRange={startingRange}
-        endingRange={endingRange}
-        onToggleWidget={handleToggleWidget}
-        onDelete={onDelete}
-        isPreview={isPreview}
-      />
+      <div className="flex-1 min-w-0 sticky top-5 h-full">
+        <AreaChart
+          widgetTitle={widgetTitle}
+          xAxisValues={xAxisValues}
+          legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
+          startingRange={startingRange}
+          endingRange={endingRange}
+          onToggleWidget={handleToggleWidget}
+          onDelete={onDelete}
+          isCreationMode={true}
+          isPreview={isPreview}
+        />
+      </div>
       {!isPreview && showWidget && (
         <ProjectConfiguration
           widgedName="Area Chart"

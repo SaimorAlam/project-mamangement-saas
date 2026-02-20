@@ -223,4 +223,3 @@ const ChartModuleOne = ({
 };
 
 export default ChartModuleOne;
-
