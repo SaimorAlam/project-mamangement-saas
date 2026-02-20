@@ -137,9 +137,7 @@ export default function HorizontalBarChart({
   breadcrumbPath = [],
   onNavigate,
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<
-    { [key: string]: ChartData[] } | undefined
-  >(allUploadedData);
+
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
@@ -199,8 +197,7 @@ export default function HorizontalBarChart({
       .trim()
       .substring(0, 31);
 
-    const dataToUse =
-      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const dataToUse = allUploadedData?.[sheetName];
 
     // Priority 1: Real Uploaded Data (must have at least one non-zero value)
     const hasRealData =
@@ -249,10 +246,9 @@ export default function HorizontalBarChart({
     safeStartingRange,
     safeEndingRange,
     widgetTitle,
-    localUploadedData,
-    allUploadedData,
     effectiveXAxisValues,
     effectiveLegendValues,
+    allUploadedData,
   ]);
 
   /*   ACTIONS   */
@@ -389,47 +385,7 @@ export default function HorizontalBarChart({
     }
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const bstr = evt.target?.result as string;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const allData: { [key: string]: ChartData[] } = {};
-
-        wb.SheetNames.forEach((sheetName) => {
-          const ws = wb.Sheets[sheetName];
-          const rawData: any[] = XLSX.utils.sheet_to_json(ws);
-
-          if (rawData.length > 0) {
-            const processedData = rawData.map((row: any) => {
-              const item: ChartData = { name: row["Label"] || "" };
-              effectiveLegendValues.forEach((l) => {
-                if (row[l.label] !== undefined) {
-                  item[l.field] = Number(row[l.label]);
-                } else if (row[l.field] !== undefined) {
-                  item[l.field] = Number(row[l.field]);
-                }
-              });
-              return item;
-            });
-            allData[sheetName] = processedData;
-          }
-        });
-
-        setLocalUploadedData(allData);
-        toast.success("Data uploaded successfully");
-      } catch (err) {
-        console.error("Upload failed", err);
-        toast.error("Failed to parse Excel file");
-      }
-    };
-    reader.readAsBinaryString(file);
-    e.target.value = ""; // Reset file input
-  };
 
   const handleAddTierClick = (title: string) => {
     if (tierLevel === 0) {
@@ -518,20 +474,12 @@ export default function HorizontalBarChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`${isSampleData ? "(Sample Data) " : "Stacked Distribution Assessment"}`}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
           onCopy: handleCopy,
           onDownload:
             tierLevel === 0 ? () => handleDownload(widgetTitle) : undefined,
-          onUpload:
-            tierLevel === 0
-              ? () =>
-                  document
-                    .getElementById(`upload-horizontal-${chartId}`)
-                    ?.click()
-              : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode
             ? () => handleAddTierClick(widgetTitle)
@@ -550,59 +498,50 @@ export default function HorizontalBarChart({
         }
       >
         <div className="relative">
-          {chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 50)}>
-              <BarChart
-                layout="vertical"
-                data={chartData}
-                margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="0"
-                  horizontal={false}
-                  stroke="#e5e7eb"
-                />
-                <XAxis
-                  type="number"
-                  domain={[safeStartingRange, safeEndingRange]}
-                  axisLine={{ stroke: "#e5e7eb" }}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  axisLine={{ stroke: "#e5e7eb" }}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                  width={20}
-                />
-                <Tooltip
-                  content={<CustomTooltip />}
-                  cursor={{ fill: "#f3f4f6", opacity: 0.4 }}
-                />
+          <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 50)}>
+            <BarChart
+              layout="vertical"
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
+            >
+              <CartesianGrid
+                strokeDasharray="0"
+                horizontal={false}
+                stroke="#e5e7eb"
+              />
+              <XAxis
+                type="number"
+                domain={[safeStartingRange, safeEndingRange]}
+                axisLine={{ stroke: "#e5e7eb" }}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+              />
+              <YAxis
+                dataKey="name"
+                type="category"
+                axisLine={{ stroke: "#e5e7eb" }}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+                width={20}
+              />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ fill: "#f3f4f6", opacity: 0.4 }}
+              />
 
-                {effectiveLegendValues.map((l) => (
-                  <Bar
-                    key={l.field}
-                    name={l.label}
-                    dataKey={l.field}
-                    stackId="a"
-                    fill={l.color}
-                    radius={[0, 4, 4, 0]}
-                    barSize={32}
-                  />
-                ))}
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-80 flex flex-col items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
-              <span className="mb-2 text-2xl">📊</span>
-              <p className="text-sm">
-                No data available. Please configure the chart.
-              </p>
-            </div>
-          )}
+              {effectiveLegendValues.map((l) => (
+                <Bar
+                  key={l.field}
+                  name={l.label}
+                  dataKey={l.field}
+                  stackId="a"
+                  fill={l.color}
+                  radius={[0, 4, 4, 0]}
+                  barSize={32}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
 
           {/* Legend Display */}
           {chartData.length > 0 && (
@@ -621,15 +560,7 @@ export default function HorizontalBarChart({
             </div>
           )}
 
-          {tierLevel === 0 && (
-            <input
-              id={`upload-horizontal-${chartId}`}
-              type="file"
-              accept=".xlsx, .xls"
-              className="hidden"
-              onChange={handleUpload}
-            />
-          )}
+
         </div>
       </ChartCardWrapper>
 

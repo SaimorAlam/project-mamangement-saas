@@ -141,9 +141,6 @@ export default function AreaChart({
   breadcrumbPath = [],
   onNavigate,
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<
-    { [key: string]: ChartData[] } | undefined
-  >(allUploadedData);
 
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
   const [findChildrenValue, { data, isLoading }] =
@@ -226,12 +223,18 @@ export default function AreaChart({
       .trim()
       .substring(0, 31);
 
-    const dataToUse =
-      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const dataToUse = allUploadedData?.[sheetName];
 
-    // Priority 1: Real Uploaded Data
-    if (dataToUse && dataToUse.length > 0) {
-      return { chartData: dataToUse, isSampleData: false };
+    // Priority 1: Real Uploaded Data (must have at least one non-zero value)
+    const hasRealData =
+      dataToUse &&
+      dataToUse.length > 0 &&
+      dataToUse.some((row) =>
+        effectiveLegendValues.some((l) => Number(row[l.field] || 0) > 0),
+      );
+
+    if (hasRealData) {
+      return { chartData: dataToUse as ChartData[], isSampleData: false };
     }
 
     const hasConfig =
@@ -269,23 +272,12 @@ export default function AreaChart({
     safeStartingRange,
     safeEndingRange,
     widgetTitle,
-    localUploadedData,
-    allUploadedData,
     effectiveXAxisValues,
     effectiveLegendValues,
+    allUploadedData,
   ]);
 
-  const totalValue = useMemo(() => {
-    return chartData.reduce((sum, row) => {
-      return (
-        sum +
-        effectiveLegendValues.reduce(
-          (inner, l) => inner + Number(row[l.field] || 0),
-          0,
-        )
-      );
-    }, 0);
-  }, [chartData, effectiveLegendValues]);
+
 
   /*   ACTIONS   */
 
@@ -390,46 +382,7 @@ export default function AreaChart({
     }
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const bstr = evt.target?.result as string;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const allData: { [key: string]: ChartData[] } = {};
-
-        wb.SheetNames.forEach((sheetName) => {
-          const ws = wb.Sheets[sheetName];
-          const rawData: any[] = XLSX.utils.sheet_to_json(ws);
-
-          if (rawData.length > 0) {
-            const processedData = rawData.map((row: any) => {
-              const item: ChartData = { name: row["Label"] || "" };
-              legendValues.forEach((l) => {
-                if (row[l.label] !== undefined) {
-                  item[l.field] = Number(row[l.label]);
-                } else if (row[l.field] !== undefined) {
-                  item[l.field] = Number(row[l.field]);
-                }
-              });
-              return item;
-            });
-            allData[sheetName] = processedData;
-          }
-        });
-
-        setLocalUploadedData(allData);
-        toast.success("Data uploaded successfully");
-      } catch (err) {
-        console.error("Upload failed", err);
-        toast.error("Failed to parse Excel file");
-      }
-    };
-    reader.readAsBinaryString(file);
-  };
 
   const handleAddTierClick = (title: string) => {
     if (tierLevel === 0) {
@@ -505,21 +458,12 @@ export default function AreaChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`Area performance view ${isSampleData ? "(Sample Data)" : ""}`}
-        chartId={chartId || "root"}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
-        
         menuActions={{
           onCopy: handleCopy,
           onDownload:
             tierLevel === 0 ? () => handleDownload(widgetTitle) : undefined,
-          onUpload:
-            tierLevel === 0
-              ? () =>
-                  document
-                    .getElementById(`upload-area-${chartId || widgetTitle}`)
-                    ?.click()
-              : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode
             ? () => handleAddTierClick(widgetTitle)
@@ -530,7 +474,7 @@ export default function AreaChart({
         isPreview={isPreview}
         customHeaderContent={
           <div className="flex items-center gap-4">
-            <p className="text-sm text-gray-500">Total {totalValue}</p>
+
             <div className="flex gap-4">
               {effectiveLegendValues.slice(0, 3).map(
                 (l) =>
@@ -598,21 +542,9 @@ export default function AreaChart({
             </ReAreaChart>
           </ResponsiveContainer>
 
-          {tierLevel === 0 && (
-            <input
-              id={`upload-area-${chartId || widgetTitle}`}
-              type="file"
-              accept=".xlsx, .xls"
-              className="hidden"
-              onChange={handleUpload}
-            />
-          )}
 
-          {chartData.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
-              No data available. Please configure the widget.
-            </div>
-          )}
+
+
         </div>
       </ChartCardWrapper>
 

@@ -31,6 +31,7 @@ type Props = {
   onDelete?: () => void;
   legendValues?: LegendValue[];
   isPreview?: boolean;
+  isCreationMode?: boolean;
 };
 
 /* ---------- COMPONENT ---------- */
@@ -46,6 +47,7 @@ export default function SplineAreaChart({
   chartId = "root",
   onDelete,
   isPreview = false,
+  isCreationMode = false,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
@@ -181,14 +183,14 @@ export default function SplineAreaChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`${xAxisValues.length} points`}
-        chartId={chartId}
+        // chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
           onCopy: handleCopy,
           onDownload: handleDownload,
           onDelete: onDelete,
-          onAddTier: () => setShowAddTierModal(true),
+          onAddTier: !isCreationMode ? () => setShowAddTierModal(true) : undefined,
           onToggleWidget: onToggleWidget,
         }}
         isDownloading={isDownloading}

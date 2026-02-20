@@ -118,6 +118,7 @@ const ChartModuleOne = ({
                   onDelete={onDelete}
                   isPreview={isPreview}
                   onToggleWidget={handleToggleWidget}
+                  isCreationMode={true}
                 />
               );
             }
@@ -131,6 +132,7 @@ const ChartModuleOne = ({
                 onToggleWidget={handleToggleWidget}
                 onDelete={onDelete}
                 isPreview={isPreview}
+                isCreationMode={true}
               />
             );
           } else if (chartName === "area-chart") {
@@ -144,6 +146,7 @@ const ChartModuleOne = ({
                 onToggleWidget={handleToggleWidget}
                 onDelete={onDelete}
                 isPreview={isPreview}
+                isCreationMode={true}
               />
             );
           } else if (chartName === "spline-area-chart") {
@@ -157,6 +160,7 @@ const ChartModuleOne = ({
                 onToggleWidget={handleToggleWidget}
                 onDelete={onDelete}
                 isPreview={isPreview}
+                isCreationMode={true}
               />
             );
           } else if (chartName === "line-chart") {
@@ -170,6 +174,7 @@ const ChartModuleOne = ({
                 onDelete={onDelete}
                 isPreview={isPreview}
                 onToggleWidget={handleToggleWidget}
+                isCreationMode={true}
               />
             );
           }

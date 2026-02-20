@@ -87,9 +87,7 @@ export default function ComboChart({
   isPreview = false,
   allUploadedData,
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<
-    { [key: string]: ChartData[] } | undefined
-  >(allUploadedData);
+
   const { childTiers } = useChartData({
     newData,
     isCreationMode,
@@ -112,8 +110,7 @@ export default function ComboChart({
       .replace(/[:/?*[\]\\]/g, " ")
       .trim()
       .substring(0, 31);
-    const dataToUse =
-      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const dataToUse = allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
       return dataToUse;
@@ -134,7 +131,6 @@ export default function ComboChart({
     startingRange,
     endingRange,
     widgetTitle,
-    localUploadedData,
     allUploadedData,
   ]);
 
@@ -283,52 +279,10 @@ export default function ComboChart({
     }
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const bstr = evt.target?.result as string;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const allData: { [key: string]: ChartData[] } = {};
-
-        wb.SheetNames.forEach((sheetName) => {
-          const ws = wb.Sheets[sheetName];
-          const rawData: any[] = XLSX.utils.sheet_to_json(ws);
-
-          if (rawData.length > 0) {
-            const processedData = rawData.map((row: any) => {
-              const item: ChartData = { name: row["Label"] || "" };
-              legendValues.forEach((l) => {
-                if (row[l.label] !== undefined) {
-                  item[l.field] = Number(row[l.label]);
-                } else if (row[l.field] !== undefined) {
-                  item[l.field] = Number(row[l.field]);
-                }
-              });
-              return item;
-            });
-            allData[sheetName] = processedData;
-          }
-        });
-
-        setLocalUploadedData(allData);
-        toast.success("Data uploaded successfully");
-      } catch (err) {
-        console.error("Upload failed", err);
-        toast.error("Failed to parse Excel file");
-      }
-    };
-    reader.readAsBinaryString(file);
-  };
-
   return (
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
@@ -337,7 +291,6 @@ export default function ComboChart({
           onDelete: onDelete,
           onAddTier: handleAddTierClick,
           onToggleWidget: onToggleWidget,
-          onUpload: tierLevel === 0 ? handleUpload : undefined,
         }}
         isDownloading={isDownloading}
         isPreview={isPreview}
@@ -400,7 +353,7 @@ export default function ComboChart({
                   endingRange={endingRange}
                   tierLevel={tierLevel + 1}
                   chartId={tier?.id}
-                  allUploadedData={localUploadedData || allUploadedData}
+                  allUploadedData={allUploadedData}
                   isPreview={isPreview}
                   onDelete={onDelete}
                 />

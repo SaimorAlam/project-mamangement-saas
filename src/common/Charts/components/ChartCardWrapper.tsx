@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef } from "react";
 import { BsThreeDots } from "react-icons/bs";
-import { Trash2, Download, Upload } from "lucide-react";
+import { Trash2, Download } from "lucide-react";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
 
@@ -11,14 +10,13 @@ type MenuActions = {
   onDelete?: () => void;
   onAddTier?: () => void;
   onToggleWidget?: () => void;
-  onUpload?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 type Props = {
   title: string;
   subtitle?: string;
-  chartId?: string; // Used for unique IDs like upload input
   children: React.ReactNode;
+  chartId?: string;
   footer?: React.ReactNode;
   menuActions: MenuActions;
   isDownloading?: boolean;
@@ -32,8 +30,8 @@ type Props = {
 const ChartCardWrapper = ({
   title,
   subtitle,
-  chartId = "root",
   children,
+  chartId,
   footer,
   menuActions,
   isDownloading = false,
@@ -45,7 +43,7 @@ const ChartCardWrapper = ({
 }: Props) => {
   const [showPopover, setShowPopover] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
-
+  console.log(chartId);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -74,8 +72,9 @@ const ChartCardWrapper = ({
 
   return (
     <div
-      className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${onHeaderClick ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
-        } ${className}`}
+      className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
+        onHeaderClick ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
+      } ${className}`}
       onClick={() => {
         if (onHeaderClick) {
           onHeaderClick();
@@ -130,30 +129,6 @@ const ChartCardWrapper = ({
                       <Download size={18} />{" "}
                       {isDownloading ? "Downloading..." : "Download"}
                     </button>
-                  )}
-
-                  {/* UPLOAD - Only for Root */}
-                  {tierLevel === 0 && menuActions.onUpload && (
-                    <>
-                      <button
-                        onClick={() => {
-                          document
-                            .getElementById(`upload-input-${chartId}`)
-                            ?.click();
-                          setShowPopover(false);
-                        }}
-                        className="w-full flex gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left items-center"
-                      >
-                        <Upload size={18} /> Upload Data
-                      </button>
-                      <input
-                        id={`upload-input-${chartId}`}
-                        type="file"
-                        accept=".xlsx, .xls"
-                        className="hidden"
-                        onChange={menuActions.onUpload}
-                      />
-                    </>
                   )}
 
                   {/* DELETE */}

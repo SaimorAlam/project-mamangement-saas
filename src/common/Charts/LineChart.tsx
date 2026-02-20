@@ -89,9 +89,7 @@ export default function MultiAxisLineChart({
   const [showLineOnly, setShowLineOnly] = useState(false);
   const [hoveredLine, setHoveredLine] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [localUploadedData, setLocalUploadedData] = useState<
-    { [key: string]: ChartData[] } | undefined
-  >(allUploadedData);
+
 
   // API hooks
   const [findChildrenValue, { data, isLoading }] =
@@ -106,12 +104,7 @@ export default function MultiAxisLineChart({
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
 
-  // Sync with allUploadedData when it changes
-  useEffect(() => {
-    if (allUploadedData) {
-      setLocalUploadedData(allUploadedData);
-    }
-  }, [allUploadedData]);
+
 
   // Fetch children
   useEffect(() => {
@@ -169,8 +162,7 @@ export default function MultiAxisLineChart({
       .trim()
       .substring(0, 31);
 
-    const dataToUse =
-      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const dataToUse = allUploadedData?.[sheetName];
 
     // Priority 1: Real Uploaded Data (must have at least one non-zero value)
     const hasRealData =
@@ -219,10 +211,9 @@ export default function MultiAxisLineChart({
     safeStartingRange,
     safeEndingRange,
     widgetTitle,
-    localUploadedData,
-    allUploadedData,
     effectiveXAxisValues,
     effectiveLegendValues,
+    allUploadedData,
   ]);
 
   /*   NAVIGATION & BREADCRUMBS   */
@@ -358,44 +349,7 @@ export default function MultiAxisLineChart({
     }
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const bstr = evt.target?.result as string;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const allData: { [key: string]: ChartData[] } = {};
-
-        wb.SheetNames.forEach((sheetName) => {
-          const ws = wb.Sheets[sheetName];
-          const rawData: any[] = XLSX.utils.sheet_to_json(ws);
-          if (rawData.length > 0) {
-            const processed = rawData.map((row: any) => {
-              const item: ChartData = { name: String(row["Label"] || "") };
-              effectiveLegendValues.forEach((l) => {
-                const val =
-                  row[l.label] !== undefined ? row[l.label] : row[l.field];
-                item[l.field] = val !== undefined ? Number(val) : 0;
-              });
-              return item;
-            });
-            allData[sheetName] = processed;
-          }
-        });
-
-        setLocalUploadedData(allData);
-        toast.success("Data uploaded successfully");
-      } catch (err) {
-        console.error("Upload Error:", err);
-        toast.error("Failed to parse file");
-      }
-    };
-    reader.readAsBinaryString(file);
-    e.target.value = ""; // Reset
-  };
 
   const handleAddTierClick = (title: string) => {
     if (tierLevel === 0) dispatch(setGroupTitle(title));
@@ -482,17 +436,12 @@ export default function MultiAxisLineChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`${isSampleData ? "(Sample Data)" : "Line Distribution Assessment"}`}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
           onCopy: handleCopy,
           onDownload:
             tierLevel === 0 ? () => handleDownload(widgetTitle) : undefined,
-          onUpload:
-            tierLevel === 0
-              ? () => document.getElementById(`upload-line-${chartId}`)?.click()
-              : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode
             ? () => handleAddTierClick(widgetTitle)
@@ -526,79 +475,71 @@ export default function MultiAxisLineChart({
         }
       >
         <div className="relative">
-          {chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart
-                data={chartData}
-                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="0"
-                  vertical={false}
-                  stroke="#e5e7eb"
-                />
-                <XAxis
-                  dataKey="name"
-                  axisLine={{ stroke: "#e5e7eb" }}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                  dy={10}
-                />
-                <YAxis
-                  domain={[safeStartingRange, safeEndingRange]}
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                  dx={-10}
-                />
-                <Tooltip
-                  content={<CustomTooltip />}
-                  cursor={{ stroke: "#d1d5db", strokeWidth: 1 }}
-                />
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+            >
+              <CartesianGrid
+                strokeDasharray="0"
+                vertical={false}
+                stroke="#e5e7eb"
+              />
+              <XAxis
+                dataKey="name"
+                axisLine={{ stroke: "#e5e7eb" }}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+                dy={10}
+              />
+              <YAxis
+                domain={[safeStartingRange, safeEndingRange]}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+                dx={-10}
+              />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: "#d1d5db", strokeWidth: 1 }}
+              />
 
-                {effectiveLegendValues.map((l) => (
-                  <Line
-                    key={l.field}
-                    name={l.label}
-                    type="monotone"
-                    dataKey={l.field}
-                    stroke={l.color}
-                    dot={
-                      !showLineOnly
-                        ? {
-                            r: 5,
-                            fill: l.color,
-                            stroke: l.color,
-                            strokeWidth: 2,
-                          }
-                        : false
-                    }
-                    activeDot={{
-                      r: 7,
-                      fill: l.color,
-                      stroke: "#fff",
-                      strokeWidth: 2,
-                    }}
-                    strokeWidth={3}
-                    connectNulls
-                    opacity={
-                      hoveredLine === null || hoveredLine === l.field ? 1 : 0.2
-                    }
-                    onMouseEnter={() => setHoveredLine(l.field)}
-                    onMouseLeave={() => setHoveredLine(null)}
-                    animationDuration={1500}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-80 flex flex-col items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
-              <span className="mb-2 text-2xl">📊</span>
-              <p className="text-sm">
-                No data available. Please configure the chart.
-              </p>
-            </div>
-          )}
+              {effectiveLegendValues.map((l) => (
+                <Line
+                  key={l.field}
+                  name={l.label}
+                  type="monotone"
+                  dataKey={l.field}
+                  stroke={l.color}
+                  dot={
+                    !showLineOnly
+                      ? {
+                          r: 5,
+                          fill: l.color,
+                          stroke: l.color,
+                          strokeWidth: 2,
+                        }
+                      : false
+                  }
+                  activeDot={{
+                    r: 7,
+                    fill: l.color,
+                    stroke: "#fff",
+                    strokeWidth: 2,
+                  }}
+                  strokeWidth={3}
+                  connectNulls
+                  opacity={
+                    hoveredLine === null || hoveredLine === l.field ? 1 : 0.2
+                  }
+                  onMouseEnter={() => setHoveredLine(l.field)}
+                  onMouseLeave={() => setHoveredLine(null)}
+                  animationDuration={1500}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+
 
           {/* Bottom Legend Alignment */}
           {chartData.length > 0 && (
@@ -623,15 +564,7 @@ export default function MultiAxisLineChart({
             </div>
           )}
 
-          {tierLevel === 0 && (
-            <input
-              id={`upload-line-${chartId}`}
-              type="file"
-              accept=".xlsx, .xls"
-              className="hidden"
-              onChange={handleUpload}
-            />
-          )}
+
         </div>
       </ChartCardWrapper>
 

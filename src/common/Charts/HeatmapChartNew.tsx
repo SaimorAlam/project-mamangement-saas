@@ -46,6 +46,7 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
   isPreview?: boolean;
+  isCreationMode?: boolean;
 };
 
 /*    COMPONENT    */
@@ -62,6 +63,7 @@ export default function HeatmapChartNew({
   tierLevel = 0,
   chartId = "root",
   isPreview = false,
+  isCreationMode = false,
 }: Props) {
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const [showPopover, setShowPopover] = useState(false);
@@ -269,16 +271,18 @@ export default function HeatmapChartNew({
                   </button>
                 )}
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddTierClick();
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
-                >
-                  <GoPlus size={18} />
-                  <span>Add Tier</span>
-                </button>
+                {!isCreationMode && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddTierClick();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded text-left"
+                  >
+                    <GoPlus size={18} />
+                    <span>Add Tier</span>
+                  </button>
+                )}
               </div>
             )}
           </div>

@@ -158,10 +158,6 @@ export default function BulletChart({
   isPreview = false,
   allUploadedData,
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<
-    { [key: string]: { [key: string]: BulletData } } | undefined
-  >(allUploadedData);
-
   const { childTiers } = useChartData({
     newData,
     isCreationMode,
@@ -234,8 +230,7 @@ export default function BulletChart({
       .trim()
       .substring(0, 31);
 
-    const dataToUse =
-      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const dataToUse = allUploadedData?.[sheetName];
 
     if (dataToUse) {
       return legendValues
@@ -259,7 +254,6 @@ export default function BulletChart({
   }, [
     legendValues,
     widgetTitle,
-    localUploadedData,
     allUploadedData,
     generatedData,
   ]);
@@ -344,45 +338,6 @@ export default function BulletChart({
     }
   }, [childTiers]);
 
-  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const bstr = evt.target?.result as string;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const allData: { [key: string]: { [key: string]: BulletData } } = {};
-
-        wb.SheetNames.forEach((sheetName) => {
-          const ws = wb.Sheets[sheetName];
-          const rawData: any[] = XLSX.utils.sheet_to_json(ws);
-
-          if (rawData.length > 0) {
-            const bulletData: { [key: string]: BulletData } = {};
-            rawData.forEach((row) => {
-              const metric = row["Metric"];
-              const current = Number(row["Current"]) || 0;
-              const target = Number(row["Target"]) || 0;
-              if (metric) {
-                bulletData[metric] = [current, target];
-              }
-            });
-            allData[sheetName] = bulletData;
-          }
-        });
-
-        setLocalUploadedData(allData);
-        toast.success("Data uploaded successfully");
-      } catch (err) {
-        console.error("Upload failed", err);
-        toast.error("Failed to parse Excel file");
-      }
-    };
-    reader.readAsBinaryString(file);
-  }, []);
-
   const menuActions = useMemo(
     () => ({
       onCopy: handleCopy,
@@ -390,7 +345,6 @@ export default function BulletChart({
       onDelete: onDelete,
       onAddTier: handleAddTierClick,
       onToggleWidget: onToggleWidget,
-      onUpload: tierLevel === 0 ? handleUpload : undefined,
     }),
     [
       handleCopy,
@@ -398,8 +352,6 @@ export default function BulletChart({
       onDelete,
       handleAddTierClick,
       onToggleWidget,
-      handleUpload,
-      tierLevel,
     ],
   );
 
@@ -407,7 +359,6 @@ export default function BulletChart({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={menuActions}
@@ -458,6 +409,9 @@ export default function BulletChart({
         onClose={() => setShowAddTierModal(false)}
         chartId={chartId}
         parentChartName={widgetTitle}
+        onSave={() => {
+            setShowAddTierModal(false);
+        }}
       />
 
       {showChildrenModal && (
@@ -480,7 +434,7 @@ export default function BulletChart({
                   endingRange={endingRange}
                   tierLevel={tierLevel + 1}
                   chartId={tier?.id}
-                  allUploadedData={localUploadedData || allUploadedData}
+                  allUploadedData={allUploadedData}
                   isPreview={isPreview}
                   onDelete={onDelete}
                 />

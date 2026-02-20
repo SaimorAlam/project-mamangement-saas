@@ -56,9 +56,6 @@ export default function MatrixTableChart({
   allUploadedData,
   isPreview = false,
 }: Props) {
-  const [localUploadedData, setLocalUploadedData] = useState<
-    { [key: string]: number[][] } | undefined
-  >(allUploadedData);
   const { childTiers } = useChartData({
     newData,
     isCreationMode,
@@ -79,8 +76,7 @@ export default function MatrixTableChart({
       .replace(/[:/?*[\]\\]/g, " ")
       .trim()
       .substring(0, 31);
-    const dataToUse =
-      localUploadedData?.[sheetName] || allUploadedData?.[sheetName];
+    const dataToUse = allUploadedData?.[sheetName];
 
     if (dataToUse && dataToUse.length > 0) {
       return dataToUse;
@@ -106,7 +102,6 @@ export default function MatrixTableChart({
     startingRange,
     endingRange,
     widgetTitle,
-    localUploadedData,
     allUploadedData,
   ]);
 
@@ -156,7 +151,7 @@ export default function MatrixTableChart({
       const usedNames = new Set<string>();
 
       const getUniqueSheetName = (name: string) => {
-        let baseName = (name || "Sheet").replace(/[:\/?*\[\]\\]/g, " ").trim();
+        let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
         if (baseName.length > 25) baseName = baseName.substring(0, 25);
         if (!baseName) baseName = "Sheet";
 
@@ -223,45 +218,11 @@ export default function MatrixTableChart({
     }
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const bstr = evt.target?.result as string;
-        const wb = XLSX.read(bstr, { type: "binary" });
-        const allData: { [key: string]: number[][] } = {};
-
-        wb.SheetNames.forEach((sheetName) => {
-          const ws = wb.Sheets[sheetName];
-          const rawData: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1 });
-
-          if (rawData.length > 1) {
-            const matrixData = rawData.slice(1).map((row) => {
-              return row.slice(1).map((cell) => Number(cell) || 0);
-            });
-            allData[sheetName] = matrixData;
-          }
-        });
-
-        setLocalUploadedData(allData);
-        toast.success("Data uploaded successfully");
-      } catch (err) {
-        console.error("Upload failed", err);
-        toast.error("Failed to parse Excel file");
-      }
-    };
-    reader.readAsBinaryString(file);
-  };
-
   return (
     <>
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`${rows.length} rows × ${columns.length} columns`}
-        chartId={chartId || "root"}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
@@ -270,16 +231,6 @@ export default function MatrixTableChart({
           onDelete: onDelete,
           onAddTier: !isCreationMode ? handleAddTierClick : undefined,
           onToggleWidget: onToggleWidget,
-          onUpload:
-            tierLevel === 0
-              ? () => {
-                  const input = document.createElement("input");
-                  input.type = "file";
-                  input.accept = ".xlsx, .xls";
-                  input.onchange = (event: any) => handleUpload(event);
-                  input.click();
-                }
-              : undefined,
         }}
         isDownloading={isDownloading}
         isPreview={isPreview}
@@ -323,10 +274,10 @@ export default function MatrixTableChart({
                           key={colIndex}
                           className="px-2 py-3 border-r border-gray-100 last:border-r-0 text-center font-medium transition-all duration-200"
                           style={{
-                            backgroundColor: cellColorFunction(cellValue),
-                            color:
-                              getOpacity(cellValue) > 0.6 ? "#fff" : "#374151",
-                          }}
+                              backgroundColor: cellColorFunction(cellValue),
+                              color:
+                                getOpacity(cellValue) > 0.6 ? "#fff" : "#374151",
+                            }}
                         >
                           {cellValue}
                         </td>
@@ -376,7 +327,7 @@ export default function MatrixTableChart({
                   endingRange={endingRange}
                   tierLevel={tierLevel + 1}
                   chartId={tier?.id}
-                  allUploadedData={localUploadedData || allUploadedData}
+                  allUploadedData={allUploadedData}
                   isPreview={isPreview}
                   onDelete={onDelete}
                 />

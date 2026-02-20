@@ -160,7 +160,7 @@ export default function PieChartWidget({
     return { chartData: data, isSampleData: data.length > 0 };
   }, [legendValues, allUploadedData]);
 
-  const isAllLegendFieldEmpty = legendValues.filter((l) => l.field !== "");
+
 
   /*   ACTIONS   */
 
@@ -341,7 +341,6 @@ export default function PieChartWidget({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`Distribution Analysis ${isSampleData ? "(Sample Data)" : ""}`}
-        chartId={chartId || "root"}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
@@ -406,11 +405,7 @@ export default function PieChartWidget({
             </RechartsPieChart>
           </ResponsiveContainer>
 
-          {isAllLegendFieldEmpty.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-xl">
-              No data available. Please configure the widget.
-            </div>
-          )}
+
         </div>
       </ChartCardWrapper>
 
