@@ -12,11 +12,11 @@ import ProgressRing from "@/common/Charts/ProgressRingTest";
 // import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 // import AreaChart from "@/common/Charts/AreaChart";
 import GanttChart from "@/common/Charts/GanttChart";
-import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
+import LineChartModule from "@/common/Charts/CompletedCharts/LineChart/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
 import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
-import HorizontalBarChartModule from './../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule';
+import HorizontalBarChartModule from "../../common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChartModule";
 
 const StaffEmployeeProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
-import MultiAxisLineChart from "@/common/Charts/LineChart";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../../../../components/client/ProjectBuilder/WidgetForChartModuleOne";
+import HorizontalBarChart from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const LineChartModule = ({
+const HorizontalBarChartModule = ({
   onDelete,
   isPreview = false,
 }: {
@@ -31,7 +33,7 @@ const LineChartModule = ({
   useEffect(() => {
     dispatch(
       setWidgetConfig({
-        id: "line-chart",
+        id: "horizontal-bar-chart",
         config: {
           widgetTitle,
           xAxisValues,
@@ -71,9 +73,11 @@ const LineChartModule = ({
 
     setXAxisValues((prev) => {
       const updated = [...prev];
+      // Adding empty values if increased
       while (updated.length < value) {
         updated.push("");
       }
+      // Removing extra values if decreased
       return updated.slice(0, value);
     });
   };
@@ -84,26 +88,26 @@ const LineChartModule = ({
       updated[index] = value;
       return updated;
     });
+    console.log("parant x values: ", xAxisValues);
   };
 
+  // Toggle widget visibility
   const handleToggleWidget = () => {
-    if (!isPreview) {
-      setShowWidget(!showWidget);
-    }
+    setShowWidget(!showWidget);
   };
 
+  // Close widget (for X button)
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3 h-full w-full">
-      <div className="flex-1 min-0 min-w-0 sticky top-5 h-full">
-        <MultiAxisLineChart
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
+        <HorizontalBarChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
           legendValues={legendValues}
-          numOfLegendDataSet={numOfLegendDataSet}
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
@@ -114,9 +118,9 @@ const LineChartModule = ({
       </div>
       {!isPreview && showWidget && (
         <ProjectConfiguration
-          widgedName="Multi Axis Line Chart"
+          widgedName="Horizontal Bar Chart"
           widgetTitle={widgetTitle}
-          widgetCategory="LINE"
+          widgetCategory="HORIZONTAL_BAR"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -131,11 +135,10 @@ const LineChartModule = ({
           endingRange={endingRange}
           setEndingRange={setEndingRange}
           onClose={handleCloseWidget}
-          onDelete={onDelete}
         />
       )}
     </div>
   );
 };
 
-export default LineChartModule;
+export default HorizontalBarChartModule;

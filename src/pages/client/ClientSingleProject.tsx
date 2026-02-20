@@ -7,7 +7,9 @@ import "handsontable/dist/handsontable.full.css";
 import {
   useUploadSheetMutation /*useUpdateSheetMutation*/,
 } from "@/store/Api/SheetApi/SheetApi";
-import StackedBarChart, { ChartData } from "@/common/Charts/StackedBarChart";
+import StackedBarChart, {
+  ChartData,
+} from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
 import { useGetChartByProjectIdQuery } from "@/store/Api/ChartApi/ChartApi";
 import * as XLSX from "xlsx";
 

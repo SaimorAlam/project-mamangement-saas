@@ -9,11 +9,11 @@ import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
 // import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
-import LineChartModule from "@/components/client/ProjectBuilder/chartModules/LineChartModule";
+import LineChartModule from "@/common/Charts/CompletedCharts/LineChart/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 // import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
-import PieChartModule from "./../../components/client/ProjectBuilder/chartModules/PieChartModule";
-import HorizontalBarChartModule from "./../../components/client/ProjectBuilder/chartModules/HorizontalBarChartModule";
+import PieChartModule from "../../common/Charts/CompletedCharts/PieChart/PieChartModule";
+import HorizontalBarChartModule from "../../common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChartModule";
 import ProgressRingModule from "./../../components/client/ProjectBuilder/chartModules/ProgressRingModule";
 import GaugeChartModule from "./../../components/client/ProjectBuilder/chartModules/GaugeChartModule";
 import HistogramChartModule from "./../../components/client/ProjectBuilder/chartModules/HistogramChartModule";
@@ -132,14 +132,10 @@ const StaffManagerProjectBuilder = () => {
 
         {selectedWidget === "gauge-chart" && <GaugeChartModule />}
 
-        {selectedWidget === "histogram-chart" && (
-          <HistogramChartModule />
-        )}
+        {selectedWidget === "histogram-chart" && <HistogramChartModule />}
 
         {selectedWidget === "bubble-chart" && <BubbleChartModule />}
-        {selectedWidget === "column-chart" && (
-          <ColumnBarChartModule />
-        )}
+        {selectedWidget === "column-chart" && <ColumnBarChartModule />}
         {selectedWidget === "funnel-chart" && <FunnelChartModule />}
         {selectedWidget === "scatter-chart" && <ScatterChartModule />}
         {selectedWidget === "pareto-chart" && <ParetoChartModule />}

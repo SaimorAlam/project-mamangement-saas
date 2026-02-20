@@ -62,8 +62,10 @@ const ProjectConfigurationTypeOne = ({
   // Handler for Legend inputs
   const minLegend = 3;
   const maxLegend = 5;
-  
-  const handleSetNumOfLegendDataSet = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleSetNumOfLegendDataSet = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const value = parseInt(e.target.value, 10);
 
     if (isNaN(value) || value < minLegend || value > maxLegend) {
@@ -121,10 +123,7 @@ const ProjectConfigurationTypeOne = ({
         <h2 className="text-lg font-semibold text-gray-900">
           Widget Configuration
         </h2>
-        <button
-          onClick={onClose}
-          className="text-gray-500 hover:text-gray-700"
-        >
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           <X size={18} />
         </button>
       </div>
@@ -235,22 +234,27 @@ const ProjectConfigurationTypeOne = ({
             {/* X-Axis Labels */}
             {Array.from({ length: numOfXAxisDataSet }).map((_, index) => (
               <div key={index} className="flex items-center mb-2">
-                <label className="text-xs text-gray-700" style={{ width: "110px" }}>
+                <label
+                  className="text-xs text-gray-700"
+                  style={{ width: "110px" }}
+                >
                   {index + 1}
                   {index === 0
                     ? "st"
                     : index === 1
-                    ? "nd"
-                    : index === 2
-                    ? "rd"
-                    : "th"}{" "}
+                      ? "nd"
+                      : index === 2
+                        ? "rd"
+                        : "th"}{" "}
                   Label:
                 </label>
                 <input
                   type="text"
                   placeholder="Enter label"
                   value={xAxisValues[index] || ""}
-                  onChange={(e) => handleXAxisValueChange(index, e.target.value)}
+                  onChange={(e) =>
+                    handleXAxisValueChange(index, e.target.value)
+                  }
                   className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
                 />
               </div>
@@ -356,10 +360,10 @@ const ProjectConfigurationTypeOne = ({
                     {index === 0
                       ? "st"
                       : index === 1
-                      ? "nd"
-                      : index === 2
-                      ? "rd"
-                      : "th"}{" "}
+                        ? "nd"
+                        : index === 2
+                          ? "rd"
+                          : "th"}{" "}
                     Legend Name:
                   </label>
 
@@ -385,10 +389,10 @@ const ProjectConfigurationTypeOne = ({
                       {index === 0
                         ? "st"
                         : index === 1
-                        ? "nd"
-                        : index === 2
-                        ? "rd"
-                        : "th"}{" "}
+                          ? "nd"
+                          : index === 2
+                            ? "rd"
+                            : "th"}{" "}
                       Legend Color:
                     </label>
 

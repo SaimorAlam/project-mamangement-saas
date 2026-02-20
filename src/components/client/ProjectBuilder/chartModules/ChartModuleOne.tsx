@@ -2,9 +2,9 @@
 // means this this a common widget which will work for these 3 charts
 import React, { useState, useEffect } from "react";
 import { LegendValue } from "../WidgetForChartModuleOne";
-import StackedBarChart from "@/common/Charts/StackedBarChart";
-import AreaChart from "@/common/Charts/AreaChart";
-import MultiAxisLineChart from "@/common/Charts/LineChart";
+import StackedBarChart from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
+import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
+import MultiAxisLineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
 import WidgetForChartModuleOne from "../WidgetForChartModuleOne";
 import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
 import SplineAreaChart from "@/common/Charts/SplineAreaChart";
