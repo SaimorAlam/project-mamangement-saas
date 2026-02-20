@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import CandleChart from "@/common/Charts/CandleChart";
 
 type CandleChartModuleProps = {
@@ -9,16 +9,17 @@ type CandleChartModuleProps = {
   isPreview?: boolean;
 };
 
-const CandleChartModule = ({ onDelete, isPreview = false }: CandleChartModuleProps) => {
+const CandleChartModule = ({
+  onDelete,
+  isPreview = false,
+}: CandleChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
-    useState<number>(1);
+  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] =
-    useState<number>(3);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#8D79F6" },
@@ -31,7 +32,7 @@ const CandleChartModule = ({ onDelete, isPreview = false }: CandleChartModulePro
   const minXaxisField = 5;
   const maxXaxisField = 30;
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -41,7 +42,7 @@ const CandleChartModule = ({ onDelete, isPreview = false }: CandleChartModulePro
     } else {
       setNumOfXAxisDataSet(5);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 
@@ -75,7 +76,6 @@ const CandleChartModule = ({ onDelete, isPreview = false }: CandleChartModulePro
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
-
 
   return (
     <div className="flex gap-3 h-full w-full">

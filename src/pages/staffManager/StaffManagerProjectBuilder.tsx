@@ -4,11 +4,11 @@ import DoughnutChart from "@/common/Charts/DoughnutChart";
 import HeatmapChart from "@/common/Charts/HeatmapChart";
 import RadarCharts from "@/common/Charts/RadarChart";
 import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
-import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
+import ProjectWidget from "@/common/Charts/CompletedCharts/Widgets/ProjectWidget";
 // import ProgressRing from "@/common/Charts/ProgressRingTest";
 // import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 import GanttChart from "@/common/Charts/GanttChart";
-import StackedBarChartModule from "@/components/client/ProjectBuilder/chartModules/StackedBarChartModule";
+
 import LineChartModule from "@/common/Charts/CompletedCharts/LineChart/LineChartModule";
 import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
 // import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
@@ -25,6 +25,7 @@ import ParetoChartModule from "@/components/client/ProjectBuilder/chartModules/P
 import RadarChartModule from "@/components/client/ProjectBuilder/chartModules/RadarChartModule";
 import WaterfallChartModule from "@/components/client/ProjectBuilder/chartModules/WaterfallChartModule";
 import CandleChartModule from "./../../components/client/ProjectBuilder/chartModules/CandleChartModule";
+import StackedBarChartModule from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChartModule";
 
 const StaffManagerProjectBuilder = () => {
   const [selectedWidget, setSelectedWidget] = useState<string>("");

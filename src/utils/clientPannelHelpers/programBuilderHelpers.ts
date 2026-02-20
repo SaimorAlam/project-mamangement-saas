@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChartData } from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
-import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
+import { LegendValue } from "@/common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 
 export const handleDownloadCSV = (csvTemplate: string, widgetTitle: string) => {
   const blob = new Blob([csvTemplate], {

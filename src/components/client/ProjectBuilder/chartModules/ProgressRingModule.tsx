@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import ProgressRing from "@/common/Charts/ProgressRing";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";

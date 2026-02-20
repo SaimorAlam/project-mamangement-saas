@@ -1,11 +1,11 @@
 // this module i created for Stacked Bar Chart, Line Chart and Area Chart
 // means this this a common widget which will work for these 3 charts
 import React, { useState, useEffect } from "react";
-import { LegendValue } from "../WidgetForChartModuleOne";
+import { LegendValue } from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import StackedBarChart from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
 import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
 import MultiAxisLineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
-import WidgetForChartModuleOne from "../WidgetForChartModuleOne";
+import WidgetForChartModuleOne from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
 import SplineAreaChart from "@/common/Charts/SplineAreaChart";
 import { useAppDispatch } from "@/hooks/useRedux";

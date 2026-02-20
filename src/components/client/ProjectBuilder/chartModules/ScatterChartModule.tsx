@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { LegendValue } from "../WidgetForChartModuleOne";
+import { LegendValue } from "@/common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import ScatterChart from "@/common/Charts/ScatterChart";
-import WidgetForChartModuleTwo from "../WidgetForChartModuleTwo";
+import WidgetForChartModuleTwo from "@/common/Charts/CompletedCharts/Widgets/WidgetForChartModuleTwo";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 

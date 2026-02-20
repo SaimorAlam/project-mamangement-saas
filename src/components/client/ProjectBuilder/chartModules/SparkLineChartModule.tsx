@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import SparkLinesChart from "@/common/Charts/SparkLinesChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
@@ -17,20 +17,18 @@ const SparkLineChartModule = ({
   const [widgetTitle, setWidgetTitle] = useState("Sparkline Trend");
   const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
 
-  const [numOfXAxisDataSet, setNumOfXAxisDataSet] =
-    useState<number>(1);
+  const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
 
-  const [numOfLegendDataSet, setNumOfLegendDataSet] =
-    useState<number>(1);
+  const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(1);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "Series 1", field: "", color: "#13A490" },
     { label: "Series 2", field: "", color: "#35B6EE" },
     { label: "Series 3", field: "", color: "#6F78F9" },
   ]);
-  const [startingRange, setStartingRange] = useState<number>(0); 
-  const [endingRange, setEndingRange] = useState<number>(100); 
+  const [startingRange, setStartingRange] = useState<number>(0);
+  const [endingRange, setEndingRange] = useState<number>(100);
 
   useEffect(() => {
     dispatch(
@@ -57,7 +55,7 @@ const SparkLineChartModule = ({
   const minXaxisField = 1;
   const maxXaxisField = 7;
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -67,7 +65,7 @@ const SparkLineChartModule = ({
     } else {
       setNumOfXAxisDataSet(1);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 
@@ -128,7 +126,7 @@ const SparkLineChartModule = ({
           setNumOfLegendDataSet={setNumOfLegendDataSet}
           legendValues={legendValues}
           setLegendValues={setLegendValues}
-          startingRange={startingRange} 
+          startingRange={startingRange}
           setStartingRange={setStartingRange}
           endingRange={endingRange}
           setEndingRange={setEndingRange}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import LogarithmicChart from "@/common/Charts/LogarithmicChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
@@ -18,7 +18,11 @@ const LogarithmicChartModule = ({
   const [showWidget, setShowWidget] = useState(false);
 
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(3);
-  const [xAxisValues, setXAxisValues] = useState<string[]>(["Jan", "Feb", "Mar"]);
+  const [xAxisValues, setXAxisValues] = useState<string[]>([
+    "Jan",
+    "Feb",
+    "Mar",
+  ]);
 
   const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(2);
 
@@ -54,7 +58,7 @@ const LogarithmicChartModule = ({
   const minXaxisField = 1;
   const maxXaxisField = 7;
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../../../../components/client/ProjectBuilder/WidgetForChartModuleOne";
+} from "../Widgets/WidgetForChartModuleOne";
 import HorizontalBarChart from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import GanttChartNew from "@/common/Charts/GanttChartNew";
 
 type GanttChartNewModuleProps = {
@@ -9,7 +9,10 @@ type GanttChartNewModuleProps = {
   isPreview?: boolean;
 };
 
-const GanttChartNewModule = ({ onDelete, isPreview = false }: GanttChartNewModuleProps) => {
+const GanttChartNewModule = ({
+  onDelete,
+  isPreview = false,
+}: GanttChartNewModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Project Timeline");
   const [showWidget, setShowWidget] = useState(false);
 

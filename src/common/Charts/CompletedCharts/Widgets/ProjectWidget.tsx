@@ -30,15 +30,17 @@ import {
   Users,
   Spline,
 } from "lucide-react";
-import useGetAllProgram from "./utils/useGetAllProgram";
+
 import SelectSkeleton from "@/common/Skeleton/SelectSkeleton";
-import useGetLazyProject from "./utils/useGetLazyProject";
+
 import { useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
   setProgramId,
   setProjectId,
 } from "@/store/Slices/ChartSlice/ChartSlice";
+import useGetAllProgram from "@/components/client/ProjectBuilder/utils/useGetAllProgram";
+import useGetLazyProject from "@/components/client/ProjectBuilder/utils/useGetLazyProject";
 
 interface Widget {
   id: string;

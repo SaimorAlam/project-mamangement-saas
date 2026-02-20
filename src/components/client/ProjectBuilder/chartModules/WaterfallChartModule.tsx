@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import WaterfallChart from "@/common/Charts/WaterfallChart";
 
 type WaterfallChartModuleProps = {
@@ -7,7 +9,10 @@ type WaterfallChartModuleProps = {
   isPreview?: boolean;
 };
 
-const WaterfallChartModule = ({ onDelete, isPreview = false }: WaterfallChartModuleProps) => {
+const WaterfallChartModule = ({
+  onDelete,
+  isPreview = false,
+}: WaterfallChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Waterfall Chart");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -27,7 +32,7 @@ const WaterfallChartModule = ({ onDelete, isPreview = false }: WaterfallChartMod
   const maxXaxisField = 10;
 
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -37,7 +42,7 @@ const WaterfallChartModule = ({ onDelete, isPreview = false }: WaterfallChartMod
     } else {
       setNumOfXAxisDataSet(1);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 

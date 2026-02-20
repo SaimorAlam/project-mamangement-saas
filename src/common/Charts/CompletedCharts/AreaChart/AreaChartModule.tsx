@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import ProjectConfiguration, { LegendValue } from "../../../../components/client/ProjectBuilder/WidgetForChartModuleOne";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../Widgets/WidgetForChartModuleOne";
 import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
