@@ -26,7 +26,7 @@ import StaffManagerStateCardDetails from "@/pages/staffManager/StaffManagerState
 import StaffManagerUploadSubmission from "@/pages/staffManager/StaffManagerUploadSubmission";
 import AllProjectsReview from "@/pages/staffManager/AllProjectsReview";
 // import StaffManagerProjectDetail from "@/pages/staffManager/StaffManagerProjectDetail";
-import ProgramDetailsPage from "@/pages/staffManager/ProgramDetailsPage";
+import StaffManagerProgramOverview from "@/pages/staffManager/Program/StaffManagerProgramOverview";
 import DashboardCardProjects from "@/pages/staffManager/DashboardCardProjects";
 import ClientProjectBuilder from "@/pages/client/ProjectBuilder/ClientProjectBuilder";
 import ProfilePage from "@/pages/commonPage/ProfilePage";
@@ -58,7 +58,7 @@ export function getStaffManagerRoutes() {
       element: <StaffManagerTimosSuperShop />,
     },
     { path: "all-program", element: <StaffManagerAllProgram /> },
-    { path: "program/:id", element: <ProgramDetailsPage /> },
+    { path: "program/:id", element: <StaffManagerProgramOverview /> },
 
     { path: "program-name", element: <StaffManagerProgramName /> },
     // {
