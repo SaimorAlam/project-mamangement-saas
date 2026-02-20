@@ -24,6 +24,14 @@ import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import { useSelector } from "react-redux";
 import ProjectLocationsMap from "@/components/staffManager/Projects/ProjectLocationsMap";
 import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // import EditProjectModal from "./EditProjectModal";
 
@@ -199,115 +207,61 @@ const StaffManagerProjects = ({
           <div className="flex flex-col lg:flex-row items-center justify-between px-6 py-4 border-b border-gray-200">
             <h1 className="text-lg font-semibold">{title}</h1>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -transform -translate-y-1/2 text-gray-400 size-4" />
-                <input
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search project..."
+                  className="pl-9 bg-white border-gray-200"
                   value={search}
                   onChange={(e) => {
                     setCurrentPage(1);
                     setSearch(e.target.value);
                   }}
-                  placeholder="Search project..."
-                  className="pl-9 pr-4 py-2 border border-[#CAD2DB] rounded-md text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
-              {/* Sort By */}
-              {/* <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 bg-transparent border border-[#CAD2DB] h-10"
-                  >
-                    <ArrowDownUp className="size-4" />
-                    Sort By
-                    <ChevronDown className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 bg-white border border-[#CAD2DB] p-1"
-                >
-                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Field
-                  </div>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortBy === "name" ? "bg-indigo-50 text-indigo-600" : ""}`}
-                    onClick={() => setSortBy("name")}
-                  >
-                    Name
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortBy === "createdAt" ? "bg-indigo-50 text-indigo-600" : ""}`}
-                    onClick={() => setSortBy("createdAt")}
-                  >
-                    Created Date
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortBy === "deadline" ? "bg-indigo-50 text-indigo-600" : ""}`}
-                    onClick={() => setSortBy("deadline")}
-                  >
-                    Deadline
-                  </DropdownMenuItem>
+              {/* Status */}
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value);
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Status</SelectItem>
+                  <SelectItem value="LIVE">Live</SelectItem>
+                  <SelectItem value="PENDING">Pending</SelectItem>
+                  <SelectItem value="OVERDUE">Overdue</SelectItem>
+                  <SelectItem value="DRAFT">Draft</SelectItem>
+                  <SelectItem value="COMPLETED">Completed</SelectItem>
+                  <SelectItem value="PROBLEM">Problem</SelectItem>
+                </SelectContent>
+              </Select>
 
-                  <div className="my-1 border-t border-gray-100" />
-
-                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Order
-                  </div>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""}`}
-                    onClick={() => setSortOrder("asc")}
-                  >
-                    Ascending
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className={`rounded-md cursor-pointer ${sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""}`}
-                    onClick={() => setSortOrder("desc")}
-                  >
-                    Descending
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu> */}
-
-              {/* Filter By */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 bg-transparent border border-[#CAD2DB] h-10"
-                  >
-                    <Filter className="size-4" />
-                    Filter By
-                    <ChevronDown className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-48 bg-white border border-[#CAD2DB]"
-                >
-                  <div className="p-2">
-                    <div className="mb-3">
-                      <DropdownSelect
-                        placeholderText="Status"
-                        dropdownItem={statusOptions}
-                        onChange={setStatusFilter}
-                        label="Status"
-                      />
-                    </div>
-                    <div>
-                      <DropdownSelect
-                        placeholderText="Priority"
-                        dropdownItem={priorityOptions}
-                        onChange={setPriorityFilter}
-                        label="Priority"
-                      />
-                    </div>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Priority */}
+              <Select
+                value={priorityFilter}
+                onValueChange={(value) => {
+                  setPriorityFilter(value);
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Select Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Priority</SelectItem>
+                  <SelectItem value="HIGH">High</SelectItem>
+                  <SelectItem value="MEDIUM">Medium</SelectItem>
+                  <SelectItem value="LOW">Low</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -347,7 +301,7 @@ const StaffManagerProjects = ({
                   )}
                 </tr>
                 {sortedProjects.map((project) => (
-                  <tr key={project.id} className="hover:bg-gray-50" onClick={() => navigate(`/staff-manager-panel/projects/${project.id}`)}>
+                  <tr key={project.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/staff-manager-panel/projects/project-details/${project.id}`)}>
                     <td className="px-6 py-4">{project.name}</td>
                     <td className="px-6 py-4">
                       {project.projectEmployees?.length > 0 ? (

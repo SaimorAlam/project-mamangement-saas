@@ -35,16 +35,22 @@ import PublishProject from "@/pages/client/ProjectBuilder/Components/PublishProj
 import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
 import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
 import ClientAllProgramContainer from "@/pages/client/ClientAllProgramContainer";
+import ProjectReviewContainer from "@/pages/client/ProjectReview/ProjectReviewContainer";
 import ProgramOverviewContainer from "@/pages/client/Program/ProgramOverviewContainer";
-import ProgramOverview from "@/pages/client/Program/ProgramOverview";
+// import ProgramOverview from "@/pages/client/Program/ProgramOverview";
 
 export function getStaffManagerRoutes() {
   return [
     { index: true, element: <StaffManagerOverview /> },
-    { path: "projects", element: <StaffManagerProjects /> },
-    // { path: "projects/:id", element: <StaffManagerProjectDetail /> },
-    { path: "projects/:id", element: <ProjectDetails /> },
-    { path: "projects/status/:status", element: <DashboardCardProjects /> },
+    {
+      path: "projects",
+      element: <ProjectReviewContainer />,
+      children: [
+        { index: true, element: <StaffManagerProjects /> },
+        { path: "project-details/:projectId", element: <ProjectDetails /> },
+        { path: "status/:status", element: <DashboardCardProjects /> },
+      ],
+    },
     {
       path: "projects/upload-submission",
       element: <StaffManagerUploadSubmission />,
