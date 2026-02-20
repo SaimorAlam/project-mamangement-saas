@@ -3,11 +3,11 @@ import { useState, useMemo } from "react";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import Pagination from "@/common/Pagination";
 // import { IProject } from "@/types/project";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-} from "@/components/ui/dropdown-menu";
+// import {
+//   DropdownMenu,
+//   DropdownMenuTrigger,
+//   DropdownMenuContent,
+// } from "@/components/ui/dropdown-menu";
 // import { useDebounce } from "@/hooks/useDebounce";
 // import { useGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { Progress } from "@/components/ui/progress";
@@ -15,10 +15,8 @@ import { useUpdateProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import { UpdateProjectPayload } from "@/types/Projects";
 import { toast } from "sonner";
 import UpdateProjectModal from "../client/Program/UpdateProjectModal";
-import { ChevronDown, Filter, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useGetProgramAllProjectsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import { Button } from "@/components/ui/button";
-import DropdownSelect from "@/common/DropdownSelect";
 import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import { useSelector } from "react-redux";
@@ -113,22 +111,22 @@ const StaffManagerProjects = ({
   const totalPages =
     meta?.totalPages ?? Math.ceil(totalProjects / itemsPerPage);
 
-  const statusOptions = [
-    { value: "ALL", title: "All Status" },
-    { value: "PENDING", title: "PENDING" },
-    { value: "COMPLETED", title: "COMPLETED" },
-    { value: "PROBLEM", title: "PROBLEM" },
-    { value: "OVERDUE", title: "OVERDUE" },
-    { value: "DRAFT", title: "DRAFT" },
-    { value: "LIVE", title: "LIVE" },
-  ];
+  // const statusOptions = [
+  //   { value: "ALL", title: "All Status" },
+  //   { value: "PENDING", title: "PENDING" },
+  //   { value: "COMPLETED", title: "COMPLETED" },
+  //   { value: "PROBLEM", title: "PROBLEM" },
+  //   { value: "OVERDUE", title: "OVERDUE" },
+  //   { value: "DRAFT", title: "DRAFT" },
+  //   { value: "LIVE", title: "LIVE" },
+  // ];
 
-  const priorityOptions = [
-    { value: "ALL", title: "All Priority" },
-    { value: "HIGH", title: "High" },
-    { value: "MEDIUM", title: "Medium" },
-    { value: "LOW", title: "Low" },
-  ];
+  // const priorityOptions = [
+  //   { value: "ALL", title: "All Priority" },
+  //   { value: "HIGH", title: "High" },
+  //   { value: "MEDIUM", title: "Medium" },
+  //   { value: "LOW", title: "Low" },
+  // ];
 
   const sortedProjects = useMemo(() => {
     const list = [...projects];
