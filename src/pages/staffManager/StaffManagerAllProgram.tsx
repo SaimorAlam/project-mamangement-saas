@@ -121,7 +121,7 @@ const StaffManagerAllProgram = ({
   ];
 
   const handleRowClick = (programId: string) => {
-    navigate(`/staff-manager-panel/program/${programId}`);
+    navigate(`/staff-manager-panel/all-program/program-overview/${programId}`);
   };
 
   return (
@@ -162,31 +162,28 @@ const StaffManagerAllProgram = ({
                   Field
                 </div>
                 <DropdownMenuItem
-                  className={`rounded-md cursor-pointer ${
-                    sortColumn === "programName"
+                  className={`rounded-md cursor-pointer ${sortColumn === "programName"
                       ? "bg-indigo-50 text-indigo-600"
                       : ""
-                  }`}
+                    }`}
                   onClick={() => setSortColumn("programName")}
                 >
                   Program Name
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className={`rounded-md cursor-pointer ${
-                    sortColumn === "updatedAt"
+                  className={`rounded-md cursor-pointer ${sortColumn === "updatedAt"
                       ? "bg-indigo-50 text-indigo-600"
                       : ""
-                  }`}
+                    }`}
                   onClick={() => setSortColumn("updatedAt")}
                 >
                   Updated At
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className={`rounded-md cursor-pointer ${
-                    sortColumn === "deadline"
+                  className={`rounded-md cursor-pointer ${sortColumn === "deadline"
                       ? "bg-indigo-50 text-indigo-600"
                       : ""
-                  }`}
+                    }`}
                   onClick={() => setSortColumn("deadline")}
                 >
                   Deadline
@@ -199,17 +196,15 @@ const StaffManagerAllProgram = ({
                   Order
                 </div>
                 <DropdownMenuItem
-                  className={`rounded-md cursor-pointer ${
-                    sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
-                  }`}
+                  className={`rounded-md cursor-pointer ${sortOrder === "asc" ? "bg-indigo-50 text-indigo-600" : ""
+                    }`}
                   onClick={() => setSortOrder("asc")}
                 >
                   Ascending
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className={`rounded-md cursor-pointer ${
-                    sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
-                  }`}
+                  className={`rounded-md cursor-pointer ${sortOrder === "desc" ? "bg-indigo-50 text-indigo-600" : ""
+                    }`}
                   onClick={() => setSortOrder("desc")}
                 >
                   Descending

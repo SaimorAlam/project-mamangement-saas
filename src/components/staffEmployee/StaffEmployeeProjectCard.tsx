@@ -7,7 +7,9 @@ import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
 import { useAddToFavouriteProjectMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 import { toast } from "sonner";
-import ProjectDetailsModal from "./Overview/ProjectDetailModal";
+// import ProjectDetailsModal from "./Overview/ProjectDetailModal";
+import PrimaryButton from "@/common/PrimaryButton";
+import { useNavigate } from "react-router-dom";
 
 export type ProjectStatus =
   | "LIVE"
@@ -106,6 +108,7 @@ const StaffEmployeeProjectCard = ({
         : "text-[#16A34A]";
 
   const [addToFavouriteProject] = useAddToFavouriteProjectMutation();
+  const navigate = useNavigate();
 
   const handleAddToFavourite = async (projectId: string) => {
     try {
@@ -224,7 +227,12 @@ const StaffEmployeeProjectCard = ({
 
         {/* CTA */}
         <div className="py-2 px-4">
-          <ProjectDetailsModal project={project} />
+          <PrimaryButton
+            title="View Project Details"
+            type="Primary"
+            className="w-full h-10"
+            onClick={() => navigate(`/staff-employee-panel/projects/${project.id}`)}
+          />
         </div>
       </CardContent>
     </Card>

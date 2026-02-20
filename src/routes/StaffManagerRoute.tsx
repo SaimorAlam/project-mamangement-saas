@@ -26,7 +26,7 @@ import StaffManagerStateCardDetails from "@/pages/staffManager/StaffManagerState
 import StaffManagerUploadSubmission from "@/pages/staffManager/StaffManagerUploadSubmission";
 import AllProjectsReview from "@/pages/staffManager/AllProjectsReview";
 // import StaffManagerProjectDetail from "@/pages/staffManager/StaffManagerProjectDetail";
-import ProgramDetailsPage from "@/pages/staffManager/ProgramDetailsPage";
+import StaffManagerProgramOverview from "@/pages/staffManager/Program/StaffManagerProgramOverview";
 import DashboardCardProjects from "@/pages/staffManager/DashboardCardProjects";
 import ClientProjectBuilder from "@/pages/client/ProjectBuilder/ClientProjectBuilder";
 import ProfilePage from "@/pages/commonPage/ProfilePage";
@@ -34,14 +34,23 @@ import ClientProjectBuilderContainer from "@/pages/client/ProjectBuilder/ClientP
 import PublishProject from "@/pages/client/ProjectBuilder/Components/PublishProject";
 import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
 import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
+import ClientAllProgramContainer from "@/pages/client/ClientAllProgramContainer";
+import ProjectReviewContainer from "@/pages/client/ProjectReview/ProjectReviewContainer";
+import ProgramOverviewContainer from "@/pages/client/Program/ProgramOverviewContainer";
+// import ProgramOverview from "@/pages/client/Program/ProgramOverview";
 
 export function getStaffManagerRoutes() {
   return [
     { index: true, element: <StaffManagerOverview /> },
-    { path: "projects", element: <StaffManagerProjects /> },
-    // { path: "projects/:id", element: <StaffManagerProjectDetail /> },
-    { path: "projects/:id", element: <ProjectDetails /> },
-    { path: "projects/status/:status", element: <DashboardCardProjects /> },
+    {
+      path: "projects",
+      element: <ProjectReviewContainer />,
+      children: [
+        { index: true, element: <StaffManagerProjects /> },
+        { path: "project-details/:projectId", element: <ProjectDetails /> },
+        { path: "status/:status", element: <DashboardCardProjects /> },
+      ],
+    },
     {
       path: "projects/upload-submission",
       element: <StaffManagerUploadSubmission />,
@@ -57,8 +66,23 @@ export function getStaffManagerRoutes() {
       path: "timos-super-shop",
       element: <StaffManagerTimosSuperShop />,
     },
-    { path: "all-program", element: <StaffManagerAllProgram /> },
-    { path: "program/:id", element: <ProgramDetailsPage /> },
+    // { path: "all-program", element: <StaffManagerAllProgram /> },
+    {
+      path: "all-program",
+      element: <ClientAllProgramContainer />,
+      children: [
+        { index: true, element: <StaffManagerAllProgram /> },
+        {
+          path: "program-overview/:programId",
+          element: <ProgramOverviewContainer />,
+          children: [
+            { index: true, element: <StaffManagerProgramOverview /> },
+            { path: "project-details/:projectId", element: <ProjectDetails /> },
+          ],
+        },
+      ],
+    },
+    // { path: "program/:id", element: <StaffManagerProgramOverview /> },
 
     { path: "program-name", element: <StaffManagerProgramName /> },
     // {
