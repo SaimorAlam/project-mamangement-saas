@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import MatrixTableChart from "@/common/Charts/MatrixTableChart";
 
 const MatrixTableChartModule = ({
@@ -32,7 +32,7 @@ const MatrixTableChartModule = ({
   const maxXaxisField = 10;
 
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -42,7 +42,7 @@ const MatrixTableChartModule = ({
     } else {
       setNumOfXAxisDataSet(1);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 

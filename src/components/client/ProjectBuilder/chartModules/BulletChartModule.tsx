@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LegendValue } from "../WidgetForChartModuleOne";
+import { LegendValue } from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import BulletChart from "@/common/Charts/BulletChart";
 import BulletChartConfiguration from "./BulletChartConfiguration";
 
@@ -8,7 +8,10 @@ type BulletChartModuleProps = {
   isPreview?: boolean;
 };
 
-const BulletChartModule = ({ onDelete, isPreview = false }: BulletChartModuleProps) => {
+const BulletChartModule = ({
+  onDelete,
+  isPreview = false,
+}: BulletChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Bullet Performance");
   const [showWidget, setShowWidget] = useState(false);
 

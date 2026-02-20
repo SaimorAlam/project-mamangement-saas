@@ -8,7 +8,7 @@ import ClientAllProgram from "@/pages/client/Program/ClientAllProgram";
 import ClientMarketingStrategy from "@/pages/client/ClientMarketingStrategy";
 import ClientAlfalaBuilders from "@/pages/client/ClientAlfalaBuilders";
 import ClientTimosSuperShop from "@/pages/client/ClientTimosSuperShop";
-import ClientProgramBuilder from "@/pages/client/ClientProgramBuilder";
+import ClientProgramBuilder from "@/pages/client/ProgramBuilder/ClientProgramBuilder";
 import ClientProgramName from "@/pages/client/ClientProgramName";
 import ClientHighwayExpansion from "@/pages/client/ClientHighwayExpansion";
 import ClientAllHighway from "@/pages/client/ClientAllHighway";

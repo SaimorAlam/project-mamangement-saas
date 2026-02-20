@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -12,9 +13,9 @@ import {
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { generateAreaChartData } from "@/utils";
-import AddTierModal from "../Modal/AddTierModal";
-import TierChartModal from "../Modal/TierChartModal";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import AddTierModal from "../../../Modal/AddTierModal";
+import TierChartModal from "../../../Modal/TierChartModal";
+import ChartCardWrapper from "../../components/ChartCardWrapper";
 import {
   useLazyFindChildrenValueQuery,
   useLazyGetAllTheLeafChartQuery,
@@ -141,7 +142,6 @@ export default function AreaChart({
   breadcrumbPath = [],
   onNavigate,
 }: Props) {
-
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
   const [findChildrenValue, { data, isLoading }] =
     useLazyFindChildrenValueQuery();
@@ -277,8 +277,6 @@ export default function AreaChart({
     allUploadedData,
   ]);
 
-
-
   /*   ACTIONS   */
 
   const handleCopy = () => {
@@ -382,8 +380,6 @@ export default function AreaChart({
     }
   };
 
-
-
   const handleAddTierClick = (title: string) => {
     if (tierLevel === 0) {
       dispatch(setGroupTitle(title));
@@ -400,7 +396,7 @@ export default function AreaChart({
       status: "ACTIVE",
       category: "AREA",
       xAxis: JSON.stringify([
-        ["Label", ...legendValues.map((l) => l.label)],
+        // ["Label", ...legendValues.map((l) => l.label)],
         ...xAxisValues.map((label) => [
           label,
           ...Array(numOfLegendDataSet).fill(0),
@@ -474,7 +470,6 @@ export default function AreaChart({
         isPreview={isPreview}
         customHeaderContent={
           <div className="flex items-center gap-4">
-
             <div className="flex gap-4">
               {effectiveLegendValues.slice(0, 3).map(
                 (l) =>
@@ -541,10 +536,6 @@ export default function AreaChart({
               ))}
             </ReAreaChart>
           </ResponsiveContainer>
-
-
-
-
         </div>
       </ChartCardWrapper>
 

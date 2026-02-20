@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import PieChartConfiguration, {
   LegendValue,
-} from "../chartConfigurations/PieChartConfiguration";
-import PieChartWidget from "@/common/Charts/PieChart";
+} from "./PieChartConfiguration";
+import PieChartWidget from "@/common/Charts/CompletedCharts/PieChart/PieChart";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 

@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import StackedBarChart from "@/common/Charts/StackedBarChart";
-import { ChartData } from "@/common/Charts/StackedBarChart";
+import StackedBarChart from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
+import { ChartData } from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
 import HorizontalBarChart, {
   parseHorizontalBarData,
-} from "@/common/Charts/HorizontalBarChart";
-import LineChart from "@/common/Charts/LineChart";
+} from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
+import LineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
 import { parseLineChartData } from "@/utils/parseLineChartData";
 import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
-import PieChartWidget from "@/common/Charts/PieChart";
+import PieChartWidget from "@/common/Charts/CompletedCharts/PieChart/PieChart";
 import ColumnBarChart from "@/common/Charts/ColumnBarChart";
 import RadarChartNew from "@/common/Charts/RadarChartNew";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
-import AreaChart from "@/common/Charts/AreaChart";
+import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
 import ParetoChart from "@/common/Charts/ParetoChart";
 import HistogramChart from "@/common/Charts/HistogramChart";
 import ScatterChart from "@/common/Charts/ScatterChart";
@@ -41,7 +41,11 @@ const parseXAxisData = (
   }
 
   // Handle case where API returns { labels: [...] }
-  if (parsedXAxis && !Array.isArray(parsedXAxis) && typeof parsedXAxis === "object") {
+  if (
+    parsedXAxis &&
+    !Array.isArray(parsedXAxis) &&
+    typeof parsedXAxis === "object"
+  ) {
     if ("labels" in parsedXAxis) {
       parsedXAxis = parsedXAxis.labels;
     }
@@ -85,528 +89,525 @@ const parseXAxisData = (
 const DefaultChartData = ({ projectsChartsData }: any) => {
   return (
     <div className="flex flex-wrap gap-6">
-      {projectsChartsData
-        ?.map((item: any) => {
-          const categoryKey = item.category?.toUpperCase();
-          const chartProperty = chartTypes[categoryKey];
-          const chartData = chartProperty ? item[chartProperty] : null;
-          if (categoryKey === "BAR") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
-
-            const { labels, data } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
-
-            return (
-              <div key={item.id} className="w-full">
-                <StackedBarChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  widgets={chartData?.widgets}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                  projectId={item?.projectId}
-                  allUploadedData={data}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "HORIZONTAL_BAR") {
-            const legendValues = (
-              chartData?.widgets ||
-              item?.widgets ||
-              []
-            ).map((w: any) => ({
+      {projectsChartsData?.map((item: any) => {
+        const categoryKey = item.category?.toUpperCase();
+        const chartProperty = chartTypes[categoryKey];
+        const chartData = chartProperty ? item[chartProperty] : null;
+        if (categoryKey === "BAR") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
               label: w.legendName || w.label,
               color: w.color,
               field: (w.legendName || w.label)
                 ?.toLowerCase()
                 .replace(/\s+/g, ""),
-            }));
+            })) || [];
 
-            const { labels, data } = parseHorizontalBarData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels, data } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <HorizontalBarChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  widgets={chartData?.widgets}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                  projectId={item?.projectId}
-                  allUploadedData={data}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "LINE") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <StackedBarChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                widgets={chartData?.widgets}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+                projectId={item?.projectId}
+                allUploadedData={data}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "HORIZONTAL_BAR") {
+          const legendValues = (chartData?.widgets || item?.widgets || []).map(
+            (w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            }),
+          );
 
-            const { labels, data } = parseLineChartData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels, data } = parseHorizontalBarData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <LineChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  widgets={chartData?.widgets}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                  projectId={item?.projectId}
-                  allUploadedData={data}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "HEATMAP") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <HorizontalBarChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                widgets={chartData?.widgets}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+                projectId={item?.projectId}
+                allUploadedData={data}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "LINE") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels, data } = parseLineChartData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <HeatmapChartNew
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "PIE") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <LineChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                widgets={chartData?.widgets}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+                projectId={item?.projectId}
+                allUploadedData={data}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "HEATMAP") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const pieData = parsePieChartData(item?.xAxis, legendValues);
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <PieChartWidget
-                  widgetTitle={item?.title}
-                  legendValues={legendValues}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  chartId={item?.id}
-                  allUploadedData={pieData}
-                  projectId={item?.projectId}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "COLUMN") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <HeatmapChartNew
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "PIE") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const pieData = parsePieChartData(item?.xAxis, legendValues);
 
-            return (
-              <div key={item.id} className="w-full">
-                <ColumnBarChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "RADAR") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <PieChartWidget
+                widgetTitle={item?.title}
+                legendValues={legendValues}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                chartId={item?.id}
+                allUploadedData={pieData}
+                projectId={item?.projectId}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "COLUMN") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <RadarChartNew
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "DOUGHNUT") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                name: w.legendName || w.label,
-                color: w.color,
-                value: 0, // Placeholder
-                count: 0,
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <ColumnBarChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "RADAR") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            return (
-              <div key={item.id} className="w-full">
-                <DoughnutChart
-                  title={item?.title}
-                  data={legendValues}
-                  centerLabel="Total"
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "AREA") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            const { labels, data } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          return (
+            <div key={item.id} className="w-full">
+              <RadarChartNew
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "DOUGHNUT") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              name: w.legendName || w.label,
+              color: w.color,
+              value: 0, // Placeholder
+              count: 0,
+            })) || [];
 
-            return (
-              <div key={item.id} className="w-full">
-                <AreaChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                  projectId={item?.projectId}
-                  allUploadedData={data}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "PARETO") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <DoughnutChart
+                title={item?.title}
+                data={legendValues}
+                centerLabel="Total"
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "AREA") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels, data } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <ParetoChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "HISTOGRAM") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <AreaChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+                projectId={item?.projectId}
+                allUploadedData={data}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "PARETO") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <HistogramChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "SCATTER") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <ParetoChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "HISTOGRAM") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            return (
-              <div key={item.id} className="w-full">
-                <ScatterChart
-                  widgetTitle={item?.title}
-                  legendValues={legendValues}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "GAUGE") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <GaugeChart
-                  widgetTitle={item?.title}
-                  legendValues={legendValues}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "FUNNEL") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <HistogramChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "SCATTER") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          return (
+            <div key={item.id} className="w-full">
+              <ScatterChart
+                widgetTitle={item?.title}
+                legendValues={legendValues}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "GAUGE") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            return (
-              <div key={item.id} className="w-full">
-                <FunnelChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "WATERFALL") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <GaugeChart
+                widgetTitle={item?.title}
+                legendValues={legendValues}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "FUNNEL") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <WaterfallChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "STACK_BAR_HORIZONTAL") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <FunnelChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "WATERFALL") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <HorizontalStackedBarChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "MIXED") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <WaterfallChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "STACK_BAR_HORIZONTAL") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <ComboChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          if (categoryKey === "CANDLESTICK") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+          return (
+            <div key={item.id} className="w-full">
+              <HorizontalStackedBarChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "MIXED") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
 
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
 
-            return (
-              <div key={item.id} className="w-full">
-                <CandleChart
-                  widgetTitle={item?.title}
-                  xAxisValues={labels}
-                  legendValues={legendValues}
-                  numOfLegendDataSet={chartData?.numberOfDataset}
-                  startingRange={chartData?.firstFieldDataset}
-                  endingRange={chartData?.lastFieldDataset}
-                  chartId={item?.id}
-                />
-              </div>
-            );
-          }
-          return null;
-        })}
+          return (
+            <div key={item.id} className="w-full">
+              <ComboChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "CANDLESTICK") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
+
+          const { labels } = parseXAxisData(
+            item?.xAxis,
+            legendValues,
+            item?.title,
+          );
+
+          return (
+            <div key={item.id} className="w-full">
+              <CandleChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                numOfLegendDataSet={chartData?.numberOfDataset}
+                startingRange={chartData?.firstFieldDataset}
+                endingRange={chartData?.lastFieldDataset}
+                chartId={item?.id}
+              />
+            </div>
+          );
+        }
+        return null;
+      })}
     </div>
   );
 };

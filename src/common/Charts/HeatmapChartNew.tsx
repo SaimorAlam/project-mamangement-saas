@@ -4,7 +4,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
 
-import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
+import { LegendValue } from "@/common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 

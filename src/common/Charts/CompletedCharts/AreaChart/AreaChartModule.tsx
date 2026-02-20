@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
-import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../Widgets/WidgetForChartModuleOne";
+import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const HorizontalBarChartModule = ({
+const AreaChartModule = ({
   onDelete,
   isPreview = false,
 }: {
@@ -13,7 +15,7 @@ const HorizontalBarChartModule = ({
 }) => {
   const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
-  const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
+  const [showWidget, setShowWidget] = useState(false);
 
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
@@ -25,13 +27,13 @@ const HorizontalBarChartModule = ({
     { label: "", field: "", color: "#35B6EE" },
     { label: "", field: "", color: "#6F78F9" },
   ]);
-  const [startingRange, setStartingRange] = useState<number>(0); //for y axis
-  const [endingRange, setEndingRange] = useState<number>(100); // for y axis
+  const [startingRange, setStartingRange] = useState<number>(0);
+  const [endingRange, setEndingRange] = useState<number>(100);
 
   useEffect(() => {
     dispatch(
       setWidgetConfig({
-        id: "horizontal-bar-chart",
+        id: "area-chart",
         config: {
           widgetTitle,
           xAxisValues,
@@ -54,6 +56,7 @@ const HorizontalBarChartModule = ({
 
   const minXaxisField = 1;
   const maxXaxisField = 7;
+
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -71,11 +74,9 @@ const HorizontalBarChartModule = ({
 
     setXAxisValues((prev) => {
       const updated = [...prev];
-      // Adding empty values if increased
       while (updated.length < value) {
         updated.push("");
       }
-      // Removing extra values if decreased
       return updated.slice(0, value);
     });
   };
@@ -86,39 +87,38 @@ const HorizontalBarChartModule = ({
       updated[index] = value;
       return updated;
     });
-    console.log("parant x values: ", xAxisValues);
   };
 
-  // Toggle widget visibility
   const handleToggleWidget = () => {
+    if (isPreview) return;
     setShowWidget(!showWidget);
   };
 
-  // Close widget (for X button)
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="flex-1 h-full sticky top-5">
-        <HorizontalBarChart
+    <div className="flex gap-3">
+      <div className="flex-1 min-w-0 sticky top-5 h-full">
+        <AreaChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
           legendValues={legendValues}
+          numOfLegendDataSet={numOfLegendDataSet}
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
-          isPreview={isPreview}
           isCreationMode={true}
+          isPreview={isPreview}
         />
       </div>
       {!isPreview && showWidget && (
         <ProjectConfiguration
-          widgedName="Horizontal Bar Chart"
+          widgedName="Area Chart"
           widgetTitle={widgetTitle}
-          widgetCategory="HORIZONTAL_BAR"
+          widgetCategory="AREA"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -139,4 +139,4 @@ const HorizontalBarChartModule = ({
   );
 };
 
-export default HorizontalBarChartModule;
+export default AreaChartModule;

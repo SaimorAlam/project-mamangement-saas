@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { LegendValue } from "../WidgetForChartModuleOne";
-import WidgetForChartModuleTwo from "../WidgetForChartModuleTwo";
-import PieChart from "@/common/Charts/PieChart";
+import { LegendValue } from "@/common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
+import WidgetForChartModuleTwo from "@/common/Charts/CompletedCharts/Widgets/WidgetForChartModuleTwo";
+import PieChart from "@/common/Charts/CompletedCharts/PieChart/PieChart";
 import ProgressRingNew from "@/common/Charts/ProgressRing";
 import HorizontalBarChartNew from "@/common/Charts/HorizontalBarChartNew";
 import { useAppDispatch } from "@/hooks/useRedux";
