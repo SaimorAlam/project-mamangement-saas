@@ -12,19 +12,19 @@ import ClientProjectInfo from "../ClientProjectInfo";
 import { useGetRootChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import StackedBarChart, {
   parseXAxisData,
-} from "@/common/Charts/StackedBarChart";
-import MultiAxisLineChart from "@/common/Charts/LineChart";
+} from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
+import MultiAxisLineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
 import { parseLineChartData } from "@/utils/parseLineChartData";
 import HorizontalBarChart, {
   parseHorizontalBarData,
-} from "@/common/Charts/HorizontalBarChart";
+} from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
 import { chartTypes } from "@/utils/ChartCategory";
 import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
-import PieChartWidget from "@/common/Charts/PieChart";
+import PieChartWidget from "@/common/Charts/CompletedCharts/PieChart/PieChart";
 import ColumnBarChart from "@/common/Charts/ColumnBarChart";
 import RadarChartNew from "@/common/Charts/RadarChartNew";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
-import AreaChart from "@/common/Charts/AreaChart";
+import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
 import ParetoChart from "@/common/Charts/ParetoChart";
 import HistogramChart from "@/common/Charts/HistogramChart";
 import ScatterChart from "@/common/Charts/ScatterChart";
@@ -77,7 +77,9 @@ const DashboardTab = () => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset || legendValues.length}
+                numOfLegendDataSet={
+                  chartData?.numberOfDataset || legendValues.length
+                }
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
@@ -318,7 +320,9 @@ const DashboardTab = () => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset || legendValues.length}
+                numOfLegendDataSet={
+                  chartData?.numberOfDataset || legendValues.length
+                }
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
@@ -327,11 +331,7 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "PARETO") {
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              [],
-              item?.title,
-            );
+            const { labels } = parseXAxisData(item?.xAxis, [], item?.title);
 
             return (
               <ParetoChart
@@ -419,11 +419,7 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "FUNNEL") {
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              [],
-              item?.title,
-            );
+            const { labels } = parseXAxisData(item?.xAxis, [], item?.title);
 
             return (
               <FunnelChart
@@ -488,7 +484,9 @@ const DashboardTab = () => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset || legendValues.length}
+                numOfLegendDataSet={
+                  chartData?.numberOfDataset || legendValues.length
+                }
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
@@ -518,7 +516,9 @@ const DashboardTab = () => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset || legendValues.length}
+                numOfLegendDataSet={
+                  chartData?.numberOfDataset || legendValues.length
+                }
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
@@ -527,11 +527,7 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "CANDLESTICK") {
-            const { labels } = parseXAxisData(
-              item?.xAxis,
-              [],
-              item?.title,
-            );
+            const { labels } = parseXAxisData(item?.xAxis, [], item?.title);
 
             return (
               <CandleChart

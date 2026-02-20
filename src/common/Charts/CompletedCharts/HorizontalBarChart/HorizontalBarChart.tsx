@@ -11,11 +11,10 @@ import {
 } from "recharts";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { generateChartData } from "@/utils";
-import AddTierModal from "../Modal/AddTierModal";
-import TierChartModal from "../Modal/TierChartModal";
-// import useChartData from "./useChartData";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import { generateChartData } from "@/utils/clientPannelHelpers/programBuilderHelpers";
+import AddTierModal from "../../../Modal/AddTierModal";
+import TierChartModal from "../../../Modal/TierChartModal";
+import ChartCardWrapper from "../../components/ChartCardWrapper";
 import {
   useLazyFindChildrenValueQuery,
   useLazyGetAllTheLeafChartQuery,
@@ -25,13 +24,13 @@ import {
   setChildPayload,
   setGroupTitle,
 } from "@/store/Slices/ChartSlice/ChartSlice";
+import { chartTypes } from "@/utils/ChartCategory";
 
 /**
- * Parse xAxis 2D array format from API
- * Format: [["day", "absent", "late", "ontime"], ["Sunday", 1, 2, 50], ...]
- * Returns: { labels: ["Sunday", "Monday", ...], data: {...} }
+ * Parse xAxis 2D array format from API for Horizontal Bar
+ * Format: [["label", "value"], ["Point1", 10], ...]
  */
-export const parseXAxisData = (
+export const parseHorizontalBarData = (
   xAxis: any[][] | string | { labels: any[][] },
   legendValues: any[],
   widgetTitle: string,
@@ -47,7 +46,6 @@ export const parseXAxisData = (
     }
   }
 
-  // Handle case where API returns { labels: [...] }
   if (
     parsedXAxis &&
     !Array.isArray(parsedXAxis) &&
@@ -61,29 +59,19 @@ export const parseXAxisData = (
     return { labels: [], data: {} as { [key: string]: ChartData[] } };
   }
 
-  // First row is the header
-  const headers = parsedXAxis[0];
-  if (!Array.isArray(headers) || headers.length === 0) {
-    return { labels: [], data: {} as { [key: string]: ChartData[] } };
-  }
-
-  // Extract labels from the first column of data rows (skip header)
+  // Extract labels from the first column (skip header)
   const labels = parsedXAxis.slice(1).map((row: any) => String(row[0] || ""));
 
-  // Transform data into the format expected by StackedBarChart
+  // Transform data
   const chartData: ChartData[] = parsedXAxis.slice(1).map((row: any) => {
     const dataPoint: ChartData = { name: String(row[0] || "") };
-
-    // Map each legend to its corresponding column value
     legendValues.forEach((legend, index) => {
-      const columnIndex = index + 1; // Skip first column (label)
+      const columnIndex = index + 1;
       dataPoint[legend.field] = Number(row[columnIndex]) || 0;
     });
-
     return dataPoint;
   });
 
-  // Create data object keyed by sheet name (sanitized widget title)
   const sheetName = (widgetTitle || "Sheet")
     .replace(/[:/?*[\]\\]/g, " ")
     .trim()
@@ -99,18 +87,10 @@ export type ChartData = {
   [key: string]: number | string;
 };
 
-type LegendValue = {
+export type LegendValue = {
   label: string;
   field: string;
   color: string;
-};
-
-export type TierChart = {
-  id: string;
-  name: string;
-  xAxisValues: string[];
-  legendValues: LegendValue[];
-  children: TierChart[];
 };
 
 export type BreadcrumbItem = {
@@ -120,61 +100,162 @@ export type BreadcrumbItem = {
 };
 
 type Props = {
-  newData?: any[];
   widgetTitle?: string;
   xAxisValues?: string[];
   legendValues?: LegendValue[];
-  numOfLegendDataSet?: number;
   startingRange: number;
   endingRange: number;
   onToggleWidget?: () => void;
   onDelete?: () => void;
   tierLevel?: number;
   chartId?: string;
+  isPreview?: boolean;
   isCreationMode?: boolean;
   allUploadedData?: { [key: string]: ChartData[] };
-  isPreview?: boolean;
   projectId?: string;
-  widgets?: any[];
   breadcrumbPath?: BreadcrumbItem[];
   onNavigate?: (level: number) => void;
+  widgets?: any[];
 };
 
-export default function StackedBarChart({
+/*       COMPONENT       */
+
+export default function HorizontalBarChart({
   widgetTitle = "My CSV",
   xAxisValues = [],
   legendValues = [],
-  numOfLegendDataSet = 3,
   startingRange,
   endingRange,
-  chartId,
-  projectId,
-
   onToggleWidget,
   onDelete,
   tierLevel = 0,
+  chartId = "root",
+  isPreview = false,
   isCreationMode = false,
   allUploadedData,
-  isPreview = false,
+  projectId,
   breadcrumbPath = [],
   onNavigate,
 }: Props) {
-
-  const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
-  const [findChildrenValue, { data, isLoading }] =
-    useLazyFindChildrenValueQuery();
-
-  useEffect(() => {
-    if (chartId) {
-      findChildrenValue(chartId);
-    }
-  }, [chartId, findChildrenValue]);
-  const dispatch = useAppDispatch();
-  const childTiers = data?.data;
   const [isDownloading, setIsDownloading] = useState(false);
   const [showAddTierModal, setShowAddTierModal] = useState(false);
   const [showChildrenModal, setShowChildrenModal] = useState(false);
+
+  const [findChildrenValue, { data, isLoading }] =
+    useLazyFindChildrenValueQuery();
+  const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
+
+  const dispatch = useAppDispatch();
   const groupTitle = useAppSelector((state) => state.chartSlice.groupTitle);
+  const childTiers = data?.data;
+
+  useEffect(() => {
+    if (chartId && chartId !== "root") {
+      findChildrenValue(chartId);
+    }
+  }, [chartId, findChildrenValue]);
+
+  /*   EFFECTIVE DATA FOR RENDERING   */
+
+  const effectiveLegendValues = useMemo(() => {
+    const validLegends = legendValues.filter(
+      (l) => l.label && l.label.trim() !== "",
+    );
+
+    if (validLegends.length > 0) {
+      return validLegends.map((l) => ({
+        ...l,
+        field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
+      }));
+    }
+    return [{ label: "Sample A", field: "field1", color: "#13A490" }];
+  }, [legendValues]);
+
+  const effectiveXAxisValues = useMemo(() => {
+    const validValues = xAxisValues.filter((v) => v && v.trim() !== "");
+    if (validValues.length > 0) {
+      return validValues;
+    }
+    return ["Category A", "Category B", "Category C"];
+  }, [xAxisValues]);
+
+  const { safeStartingRange, safeEndingRange } = useMemo(() => {
+    let start = Number(startingRange);
+    let end = Number(endingRange);
+    if (start === end) {
+      start = 0;
+      end = 1000; // Standardize range for horizontal bars
+    }
+    return { safeStartingRange: start, safeEndingRange: end };
+  }, [startingRange, endingRange]);
+
+  const { chartData, isSampleData } = useMemo(() => {
+    const sheetName = (widgetTitle || "Sheet")
+      .replace(/[:/?*[\]\\]/g, " ")
+      .trim()
+      .substring(0, 31);
+
+    const dataToUse = allUploadedData?.[sheetName];
+
+    // Priority 1: Real Uploaded Data (must have at least one non-zero value)
+    const hasRealData =
+      dataToUse &&
+      dataToUse.length > 0 &&
+      dataToUse.some((row) =>
+        effectiveLegendValues.some((l) => Number(row[l.field] || 0) > 0),
+      );
+
+    if (hasRealData) {
+      return { chartData: dataToUse as ChartData[], isSampleData: false };
+    }
+
+    const hasConfig =
+      xAxisValues.length > 0 &&
+      xAxisValues.some((v) => v !== "") &&
+      effectiveLegendValues.length > 0;
+
+    // Priority 2: Sample Data based on Config
+    if (hasConfig) {
+      return {
+        chartData: generateChartData(
+          xAxisValues.filter((v) => v && v.trim() !== ""),
+          effectiveLegendValues,
+          effectiveLegendValues.length,
+          safeStartingRange,
+          safeEndingRange,
+        ),
+        isSampleData: true,
+      };
+    }
+
+    // Priority 3: Default Sample Data (Generic fallback)
+    return {
+      chartData: generateChartData(
+        effectiveXAxisValues,
+        effectiveLegendValues,
+        effectiveLegendValues.length,
+        0,
+        100,
+      ),
+      isSampleData: true,
+    };
+  }, [
+    xAxisValues,
+    safeStartingRange,
+    safeEndingRange,
+    widgetTitle,
+    effectiveXAxisValues,
+    effectiveLegendValues,
+    allUploadedData,
+  ]);
+
+  /*   ACTIONS   */
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
+    toast.success("JSON copied to clipboard");
+  };
+
   const currentBreadcrumbs = useMemo(() => {
     const base =
       breadcrumbPath.length === 0
@@ -203,109 +284,6 @@ export default function StackedBarChart({
     }
   };
 
-  /*   EFFECTIVE DATA FOR RENDERING   */
-
-  const effectiveLegendValues = useMemo(() => {
-    if (legendValues.length > 0 && legendValues.some((l) => l.label !== "")) {
-      return legendValues.map((l) => ({
-        ...l,
-        field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
-      }));
-    }
-    return [
-      { label: "Sample A", field: "field1", color: "#13A490" },
-      { label: "Sample B", field: "field2", color: "#35B6EE" },
-      { label: "Sample C", field: "field3", color: "#6F78F9" },
-    ];
-  }, [legendValues]);
-
-  const effectiveXAxisValues = useMemo(() => {
-    const validValues = xAxisValues.filter((v) => v !== "");
-    if (validValues.length > 0) {
-      return validValues;
-    }
-    return ["Jan", "Feb", "Mar", "Apr", "May"];
-  }, [xAxisValues]);
-
-  const { safeStartingRange, safeEndingRange } = useMemo(() => {
-    let start = startingRange;
-    let end = endingRange;
-    if (start === end) {
-      start = 0;
-      end = 100;
-    }
-    return { safeStartingRange: start, safeEndingRange: end };
-  }, [startingRange, endingRange]);
-
-  const { chartData, isSampleData } = useMemo(() => {
-    const sheetName = (widgetTitle || "Sheet")
-      .replace(/[:/?*[\]\\]/g, " ")
-      .trim()
-      .substring(0, 31);
-
-    const dataToUse = allUploadedData?.[sheetName];
-
-    // Priority 1: Real Uploaded Data (must have at least one non-zero value)
-    const hasRealData =
-      dataToUse &&
-      dataToUse.length > 0 &&
-      dataToUse.some((row) =>
-        effectiveLegendValues.some((l) => Number(row[l.field] || 0) > 0),
-      );
-
-    if (hasRealData) {
-      return { chartData: dataToUse as ChartData[], isSampleData: false };
-    }
-
-    const hasConfig =
-      xAxisValues.length > 0 &&
-      xAxisValues.some((v) => v !== "") &&
-      legendValues.length > 0 &&
-      legendValues.some((l) => l.label !== "");
-
-    // Priority 2: Sample Data based on Config
-    if (hasConfig) {
-      return {
-        chartData: generateChartData(
-          xAxisValues.filter((v) => v !== ""),
-          effectiveLegendValues,
-          numOfLegendDataSet,
-          safeStartingRange,
-          safeEndingRange,
-        ),
-        isSampleData: true,
-      };
-    }
-
-    // Priority 3: Default Sample Data (Generic fallback)
-    return {
-      chartData: generateChartData(
-        effectiveXAxisValues,
-        effectiveLegendValues,
-        effectiveLegendValues.length,
-        0,
-        100,
-      ),
-      isSampleData: true,
-    };
-  }, [
-    xAxisValues,
-    legendValues,
-    numOfLegendDataSet,
-    safeStartingRange,
-    safeEndingRange,
-    widgetTitle,
-    effectiveXAxisValues,
-    effectiveLegendValues,
-    allUploadedData,
-  ]);
-
-  /*   ACTIONS   */
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(chartData, null, 2));
-  };
-
   const handleDownload = async (title: string) => {
     if (!projectId) {
       toast.error("Project ID is missing");
@@ -327,25 +305,21 @@ export default function StackedBarChart({
 
       const getUniqueSheetName = (name: string, id: string) => {
         const safeName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
-
         const fullName = `${safeName}_${id}`;
-
-        // Enforce Excel 31 character limit
         let finalName =
           fullName.length > 31 ? fullName.substring(0, 31) : fullName;
 
         let counter = 1;
-
         while (usedNames.has(finalName.toLowerCase())) {
           const suffix = `_${counter}`;
           const base = fullName.substring(0, 31 - suffix.length);
           finalName = base + suffix;
           counter++;
         }
-
         usedNames.add(finalName.toLowerCase());
         return finalName;
       };
+
       leafCharts?.charts?.forEach((node: any) => {
         ids.push(node.id);
         let xAxis = node.xAxisValues || [];
@@ -355,7 +329,6 @@ export default function StackedBarChart({
               typeof node.xAxis === "string"
                 ? JSON.parse(node.xAxis)
                 : node.xAxis;
-
             if (Array.isArray(parsed)) {
               if (parsed.length > 0 && Array.isArray(parsed[0])) {
                 xAxis = parsed.slice(1).map((row: any) => row[0]);
@@ -370,13 +343,10 @@ export default function StackedBarChart({
           }
         }
 
-        // Fallback to current chart's xAxis if node has none
-        if (!xAxis.length) {
-          xAxis = effectiveXAxisValues;
-        }
+        if (!xAxis.length) xAxis = effectiveXAxisValues;
 
         let legends = node.legendValues || [];
-        const nodeWidgets = node.widgets || node.barChart?.widgets;
+        const nodeWidgets = node.widgets || node.horizontalBarChart?.widgets;
         if (!legends.length && nodeWidgets) {
           legends = nodeWidgets.map((w: any) => ({
             label: w.legendName || w.label || "Legend",
@@ -386,16 +356,12 @@ export default function StackedBarChart({
             color: w.color || "#000000",
           }));
         }
-
-        // Fallback to current chart's legends if node has none
-        if (!legends.length) {
-          legends = effectiveLegendValues;
-        }
+        if (!legends.length) legends = effectiveLegendValues;
 
         const headers = ["Label", ...legends.map((l: any) => l.label)];
         const rows = xAxis.map((label: string) => [
           label,
-          ...Array(numOfLegendDataSet).fill(" "),
+          ...Array(legends.length).fill(" "),
         ]);
         const data = [headers, ...rows];
         const ws = XLSX.utils.aoa_to_sheet(data);
@@ -422,23 +388,21 @@ export default function StackedBarChart({
       dispatch(setGroupTitle(title));
     }
     const childPayload = {
-      numberOfDataset: numOfLegendDataSet,
+      numberOfDataset: effectiveLegendValues.length,
       firstFieldDataset: safeStartingRange,
       lastFieldDataset: safeEndingRange,
-      widgets: legendValues.map((l) => ({
+      widgets: effectiveLegendValues.map((l) => ({
         legendName: l.label,
         color: l.color,
       })),
-
       title: "",
       status: "ACTIVE",
-      category: "BAR",
-
+      category: "HORIZONTAL_BAR",
       xAxis: JSON.stringify([
-        ["Label", ...legendValues.map((l) => l.label)],
-        ...xAxisValues.map((label) => [
+        // ["Label", ...effectiveLegendValues.map((l) => l.label)],
+        ...effectiveXAxisValues.map((label) => [
           label,
-          ...Array(numOfLegendDataSet).fill(0),
+          ...Array(effectiveLegendValues.length).fill(0),
         ]),
       ]),
       yAxis: JSON.stringify({}),
@@ -447,10 +411,9 @@ export default function StackedBarChart({
       parentId: chartId,
       rootchart: false,
       roottitle: widgetTitle,
-      grouptitle: groupTitle,
+      grouptitle: tierLevel === 0 ? title : groupTitle,
     };
     dispatch(setChildPayload(childPayload));
-
     setShowAddTierModal(true);
   };
 
@@ -463,33 +426,50 @@ export default function StackedBarChart({
     }
   };
 
+  /*   TOOLTIP   */
 
-
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
-    const row = payload[0].payload;
-
     return (
-      <div className="bg-white p-3 border rounded shadow-lg">
-        <p className="font-semibold mb-2">{row.name}</p>
-        {effectiveLegendValues.map((l) => (
-          <p key={l.field} style={{ color: l.color }} className="text-sm">
-            {l.label}: {row[l.field]}
-          </p>
-        ))}
+      <div className="bg-white/95 backdrop-blur-sm p-3 border border-gray-100 rounded-xl shadow-xl">
+        <p className="font-bold text-gray-700 mb-2 border-b border-gray-50 pb-1">
+          {label}
+        </p>
+        <div className="space-y-1.5">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center gap-3">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-xs font-medium text-gray-600 min-w-[60px]">
+                {entry.name}:
+              </span>
+              <span className="text-xs font-bold text-gray-900 ml-auto">
+                {entry.value}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full h-[400px] flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm animate-pulse">
+        <div className="text-gray-400 text-sm font-medium">
+          Loading child tiers...
+        </div>
+      </div>
+    );
   }
 
   return (
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        subtitle={`Stacked Performance View ${isSampleData ? "(Sample Data)" : ""}`}
+        subtitle={`${isSampleData ? "(Sample Data) " : "Stacked Distribution Assessment"}`}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
@@ -504,75 +484,80 @@ export default function StackedBarChart({
         }}
         isDownloading={isDownloading}
         isPreview={isPreview}
-        customHeaderContent={
-          <div className="flex gap-4">
-            {effectiveLegendValues.slice(0, 3).map((l) =>
-              l.label ? (
-                <div key={l.field} className="flex items-center gap-1.5">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: l.color }}
-                  />
-                  <span className="text-xs text-gray-500 font-medium">
-                    {l.label}
-                  </span>
-                </div>
-              ) : null,
-            )}
-            {effectiveLegendValues.length > 3 && (
-              <span className="text-xs text-gray-400">
-                +{effectiveLegendValues.length - 3} more
-              </span>
-            )}
-          </div>
-        }
         footer={
           childTiers?.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers?.length} child tier
-              {childTiers?.length > 1 ? "s" : ""}
+              Click chart to view {childTiers.length} child tier
+              {childTiers.length > 1 ? "s" : ""}
             </p>
           ) : undefined
         }
       >
         <div className="relative">
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={chartData}>
+          <ResponsiveContainer
+            width="100%"
+            height={Math.max(400, chartData.length * 50)}
+          >
+            <BarChart
+              layout="vertical"
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
+            >
               <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="#f0f0f0"
+                strokeDasharray="0"
+                horizontal={false}
+                stroke="#e5e7eb"
               />
               <XAxis
-                dataKey="name"
-                axisLine={false}
+                type="number"
+                domain={[safeStartingRange, safeEndingRange]}
+                axisLine={{ stroke: "#e5e7eb" }}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: "#9ca3af" }}
+                tick={{ fontSize: 12, fill: "#6b7280" }}
               />
               <YAxis
-                domain={[safeStartingRange, safeEndingRange]}
-                axisLine={false}
+                dataKey="name"
+                type="category"
+                axisLine={{ stroke: "#e5e7eb" }}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: "#9ca3af" }}
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+                width={20}
               />
-              <Tooltip content={<CustomTooltip />} />
-              {effectiveLegendValues?.map((l, i) => (
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ fill: "#f3f4f6", opacity: 0.4 }}
+              />
+
+              {effectiveLegendValues.map((l) => (
                 <Bar
                   key={l.field}
+                  name={l.label}
                   dataKey={l.field}
                   stackId="a"
                   fill={l.color}
-                  radius={
-                    i === effectiveLegendValues.length - 1 ? [4, 4, 0, 0] : 0
-                  }
+                  radius={[0, 4, 4, 0]}
+                  barSize={32}
                 />
               ))}
             </BarChart>
           </ResponsiveContainer>
 
-
-
-
+          {/* Legend Display */}
+          {chartData.length > 0 && (
+            <div className="flex justify-center flex-wrap gap-6 mt-6 pb-2 border-t border-gray-50 pt-4">
+              {effectiveLegendValues.map((l) => (
+                <div key={l.field} className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full shadow-sm"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-xs font-semibold text-gray-600">
+                    {l.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </ChartCardWrapper>
 
@@ -580,7 +565,7 @@ export default function StackedBarChart({
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
         chartId={chartId}
-        parentChartName={groupTitle}
+        parentChartName={tierLevel === 0 ? widgetTitle : groupTitle}
       />
 
       {showChildrenModal && (
@@ -593,48 +578,45 @@ export default function StackedBarChart({
           onBreadcrumbClick={handleBreadcrumbClick}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers &&
-              childTiers?.map((tier: any) => {
-                const tierLegends = (tier?.barChart?.widgets || []).map(
-                  (w: any) => ({
-                    label: w.legendName,
-                    field: w.legendName?.toLowerCase().replace(/\s+/g, ""),
-                    color: w.color,
-                  }),
-                );
+            {childTiers?.map((tier: any) => {
+              const category = chartTypes[tier.category];
+              const tierLegends = (
+                tier?.[category]?.widgets ||
+                tier?.widgets ||
+                []
+              ).map((w: any) => ({
+                label: w.legendName || w.label,
+                field: (w.legendName || w.label)
+                  ?.toLowerCase()
+                  .replace(/\s+/g, ""),
+                color: w.color,
+              }));
 
-                const { labels, data } = parseXAxisData(
-                  tier.xAxis,
-                  tierLegends,
-                  tier.title,
-                );
+              const { labels, data } = parseHorizontalBarData(
+                tier.xAxis,
+                tierLegends,
+                tier.title,
+              );
 
-                return (
-                  <StackedBarChart
-                    newData={tier?.children || []}
-                    key={tier?.id}
-                    widgetTitle={
-                      tier?.title ||
-                      tier?.name ||
-                      tier?.taskName ||
-                      "Untitled Tier"
-                    }
-                    xAxisValues={labels}
-                    legendValues={tierLegends}
-                    numOfLegendDataSet={tierLegends.length}
-                    startingRange={startingRange}
-                    endingRange={endingRange}
-                    tierLevel={tierLevel + 1}
-                    chartId={tier?.id}
-                    allUploadedData={data}
-                    isPreview={isPreview}
-                    widgets={tier?.widgets}
-                    projectId={tier?.projectId}
-                    breadcrumbPath={currentBreadcrumbs}
-                    onNavigate={handleChildNavigate}
-                  />
-                );
-              })}
+              return (
+                <HorizontalBarChart
+                  key={tier.id}
+                  widgetTitle={tier.title || tier.name || "Untitled Tier"}
+                  xAxisValues={labels}
+                  legendValues={tierLegends}
+                  startingRange={startingRange}
+                  endingRange={endingRange}
+                  tierLevel={tierLevel + 1}
+                  chartId={tier.id}
+                  allUploadedData={data}
+                  isPreview={isPreview}
+                  projectId={tier.projectId || projectId}
+                  breadcrumbPath={currentBreadcrumbs}
+                  onNavigate={handleChildNavigate}
+                  onDelete={onDelete}
+                />
+              );
+            })}
           </div>
         </TierChartModal>
       )}

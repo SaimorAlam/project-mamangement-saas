@@ -119,7 +119,7 @@ const PieChartConfiguration = ({
     // Create the xAxis structure for Pie Charts: ["Label", "Legend1", "Legend2"...] followed by ["Value", 0, 0...]
     // This follows Module One standard which is more reliable for backend validation
     const xAxisData = [
-      ["Label", ...legendValues.map(l => l.label)],
+      // ["Label", ...legendValues.map(l => l.label)],
       ["Value", ...Array(legendValues.length).fill(0)]
     ];
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import ColumnBarChart from "@/common/Charts/ColumnBarChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
@@ -55,7 +57,7 @@ const ColumnBarChartModule = ({
   const maxXaxisField = 10;
 
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -65,7 +67,7 @@ const ColumnBarChartModule = ({
     } else {
       setNumOfXAxisDataSet(1);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 

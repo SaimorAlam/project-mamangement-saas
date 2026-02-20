@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChartData } from "@/common/Charts/StackedBarChart";
-import { LegendValue } from "@/components/client/ProjectBuilder/WidgetForChartModuleOne";
+import { ChartData } from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
+import { LegendValue } from "@/common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 
-export const handleDownloadCSV = (csvTemplate : string, widgetTitle: string) => {
-    const blob = new Blob([csvTemplate], {
-      type: "text/csv;charset=utf-8;",
-    });
+export const handleDownloadCSV = (csvTemplate: string, widgetTitle: string) => {
+  const blob = new Blob([csvTemplate], {
+    type: "text/csv;charset=utf-8;",
+  });
 
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
 
-    link.href = url;
-    link.download = `${widgetTitle}-template.csv`;
-    link.click();
+  link.href = url;
+  link.download = `${widgetTitle}-template.csv`;
+  link.click();
 
-    URL.revokeObjectURL(url);
-  };
+  URL.revokeObjectURL(url);
+};
 
 const getRandomValue = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
@@ -32,8 +32,8 @@ export const generateChartData = (
     const item: ChartData = { name: label };
 
     legend.forEach((l) => {
-      const r =Math.floor(getRandomValue(min, max)/numOfLegendDataSet);
-      
+      const r = Math.floor(getRandomValue(min, max) / numOfLegendDataSet);
+
       item[l.field] = r;
     });
 
@@ -45,34 +45,36 @@ export const generateLineChartData = (
   xAxis: string[],
   legend: LegendValue[],
   min = 0,
-  max = 100
+  max = 100,
 ) => {
   const count = legend.length || 1;
-  return xAxis.map(label => {
-    const row: any = { name: label }
+  return xAxis.map((label) => {
+    const row: any = { name: label };
 
-    legend.forEach(l => {
-      row[l.field] =
-        Math.floor((Math.random() * (max - min + 1) + min) / count);
-    })
+    legend.forEach((l) => {
+      row[l.field] = Math.floor(
+        (Math.random() * (max - min + 1) + min) / count,
+      );
+    });
 
-    return row
-  })
-}
+    return row;
+  });
+};
 
 export const generateAreaChartData = (
   xAxis: string[],
   legend: LegendValue[],
   min = 0,
-  max = 100
+  max = 100,
 ): ChartData[] => {
   const count = legend.length || 1;
-  return xAxis.map(label => {
+  return xAxis.map((label) => {
     const row: ChartData = { name: label };
 
-    legend.forEach(l => {
-      row[l.field] =
-        Math.floor((Math.random() * (max - min + 1) + min) / count);
+    legend.forEach((l) => {
+      row[l.field] = Math.floor(
+        (Math.random() * (max - min + 1) + min) / count,
+      );
     });
 
     return row;

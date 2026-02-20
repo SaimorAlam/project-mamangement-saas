@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import ComboChart from "@/common/Charts/ComboChart";
 
 type ComboChartModuleProps = {
@@ -9,7 +9,10 @@ type ComboChartModuleProps = {
   isPreview?: boolean;
 };
 
-const ComboChartModule = ({ onDelete, isPreview = false }: ComboChartModuleProps) => {
+const ComboChartModule = ({
+  onDelete,
+  isPreview = false,
+}: ComboChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Combo Analysis");
   const [showWidget, setShowWidget] = useState(false);
 
@@ -19,8 +22,8 @@ const ComboChartModule = ({ onDelete, isPreview = false }: ComboChartModuleProps
   const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(2);
 
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
-    { label: "", field: "", color: "#FF6384"},
-    { label: "", field: "", color: "#36A2EB"},
+    { label: "", field: "", color: "#FF6384" },
+    { label: "", field: "", color: "#36A2EB" },
   ]);
 
   const [startingRange, setStartingRange] = useState<number>(0);
@@ -30,7 +33,7 @@ const ComboChartModule = ({ onDelete, isPreview = false }: ComboChartModuleProps
   const maxXaxisField = 7;
 
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -40,7 +43,7 @@ const ComboChartModule = ({ onDelete, isPreview = false }: ComboChartModuleProps
     } else {
       setNumOfXAxisDataSet(1);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 

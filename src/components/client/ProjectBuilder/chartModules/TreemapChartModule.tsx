@@ -1,5 +1,7 @@
 import { useState } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import TreemapChart from "@/common/Charts/TreemapChart";
 
 type TreemapChartModuleProps = {

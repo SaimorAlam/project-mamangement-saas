@@ -70,91 +70,6 @@ interface CreateProjectForm {
   currentRate: string;
 }
 
-const TeamMemberTag = ({
-  name,
-  role,
-  image,
-  onRemove,
-  variant = "blue",
-}: {
-  name: string;
-  role: string;
-  image?: string;
-  onRemove: () => void;
-  variant?: "emerald" | "blue" | "indigo";
-}) => {
-  const styles = {
-    emerald: {
-      tagBorder: "border-emerald-100",
-      iconBg: "bg-emerald-50",
-      iconBorder: "border-emerald-50",
-      initialsText: "text-emerald-600",
-      roleText: "text-emerald-500/80",
-    },
-    blue: {
-      tagBorder: "border-slate-100",
-      iconBg: "bg-blue-50",
-      iconBorder: "border-slate-50",
-      initialsText: "text-blue-600",
-      roleText: "text-blue-500/80",
-    },
-    indigo: {
-      tagBorder: "border-slate-100",
-      iconBg: "bg-indigo-50",
-      iconBorder: "border-slate-50",
-      initialsText: "text-indigo-600",
-      roleText: "text-indigo-500/80",
-    },
-  };
-
-  const s = styles[variant];
-
-  return (
-    <div
-      className={cn(
-        "flex items-center gap-2 bg-white shadow-sm hover:shadow-md p-1 pr-2.5 border rounded-full transition-all group",
-        s.tagBorder,
-      )}
-    >
-      <div
-        className={cn(
-          "rounded-full w-8 h-8 flex items-center justify-center overflow-hidden shrink-0 border",
-          s.iconBg,
-          s.iconBorder,
-        )}
-      >
-        {image ? (
-          <img src={image} className="w-full h-full object-cover" />
-        ) : (
-          <span className={cn("font-bold text-[10px]", s.initialsText)}>
-            {name?.[0]}
-          </span>
-        )}
-      </div>
-      <div className="flex flex-col">
-        <span className="font-bold text-slate-700 text-[11px] leading-none">
-          {name}
-        </span>
-        <span
-          className={cn(
-            "text-[8px] uppercase font-bold tracking-tighter leading-none mt-0.5",
-            s.roleText,
-          )}
-        >
-          {role}
-        </span>
-      </div>
-      <button
-        type="button"
-        onClick={onRemove}
-        className="hover:text-red-500 text-slate-300 ml-1"
-      >
-        <X size={12} />
-      </button>
-    </div>
-  );
-};
-
 const CreateProject = ({
   programId,
   onClose,
@@ -171,12 +86,11 @@ const CreateProject = ({
   const isLoading = isCreating || isUpdating;
   const isUpdate = !!project;
   const { data: managersData } = useGetAllManagersQuery({});
-  const allManagers = managersData?.data?.data || managersData?.data || [];
+  const allManagers = managersData?.data?.data || [];
   const { data: employeesData } = useGetAllEmployeesQuery({});
   const { data: viewerData } = useGetAllViewersQuery({});
-  const allEmployees: any =
-    employeesData?.data?.data || employeesData?.data || [];
-  const allViewer = viewerData?.data?.data || viewerData?.data || [];
+  const allEmployees: any = employeesData?.data || [];
+  const allViewer = viewerData?.data?.data || [];
   const [enableDetails, setEnableDetails] = useState(false);
   const [statuses] = useState([
     "PENDING",
@@ -357,22 +271,12 @@ const CreateProject = ({
         programId: project.programId || programId,
         name: project.name || "",
         shareWith:
-          project.shareWith === "Invite_Staff" ||
-          (project.employeeIds && project.employeeIds.length > 0) ||
-          (project.viewerIds && project.viewerIds.length > 0) ||
-          (project.projectEmployees && project.projectEmployees.length > 0) ||
-          (project.projectViewers && project.projectViewers.length > 0)
+          project.employeeIds?.length > 0 || project.viewerIds?.length > 0
             ? "Invite_Staff"
             : "Only_Me",
-        managerId: project.managerId || project.manager?.id || "",
-        viewerIds:
-          project.viewerIds ||
-          project.projectViewers?.map((v: any) => v.viewerId) ||
-          [],
-        employeeIds:
-          project.employeeIds ||
-          project.projectEmployees?.map((e: any) => e.employeeId) ||
-          [],
+        managerId: project.managerId || "",
+        viewerIds: project.viewerIds || [],
+        employeeIds: project.employeeIds || [],
         dateDate: dateDate,
         uploadCycle: project.uploadCycle || "Weekly",
         SelectDays: project.SelectDays
@@ -400,7 +304,7 @@ const CreateProject = ({
         budget: project.budget || "",
         currentRate: project.currentRate || "",
       });
-      if (project.description || project.budget) {
+      if (project.description || project.budget || project.managerId) {
         setEnableDetails(true);
       }
     }
@@ -896,7 +800,7 @@ const CreateProject = ({
                 {/* Share With */}
                 <div className="space-y-4">
                   <h4 className="font-bold text-[11px] text-blue-600/70 text-sm uppercase tracking-tight">
-                    Sharing & Access
+                    Data Date Uploading Cycle
                   </h4>
                   <Controller
                     control={control}
@@ -1048,40 +952,17 @@ const CreateProject = ({
                       render={({ field }) => (
                         <Select
                           onValueChange={field.onChange}
-                          value={field.value || ""}
+                          value={field.value}
                         >
                           <SelectTrigger className="bg-slate-50 px-4 border border-slate-200 focus:border-blue-500 rounded-lg focus:ring-blue-500/20 w-full h-11! text-slate-700 text-sm transition-all">
                             <SelectValue placeholder="Select Manager" />
                           </SelectTrigger>
                           <SelectContent className="bg-white">
-                            {allManagers.map((m: any) => {
-                              const mId = m.id;
-                              const mName = m.user?.name;
-                              return (
-                                <SelectItem
-                                  key={String(mId)}
-                                  value={String(mId)}
-                                >
-                                  {mName}
-                                </SelectItem>
-                              );
-                            })}
-                            {/* Fallback for project manager if not in the list */}
-                            {project?.manager &&
-                              !allManagers.find((m: any) => {
-                                const mId = m.id;
-                                return (
-                                  String(mId) === String(project.manager.id)
-                                );
-                              }) && (
-                                <SelectItem
-                                  key={project.manager.id}
-                                  value={project.manager.id}
-                                >
-                                  {project.manager.user?.name ||
-                                    project.manager.name}
-                                </SelectItem>
-                              )}
+                            {allManagers.map((m: any) => (
+                              <SelectItem key={m.id} value={m.id}>
+                                {m.user.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}
@@ -1103,124 +984,139 @@ const CreateProject = ({
                     <div className="flex flex-wrap gap-2">
                       {selectedManagerId &&
                         (() => {
-                          const managerFromList = allManagers.find((m: any) => {
-                            const mId = m.id || m.manager?.id;
-                            const mUserId =
-                              m.userId || m.manager?.userId || m.user?.id;
-                            return (
-                              String(mId) === String(selectedManagerId) ||
-                              String(mUserId) === String(selectedManagerId)
-                            );
-                          });
-                          const managerFallback =
-                            !managerFromList &&
-                            project?.manager &&
-                            (String(project.managerId) ===
-                              String(selectedManagerId) ||
-                              String(project.manager?.id) ===
-                                String(selectedManagerId) ||
-                              String(project.manager?.userId) ===
-                                String(selectedManagerId))
-                              ? project.manager
-                              : null;
-                          const manager = managerFromList || managerFallback;
+                          const manager = allManagers.find(
+                            (m: any) => m.id === selectedManagerId,
+                          );
                           if (!manager) return null;
-                          const name =
-                            manager.user?.name || manager.name || "Unknown";
-                          const profileImage =
-                            manager.user?.profileImage || manager.profileImage;
+                          const name = manager.user?.name || "Unknown";
                           return (
-                            <TeamMemberTag
-                              key={manager.id}
-                              name={name || "Manager"}
-                              role="Manager"
-                              image={profileImage}
-                              variant="emerald"
-                              onRemove={() => setValue("managerId", "")}
-                            />
+                            <div className="flex items-center gap-2 bg-white shadow-sm hover:shadow-md p-1 pr-2.5 border border-emerald-100 rounded-full transition-all group">
+                              <div className="flex justify-center items-center bg-emerald-50 border border-emerald-50 rounded-full w-8 h-8 overflow-hidden shrink-0">
+                                {manager.user?.profileImage ? (
+                                  <img
+                                    src={manager.user.profileImage}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <span className="font-bold text-emerald-600 text-[10px]">
+                                    {name.charAt(0)}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-bold text-slate-700 text-[11px] leading-none">
+                                  {name}
+                                </span>
+                                <span className="font-bold text-emerald-500/80 text-[8px] uppercase tracking-tighter leading-none mt-0.5">
+                                  Manager
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setValue("managerId", "")}
+                                className="hover:bg-red-50 ml-1 p-0.5 rounded-full text-slate-300 hover:text-red-500 transition-colors"
+                              >
+                                <X size={12} />
+                              </button>
+                            </div>
                           );
                         })()}
 
                       {selectedEmployeeIds.map((empId) => {
-                        const empRecord = allEmployees.find((e: any) => {
-                          const eId = e.id || e.employee?.id;
-                          const eUserId =
-                            e.userId || e.employee?.userId || e.user?.id;
-                          return (
-                            String(eId) === String(empId) ||
-                            String(eUserId) === String(empId)
-                          );
-                        });
-                        const empProjectData = project?.projectEmployees?.find(
-                          (pe: any) => {
-                            const peId = pe.employeeId || pe.employee?.id;
-                            return String(peId) === String(empId);
-                          },
-                        )?.employee;
-
-                        const emp = empRecord || empProjectData;
+                        const emp = allEmployees.find(
+                          (e: any) => e.id === empId,
+                        );
                         if (!emp) return null;
                         const name = emp?.name || emp?.user?.name || "Unknown";
-                        const profileImage =
-                          emp?.profileImage || emp?.user?.profileImage;
-
                         return (
-                          <TeamMemberTag
+                          <div
                             key={empId}
-                            name={name}
-                            role="Employee"
-                            image={profileImage}
-                            variant="blue"
-                            onRemove={() =>
-                              setValue(
-                                "employeeIds",
-                                selectedEmployeeIds.filter(
-                                  (id) => id !== empId,
-                                ),
-                              )
-                            }
-                          />
+                            className="flex items-center gap-2 bg-white shadow-sm hover:shadow-md p-1 pr-2.5 border border-slate-100 rounded-full transition-all group"
+                          >
+                            <div className="flex justify-center items-center bg-blue-50 border border-slate-50 rounded-full w-8 h-8 overflow-hidden shrink-0">
+                              {emp?.profileImage ? (
+                                <img
+                                  src={emp.profileImage}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span className="font-bold text-blue-600 text-[10px]">
+                                  {name.charAt(0)}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-700 text-[11px] leading-none">
+                                {name}
+                              </span>
+                              <span className="font-bold text-blue-500/80 text-[8px] uppercase tracking-tighter leading-none mt-0.5">
+                                Employee
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setValue(
+                                  "employeeIds",
+                                  selectedEmployeeIds.filter(
+                                    (id) => id !== empId,
+                                  ),
+                                );
+                              }}
+                              className="hover:bg-red-50 ml-1 p-0.5 rounded-full text-slate-300 hover:text-red-500 transition-colors"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
                         );
                       })}
 
                       {selectedViewerIds.map((vId) => {
-                        const viewerRecord = allViewer.find((v: any) => {
-                          const vIdShort = v.id || v.viewer?.id;
-                          const vUserId =
-                            v.userId || v.viewer?.userId || v.user?.id;
-                          return (
-                            String(vIdShort) === String(vId) ||
-                            String(vUserId) === String(vId)
-                          );
-                        });
-                        const viewerProjectData = project?.projectViewers?.find(
-                          (pv: any) => {
-                            const pvId = pv.viewerId || pv.viewer?.id;
-                            return String(pvId) === String(vId);
-                          },
-                        )?.viewer;
-
-                        const viewer = viewerRecord || viewerProjectData;
+                        const viewer = allViewer.find((v: any) => v.id === vId);
                         if (!viewer) return null;
                         const name =
                           viewer?.user?.name || viewer?.name || "Unknown";
-                        const profileImage =
-                          viewer?.user?.profileImage || viewer?.profileImage;
-
                         return (
-                          <TeamMemberTag
+                          <div
                             key={vId}
-                            name={name}
-                            role="Viewer"
-                            image={profileImage}
-                            variant="indigo"
-                            onRemove={() =>
-                              setValue(
-                                "viewerIds",
-                                selectedViewerIds.filter((id) => id !== vId),
-                              )
-                            }
-                          />
+                            className="flex items-center gap-2 bg-white shadow-sm hover:shadow-md p-1 pr-2.5 border border-slate-100 rounded-full transition-all group"
+                          >
+                            <div className="flex justify-center items-center bg-indigo-50 border border-slate-50 rounded-full w-8 h-8 overflow-hidden shrink-0">
+                              {viewer?.user?.profileImage ? (
+                                <img
+                                  src={viewer.user.profileImage}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span className="font-bold text-indigo-600 text-[10px]">
+                                  {name.charAt(0)}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-700 text-[11px] leading-none">
+                                {name}
+                              </span>
+                              <span className="font-bold text-indigo-500/80 text-[8px] uppercase tracking-tighter leading-none mt-0.5">
+                                Viewer
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setValue(
+                                  "viewerIds",
+                                  selectedViewerIds.filter((id) => id !== vId),
+                                );
+                              }}
+                              className="hover:bg-red-50 ml-1 p-0.5 rounded-full text-slate-300 hover:text-red-500 transition-colors"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
                         );
                       })}
                     </div>

@@ -1,6 +1,6 @@
 import React, { SetStateAction, Dispatch } from "react";
 import { X, Plus, Trash2, Settings2, Palette, Ruler } from "lucide-react";
-import { LegendValue } from "../WidgetForChartModuleOne";
+import { LegendValue } from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 
 interface BulletChartConfigurationProps {
   widgetTitle: string;
@@ -89,7 +89,9 @@ const BulletChartConfiguration: React.FC<BulletChartConfigurationProps> = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs text-gray-600 block mb-1">Minimum</label>
+              <label className="text-xs text-gray-600 block mb-1">
+                Minimum
+              </label>
               <input
                 type="number"
                 value={startingRange}
@@ -98,7 +100,9 @@ const BulletChartConfiguration: React.FC<BulletChartConfigurationProps> = ({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs text-gray-600 block mb-1">Maximum</label>
+              <label className="text-xs text-gray-600 block mb-1">
+                Maximum
+              </label>
               <input
                 type="number"
                 value={endingRange}

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import RadarChartNew from "@/common/Charts/RadarChartNew";
 
 const RadarChartModule = ({
@@ -28,7 +30,7 @@ const RadarChartModule = ({
   const maxXaxisField = 8;
 
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -38,7 +40,7 @@ const RadarChartModule = ({
     } else {
       setNumOfXAxisDataSet(3);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 

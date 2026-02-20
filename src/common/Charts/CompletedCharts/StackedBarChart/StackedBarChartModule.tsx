@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
-import AreaChart from "@/common/Charts/AreaChart";
+} from "../Widgets/WidgetForChartModuleOne";
+import StackedBarChart from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const AreaChartModule = ({
+const StackedBarChartModule = ({
   onDelete,
   isPreview = false,
 }: {
@@ -16,12 +16,9 @@ const AreaChartModule = ({
   const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
   const [showWidget, setShowWidget] = useState(false);
-
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
-
   const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
-
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#13A490" },
     { label: "", field: "", color: "#35B6EE" },
@@ -33,7 +30,7 @@ const AreaChartModule = ({
   useEffect(() => {
     dispatch(
       setWidgetConfig({
-        id: "area-chart",
+        id: "bar-chart",
         config: {
           widgetTitle,
           xAxisValues,
@@ -55,7 +52,7 @@ const AreaChartModule = ({
   ]);
 
   const minXaxisField = 1;
-  const maxXaxisField = 7;
+  const maxXaxisField = 10;
 
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -90,8 +87,9 @@ const AreaChartModule = ({
   };
 
   const handleToggleWidget = () => {
-    if (isPreview) return;
-    setShowWidget(!showWidget);
+    if (!isPreview) {
+      setShowWidget(!showWidget);
+    }
   };
 
   const handleCloseWidget = () => {
@@ -99,9 +97,9 @@ const AreaChartModule = ({
   };
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 h-full w-full">
       <div className="flex-1 min-w-0 sticky top-5 h-full">
-        <AreaChart
+        <StackedBarChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
           legendValues={legendValues}
@@ -116,9 +114,9 @@ const AreaChartModule = ({
       </div>
       {!isPreview && showWidget && (
         <ProjectConfiguration
-          widgedName="Area Chart"
+          widgedName="Stack Bar Chart"
           widgetTitle={widgetTitle}
-          widgetCategory="AREA"
+          widgetCategory="BAR"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -133,10 +131,11 @@ const AreaChartModule = ({
           endingRange={endingRange}
           setEndingRange={setEndingRange}
           onClose={handleCloseWidget}
+          onDelete={onDelete}
         />
       )}
     </div>
   );
 };
 
-export default AreaChartModule;
+export default StackedBarChartModule;

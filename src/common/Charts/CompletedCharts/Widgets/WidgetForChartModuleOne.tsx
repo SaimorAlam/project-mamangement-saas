@@ -181,7 +181,7 @@ const WidgetForChartModuleOne = ({
       status: "ACTIVE",
       category: widgetCategory,
       xAxis: JSON.stringify([
-        ["Label", ...legendValues.map((l) => l.label)],
+        // ["Label", ...legendValues.map((l) => l.label)],
         ...xAxisValues.map((label) => [
           label,
           ...Array(numOfLegendDataSet).fill(0),

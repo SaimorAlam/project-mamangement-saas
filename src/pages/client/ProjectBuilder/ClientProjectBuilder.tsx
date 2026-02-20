@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import ProjectWidget from "@/components/client/ProjectBuilder/ProjectWidget";
+import ProjectWidget from "@/common/Charts/CompletedCharts/Widgets/ProjectWidget";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
   setSelectedWidgets,

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
 
 const HeatmapChartModule = () => {
@@ -23,7 +25,7 @@ const HeatmapChartModule = () => {
   const maxXaxisField = 7;
 
   const handleSetNumOfXAxisDataSet = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value)) {
@@ -33,7 +35,7 @@ const HeatmapChartModule = () => {
     } else {
       setNumOfXAxisDataSet(1);
       alert(
-        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`
+        `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
 

@@ -11,9 +11,9 @@ import {
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
-import AddTierModal from "../Modal/AddTierModal";
-import TierChartModal from "../Modal/TierChartModal";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import AddTierModal from "../../../Modal/AddTierModal";
+import TierChartModal from "../../../Modal/TierChartModal";
+import ChartCardWrapper from "../../components/ChartCardWrapper";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
   useLazyFindChildrenValueQuery,
@@ -159,8 +159,6 @@ export default function PieChartWidget({
       }));
     return { chartData: data, isSampleData: data.length > 0 };
   }, [legendValues, allUploadedData]);
-
-
 
   /*   ACTIONS   */
 
@@ -404,8 +402,6 @@ export default function PieChartWidget({
               <Tooltip formatter={(value) => `${value}`} />
             </RechartsPieChart>
           </ResponsiveContainer>
-
-
         </div>
       </ChartCardWrapper>
 

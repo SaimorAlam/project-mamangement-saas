@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../WidgetForChartModuleOne";
+} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
 import CalendarHeatmapChart from "@/common/Charts/CalendarHeatmapChart";
 
 type CalendarHeatmapChartModuleProps = {
@@ -9,7 +9,10 @@ type CalendarHeatmapChartModuleProps = {
   isPreview?: boolean;
 };
 
-const CalendarHeatmapChartModule = ({ onDelete, isPreview = false }: CalendarHeatmapChartModuleProps) => {
+const CalendarHeatmapChartModule = ({
+  onDelete,
+  isPreview = false,
+}: CalendarHeatmapChartModuleProps) => {
   const [widgetTitle, setWidgetTitle] = useState("Activity Calendar");
   const [showWidget, setShowWidget] = useState(false);
 

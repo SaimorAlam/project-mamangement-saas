@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import ProjectConfiguration, { LegendValue } from "../WidgetForChartModuleOne";
-import StackedBarChart from "@/common/Charts/StackedBarChart";
+import ProjectConfiguration, {
+  LegendValue,
+} from "../Widgets/WidgetForChartModuleOne";
+import HorizontalBarChart from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
-const StackedBarChartModule = ({
+const HorizontalBarChartModule = ({
   onDelete,
   isPreview = false,
 }: {
@@ -13,22 +15,25 @@ const StackedBarChartModule = ({
 }) => {
   const dispatch = useAppDispatch();
   const [widgetTitle, setWidgetTitle] = useState("My-CSV");
-  const [showWidget, setShowWidget] = useState(false);
+  const [showWidget, setShowWidget] = useState(false); // Widget hidden by default
+
   const [numOfXAxisDataSet, setNumOfXAxisDataSet] = useState<number>(1);
   const [xAxisValues, setXAxisValues] = useState<string[]>([]);
+
   const [numOfLegendDataSet, setNumOfLegendDataSet] = useState<number>(3);
+
   const [legendValues, setLegendValues] = useState<LegendValue[]>([
     { label: "", field: "", color: "#13A490" },
     { label: "", field: "", color: "#35B6EE" },
     { label: "", field: "", color: "#6F78F9" },
   ]);
-  const [startingRange, setStartingRange] = useState<number>(0);
-  const [endingRange, setEndingRange] = useState<number>(100);
+  const [startingRange, setStartingRange] = useState<number>(0); //for y axis
+  const [endingRange, setEndingRange] = useState<number>(100); // for y axis
 
   useEffect(() => {
     dispatch(
       setWidgetConfig({
-        id: "bar-chart",
+        id: "horizontal-bar-chart",
         config: {
           widgetTitle,
           xAxisValues,
@@ -50,8 +55,7 @@ const StackedBarChartModule = ({
   ]);
 
   const minXaxisField = 1;
-  const maxXaxisField = 10;
-
+  const maxXaxisField = 7;
   const handleSetNumOfXAxisDataSet = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -69,9 +73,11 @@ const StackedBarChartModule = ({
 
     setXAxisValues((prev) => {
       const updated = [...prev];
+      // Adding empty values if increased
       while (updated.length < value) {
         updated.push("");
       }
+      // Removing extra values if decreased
       return updated.slice(0, value);
     });
   };
@@ -82,39 +88,39 @@ const StackedBarChartModule = ({
       updated[index] = value;
       return updated;
     });
+    console.log("parant x values: ", xAxisValues);
   };
 
+  // Toggle widget visibility
   const handleToggleWidget = () => {
-    if (!isPreview) {
-      setShowWidget(!showWidget);
-    }
+    setShowWidget(!showWidget);
   };
 
+  // Close widget (for X button)
   const handleCloseWidget = () => {
     setShowWidget(false);
   };
 
   return (
-    <div className="flex gap-3 h-full w-full">
-      <div className="flex-1 min-w-0 sticky top-5 h-full">
-        <StackedBarChart
+    <div className="flex gap-3 h-full">
+      <div className="flex-1 h-full sticky top-5">
+        <HorizontalBarChart
           widgetTitle={widgetTitle}
           xAxisValues={xAxisValues}
           legendValues={legendValues}
-          numOfLegendDataSet={numOfLegendDataSet}
           startingRange={startingRange}
           endingRange={endingRange}
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
-          isCreationMode={true}
           isPreview={isPreview}
+          isCreationMode={true}
         />
       </div>
       {!isPreview && showWidget && (
         <ProjectConfiguration
-          widgedName="Stack Bar Chart"
+          widgedName="Horizontal Bar Chart"
           widgetTitle={widgetTitle}
-          widgetCategory="BAR"
+          widgetCategory="HORIZONTAL_BAR"
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
           handleSetNumOfXAxisDataSet={handleSetNumOfXAxisDataSet}
@@ -129,11 +135,10 @@ const StackedBarChartModule = ({
           endingRange={endingRange}
           setEndingRange={setEndingRange}
           onClose={handleCloseWidget}
-          onDelete={onDelete}
         />
       )}
     </div>
   );
 };
 
-export default StackedBarChartModule;
+export default HorizontalBarChartModule;
