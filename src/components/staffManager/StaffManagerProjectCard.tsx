@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Flag, Layers, Star } from "lucide-react";
 // import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
-import ProjectDetailsModal from "./overview/ProjectDetailsModal";
+// import ProjectDetailsModal from "./overview/ProjectDetailsModal";
 import { toast } from "sonner";
 import {
   useAddProjectToFavoriteMutation,
@@ -13,6 +13,8 @@ import {
   useRemoveProjectFromFavoriteMutation
 } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import RenderStaffAvatars from "../client/RenderStaffAvater";
+import PrimaryButton from "@/common/PrimaryButton";
+import { useNavigate } from "react-router-dom";
 
 export type ProjectStatus =
   | "LIVE"
@@ -143,6 +145,7 @@ const StaffManagerProjectCard = ({
   const { data } = useGetFavoriteProjectsQuery();
   const [addProjectToFavorite] = useAddProjectToFavoriteMutation();
   const [removeProjectFromFavorite] = useRemoveProjectFromFavoriteMutation();
+  const navigate = useNavigate();
 
   const priorityColor =
     priority === "HIGH"
@@ -281,7 +284,12 @@ const StaffManagerProjectCard = ({
 
         {/* CTA */}
         <div className="py-2 px-4">
-          <ProjectDetailsModal project={project} />
+          <PrimaryButton
+            title="View Project Details"
+            type="Primary"
+            className="w-full h-10"
+            onClick={() => navigate(`/staff-manager-panel/projects/${project.id}`)}
+          />
         </div>
       </CardContent>
     </Card>
