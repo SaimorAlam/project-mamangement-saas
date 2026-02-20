@@ -1055,8 +1055,8 @@ const CreateProject = ({
                           </SelectTrigger>
                           <SelectContent className="bg-white">
                             {allManagers.map((m: any) => {
-                              const mId =m.id;
-                              const mName = m.user?.name
+                              const mId = m.id;
+                              const mName = m.user?.name;
                               return (
                                 <SelectItem
                                   key={String(mId)}
@@ -1069,7 +1069,7 @@ const CreateProject = ({
                             {/* Fallback for project manager if not in the list */}
                             {project?.manager &&
                               !allManagers.find((m: any) => {
-                                const mId = m.id
+                                const mId = m.id;
                                 return (
                                   String(mId) === String(project.manager.id)
                                 );
@@ -1093,7 +1093,6 @@ const CreateProject = ({
                   selectedEmployeeIds.length > 0 ||
                   selectedViewerIds.length > 0) && (
                   <div className="flex flex-col gap-3 bg-slate-50/50 slide-in-from-top-1 p-3 border border-slate-100 rounded-xl animate-in fade-in">
-
                     <div className="flex justify-between items-center px-1">
                       <span className="flex items-center gap-2 font-bold text-[10px] text-slate-400 uppercase tracking-widest">
                         <Users size={12} className="text-blue-500/70" />
@@ -1116,11 +1115,12 @@ const CreateProject = ({
                           const managerFallback =
                             !managerFromList &&
                             project?.manager &&
-                            (
-                              String(project.managerId) === String(selectedManagerId) ||
-                              String(project.manager?.id) === String(selectedManagerId) ||
-                              String(project.manager?.userId) === String(selectedManagerId)
-                            )
+                            (String(project.managerId) ===
+                              String(selectedManagerId) ||
+                              String(project.manager?.id) ===
+                                String(selectedManagerId) ||
+                              String(project.manager?.userId) ===
+                                String(selectedManagerId))
                               ? project.manager
                               : null;
                           const manager = managerFromList || managerFallback;
