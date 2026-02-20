@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
-// import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { useAppSelector } from "@/hooks/useRedux";
-import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
+import {
+  useCreateChartMutation,
+  useLazyGetChartByProjectIdQuery,
+} from "@/store/Api/ChartApi/ChartApi";
+import { useLazyGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { toast } from "sonner";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useLocation } from "react-router-dom";
@@ -52,13 +55,19 @@ const WidgetForChartModuleOne = ({
   onClose?: () => void;
   onDelete?: () => void;
 }) => {
+  // ── detect Program Builder context ────────────────────────────────────────
+  const { pathname, state: locationState } = useLocation();
+  const isProgramBuilder = pathname.split("/")[2] === "program-builder";
+  const projectIdFromState = (locationState as { projectId?: string } | null)?.projectId;
+
   const [projectId, setProjectId] = useState<string>("");
   const { name, role, profileImage, loading } = useGetUser();
   const projectIdFromSlice = useAppSelector(
     (state) => state?.chartSlice?.projectId,
   );
-  const location = useLocation();
-  const projectIdFromState = location.state?.projectId;
+  const programIdFromSlice = useAppSelector(
+    (state) => state?.chartSlice?.programId,
+  );
 
   useEffect(() => {
     if (projectIdFromSlice) {
@@ -68,6 +77,64 @@ const WidgetForChartModuleOne = ({
       setProjectId(projectIdFromState);
     }
   }, [projectIdFromSlice, projectIdFromState]);
+
+  // ── Program Builder: Y-Axis cascading state ───────────────────────────────
+  const [yAxisProjectId, setYAxisProjectId] = useState<string>("");
+  const [yAxisChartId, setYAxisChartId] = useState<string>("");
+  const [yAxisDataScope, setYAxisDataScope] = useState<string>("");
+
+  const [getProjectsByProgram, { data: programProjectsData, isLoading: isProgramProjectsLoading }] =
+    useLazyGetProjectsByProgramIdQuery();
+
+  const [getChartsByProject, { data: projectChartsData, isLoading: isProjectChartsLoading }] =
+    useLazyGetChartByProjectIdQuery();
+
+  // Fetch projects when entering program-builder context
+  useEffect(() => {
+    if (isProgramBuilder && programIdFromSlice) {
+      getProjectsByProgram({ programId: programIdFromSlice });
+    }
+  }, [isProgramBuilder, programIdFromSlice, getProjectsByProgram]);
+
+  // Fetch root charts when a project is selected in y-axis panel
+  useEffect(() => {
+    if (isProgramBuilder && yAxisProjectId) {
+      getChartsByProject(yAxisProjectId);
+    }
+  }, [isProgramBuilder, yAxisProjectId, getChartsByProject]);
+
+  // Loose API item type used only within this component for response mapping
+  type RawApiItem = Record<string, unknown>;
+
+  const programProjects: { id: string; name: string }[] =
+    (programProjectsData?.data?.data as RawApiItem[] | undefined)?.map(
+      (p) => ({ id: p.id as string, name: p.name as string }),
+    ) ?? [];
+
+  const rootCharts: { id: string; title: string; xAxis: string }[] =
+    ((projectChartsData?.data ?? []) as RawApiItem[])
+      .filter((c) => c.rootchart === true)
+      .map((c) => ({
+        id: c.id as string,
+        title: c.title as string,
+        xAxis: c.xAxis as string,
+      }));
+
+  const selectedRootChart = rootCharts.find((c) => c.id === yAxisChartId);
+
+  // Parse xAxis labels — skip header row, take first column of each data row
+  const xAxisSliceLabels: string[] = (() => {
+    if (!selectedRootChart?.xAxis) return [];
+    try {
+      const parsed = JSON.parse(selectedRootChart.xAxis) as unknown[][];
+      return parsed
+        .slice(1)
+        .map((row) => row[0])
+        .filter((v): v is string => typeof v === "string" && v !== "");
+    } catch {
+      return [];
+    }
+  })();
 
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
@@ -357,46 +424,146 @@ const WidgetForChartModuleOne = ({
             Data Mapping for Y-Axis
           </h3>
 
-          {/* Number of Data sets */}
-          <div className="flex items-center mb-3">
-            <label className="text-xs text-gray-700 flex-1">
-              Number of Data sets:
-            </label>
-            <input
-              type="number"
-              min={minLegend}
-              max={maxLegend}
-              value={numOfLegendDataSet}
-              onChange={handleSetNumOfLegendDataSet}
-              className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
-            />
-          </div>
+          {isProgramBuilder ? (
+            /* ── Program Builder: cascading Project → Chart → Scope dropdowns ── */
+            <div className="space-y-3">
+              {/* Project */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-700 w-24 shrink-0">Project:</label>
+                <div className="relative flex-1">
+                  <select
+                    value={yAxisProjectId}
+                    onChange={(e) => {
+                      setYAxisProjectId(e.target.value);
+                      setYAxisChartId("");
+                      setYAxisDataScope("");
+                    }}
+                    disabled={isProgramProjectsLoading}
+                    className="w-full pr-7 pl-2 py-1.5 bg-white border border-gray-300 rounded text-xs text-gray-600 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    <option value="">
+                      {isProgramProjectsLoading ? "Loading..." : "Select project"}
+                    </option>
+                    {programProjects.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
 
-          {/* 1st field Data */}
-          <div className="flex items-center mb-2">
-            <label className="text-xs text-gray-700 flex-1">
-              1st field Data:
-            </label>
-            <input
-              type="number"
-              onChange={(e) => setStartingRange(Number(e.target.value))}
-              defaultValue={startingRange}
-              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
-            />
-          </div>
+              {/* Source Chart */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-700 w-24 shrink-0">Source Chart:</label>
+                <div className="relative flex-1">
+                  <select
+                    value={yAxisChartId}
+                    onChange={(e) => {
+                      setYAxisChartId(e.target.value);
+                      setYAxisDataScope("");
+                    }}
+                    disabled={!yAxisProjectId || isProjectChartsLoading}
+                    className="w-full pr-7 pl-2 py-1.5 bg-white border border-gray-300 rounded text-xs text-gray-600 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    <option value="">
+                      {isProjectChartsLoading
+                        ? "Loading..."
+                        : !yAxisProjectId
+                          ? "Select project first"
+                          : rootCharts.length === 0
+                            ? "No root charts"
+                            : "Select chart"}
+                    </option>
+                    {rootCharts.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
 
-          {/* Last field Data */}
-          <div className="flex items-center mb-2">
-            <label className="text-xs text-gray-700 flex-1">
-              Last field Data:
-            </label>
-            <input
-              type="number"
-              onChange={(e) => setEndingRange(Number(e.target.value))}
-              defaultValue={endingRange}
-              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
-            />
-          </div>
+              {/* Data Scope — xAxis slice labels */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-700 w-24 shrink-0">Data Scope:</label>
+                <div className="relative flex-1">
+                  <select
+                    value={yAxisDataScope}
+                    onChange={(e) => setYAxisDataScope(e.target.value)}
+                    disabled={!yAxisChartId || xAxisSliceLabels.length === 0}
+                    className="w-full pr-7 pl-2 py-1.5 bg-white border border-gray-300 rounded text-xs text-gray-600 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    <option value="">
+                      {!yAxisChartId
+                        ? "Select chart first"
+                        : xAxisSliceLabels.length === 0
+                          ? "No labels found"
+                          : "Select scope"}
+                    </option>
+                    {xAxisSliceLabels.map((label) => (
+                      <option key={label} value={label}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* ── Project Builder: standard numeric range inputs ── */
+            <div className="space-y-2">
+              {/* Number of Data sets */}
+              <div className="flex items-center">
+                <label className="text-xs text-gray-700 flex-1">Number of Data sets:</label>
+                <input
+                  type="number"
+                  min={minLegend}
+                  max={maxLegend}
+                  value={numOfLegendDataSet}
+                  onChange={handleSetNumOfLegendDataSet}
+                  className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+                />
+              </div>
+
+              {/* 1st field Data */}
+              <div className="flex items-center">
+                <label className="text-xs text-gray-700 flex-1">1st field Data:</label>
+                <input
+                  type="number"
+                  onChange={(e) => setStartingRange(Number(e.target.value))}
+                  defaultValue={startingRange}
+                  className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+                />
+              </div>
+
+              {/* Last field Data */}
+              <div className="flex items-center">
+                <label className="text-xs text-gray-700 flex-1">Last field Data:</label>
+                <input
+                  type="number"
+                  onChange={(e) => setEndingRange(Number(e.target.value))}
+                  defaultValue={endingRange}
+                  className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Display Settings Section */}
