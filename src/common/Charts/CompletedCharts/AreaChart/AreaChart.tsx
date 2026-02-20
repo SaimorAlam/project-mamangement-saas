@@ -28,8 +28,8 @@ import {
 
 /**
  * Parse xAxis 2D array format from API
- * Format: [["day", "absent", "late", "ontime"], ["Sunday", 1, 2, 50], ...]
- * Same logic as StackedBarChart
+ * Format: [["Project A", 0, 0], ["Project B", 0, 0], ...]
+ * All rows are data rows — no header row in the new format.
  */
 export const parseAreaChartData = (
   xAxis: any[][] | string | { labels: any[][] },
@@ -60,14 +60,10 @@ export const parseAreaChartData = (
     return { labels: [], data: {} as { [key: string]: ChartData[] } };
   }
 
-  const headers = parsedXAxis[0];
-  if (!Array.isArray(headers) || headers.length === 0) {
-    return { labels: [], data: {} as { [key: string]: ChartData[] } };
-  }
+  // All rows are data rows — extract labels from the first column
+  const labels = parsedXAxis.map((row: any) => String(row[0] || ""));
 
-  const labels = parsedXAxis.slice(1).map((row: any) => String(row[0] || ""));
-
-  const chartData: ChartData[] = parsedXAxis.slice(1).map((row: any) => {
+  const chartData: ChartData[] = parsedXAxis.map((row: any) => {
     const dataPoint: ChartData = { name: String(row[0] || "") };
     legendValues.forEach((legend, index) => {
       const columnIndex = index + 1;
@@ -329,7 +325,8 @@ export default function AreaChart({
                 : node.xAxis;
             if (Array.isArray(parsed)) {
               if (parsed.length > 0 && Array.isArray(parsed[0])) {
-                xAxis = parsed.slice(1).map((row: any) => row[0]);
+                // All rows are data rows — no header to skip
+                xAxis = parsed.map((row: any) => row[0]);
               } else {
                 xAxis = parsed;
               }

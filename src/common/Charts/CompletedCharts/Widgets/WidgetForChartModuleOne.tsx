@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { useAppSelector } from "@/hooks/useRedux";
 import {
   useCreateChartMutation,
-  useLazyGetChartByProjectIdQuery,
+  useLazyGetRootChartQuery,
 } from "@/store/Api/ChartApi/ChartApi";
 import { useLazyGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { toast } from "sonner";
@@ -86,8 +86,8 @@ const WidgetForChartModuleOne = ({
   const [getProjectsByProgram, { data: programProjectsData, isLoading: isProgramProjectsLoading }] =
     useLazyGetProjectsByProgramIdQuery();
 
-  const [getChartsByProject, { data: projectChartsData, isLoading: isProjectChartsLoading }] =
-    useLazyGetChartByProjectIdQuery();
+  const [getRootChartByProject, { data: projectChartsData, isLoading: isProjectChartsLoading }] =
+    useLazyGetRootChartQuery();
 
   // Fetch projects when entering program-builder context
   useEffect(() => {
@@ -99,9 +99,9 @@ const WidgetForChartModuleOne = ({
   // Fetch root charts when a project is selected in y-axis panel
   useEffect(() => {
     if (isProgramBuilder && yAxisProjectId) {
-      getChartsByProject(yAxisProjectId);
+      getRootChartByProject(yAxisProjectId);
     }
-  }, [isProgramBuilder, yAxisProjectId, getChartsByProject]);
+  }, [isProgramBuilder, yAxisProjectId, getRootChartByProject]);
 
   // Loose API item type used only within this component for response mapping
   type RawApiItem = Record<string, unknown>;
@@ -128,7 +128,6 @@ const WidgetForChartModuleOne = ({
     try {
       const parsed = JSON.parse(selectedRootChart.xAxis) as unknown[][];
       return parsed
-        .slice(1)
         .map((row) => row[0])
         .filter((v): v is string => typeof v === "string" && v !== "");
     } catch {

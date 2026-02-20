@@ -236,7 +236,8 @@ export default function PieChartWidget({
               parsed.length > 0 &&
               Array.isArray(parsed[0])
             ) {
-              xAxisLabels = parsed.slice(1).map((row: any) => row[0]);
+              // All rows are data rows
+              xAxisLabels = parsed.map((row: any) => row[0]);
             }
           } catch (e) {
             console.error("Failed to parse xAxis for node", node.id, e);
@@ -293,7 +294,7 @@ export default function PieChartWidget({
       status: "ACTIVE",
       category: "PIE",
       xAxis: JSON.stringify([
-        ["Legend", "Value"],
+        // ["Legend", "Value"],
         ...legendValues.map((l) => [l.label, 0]),
       ]),
       yAxis: JSON.stringify({}),

@@ -37,8 +37,9 @@ const ProjectDashboardView = ({
   });
 
   const projectsChartsData = useMemo(() => {
+    if (!projectId) return null;
     return projectsChart?.data;
-  }, [projectsChart]);
+  }, [projectsChart, projectId]);
 
   return (
     <Suspense fallback={<ProjectBuilderPlaceholderChartSkeleton />}>

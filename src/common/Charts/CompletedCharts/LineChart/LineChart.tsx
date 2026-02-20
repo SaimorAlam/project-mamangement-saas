@@ -305,8 +305,9 @@ export default function MultiAxisLineChart({
             typeof node.xAxis === "string"
               ? JSON.parse(node.xAxis)
               : node.xAxis;
-          if (Array.isArray(parsed) && parsed.length > 1) {
-            xAxisItems = parsed.slice(1).map((row: any) => String(row[0]));
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // All rows are data rows — no header to skip
+            xAxisItems = parsed.map((row: any) => String(row[0]));
           } else if (parsed?.labels) {
             xAxisItems = parsed.labels;
           }
@@ -361,7 +362,7 @@ export default function MultiAxisLineChart({
       status: "ACTIVE",
       category: "LINE",
       xAxis: JSON.stringify([
-        ["Label", ...legendValues.map((l) => l.label)],
+        // ["Label", ...legendValues.map((l) => l.label)],
         ...effectiveXAxisValues.map((label) => [
           label,
           ...Array(legendValues.length).fill(0),

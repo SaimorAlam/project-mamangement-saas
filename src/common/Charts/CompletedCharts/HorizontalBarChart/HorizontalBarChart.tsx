@@ -28,7 +28,8 @@ import { chartTypes } from "@/utils/ChartCategory";
 
 /**
  * Parse xAxis 2D array format from API for Horizontal Bar
- * Format: [["label", "value"], ["Point1", 10], ...]
+ * Format: [["Point1", 10, ...], ["Point2", 20, ...], ...]
+ * All rows are data rows — no header row.
  */
 export const parseHorizontalBarData = (
   xAxis: any[][] | string | { labels: any[][] },
@@ -59,11 +60,11 @@ export const parseHorizontalBarData = (
     return { labels: [], data: {} as { [key: string]: ChartData[] } };
   }
 
-  // Extract labels from the first column (skip header)
-  const labels = parsedXAxis.slice(1).map((row: any) => String(row[0] || ""));
+  // All rows are data rows — extract labels from the first column
+  const labels = parsedXAxis.map((row: any) => String(row[0] || ""));
 
   // Transform data
-  const chartData: ChartData[] = parsedXAxis.slice(1).map((row: any) => {
+  const chartData: ChartData[] = parsedXAxis.map((row: any) => {
     const dataPoint: ChartData = { name: String(row[0] || "") };
     legendValues.forEach((legend, index) => {
       const columnIndex = index + 1;
@@ -331,7 +332,8 @@ export default function HorizontalBarChart({
                 : node.xAxis;
             if (Array.isArray(parsed)) {
               if (parsed.length > 0 && Array.isArray(parsed[0])) {
-                xAxis = parsed.slice(1).map((row: any) => row[0]);
+                // All rows are data rows — no header to skip
+                xAxis = parsed.map((row: any) => row[0]);
               } else {
                 xAxis = parsed;
               }

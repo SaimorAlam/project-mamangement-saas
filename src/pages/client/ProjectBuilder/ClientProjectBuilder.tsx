@@ -1,24 +1,39 @@
 import { useState, useEffect } from "react";
 import ProjectWidget from "@/common/Charts/CompletedCharts/Widgets/ProjectWidget";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { useLocation } from "react-router-dom";
 import {
   setSelectedWidgets,
   setIsPreview,
   setIsPublished,
+  resetChartState,
 } from "@/store/Slices/ChartSlice/ChartSlice";
 import { toast } from "sonner";
 import ProjectDashboardView from "./Components/ProjectDashboardView";
 
 const ClientProjectBuilder = () => {
   const dispatch = useAppDispatch();
-  const { projectId, isPreview, isPublished, widgetConfigs, selectedWidgets } =
-    useAppSelector((state) => state.chartSlice);
+  const { pathname } = useLocation();
+  const isProgramBuilder = pathname.split("/")[2] === "program-builder";
+
+  const {
+    projectId,
+    isPreview,
+    isPublished,
+    widgetConfigs,
+    selectedWidgets,
+  } = useAppSelector((state) => state.chartSlice);
   const [activeWidget, setActiveWidget] = useState("KPI widget");
 
   useEffect(() => {
     dispatch(setIsPreview(false));
     dispatch(setIsPublished(false));
   }, [dispatch]);
+
+  // Reset state when builder type changes
+  useEffect(() => {
+    dispatch(resetChartState());
+  }, [isProgramBuilder, dispatch]);
 
   const handleWidgetSelect = (widgetId: string) => {
     if (widgetId) {

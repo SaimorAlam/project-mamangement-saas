@@ -55,22 +55,17 @@ const parseXAxisData = (
     return { labels: [], data: {} as { [key: string]: ChartData[] } };
   }
 
-  // First row is the header
-  const headers = parsedXAxis[0];
-  if (!Array.isArray(headers) || headers.length === 0) {
-    return { labels: [], data: {} as { [key: string]: ChartData[] } };
-  }
+  // All rows are data rows — no header to skip
+  // Extract labels from the first column of every row
+  const labels = parsedXAxis.map((row) => String(row[0] || ""));
 
-  // Extract labels from the first column of data rows (skip header)
-  const labels = parsedXAxis.slice(1).map((row) => String(row[0] || ""));
-
-  // Transform data into the format expected by StackedBarChart
-  const chartData: ChartData[] = parsedXAxis.slice(1).map((row) => {
+  // Transform data: first element is the label, subsequent elements are dataset values
+  const chartData: ChartData[] = parsedXAxis.map((row) => {
     const dataPoint: ChartData = { name: String(row[0] || "") };
 
-    // Map each legend to its corresponding column value
+    // Map each legend to its corresponding column value (starting from index 1)
     legendValues.forEach((legend, index) => {
-      const columnIndex = index + 1; // Skip first column (label)
+      const columnIndex = index + 1;
       dataPoint[legend.field] = Number(row[columnIndex]) || 0;
     });
 

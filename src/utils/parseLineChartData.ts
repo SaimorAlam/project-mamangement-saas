@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Parse xAxis data from LINE chart API response
- * Format: [["day", "line1", "line2"], ["Jan", 10, 20], ["Feb", 15, 25], ...]
+ * Format: [["Jan", 10, 20], ["Feb", 15, 25], ...]
+ * All rows are data rows — no header row in the new format.
  * Returns: { labels: ["Jan", "Feb", ...], data: { [sheetName]: [...] } }
  */
 
@@ -41,22 +42,16 @@ export const parseLineChartData = (
     return { labels: [], data: {} as { [key: string]: LineChartData[] } };
   }
 
-  // First row is the header
-  const headers = parsedXAxis[0];
-  if (!Array.isArray(headers) || headers.length === 0) {
-    return { labels: [], data: {} as { [key: string]: LineChartData[] } };
-  }
+  // All rows are data rows — extract labels from the first column
+  const labels = parsedXAxis.map((row: any) => String(row[0] || ""));
 
-  // Extract labels from the first column of data rows (skip header)
-  const labels = parsedXAxis.slice(1).map((row: any) => String(row[0] || ""));
-
-  // Transform data into the format expected by LineChart
-  const chartData: LineChartData[] = parsedXAxis.slice(1).map((row: any) => {
+  // Transform data: first element is the label, subsequent elements are dataset values
+  const chartData: LineChartData[] = parsedXAxis.map((row: any) => {
     const dataPoint: LineChartData = { name: String(row[0] || "") };
 
     // Map each legend to its corresponding column value
     legendValues.forEach((legend, index) => {
-      const columnIndex = index + 1; // Skip first column (label)
+      const columnIndex = index + 1; // values start at index 1
       dataPoint[legend.field] = Number(row[columnIndex]) || 0;
     });
 
