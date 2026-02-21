@@ -1,7 +1,11 @@
 import { useMemo, Suspense } from "react";
-import { useGetRootChartQuery } from "@/store/Api/ChartApi/ChartApi";
+import {
+  useGetRootChartQuery,
+  useGetProgramBuilderChartQuery,
+} from "@/store/Api/ChartApi/ChartApi";
 import ProjectBuilderPlaceholderChartSkeleton from "@/common/Skeleton/ProjectBuilderPlaceholderChartSkeleton";
 import ChartModuleSkeleton from "@/common/Skeleton/ChartModuleSkeleton";
+import { useAppSelector } from "@/hooks/useRedux";
 import {
   CHART_REGISTRY,
   DoughnutChart,
@@ -32,14 +36,25 @@ const ProjectDashboardView = ({
   handleDefaultCopy,
   handleWidgetDelete,
 }: ProjectDashboardViewProps) => {
+  const { programId } = useAppSelector((state) => state.chartSlice);
+
   const { data: projectsChart } = useGetRootChartQuery(projectId, {
     skip: !projectId,
   });
 
+  const { data: programCharts } = useGetProgramBuilderChartQuery(programId, {
+    skip: !programId,
+  });
+
   const projectsChartsData = useMemo(() => {
-    if (!projectId) return null;
-    return projectsChart?.data;
+    if (projectId) return projectsChart?.data;
+    return null;
   }, [projectsChart, projectId]);
+
+  const programChartsData = useMemo(() => {
+    if (programId) return programCharts?.data?.charts;
+    return null;
+  }, [programCharts, programId]);
 
   return (
     <Suspense fallback={<ProjectBuilderPlaceholderChartSkeleton />}>
@@ -55,11 +70,20 @@ const ProjectDashboardView = ({
               : "flex flex-col gap-6"
           }`}
         >
-          {projectsChartsData && projectsChartsData.length > 0 ? (
+          {projectsChartsData && projectsChartsData.length > 0 && (
             <div className={isPreviewOrPublished ? "col-span-full" : ""}>
               <DefaultChartData projectsChartsData={projectsChartsData} />
             </div>
-          ) : (
+          )}
+
+          {programChartsData && programChartsData.length > 0 && (
+            <div className={isPreviewOrPublished ? "col-span-full" : ""}>
+              <DefaultChartData projectsChartsData={programChartsData} />
+            </div>
+          )}
+
+          {(!projectsChartsData || projectsChartsData.length === 0) &&
+            (!programChartsData || programChartsData.length === 0) &&
             selectedWidgets.length === 0 && (
               <div className={isPreviewOrPublished ? "col-span-full" : ""}>
                 {!hiddenDefaultWidgets.includes("project-stats") && (
@@ -110,8 +134,7 @@ const ProjectDashboardView = ({
                   </div>
                 )}
               </div>
-            )
-          )}
+            )}
 
           {/* Dynamic Widget Rendering */}
           {selectedWidgets.map((widgetId) => {

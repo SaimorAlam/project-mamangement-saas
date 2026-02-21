@@ -92,6 +92,13 @@ const chartApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Charts"],
     }),
+    getProgramBuilderChart: builder.query({
+      query: (id: string) => ({
+        url: `/chart/program-builder/program/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Charts"],
+    }),
   }),
 });
 
@@ -111,5 +118,6 @@ export const {
   useLazyGetAllTheLeafChartQuery,
   useUploadChartDataMutation,
   useCreateProgramChartMutation,
+  useGetProgramBuilderChartQuery,
 } = chartApi;
 export default chartApi;
