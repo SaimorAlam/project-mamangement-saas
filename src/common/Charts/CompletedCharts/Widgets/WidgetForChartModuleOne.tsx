@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { useAppSelector } from "@/hooks/useRedux";
 import {
   useCreateChartMutation,
+  useCreateProgramChartMutation,
   useLazyGetRootChartQuery,
 } from "@/store/Api/ChartApi/ChartApi";
 import { useLazyGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
@@ -58,7 +59,8 @@ const WidgetForChartModuleOne = ({
   // ── detect Program Builder context ────────────────────────────────────────
   const { pathname, state: locationState } = useLocation();
   const isProgramBuilder = pathname.split("/")[2] === "program-builder";
-  const projectIdFromState = (locationState as { projectId?: string } | null)?.projectId;
+  const projectIdFromState = (locationState as { projectId?: string } | null)
+    ?.projectId;
 
   const [projectId, setProjectId] = useState<string>("");
   const { name, role, profileImage, loading } = useGetUser();
@@ -82,12 +84,16 @@ const WidgetForChartModuleOne = ({
   const [yAxisProjectId, setYAxisProjectId] = useState<string>("");
   const [yAxisChartId, setYAxisChartId] = useState<string>("");
   const [yAxisDataScope, setYAxisDataScope] = useState<string>("");
+  const [createProgramChart] = useCreateProgramChartMutation();
+  const [
+    getProjectsByProgram,
+    { data: programProjectsData, isLoading: isProgramProjectsLoading },
+  ] = useLazyGetProjectsByProgramIdQuery();
 
-  const [getProjectsByProgram, { data: programProjectsData, isLoading: isProgramProjectsLoading }] =
-    useLazyGetProjectsByProgramIdQuery();
-
-  const [getRootChartByProject, { data: projectChartsData, isLoading: isProjectChartsLoading }] =
-    useLazyGetRootChartQuery();
+  const [
+    getRootChartByProject,
+    { data: projectChartsData, isLoading: isProjectChartsLoading },
+  ] = useLazyGetRootChartQuery();
 
   // Fetch projects when entering program-builder context
   useEffect(() => {
@@ -107,18 +113,18 @@ const WidgetForChartModuleOne = ({
   type RawApiItem = Record<string, unknown>;
 
   const programProjects: { id: string; name: string }[] =
-    (programProjectsData?.data?.data as RawApiItem[] | undefined)?.map(
-      (p) => ({ id: p.id as string, name: p.name as string }),
-    ) ?? [];
+    (programProjectsData?.data?.data as RawApiItem[] | undefined)?.map((p) => ({
+      id: p.id as string,
+      name: p.name as string,
+    })) ?? [];
 
-  const rootCharts: { id: string; title: string; xAxis: string }[] =
-    ((projectChartsData?.data ?? []) as RawApiItem[])
-      .filter((c) => c.rootchart === true)
-      .map((c) => ({
-        id: c.id as string,
-        title: c.title as string,
-        xAxis: c.xAxis as string,
-      }));
+  const rootCharts: { id: string; title: string; xAxis: unknown }[] = (
+    (projectChartsData?.data ?? []) as RawApiItem[]
+  ).map((c) => ({
+    id: c.id as string,
+    title: c.title as string,
+    xAxis: c.xAxis,
+  }));
 
   const selectedRootChart = rootCharts.find((c) => c.id === yAxisChartId);
 
@@ -126,14 +132,67 @@ const WidgetForChartModuleOne = ({
   const xAxisSliceLabels: string[] = (() => {
     if (!selectedRootChart?.xAxis) return [];
     try {
-      const parsed = JSON.parse(selectedRootChart.xAxis) as unknown[][];
-      return parsed
-        .map((row) => row[0])
-        .filter((v): v is string => typeof v === "string" && v !== "");
-    } catch {
+      let parsed: unknown = selectedRootChart.xAxis;
+      if (typeof parsed === "string") {
+        parsed = JSON.parse(parsed);
+      }
+      // Handle scenario where it's wrapped in { labels: [...] }
+      if (parsed && !Array.isArray(parsed) && typeof parsed === "object") {
+        parsed = (parsed as Record<string, unknown>).labels;
+      }
+
+      if (Array.isArray(parsed)) {
+        // If it's a 2D array of [label, value, ...], take first column
+        if (Array.isArray(parsed[0])) {
+          return (parsed as unknown[][]).map((row) => String(row[0] || ""));
+        }
+        // If it's already a flat array of labels
+        return (parsed as unknown[]).map((v) => String(v));
+      }
+      return [];
+    } catch (err) {
+      console.error("Error parsing xAxis for mapping:", err);
       return [];
     }
   })();
+  const [mappedData, setMappedData] = useState<
+    (null | { projectId: string; charttableId: string; rowname: string })[]
+  >([]);
+
+  const handleAddMapping = () => {
+    if (!yAxisDataScope) {
+      toast.error("Please select a data scope first");
+      return;
+    }
+
+    // Find first empty index in xAxisValues
+    const targetIndex = xAxisValues.findIndex((v) => !v);
+    if (targetIndex === -1) {
+      toast.error(
+        "All X-Axis fields are filled. Increase frequency/dataset count if needed.",
+      );
+      return;
+    }
+
+    // Map the selected scope to the next available X-axis field
+    handleXAxisValueChange(targetIndex, yAxisDataScope);
+
+    setMappedData((prev) => {
+      const next = [...prev];
+      // Ensure the array is long enough
+      while (next.length <= targetIndex) {
+        next.push(null);
+      }
+      next[targetIndex] = {
+        projectId: yAxisProjectId,
+        charttableId: yAxisChartId,
+        rowname: yAxisDataScope,
+      };
+      return next;
+    });
+
+    toast.success(`Mapped "${yAxisDataScope}" to Field ${targetIndex + 1}`);
+  };
 
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
@@ -234,40 +293,109 @@ const WidgetForChartModuleOne = ({
       return;
     }
 
+    if (isProgramBuilder) {
+      if (!yAxisProjectId) {
+        toast.error("Please select a project for Y-Axis mapping");
+        return;
+      }
+      if (!yAxisChartId) {
+        toast.error("Please select a source chart for Y-Axis mapping");
+        return;
+      }
+      if (!yAxisDataScope) {
+        toast.error("Please select a data scope for Y-Axis mapping");
+        return;
+      }
+    }
+
     const toastId = toast.loading("Creating chart...");
+    // const payload = {
+    //   numberOfDataset: numOfLegendDataSet,
+    //   firstFieldDataset: startingRange,
+    //   lastFieldDataset: endingRange,
+    //   widgets: legendValues.map((l) => ({
+    //     legendName: l.label,
+    //     color: l.color,
+    //   })),
+    //   title: widgetTitle,
+    //   status: "ACTIVE",
+    //   category: widgetCategory,
+    //   xAxis: JSON.stringify([
+    //     // ["Label", ...legendValues.map((l) => l.label)],
+    //     ...xAxisValues.map((label) => [
+    //       label,
+    //       ...Array(numOfLegendDataSet).fill(0),
+    //     ]),
+    //   ]),
+    //   yAxis: JSON.stringify({}),
+    //   zAxis: JSON.stringify({}),
+    //   projectId: projectId ? projectId : projectIdFromState,
+    //   ...(isProgramBuilder && {
+    //     programid: programIdFromSlice,
+    //     projectnumber: numOfXAxisDataSet,
+    //     filter_By: filter || "string",
+    //     valueDiteacts: mappedData
+    //       .slice(0, numOfXAxisDataSet)
+    //       .filter((item): item is NonNullable<typeof item> => !!item),
+    //   }),
+    //   rootchart: true,
+    //   roottitle: widgetTitle,
+    //   grouptitle: widgetTitle,
+    // };
     const payload = {
-      numberOfDataset: numOfLegendDataSet,
-      firstFieldDataset: startingRange,
-      lastFieldDataset: endingRange,
-      widgets: legendValues.map((l) => ({
-        legendName: l.label,
-        color: l.color,
-      })),
-      title: widgetTitle,
-      status: "ACTIVE",
-      category: widgetCategory,
-      xAxis: JSON.stringify([
-        // ["Label", ...legendValues.map((l) => l.label)],
-        ...xAxisValues.map((label) => [
-          label,
-          ...Array(numOfLegendDataSet).fill(0),
-        ]),
+  numberOfDataset: numOfLegendDataSet,
+  firstFieldDataset: startingRange,
+  lastFieldDataset: endingRange,
+
+  widgets: legendValues.map((l) => ({
+    legendName: l.label,
+    color: l.color,
+  })),
+
+  filter_By: filter || "string",
+  title: widgetTitle,
+  status: "ACTIVE",
+  category: widgetCategory,
+
+  // -------- PROJECT-SPECIFIC FIELDS --------
+  ...(!isProgramBuilder && {
+    xAxis: JSON.stringify({
+      labels: xAxisValues.map((label) => [
+        label,
+        ...Array(numOfLegendDataSet).fill(0),
       ]),
-      yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
-      projectId: projectId ? projectId : projectIdFromState,
-      rootchart: true,
-      roottitle: widgetTitle,
-      grouptitle: widgetTitle,
-    };
+    }),
+
+    yAxis: JSON.stringify({ labels: [] }),
+    zAxis: JSON.stringify({ labels: [] }),
+
+    projectId: projectId ?? projectIdFromState,
+    rootchart: true,
+    roottitle: widgetTitle,
+    grouptitle: widgetTitle,
+  }),
+
+  // -------- PROGRAM-SPECIFIC FIELDS --------
+  ...(isProgramBuilder && {
+    programid: programIdFromSlice,
+    projectnumber: numOfXAxisDataSet,
+
+    valueDiteacts: mappedData
+      .slice(0, numOfXAxisDataSet)
+      .filter((item): item is NonNullable<typeof item> => !!item),
+  }),
+};
     try {
-      const res = await createChart(payload).unwrap();
+      const res = isProgramBuilder
+        ? await createProgramChart(payload).unwrap()
+        : await createChart(payload).unwrap();
       if (res?.success) {
         toast.success("Chart created successfully", { id: toastId });
         onDelete?.();
         onClose?.();
       }
-    } catch {
+    } catch (error) {
+      console.error("Chart creation error:", error);
       toast.error("Chart creation failed", { id: toastId });
     }
   };
@@ -346,9 +474,16 @@ const WidgetForChartModuleOne = ({
                           : "th"
                   } field name here...`}
                   value={xAxisValues[index] || ""}
-                  onChange={(e) =>
-                    handleXAxisValueChange(index, e.target.value)
-                  }
+                  onChange={(e) => {
+                    handleXAxisValueChange(index, e.target.value);
+                    if (isProgramBuilder) {
+                      setMappedData((prev) => {
+                        const next = [...prev];
+                        next[index] = null;
+                        return next;
+                      });
+                    }
+                  }}
                   className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
                 />
               ))}
@@ -428,7 +563,9 @@ const WidgetForChartModuleOne = ({
             <div className="space-y-3">
               {/* Project */}
               <div className="flex items-center gap-2">
-                <label className="text-xs text-gray-700 w-24 shrink-0">Project:</label>
+                <label className="text-xs text-gray-700 w-24 shrink-0">
+                  Project:
+                </label>
                 <div className="relative flex-1">
                   <select
                     value={yAxisProjectId}
@@ -441,7 +578,9 @@ const WidgetForChartModuleOne = ({
                     className="w-full pr-7 pl-2 py-1.5 bg-white border border-gray-300 rounded text-xs text-gray-600 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
                   >
                     <option value="">
-                      {isProgramProjectsLoading ? "Loading..." : "Select project"}
+                      {isProgramProjectsLoading
+                        ? "Loading..."
+                        : "Select project"}
                     </option>
                     {programProjects.map((p) => (
                       <option key={p.id} value={p.id}>
@@ -450,8 +589,18 @@ const WidgetForChartModuleOne = ({
                     ))}
                   </select>
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="w-3 h-3 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -459,7 +608,9 @@ const WidgetForChartModuleOne = ({
 
               {/* Source Chart */}
               <div className="flex items-center gap-2">
-                <label className="text-xs text-gray-700 w-24 shrink-0">Source Chart:</label>
+                <label className="text-xs text-gray-700 w-24 shrink-0">
+                  Source Chart:
+                </label>
                 <div className="relative flex-1">
                   <select
                     value={yAxisChartId}
@@ -486,8 +637,18 @@ const WidgetForChartModuleOne = ({
                     ))}
                   </select>
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="w-3 h-3 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -495,7 +656,9 @@ const WidgetForChartModuleOne = ({
 
               {/* Data Scope — xAxis slice labels */}
               <div className="flex items-center gap-2">
-                <label className="text-xs text-gray-700 w-24 shrink-0">Data Scope:</label>
+                <label className="text-xs text-gray-700 w-24 shrink-0">
+                  Data Scope:
+                </label>
                 <div className="relative flex-1">
                   <select
                     value={yAxisDataScope}
@@ -517,11 +680,33 @@ const WidgetForChartModuleOne = ({
                     ))}
                   </select>
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="w-3 h-3 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
                 </div>
+              </div>
+
+              {/* Map to X-Axis Button */}
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={handleAddMapping}
+                  disabled={!yAxisDataScope}
+                  className="px-3 py-1.5 text-[10px] font-semibold text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
+                >
+                  Map to X-Axis
+                </button>
               </div>
             </div>
           ) : (
@@ -529,7 +714,9 @@ const WidgetForChartModuleOne = ({
             <div className="space-y-2">
               {/* Number of Data sets */}
               <div className="flex items-center">
-                <label className="text-xs text-gray-700 flex-1">Number of Data sets:</label>
+                <label className="text-xs text-gray-700 flex-1">
+                  Number of Data sets:
+                </label>
                 <input
                   type="number"
                   min={minLegend}
@@ -542,7 +729,9 @@ const WidgetForChartModuleOne = ({
 
               {/* 1st field Data */}
               <div className="flex items-center">
-                <label className="text-xs text-gray-700 flex-1">1st field Data:</label>
+                <label className="text-xs text-gray-700 flex-1">
+                  1st field Data:
+                </label>
                 <input
                   type="number"
                   onChange={(e) => setStartingRange(Number(e.target.value))}
@@ -553,7 +742,9 @@ const WidgetForChartModuleOne = ({
 
               {/* Last field Data */}
               <div className="flex items-center">
-                <label className="text-xs text-gray-700 flex-1">Last field Data:</label>
+                <label className="text-xs text-gray-700 flex-1">
+                  Last field Data:
+                </label>
                 <input
                   type="number"
                   onChange={(e) => setEndingRange(Number(e.target.value))}

@@ -81,6 +81,17 @@ const chartApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Charts"],
     }),
+    createProgramChart: builder.mutation({
+      query: (data) => {
+        console.log(data);
+        return {
+          url: `/chart/create-chart-build`,
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["Charts"],
+    }),
   }),
 });
 
@@ -99,5 +110,6 @@ export const {
   useGetAllTheLeafChartQuery,
   useLazyGetAllTheLeafChartQuery,
   useUploadChartDataMutation,
+  useCreateProgramChartMutation,
 } = chartApi;
 export default chartApi;
