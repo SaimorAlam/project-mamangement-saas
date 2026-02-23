@@ -306,8 +306,17 @@ export default function MultiAxisLineChart({
               ? JSON.parse(node.xAxis)
               : node.xAxis;
           if (Array.isArray(parsed) && parsed.length > 0) {
-            // All rows are data rows — no header to skip
-            xAxisItems = parsed.map((row: any) => String(row[0]));
+            if (Array.isArray(parsed[0])) {
+              // Smart header detection: a header row has legend labels (strings) in data columns.
+              // We skip it because the download process manually adds a header row.
+              const hasHeader =
+                parsed[0].length > 1 && typeof parsed[0][1] === "string";
+              xAxisItems = (hasHeader ? parsed.slice(1) : parsed).map(
+                (row: any) => String(row[0]),
+              );
+            } else {
+              xAxisItems = parsed.map((v) => String(v));
+            }
           } else if (parsed?.labels) {
             xAxisItems = parsed.labels;
           }
@@ -362,7 +371,7 @@ export default function MultiAxisLineChart({
       status: "ACTIVE",
       category: "LINE",
       xAxis: JSON.stringify([
-        // ["Label", ...legendValues.map((l) => l.label)],
+        ["Label", ...legendValues.map((l) => l.label)],
         ...effectiveXAxisValues.map((label) => [
           label,
           ...Array(legendValues.length).fill(0),

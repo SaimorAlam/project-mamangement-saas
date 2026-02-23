@@ -60,10 +60,20 @@ export const parseAreaChartData = (
     return { labels: [], data: {} as { [key: string]: ChartData[] } };
   }
 
-  // All rows are data rows — extract labels from the first column
-  const labels = parsedXAxis.map((row: any) => String(row[0] || ""));
+  // Smart header detection: a header row has legend labels (strings) in data columns,
+  // whereas data rows have numbers (0 by default in creation mode).
+  const hasHeader =
+    parsedXAxis.length > 0 &&
+    Array.isArray(parsedXAxis[0]) &&
+    parsedXAxis[0].length > 1 &&
+    typeof parsedXAxis[0][1] === "string";
 
-  const chartData: ChartData[] = parsedXAxis.map((row: any) => {
+  const dataRows = hasHeader ? parsedXAxis.slice(1) : parsedXAxis;
+
+  // Extract labels from the first column of every data row
+  const labels = dataRows.map((row: any) => String(row[0] || ""));
+
+  const chartData: ChartData[] = dataRows.map((row: any) => {
     const dataPoint: ChartData = { name: String(row[0] || "") };
     legendValues.forEach((legend, index) => {
       const columnIndex = index + 1;
@@ -325,8 +335,13 @@ export default function AreaChart({
                 : node.xAxis;
             if (Array.isArray(parsed)) {
               if (parsed.length > 0 && Array.isArray(parsed[0])) {
-                // All rows are data rows — no header to skip
-                xAxis = parsed.map((row: any) => row[0]);
+                // Smart header detection: a header row has legend labels (strings) in data columns.
+                // We skip it because the download process manually adds a header row.
+                const hasHeader =
+                  parsed[0].length > 1 && typeof parsed[0][1] === "string";
+                xAxis = (hasHeader ? parsed.slice(1) : parsed).map(
+                  (row: any) => row[0],
+                );
               } else {
                 xAxis = parsed;
               }
@@ -393,7 +408,7 @@ export default function AreaChart({
       status: "ACTIVE",
       category: "AREA",
       xAxis: JSON.stringify([
-        // ["Label", ...legendValues.map((l) => l.label)],
+        ["Label", ...legendValues.map((l) => l.label)],
         ...xAxisValues.map((label) => [
           label,
           ...Array(numOfLegendDataSet).fill(0),

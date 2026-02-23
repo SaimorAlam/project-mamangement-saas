@@ -236,8 +236,13 @@ export default function PieChartWidget({
               parsed.length > 0 &&
               Array.isArray(parsed[0])
             ) {
-              // All rows are data rows
-              xAxisLabels = parsed.map((row: any) => row[0]);
+              // Smart header detection: a header row has legend labels (strings) in data columns.
+              // We skip it because the download process manually adds a header row.
+              const hasHeader =
+                parsed[0].length > 1 && typeof parsed[0][1] === "string";
+              xAxisLabels = (hasHeader ? parsed.slice(1) : parsed).map(
+                (row: any) => row[0],
+              );
             }
           } catch (e) {
             console.error("Failed to parse xAxis for node", node.id, e);
@@ -294,7 +299,7 @@ export default function PieChartWidget({
       status: "ACTIVE",
       category: "PIE",
       xAxis: JSON.stringify([
-        // ["Legend", "Value"],
+        ["Legend", "Value"],
         ...legendValues.map((l) => [l.label, 0]),
       ]),
       yAxis: JSON.stringify({}),

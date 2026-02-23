@@ -265,7 +265,7 @@ const WidgetForChartModuleOne = ({
       return updated;
     });
   };
-
+console.log(widgetTitle,xAxisSliceLabels,xAxisValues,numOfXAxisDataSet)
   // const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const handleSaveChanges = async () => {
@@ -351,48 +351,50 @@ const WidgetForChartModuleOne = ({
     //   grouptitle: widgetTitle,
     // };
     const payload = {
-  numberOfDataset: numOfLegendDataSet,
-  firstFieldDataset: startingRange,
-  lastFieldDataset: endingRange,
+      numberOfDataset: numOfLegendDataSet,
+      firstFieldDataset: startingRange,
+      lastFieldDataset: endingRange,
 
-  widgets: legendValues.map((l) => ({
-    legendName: l.label,
-    color: l.color,
-  })),
+      widgets: legendValues.map((l) => ({
+        legendName: l.label,
+        color: l.color,
+      })),
 
-  filter_By: filter || "string",
-  title: widgetTitle,
-  status: "ACTIVE",
-  category: widgetCategory,
+      filter_By: filter || "string",
+      title: widgetTitle,
+      status: "ACTIVE",
+      category: widgetCategory,
 
-  // -------- PROJECT-SPECIFIC FIELDS --------
-  ...(!isProgramBuilder && {
-    xAxis: JSON.stringify({
-      labels: xAxisValues.map((label) => [
-        label,
-        ...Array(numOfLegendDataSet).fill(0),
-      ]),
-    }),
+      // -------- PROJECT-SPECIFIC FIELDS --------
+      ...(!isProgramBuilder && {
+        xAxis: JSON.stringify([
+          [widgetTitle, ...legendValues.map((l) => l.label)],
+          ...xAxisValues.map((label) => [
+            label,
+            ...Array(numOfLegendDataSet).fill(0),
+          ]),
+        ]),
 
-    yAxis: JSON.stringify({ labels: [] }),
-    zAxis: JSON.stringify({ labels: [] }),
+        yAxis: JSON.stringify([]),
+        zAxis: JSON.stringify([]),
 
-    projectId: projectId ?? projectIdFromState,
-    rootchart: true,
-    roottitle: widgetTitle,
-    grouptitle: widgetTitle,
-  }),
+        projectId: projectId ?? projectIdFromState,
+        rootchart: true,
+        roottitle: widgetTitle,
+        grouptitle: widgetTitle,
+      }),
 
-  // -------- PROGRAM-SPECIFIC FIELDS --------
-  ...(isProgramBuilder && {
-    programid: programIdFromSlice,
-    projectnumber: numOfXAxisDataSet,
+      // -------- PROGRAM-SPECIFIC FIELDS --------
+      ...(isProgramBuilder && {
+        programid: programIdFromSlice,
+        projectnumber: numOfXAxisDataSet,
 
-    valueDiteacts: mappedData
-      .slice(0, numOfXAxisDataSet)
-      .filter((item): item is NonNullable<typeof item> => !!item),
-  }),
-};
+        valueDiteacts: mappedData
+          .slice(0, numOfXAxisDataSet)
+          .filter((item): item is NonNullable<typeof item> => !!item),
+      }),
+    };
+    console.log(payload)
     try {
       const res = isProgramBuilder
         ? await createProgramChart(payload).unwrap()
@@ -566,6 +568,21 @@ const WidgetForChartModuleOne = ({
             Data Mapping for Y-Axis
           </h3>
 
+          {/* Number of Data sets (Legends) */}
+          <div className="flex items-center mb-3">
+            <label className="text-xs text-gray-700 flex-1">
+              Number of Legend sets:
+            </label>
+            <input
+              type="number"
+              min={minLegend}
+              max={maxLegend}
+              value={numOfLegendDataSet}
+              onChange={handleSetNumOfLegendDataSet}
+              className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+            />
+          </div>
+
           {isProgramBuilder ? (
             /* ── Program Builder: cascading Project → Chart → Scope dropdowns ── */
             <div className="space-y-3">
@@ -720,21 +737,6 @@ const WidgetForChartModuleOne = ({
           ) : (
             /* ── Project Builder: standard numeric range inputs ── */
             <div className="space-y-2">
-              {/* Number of Data sets */}
-              <div className="flex items-center">
-                <label className="text-xs text-gray-700 flex-1">
-                  Number of Data sets:
-                </label>
-                <input
-                  type="number"
-                  min={minLegend}
-                  max={maxLegend}
-                  value={numOfLegendDataSet}
-                  onChange={handleSetNumOfLegendDataSet}
-                  className="w-12 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
-                />
-              </div>
-
               {/* 1st field Data */}
               <div className="flex items-center">
                 <label className="text-xs text-gray-700 flex-1">

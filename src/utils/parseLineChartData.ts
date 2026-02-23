@@ -42,11 +42,21 @@ export const parseLineChartData = (
     return { labels: [], data: {} as { [key: string]: LineChartData[] } };
   }
 
-  // All rows are data rows — extract labels from the first column
-  const labels = parsedXAxis.map((row: any) => String(row[0] || ""));
+  // Smart header detection: a header row has legend labels (strings) in data columns,
+  // whereas data rows have numbers (0 by default in creation mode).
+  const hasHeader =
+    parsedXAxis.length > 0 &&
+    Array.isArray(parsedXAxis[0]) &&
+    parsedXAxis[0].length > 1 &&
+    typeof parsedXAxis[0][1] === "string";
+
+  const dataRows = hasHeader ? parsedXAxis.slice(1) : parsedXAxis;
+
+  // Extract labels from the first column of every data row
+  const labels = dataRows.map((row: any) => String(row[0] || ""));
 
   // Transform data: first element is the label, subsequent elements are dataset values
-  const chartData: LineChartData[] = parsedXAxis.map((row: any) => {
+  const chartData: LineChartData[] = dataRows.map((row: any) => {
     const dataPoint: LineChartData = { name: String(row[0] || "") };
 
     // Map each legend to its corresponding column value
