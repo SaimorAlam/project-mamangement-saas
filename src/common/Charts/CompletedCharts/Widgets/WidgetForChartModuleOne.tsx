@@ -165,8 +165,15 @@ const WidgetForChartModuleOne = ({
       return;
     }
 
-    // Find first empty index in xAxisValues
-    const targetIndex = xAxisValues.findIndex((v) => !v);
+    // Find first empty index in xAxisValues (up to numOfXAxisDataSet)
+    let targetIndex = -1;
+    for (let i = 0; i < numOfXAxisDataSet; i++) {
+      if (!xAxisValues[i]) {
+        targetIndex = i;
+        break;
+      }
+    }
+
     if (targetIndex === -1) {
       toast.error(
         "All X-Axis fields are filled. Increase frequency/dataset count if needed.",
@@ -270,21 +277,22 @@ const WidgetForChartModuleOne = ({
       }
     }
 
-    for (let i = 0; i < xAxisValues.length; i++) {
+    for (let i = 0; i < numOfXAxisDataSet; i++) {
       if (!xAxisValues[i]) {
         toast.error(`Please fill in the value for X-Axis field ${i + 1}`);
         return;
       }
     }
 
+    if (numOfXAxisDataSet < 1) {
+      toast.error(`Please add at least 1 X-Axis value`);
+      return;
+    }
+
     if (legendValues.length < minLegend) {
       toast.error(
         `Please add at least ${minLegend} legend value${minLegend > 1 ? "s" : ""}`,
       );
-      return;
-    }
-    if (xAxisValues.length < 1) {
-      toast.error(`Please add at least 1 X-Axis value`);
       return;
     }
     if (!widgetCategory) {
