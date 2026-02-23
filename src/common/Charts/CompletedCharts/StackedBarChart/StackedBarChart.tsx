@@ -419,8 +419,7 @@ export default function StackedBarChart({
       const filename = `${widgetTitle}_ID_${ids.join("_")}.xlsx`;
       XLSX.writeFile(wb, filename);
       toast.success("Excel downloaded successfully");
-    } catch (error) {
-      console.error("Excel download failed", error);
+    } catch {
       toast.error("Failed to download Excel");
     } finally {
       setIsDownloading(false);

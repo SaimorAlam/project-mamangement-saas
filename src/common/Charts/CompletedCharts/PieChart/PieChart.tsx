@@ -244,8 +244,8 @@ export default function PieChartWidget({
                 (row: any) => row[0],
               );
             }
-          } catch (e) {
-            console.error("Failed to parse xAxis for node", node.id, e);
+          } catch {
+            toast.error("Failed to parse xAxis for node");
           }
         }
 
@@ -275,8 +275,7 @@ export default function PieChartWidget({
       const filename = `${widgetTitle}_ID_${ids.join("_")}.xlsx`;
       XLSX.writeFile(wb, filename);
       toast.success("Excel downloaded successfully");
-    } catch (error) {
-      console.error("Excel download failed", error);
+    } catch {
       toast.error("Failed to download Excel");
     } finally {
       setIsDownloading(false);

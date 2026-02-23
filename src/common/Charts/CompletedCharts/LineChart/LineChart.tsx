@@ -348,8 +348,7 @@ export default function MultiAxisLineChart({
 
       XLSX.writeFile(wb, `${widgetTitle}_ID_${ids.join("_")}.xlsx`);
       toast.success("Excel template downloaded");
-    } catch (error) {
-      console.error("Download failed:", error);
+    } catch {
       toast.error("Failed to download Excel");
     } finally {
       setIsDownloading(false);

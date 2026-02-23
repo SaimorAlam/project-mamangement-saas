@@ -41,8 +41,8 @@ export const parseAreaChartData = (
   if (typeof xAxis === "string") {
     try {
       parsedXAxis = JSON.parse(xAxis);
-    } catch (error) {
-      console.error("Error parsing xAxis JSON:", error);
+    } catch {
+      toast.error("Error parsing xAxis JSON");
       parsedXAxis = [];
     }
   }
