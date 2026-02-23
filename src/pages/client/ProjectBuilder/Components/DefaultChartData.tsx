@@ -90,15 +90,18 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
 
         // Normalize chart data between standard and program builder formats
         // Program builder format nests under 'chartData', standard uses dynamic keys via chartTypes
-        const chartData = item.chartData || (chartProperty ? item[chartProperty] : null);
+        const chartData =
+          item.chartData || (chartProperty ? item[chartProperty] : null);
 
         // Standard format has xAxis string/array at root.
         // Program builder format has it in valueDetection.matching
         const xAxisData = item.valueDetection?.matching || item.xAxis;
 
         // API field normalization (Program Builder uses 'firstFiledDataset', 'lastFiledDAtaset')
-        const firstField = chartData?.firstFiledDataset ?? chartData?.firstFieldDataset;
-        const lastField = chartData?.lastFiledDAtaset ?? chartData?.lastFieldDataset;
+        const firstField =
+          chartData?.firstFiledDataset ?? chartData?.firstFieldDataset;
+        const lastField =
+          chartData?.lastFiledDAtaset ?? chartData?.lastFieldDataset;
         const numDatasets = chartData?.numberOfDataset;
 
         if (categoryKey === "BAR") {

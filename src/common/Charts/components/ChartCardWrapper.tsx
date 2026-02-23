@@ -3,7 +3,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { Trash2, Download } from "lucide-react";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 
 type MenuActions = {
   onCopy?: () => void;
@@ -42,9 +42,8 @@ const ChartCardWrapper = ({
   className = "",
   isPreview = false,
 }: Props) => {
-  const location = useLocation()
-  console.log(location)
-  const isProgramBuilder = location.pathname.includes("program-builder")
+  // const location = useLocation()
+  // const isProgramBuilder = location.pathname.includes("program-builder")
   const [showPopover, setShowPopover] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
   console.log(chartId);
@@ -99,7 +98,7 @@ const ChartCardWrapper = ({
           {customHeaderContent}
 
           {/* MENU 3-DOTS */}
-          {!isPreview && !isProgramBuilder && (
+          {!isPreview && (
             <div className="relative border-l pl-4">
               <button
                 className="p-2 border rounded hover:bg-gray-50"
