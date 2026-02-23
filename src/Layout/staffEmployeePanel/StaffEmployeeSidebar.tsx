@@ -52,7 +52,7 @@ const StaffEmployeeSidebar = () => {
     favorites.push({
       id: item.project.id,
       name: item.project.name,
-      path: `/staff-employee-panel/projects/${item.project.id}`,
+      path: `/staff-employee-panel/projects/project-details/${item.project.id}`,
       icon: <Heart />,
     });
   });
@@ -60,9 +60,9 @@ const StaffEmployeeSidebar = () => {
   const updatedGroups = groups.map((group, index) =>
     index === 1
       ? {
-          ...group,
-          items: favorites,
-        }
+        ...group,
+        items: favorites,
+      }
       : group,
   );
 
@@ -113,10 +113,9 @@ const StaffEmployeeSidebar = () => {
               <button
                 className={`self-stretch rounded-[10px] inline-flex items-center w-full
                   ${isExpanded ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
-                  ${
-                    active
-                      ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
-                      : "text-gray-900 hover:bg-slate-100"
+                  ${active
+                    ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                    : "text-gray-900 hover:bg-slate-100"
                   }`}
               >
                 <div
@@ -170,10 +169,9 @@ const StaffEmployeeSidebar = () => {
             asChild
             className={`self-stretch rounded-[10px] inline-flex items-center w-full
               ${isExpanded ? "px-4 py-5 justify-start" : "px-2 py-3 justify-center"}
-              ${
-                active
-                  ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
-                  : "text-gray-900"
+              ${active
+                ? "bg-linear-to-b from-[#4881FF] to-[#0151FFD6] text-white hover:text-white"
+                : "text-gray-900"
               }`}
           >
             <div className={`flex items-center ${isExpanded ? "gap-2" : ""}`}>

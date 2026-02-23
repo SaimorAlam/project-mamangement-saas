@@ -256,7 +256,7 @@ const StaffEmployeeProjects = ({
 
                   <tbody>
                     {sortedProjects.map((project) => (
-                      <tr key={project.id} className="hover:bg-gray-50" onClick={() => navigate(`/staff-employee-panel/projects/${project.id}`)}>
+                      <tr key={project.id} className="hover:bg-gray-50" onClick={() => navigate(`/staff-employee-panel/projects/project-details/${project.id}`)}>
                         <td className="px-6 py-4">{project.name}</td>
                         <td className="px-6 py-4">
                           {project.projectEmployees?.length > 0 ? (

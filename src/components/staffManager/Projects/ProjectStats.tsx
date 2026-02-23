@@ -21,7 +21,7 @@ const ProjectStats = () => {
       growth: "",
       growth_type: "",
       description: "7 new clients joined",
-      link: "/staff-manager-panel/projects",
+      link: "/staff-manager-panel/projects/",
       link_text: "View report ",
       icon: "SubmissionOverdue",
       icon_bg_color: "#4881FF",

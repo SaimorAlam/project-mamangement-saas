@@ -241,7 +241,7 @@ const StaffManagerProjectTable = ({
               <TableRow
                 key={project.id}
                 className="border-b border-gray-200 hover:bg-gray-100 odd:bg-white even:bg-[#F7F9FA]"
-                onClick={() => navigate(`/staff-manager-panel/projects/${project.id}`)}
+                onClick={() => navigate(`/staff-manager-panel/projects/project-details/${project.id}`)}
               >
                 <TableCell className="px-6 py-3.5 font-medium">
                   {project.programName || "Program Name"}
@@ -287,7 +287,7 @@ const StaffManagerProjectTable = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => navigate(`/staff-manager-panel/projects/${project.id}`)}
+                      onClick={() => navigate(`/staff-manager-panel/projects/project-details/${project.id}`)}
                     >
                       <Eye className="w-4 h-4 text-[#1C73E0]" />
                     </Button>

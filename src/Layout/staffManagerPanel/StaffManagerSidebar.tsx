@@ -53,7 +53,7 @@ const StaffManagerSidebar = () => {
     favorites.push({
       id: item.project.id,
       name: item.project.name,
-      path: `/staff-manager-panel/projects/${item.project.id}`,
+      path: `/staff-manager-panel/projects/project-details/${item.project.id}`,
       icon: <Heart />,
     });
   });

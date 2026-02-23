@@ -148,7 +148,7 @@ export default function StaffEmployeeNotificationModal({
                             key={index}
                             variant={action.variant || "outline"}
                             size="sm"
-                            onClick={() => navigate(`/staff-manager-panel/projects/${notification.projectId}`)}
+                            onClick={() => navigate(`/staff-manager-panel/projects/project-details/${notification.projectId}`)}
                             className="h-7 px-3 text-xs bg-gray-100 hover:cursor-pointer hover:text-blue-600"
                           >
                             {action.label}
