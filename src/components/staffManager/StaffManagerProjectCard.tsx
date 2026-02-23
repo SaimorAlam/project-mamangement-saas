@@ -288,7 +288,7 @@ const StaffManagerProjectCard = ({
             title="View Project Details"
             type="Primary"
             className="w-full h-10"
-            onClick={() => navigate(`/staff-manager-panel/projects/${project.id}`)}
+            onClick={() => navigate(`/staff-manager-panel/projects/project-details/${project.id}`)}
           />
         </div>
       </CardContent>

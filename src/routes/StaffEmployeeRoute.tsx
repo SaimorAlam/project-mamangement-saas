@@ -26,13 +26,23 @@ import UploadProject from "@/components/staffEmployee/Projects/UploadProject";
 import DashboardCardProjects from "@/components/staffEmployee/Overview/DashboardCardProjects";
 import ProfilePage from "@/pages/commonPage/ProfilePage";
 import ProjectDetails from "@/pages/client/ProjectDetails/ProjectDetails";
+import ProjectReviewContainer from "@/pages/client/ProjectReview/ProjectReviewContainer";
 
 export default function getStaffEmployeeRoutes() {
   return [
     { index: true, element: <StaffEmployeeOverview /> },
-    { path: "projects", element: <StaffEmployeeProjects /> },
-    { path: "projects/:id", element: <ProjectDetails /> },
-    { path: "projects/status/:status", element: <DashboardCardProjects /> },
+    // { path: "projects", element: <StaffEmployeeProjects /> },
+    // { path: "projects/:id", element: <ProjectDetails /> },
+    // { path: "projects/status/:status", element: <DashboardCardProjects /> },
+    {
+      path: "projects",
+      element: <ProjectReviewContainer />,
+      children: [
+        { index: true, element: <StaffEmployeeProjects /> },
+        { path: "project-details/:projectId", element: <ProjectDetails /> },
+        { path: "status/:status", element: <DashboardCardProjects /> },
+      ],
+    },
     { path: "upload-submission", element: <UploadProject /> },
     { path: "carlyle-hall", element: <StaffEmployeeCarlyleHall /> },
     { path: "employees", element: <StaffEmployeeEmployees /> },

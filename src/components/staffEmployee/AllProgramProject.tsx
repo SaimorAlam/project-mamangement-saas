@@ -25,6 +25,7 @@ import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import DropdownSelect from "@/common/DropdownSelect";
 import PrimaryButton from "@/common/PrimaryButton";
 import StaffEmployeeProjectTable from "./Overview/StaffEmployeeProjectTable";
+import StaffEmployeeProjectCard from "./StaffEmployeeProjectCard";
 
 export type Priority = "HIGH" | "MEDIUM" | "LOW";
 export type ProjectStatus =
@@ -298,14 +299,14 @@ const AllProgramProject = () => {
             {projects?.map((projectData: StaffEmployeeProject) => {
               return (
                 <div key={projectData.id}>
-                  <StaffManagerProjectCard project={projectData} />
+                  <StaffEmployeeProjectCard project={projectData} />
                 </div>
               );
             })}
           </div>
           {projects.length > 8 && (
             <div className="pt-6">
-              <Link to="/staff-manager-panel/projects">
+              <Link to="/staff-employee-panel/projects">
                 <Button
                   variant="ghost"
                   className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"

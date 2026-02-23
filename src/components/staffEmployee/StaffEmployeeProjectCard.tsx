@@ -2,12 +2,17 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Flag, Layers } from "lucide-react";
-import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
+import { Flag, Layers, Star } from "lucide-react";
+// import RenderStaffAvatars from "../ViewerPanel/RenderStaffAvater";
 import { FaStar } from "react-icons/fa6";
-import { useAddToFavouriteProjectMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
+// import ProjectDetailsModal from "./overview/ProjectDetailsModal";
 import { toast } from "sonner";
-// import ProjectDetailsModal from "./Overview/ProjectDetailModal";
+import {
+  useAddProjectToFavoriteMutation,
+  useGetFavoriteProjectsQuery,
+  useRemoveProjectFromFavoriteMutation
+} from "@/store/Api/staffManagerApi/StaffManagerApi";
+import RenderStaffAvatars from "../client/RenderStaffAvater";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useNavigate } from "react-router-dom";
 
@@ -54,6 +59,29 @@ export interface StaffEmployeeProject {
 
   createdAt: string;
   updatedAt: string;
+
+  projectEmployees?: {
+    employee: {
+      user: {
+        name: string;
+        profileImage: string;
+      };
+    };
+  };
+  projectViewers?: {
+    viewer: {
+      user: {
+        name: string;
+        profileImage: string;
+      };
+    };
+  };
+  manager?: {
+    user: {
+      name: string;
+      profileImage: string;
+    };
+  };
 }
 
 interface StaffEmployeeProgramCardProps {
@@ -100,6 +128,25 @@ const StaffEmployeeProjectCard = ({
     status,
   } = project;
 
+  const assignedStaffImg = []
+  project?.manager?.user?.profileImage && assignedStaffImg.push({
+    name: project?.manager?.user?.name,
+    avatar: project?.manager?.user?.profileImage
+  })
+  project?.projectEmployees?.employee?.user?.profileImage && assignedStaffImg.push({
+    name: project?.projectEmployees?.employee?.user?.name,
+    avatar: project?.projectEmployees?.employee?.user?.profileImage
+  })
+  project?.projectViewers?.viewer?.user?.profileImage && assignedStaffImg.push({
+    name: project?.projectViewers?.viewer?.user?.name,
+    avatar: project?.projectViewers?.viewer?.user?.profileImage
+  })
+
+  const { data } = useGetFavoriteProjectsQuery();
+  const [addProjectToFavorite] = useAddProjectToFavoriteMutation();
+  const [removeProjectFromFavorite] = useRemoveProjectFromFavoriteMutation();
+  const navigate = useNavigate();
+
   const priorityColor =
     priority === "HIGH"
       ? "text-[#DA4352]"
@@ -107,12 +154,9 @@ const StaffEmployeeProjectCard = ({
         ? "text-[#F59E0B]"
         : "text-[#16A34A]";
 
-  const [addToFavouriteProject] = useAddToFavouriteProjectMutation();
-  const navigate = useNavigate();
-
   const handleAddToFavourite = async (projectId: string) => {
     try {
-      const res = await addToFavouriteProject(projectId);
+      const res = await addProjectToFavorite({ projectId });
 
       // Handle error response
       if ("error" in res) {
@@ -150,7 +194,7 @@ const StaffEmployeeProjectCard = ({
   };
 
   return (
-    <Card className="w-full max-w-md bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">
+    <Card className="min-w-60 lg:min-w-80 bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md transition flex flex-col">
       <CardContent className="flex flex-col justify-between p-0">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-gray-200 py-2 px-4">
@@ -165,9 +209,26 @@ const StaffEmployeeProjectCard = ({
               </h4>
               <p className="text-sm text-gray-600 line-clamp-2 mt-1 flex items-center gap-x-2">
                 <span>{name || "Project Name"}</span>{" "}
-                <button onClick={() => handleAddToFavourite(id)}>
-                  <FaStar className="text-yellow-500" size={18} />
-                </button>
+                {data.data.some((element: any) => element.projectId === id) ? (
+                  <button
+                    title="Remove from favorite"
+                    className=""
+                    onClick={() => {
+                      removeProjectFromFavorite(id)
+                      toast.success("Succesfully removed from favorite.")
+                    }}
+                  >
+                    <FaStar className="text-yellow-500" size={18} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleAddToFavourite(id)}
+                    title="Add to favorite"
+                    className="hover:scale-105 hover:cursor-pointer duration-300"
+                  >
+                    <Star className="text-gray-500" size={18} />
+                  </button>
+                )}
               </p>
             </div>
           </div>
@@ -182,27 +243,12 @@ const StaffEmployeeProjectCard = ({
               <h3 className="mb-1">Assigned People</h3>
               {/* Kept intentionally even if data is not available */}
               <RenderStaffAvatars
-                staff={Array.from({ length: 3 }, (_, i) => ({
-                  id: i.toString(),
-                  name: `Staff ${i + 1}`,
-                  avatar: "https://randomuser.me/api/portraits/men/19.jpg",
-                }))}
+                staff={assignedStaffImg}
               />
+              {/* -- */}
             </div>
 
-            {/* Priority */}
-            <div className="px-4 py-2">
-              <p className="text-gray-500">Priority</p>
-              <div className="flex items-center gap-1">
-                <Flag className={`w-4 h-4 ${priorityColor}`} />
-                <span className={`text-sm font-medium ${priorityColor}`}>
-                  {priority}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="w-full h-full flex flex-col justify-between gap-3">
-            <div className="flex h-full flex-col justify-between gap-y-4 text-sm py-2 px-4">
+            <div className="flex flex-col gap-y-4 text-sm py-2 px-4">
               <div>
                 <p className="text-gray-500">Project start</p>
                 <p className="font-medium">{formatDate(startDate)}</p>
@@ -213,6 +259,17 @@ const StaffEmployeeProjectCard = ({
                 <p className="font-medium">{formatDate(deadline)}</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Priority */}
+        <div className="px-4 py-2">
+          <p className="text-gray-500">Priority</p>
+          <div className="flex items-center gap-1">
+            <Flag className={`w-4 h-4 ${priorityColor}`} />
+            <span className={`text-sm font-medium ${priorityColor}`}>
+              {priority}
+            </span>
           </div>
         </div>
 
@@ -231,7 +288,7 @@ const StaffEmployeeProjectCard = ({
             title="View Project Details"
             type="Primary"
             className="w-full h-10"
-            onClick={() => navigate(`/staff-employee-panel/projects/${project.id}`)}
+            onClick={() => navigate(`/staff-employee-panel/projects/project-details/${project.id}`)}
           />
         </div>
       </CardContent>
