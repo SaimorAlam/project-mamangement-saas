@@ -188,7 +188,7 @@ const ClientSettings = () => {
         </div>
 
         {/* Full width row at bottom for API Connections */}
-        <div className="lg:col-span-2">
+        <div className="">
           <BoxContainer className="shadow-sm border-gray-100">
             <h4 className="text-xl font-semibold text-gray-800 mb-6">
               API Connections

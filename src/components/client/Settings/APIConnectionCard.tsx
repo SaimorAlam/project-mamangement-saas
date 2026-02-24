@@ -16,13 +16,12 @@ const APIConnectionCard = ({
   return (
     <div
       className={`flex flex-col p-4.5 border border-gray-200 rounded-lg ${className}`}
-      style={{ width: "294px" }}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
         <img src={icon} alt={`${name} icon`} />
-        <span className="text-[20px] font-medium text-gray-900">{name}</span>
+        <span className="text-base font-medium text-gray-900">{name}</span>
         <span
-          className={`text-[11px] px-1.5 py-0.5 rounded ml-auto ${
+          className={`text-[10px] px-1.5 py-0.5 rounded ml-auto ${
             status === "Connected"
               ? "text-green-600 bg-green-100"
               : "text-red-600 bg-red-100"
