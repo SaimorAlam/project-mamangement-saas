@@ -133,6 +133,7 @@ const AreaChartModule = ({
           endingRange={endingRange}
           setEndingRange={setEndingRange}
           onClose={handleCloseWidget}
+          onDelete={onDelete}
         />
       )}
     </div>

@@ -135,6 +135,7 @@ const HorizontalBarChartModule = ({
           endingRange={endingRange}
           setEndingRange={setEndingRange}
           onClose={handleCloseWidget}
+          onDelete={onDelete}
         />
       )}
     </div>

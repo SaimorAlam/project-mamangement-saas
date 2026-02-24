@@ -265,7 +265,6 @@ const WidgetForChartModuleOne = ({
       return updated;
     });
   };
-console.log(widgetTitle,xAxisSliceLabels,xAxisValues,numOfXAxisDataSet)
   // const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const handleSaveChanges = async () => {
@@ -394,7 +393,7 @@ console.log(widgetTitle,xAxisSliceLabels,xAxisValues,numOfXAxisDataSet)
           .filter((item): item is NonNullable<typeof item> => !!item),
       }),
     };
-    console.log(payload)
+
     try {
       const res = isProgramBuilder
         ? await createProgramChart(payload).unwrap()
@@ -404,8 +403,7 @@ console.log(widgetTitle,xAxisSliceLabels,xAxisValues,numOfXAxisDataSet)
         onDelete?.();
         onClose?.();
       }
-    } catch (error) {
-      console.error("Chart creation error:", error);
+    } catch {
       toast.error("Chart creation failed", { id: toastId });
     }
   };
