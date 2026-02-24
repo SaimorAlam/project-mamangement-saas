@@ -185,35 +185,34 @@ const ClientSettings = () => {
           </BoxContainer>
 
           <Notification title="Notification Settings" />
-        </div>
-
-        {/* Full width row at bottom for API Connections */}
-        <div className="">
-          <BoxContainer className="shadow-sm border-gray-100">
-            <h4 className="text-xl font-semibold text-gray-800 mb-6">
-              API Connections
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
-              <APIConnectionCard
-                name="Slack"
-                status="Active"
-                icon="/slack.png"
-                lastSynced="Today"
-              />
-              <APIConnectionCard
-                name="Salesforce"
-                status="Pending"
-                icon="/salesforce.png"
-                lastSynced="Today"
-              />
-              <APIConnectionCard
-                name="AWS S3"
-                status="Active"
-                icon="/aws.png"
-                lastSynced="Today"
-              />
-            </div>
-          </BoxContainer>
+          {/* Full width row at bottom for API Connections */}
+          <div className="">
+            <BoxContainer className="shadow-sm border-gray-100">
+              <h4 className="text-xl font-semibold text-gray-800 mb-6">
+                API Connections
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+                <APIConnectionCard
+                  name="Slack"
+                  status="Active"
+                  icon="/slack.png"
+                  lastSynced="Today"
+                />
+                <APIConnectionCard
+                  name="Salesforce"
+                  status="Pending"
+                  icon="/salesforce.png"
+                  lastSynced="Today"
+                />
+                <APIConnectionCard
+                  name="AWS S3"
+                  status="Active"
+                  icon="/aws.png"
+                  lastSynced="Today"
+                />
+              </div>
+            </BoxContainer>
+          </div>
         </div>
       </div>
     </div>
