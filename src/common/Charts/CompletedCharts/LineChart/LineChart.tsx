@@ -305,8 +305,18 @@ export default function MultiAxisLineChart({
             typeof node.xAxis === "string"
               ? JSON.parse(node.xAxis)
               : node.xAxis;
-          if (Array.isArray(parsed) && parsed.length > 1) {
-            xAxisItems = parsed.slice(1).map((row: any) => String(row[0]));
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            if (Array.isArray(parsed[0])) {
+              // Smart header detection: a header row has legend labels (strings) in data columns.
+              // We skip it because the download process manually adds a header row.
+              const hasHeader =
+                parsed[0].length > 1 && typeof parsed[0][1] === "string";
+              xAxisItems = (hasHeader ? parsed.slice(1) : parsed).map(
+                (row: any) => String(row[0]),
+              );
+            } else {
+              xAxisItems = parsed.map((v) => String(v));
+            }
           } else if (parsed?.labels) {
             xAxisItems = parsed.labels;
           }
@@ -338,8 +348,7 @@ export default function MultiAxisLineChart({
 
       XLSX.writeFile(wb, `${widgetTitle}_ID_${ids.join("_")}.xlsx`);
       toast.success("Excel template downloaded");
-    } catch (error) {
-      console.error("Download failed:", error);
+    } catch {
       toast.error("Failed to download Excel");
     } finally {
       setIsDownloading(false);

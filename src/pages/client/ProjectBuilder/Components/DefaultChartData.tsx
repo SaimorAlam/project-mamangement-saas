@@ -55,22 +55,24 @@ const parseXAxisData = (
     return { labels: [], data: {} as { [key: string]: ChartData[] } };
   }
 
-  // First row is the header
-  const headers = parsedXAxis[0];
-  if (!Array.isArray(headers) || headers.length === 0) {
-    return { labels: [], data: {} as { [key: string]: ChartData[] } };
-  }
+  // Smart header detection: a header row has legend labels (strings) in data columns,
+  // whereas data rows have numbers (0 by default in creation mode).
+  const hasHeader =
+    parsedXAxis.length > 0 &&
+    Array.isArray(parsedXAxis[0]) &&
+    parsedXAxis[0].length > 1 &&
+    typeof parsedXAxis[0][1] === "string";
 
-  // Extract labels from the first column of data rows (skip header)
-  const labels = parsedXAxis.slice(1).map((row) => String(row[0] || ""));
+  const dataRows = hasHeader ? parsedXAxis.slice(1) : parsedXAxis;
+  const labels = dataRows.map((row) => String(row[0] || ""));
 
-  // Transform data into the format expected by StackedBarChart
-  const chartData: ChartData[] = parsedXAxis.slice(1).map((row) => {
+  // Transform data: first element is the label, subsequent elements are dataset values
+  const chartData: ChartData[] = dataRows.map((row) => {
     const dataPoint: ChartData = { name: String(row[0] || "") };
 
-    // Map each legend to its corresponding column value
+    // Map each legend to its corresponding column value (starting from index 1)
     legendValues.forEach((legend, index) => {
-      const columnIndex = index + 1; // Skip first column (label)
+      const columnIndex = index + 1;
       dataPoint[legend.field] = Number(row[columnIndex]) || 0;
     });
 
@@ -92,7 +94,23 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
       {projectsChartsData?.map((item: any) => {
         const categoryKey = item.category?.toUpperCase();
         const chartProperty = chartTypes[categoryKey];
-        const chartData = chartProperty ? item[chartProperty] : null;
+
+        // Normalize chart data between standard and program builder formats
+        // Program builder format nests under 'chartData', standard uses dynamic keys via chartTypes
+        const chartData =
+          item.chartData || (chartProperty ? item[chartProperty] : null);
+
+        // Standard format has xAxis string/array at root.
+        // Program builder format has it in valueDetection.matching
+        const xAxisData = item.valueDetection?.matching || item.xAxis;
+
+        // API field normalization (Program Builder uses 'firstFiledDataset', 'lastFiledDAtaset')
+        const firstField =
+          chartData?.firstFiledDataset ?? chartData?.firstFieldDataset;
+        const lastField =
+          chartData?.lastFiledDAtaset ?? chartData?.lastFieldDataset;
+        const numDatasets = chartData?.numberOfDataset;
+
         if (categoryKey === "BAR") {
           const legendValues =
             (chartData?.widgets || item?.widgets)?.map((w: any) => ({
@@ -104,7 +122,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels, data } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -116,9 +134,9 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 xAxisValues={labels}
                 legendValues={legendValues}
                 widgets={chartData?.widgets}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={numDatasets}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
                 projectId={item?.projectId}
                 allUploadedData={data}
@@ -138,7 +156,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
           );
 
           const { labels, data } = parseHorizontalBarData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -150,8 +168,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 xAxisValues={labels}
                 legendValues={legendValues}
                 widgets={chartData?.widgets}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
                 projectId={item?.projectId}
                 allUploadedData={data}
@@ -170,7 +188,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels, data } = parseLineChartData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -182,9 +200,9 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 xAxisValues={labels}
                 legendValues={legendValues}
                 widgets={chartData?.widgets}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={numDatasets}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
                 projectId={item?.projectId}
                 allUploadedData={data}
@@ -203,7 +221,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -214,9 +232,9 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={numDatasets}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -232,14 +250,14 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 .replace(/\s+/g, ""),
             })) || [];
 
-          const pieData = parsePieChartData(item?.xAxis, legendValues);
+          const pieData = parsePieChartData(xAxisData, legendValues);
 
           return (
             <div key={item.id} className="w-full">
               <PieChartWidget
                 widgetTitle={item?.title}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset}
+                numOfLegendDataSet={numDatasets}
                 chartId={item?.id}
                 allUploadedData={pieData}
                 projectId={item?.projectId}
@@ -258,7 +276,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -269,9 +287,9 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={numDatasets}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -288,7 +306,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -299,9 +317,9 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={numDatasets}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -337,7 +355,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels, data } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -348,9 +366,9 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={numDatasets}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
                 projectId={item?.projectId}
                 allUploadedData={data}
@@ -369,7 +387,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -379,8 +397,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
               <ParetoChart
                 widgetTitle={item?.title}
                 xAxisValues={labels}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -397,7 +415,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -408,8 +426,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -430,8 +448,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
               <ScatterChart
                 widgetTitle={item?.title}
                 legendValues={legendValues}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -452,8 +470,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
               <GaugeChart
                 widgetTitle={item?.title}
                 legendValues={legendValues}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -470,7 +488,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -480,8 +498,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
               <FunnelChart
                 widgetTitle={item?.title}
                 xAxisValues={labels}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -498,7 +516,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -509,8 +527,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -527,7 +545,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -538,9 +556,9 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={numDatasets}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -557,7 +575,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -568,9 +586,9 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={numDatasets}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>
@@ -587,7 +605,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             })) || [];
 
           const { labels } = parseXAxisData(
-            item?.xAxis,
+            xAxisData,
             legendValues,
             item?.title,
           );
@@ -598,9 +616,9 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={numDatasets}
+                startingRange={firstField}
+                endingRange={lastField}
                 chartId={item?.id}
               />
             </div>

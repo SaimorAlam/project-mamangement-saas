@@ -13,7 +13,7 @@ import ProgressRing from "@/common/Charts/ProgressRingTest";
 // import AreaChart from "@/common/Charts/AreaChart";
 import GanttChart from "@/common/Charts/GanttChart";
 import LineChartModule from "@/common/Charts/CompletedCharts/LineChart/LineChartModule";
-import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
+import ChartModuleOne from "@/common/Charts/CompletedCharts/ChartModule/ChartModuleOne";
 
 import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
 import HorizontalBarChartModule from "../../common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChartModule";

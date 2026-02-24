@@ -88,7 +88,7 @@ const HorizontalBarChartModule = ({
       updated[index] = value;
       return updated;
     });
-    console.log("parant x values: ", xAxisValues);
+    // console.log("parant x values: ", xAxisValues);
   };
 
   // Toggle widget visibility
@@ -135,6 +135,7 @@ const HorizontalBarChartModule = ({
           endingRange={endingRange}
           setEndingRange={setEndingRange}
           onClose={handleCloseWidget}
+          onDelete={onDelete}
         />
       )}
     </div>

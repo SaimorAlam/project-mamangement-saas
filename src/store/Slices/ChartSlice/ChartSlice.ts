@@ -53,6 +53,7 @@ const chartSlice = createSlice({
     setGroupTitle: (state, action: { payload: string }) => {
       state.groupTitle = action.payload;
     },
+    resetChartState: () => initialState,
   },
 });
 
@@ -65,6 +66,7 @@ export const {
   setChildPayload,
   setSelectedWidgets,
   setGroupTitle,
+  resetChartState,
 } = chartSlice.actions;
 
 export default chartSlice.reducer;

@@ -1,7 +1,7 @@
 import {
   Building2,
   ChartPie,
-  Folder,
+  // Folder,
   // Headphones,
   // Info,
   Megaphone,
@@ -38,11 +38,11 @@ export const getViewerPanelSidebarItems = (): SidebarGroup[] => {
           name: "Overview",
           path: "/viewer-panel",
         },
-        {
-          icon: <Folder />,
-          name: "Projects",
-          path: "/viewer-panel/projects",
-        },
+        // {
+        //   icon: <Folder />,
+        //   name: "Projects",
+        //   path: "/viewer-panel/projects",
+        // },
       ],
     },
     {

@@ -5,7 +5,7 @@ import {
   ChartPie,
   Clipboard,
   FileChartColumnIncreasing,
-  FolderClosed,
+  // FolderClosed,
   Grid2x2,
   Headphones,
   Info,
@@ -92,25 +92,25 @@ export const getClientSidebarItems = (): SidebarGroup[] => {
           path: "/client-panel/program-name",
           hidden: showHighwayExpansion,
         },
-        {
-          icon: <BriefcaseBusiness />,
-          name: <span className="text-[15px]">Highway Expansion</span>,
-          className: "text-sm",
-          path: "/client-panel/highway-expansion",
-          hidden: !showHighwayExpansion,
-          children: [
-            {
-              icon: <FileChartColumnIncreasing />,
-              name: "Highway Expansion",
-              path: "all-highway",
-            },
-            {
-              icon: <FolderClosed />,
-              name: "Carlyle Hall",
-              path: "carlyle-hall",
-            },
-          ],
-        },
+        // {
+        //   icon: <BriefcaseBusiness />,
+        //   name: <span className="text-[15px]">Highway Expansion</span>,
+        //   className: "text-sm",
+        //   path: "/client-panel/highway-expansion",
+        //   hidden: !showHighwayExpansion,
+        //   children: [
+        //     {
+        //       icon: <FileChartColumnIncreasing />,
+        //       name: "Highway Expansion",
+        //       path: "all-highway",
+        //     },
+        //     {
+        //       icon: <FolderClosed />,
+        //       name: "Carlyle Hall",
+        //       path: "carlyle-hall",
+        //     },
+        //   ],
+        // },
         {
           icon: <FileChartColumnIncreasing />,
           name: "Project Review",
