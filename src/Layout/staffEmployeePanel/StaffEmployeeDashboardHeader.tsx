@@ -13,10 +13,10 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useHeaderContext } from "./StaffEmployeeHeaderContext";
 import { getStaffEmployeeSidebarItems } from "./staffEmployeeSidebarMenuItems";
-import GlobalSearch from "@/components/staffManager/GlobalSearch";
 import NotificationModalNew from "@/components/staffManager/NotificationModalNew";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useNotification } from "@/context/NotificationContext";
+import StaffEmployeeGlobalSearch from "@/components/staffEmployee/StaffEmployeeGlobalSearch";
 
 const StaffEmployeeDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,7 +60,7 @@ const StaffEmployeeDashboardHeader = () => {
           </div>
         </div>
 
-          <GlobalSearch />
+          <StaffEmployeeGlobalSearch />
 
           {/* Right Controls */}
           <div className="flex items-center justify-between gap-2 relative">
