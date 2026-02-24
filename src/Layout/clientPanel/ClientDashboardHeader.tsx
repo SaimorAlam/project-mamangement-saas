@@ -5,6 +5,7 @@ import React, {
   cloneElement,
   ReactElement,
   isValidElement,
+  useMemo,
 } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
@@ -19,11 +20,12 @@ import NewProjectModal from "@/components/client/NewProjectModal";
 import ProjectSuccessModal from "./CreateProject/ProjectSuccessModal";
 import {
   Bell,
-  // CalendarDays,
-  // ChevronDown,
   Plus,
   Upload,
   UserPlus,
+  Download,
+  Layers,
+  Briefcase,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -35,20 +37,19 @@ import {
 } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getClientSidebarItems } from "./clientSidebarItems";
-// import CreateProjectModal from "./CreateProjectModal";
 import CreateProject from "./CreateProject/CreateProject";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
   setIsPreview,
   setIsPublished,
 } from "@/store/Slices/ChartSlice/ChartSlice";
-import { Download } from "lucide-react";
-import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import {
+  useGetProjectByIdQuery,
+  useGetAllProjectsQuery,
+} from "@/store/Api/ProjectApi/ProjectApi";
 import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
-import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Layers, Briefcase } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
 
@@ -57,104 +58,133 @@ interface ClientDashboardHeaderProps {
 }
 
 const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
-  // const [projectName, setProjectName] = useState<string>("");
-
   const { programId, projectId: projectIdFromParams } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const currentPath = location.pathname;
+
   const projectIdFromState = useAppSelector(
     (state) => state.chartSlice.projectId,
   );
+  const { isPreview, isPublished } = useAppSelector(
+    (state) => state.chartSlice,
+  );
 
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
-  const projectId = projectIdFromParams
-    ? projectIdFromParams
-    : projectIdFromState;
-  const location = useLocation();
-  const currentPath = location.pathname;
+  const projectId = projectIdFromParams || projectIdFromState;
 
-  // Path detection
-  const isEmployeePage = currentPath.includes("/employee");
-  const isHighwayExpansionPage = currentPath.includes(
-    "/highway-expansion/all-highway",
-  );
-  const isAllProgramPage = currentPath === "/client-panel/all-program";
-  const isProgramOverviewPage =
-    currentPath.includes("/all-program/program-overview/") &&
-    !currentPath.includes("/project-details/");
-  const isProjectDetailsPage = currentPath.includes("/project-details/");
-  const isProjectReviewPage = currentPath.includes(
-    "/client-panel/project-review",
-  );
-  const isProjectBuilderPage = currentPath.includes(
-    "/client-panel/project-builder",
-  );
-  const isPublishPage = currentPath.includes("/project-builder/publish");
-  const isImportCSVPage = currentPath.includes("/project-builder/file-upload");
-  const isProjectReviewDetailsPage = currentPath.startsWith(
-    "/client-panel/project-review/project-details/",
-  );
-  const isActivityLogPage = currentPath.includes("/client-panel/activity-log");
-  const isSupportPage = currentPath.includes("/client-panel/help");
+  // Optimized Page Type Detection
+  const isPage = useMemo(() => {
+    const p = currentPath;
+    return {
+      employee: p.includes("/employee"),
+      highway: p.includes("/highway-expansion/all-highway"),
+      allProgram: p === "/client-panel/all-program",
+      programOverview:
+        p.includes("/all-program/program-overview/") &&
+        !p.includes("/project-details/"),
+      projectDetails: p.includes("/project-details/"),
+      projectReview: p.includes("/client-panel/project-review"),
+      projectBuilder: p.includes("/client-panel/project-builder"),
+      publish: p.includes("/project-builder/publish"),
+      importCSV: p.includes("/project-builder/file-upload"),
+      projectReviewDetails: p.startsWith(
+        "/client-panel/project-review/project-details/",
+      ),
+      activityLog: p.includes("/client-panel/activity-log"),
+      support: p.includes("/client-panel/help"),
+      overviewProjectDetails: p.includes(
+        "/client-panel/overview/project-details/",
+      ),
+      showProgramOverviewBreadcrumb: p.startsWith(
+        "/client-panel/all-program/program-overview/",
+      ),
+    };
+  }, [currentPath]);
+
   const { data: ProjectData } = useGetProjectByIdQuery(projectId as string, {
     skip: !projectId,
   });
-
   const projectName = ProjectData?.data?.project?.name;
 
-  const allRoutes = React.useMemo(() => {
-    return getClientSidebarItems().flatMap((group) => group.items);
-  }, []);
-
-  const isOverviewProjectDetailsPage = currentPath.includes(
-    "/client-panel/overview/project-details/",
+  const allRoutes = useMemo(
+    () => getClientSidebarItems().flatMap((group) => group.items),
+    [],
   );
 
-  const showProgramOverviewBreadcrumb = currentPath.startsWith(
-    "/client-panel/all-program/program-overview/",
-  );
+  // Optimized Route Mapping
+  const currentRoute = useMemo(() => {
+    if (isPage.showProgramOverviewBreadcrumb)
+      return allRoutes.find((r) => r.path === "/client-panel/all-program");
+    if (isPage.projectReviewDetails)
+      return allRoutes.find((r) => r.path === "/client-panel/project-review");
+    if (isPage.overviewProjectDetails)
+      return allRoutes.find((r) => r.path === "/client-panel");
+    if (isPage.publish || isPage.importCSV)
+      return allRoutes.find((r) => r.path === "/client-panel/project-builder");
 
-  // Determine current route
-  const currentRoute = React.useMemo(() => {
-    let route = allRoutes.find((r) => {
-      // Match exact path or any child path
-      if (r.children) {
+    return allRoutes.find((r) => {
+      if (r.children)
         return r.children.some(
           (child) => `${r.path}/${child.path}` === currentPath,
         );
-      }
       return r.path === currentPath;
     });
+  }, [allRoutes, currentPath, isPage]);
 
-    // Special case for Program Overview: map to All Program
-    if (showProgramOverviewBreadcrumb) {
-      route = allRoutes.find((r) => r.path === "/client-panel/all-program");
+  // Optimized Breadcrumb Data Structure
+  const breadcrumbData = useMemo(() => {
+    const items: Array<{
+      label: string;
+      path?: string;
+      icon?: React.ReactNode;
+      isPage?: boolean;
+    }> = [{ label: "Home", path: "/client-panel" }];
+
+    if (currentRoute) {
+      items.push({
+        label: currentRoute?.name as string,
+        path: currentRoute.path as string,
+        icon: currentRoute.icon,
+      });
+
+      if (isPage.showProgramOverviewBreadcrumb) {
+        items.push({
+          label: "Program Overview",
+          path: `/client-panel/all-program/program-overview/${programId}`,
+        });
+      }
+
+      if (isPage.publish) {
+        items.push({
+          label: projectName as string,
+          path: "/client-panel/project-builder",
+        });
+        items.push({ label: "Publish", isPage: true });
+      } else if (isPage.importCSV) {
+        items.push({
+          label: projectName as string,
+          path: "/client-panel/project-builder",
+        });
+        items.push({
+          label: "Publish",
+          path: "/client-panel/project-builder/publish",
+        });
+        items.push({ label: "Import CSV", isPage: true });
+      }
     }
 
-    // Special case for Project Review Details: map to Project Review
-    if (isProjectReviewDetailsPage) {
-      route = allRoutes.find((r) => r.path === "/client-panel/project-review");
+    // Final Project Page Identifier (Mutual Exclusion)
+    const isSpecialProjectPage = isPage.publish || isPage.importCSV;
+    if (isPage.projectDetails && !isSpecialProjectPage && projectName) {
+      items.push({ label: projectName, isPage: true });
     }
 
-    // Special case for Overview Project Details: map to Overview
-    if (isOverviewProjectDetailsPage) {
-      route = allRoutes.find((r) => r.path === "/client-panel");
-    }
+    return items;
+  }, [currentRoute, isPage, projectName, programId]);
 
-    // Special case for Publish or Import CSV page: map to Project Builder
-    if (isPublishPage || isImportCSVPage) {
-      route = allRoutes.find((r) => r.path === "/client-panel/project-builder");
-    }
-
-    return route;
-  }, [
-    allRoutes,
-    currentPath,
-    showProgramOverviewBreadcrumb,
-    isProjectReviewDetailsPage,
-    isOverviewProjectDetailsPage,
-    isPublishPage,
-    isImportCSVPage,
-  ]);
-
+  // State Management
   const [searchTerm, setSearchTerm] = useState("");
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{
@@ -163,7 +193,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   }>({ programName: "", id: "" });
   const [successOpen, setSuccessOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [, setIsDropdownOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [projectSuccessData, setProjectSuccessData] = useState<{
@@ -172,17 +201,13 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   } | null>(null);
   const [projectSuccessOpen, setProjectSuccessOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { isPreview, isPublished } = useAppSelector(
-    (state) => state.chartSlice,
-  );
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const { data: allProgramsData } = useGetAllProgramQuery({});
   const { data: allProjectsData } = useGetAllProjectsQuery({});
 
-  const filteredPrograms = React.useMemo(() => {
+  // Search Logic
+  const filteredPrograms = useMemo(() => {
     if (!debouncedSearchTerm) return [];
     const programs = allProgramsData?.data?.data || [];
     return Array.isArray(programs)
@@ -194,7 +219,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
       : [];
   }, [debouncedSearchTerm, allProgramsData]);
 
-  const filteredProjects = React.useMemo(() => {
+  const filteredProjects = useMemo(() => {
     if (!debouncedSearchTerm) return [];
     const projects =
       allProjectsData?.data?.projects?.data ||
@@ -209,9 +234,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
 
   useEffect(() => {
     setIsEmployeeModalOpen(false);
-    setIsDropdownOpen(false);
   }, [currentPath]);
 
+  // Handlers
   const handleProgramSuccess = ({
     programName,
     id,
@@ -241,13 +266,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         projectIdFromState as string,
       ).unwrap();
       const leafCharts = res?.data || [];
-
       if (leafCharts.length === 0) {
         toast.error("No data found to download", { id: toastId });
         return;
       }
 
-      // Find template structure from first leaf chart that has data
       let templateXAxis: string[] = [];
       let templateLegends: any[] = [];
 
@@ -291,19 +314,18 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
       const getUniqueSheetName = (name: string, id: string) => {
         let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
         const idSuffix = id ? `_${id.slice(-8)}` : "";
-        if (baseName.length + idSuffix.length > 31) {
+        if (baseName.length + idSuffix.length > 31)
           baseName = baseName.substring(0, 31 - idSuffix.length);
-        }
         const combinedName = baseName + idSuffix;
         let uniqueName = combinedName;
         let counter = 1;
         while (usedNames.has(uniqueName.toLowerCase())) {
           const suffix = `_${counter}`;
-          if (combinedName.length + suffix.length > 31) {
-            uniqueName = combinedName.substring(0, 31 - suffix.length) + suffix;
-          } else {
-            uniqueName = combinedName + suffix;
-          }
+          uniqueName =
+            combinedName.substring(
+              0,
+              Math.min(combinedName.length, 31 - suffix.length),
+            ) + suffix;
           counter++;
         }
         usedNames.add(uniqueName.toLowerCase());
@@ -312,7 +334,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
 
       leafCharts.forEach((node: any) => {
         ids.push(node.id);
-
         let xAxis = node.xAxisValues || [];
         if (!xAxis.length && node.xAxis) {
           try {
@@ -325,7 +346,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             /* ignore */
           }
         }
-
         let legends = node.legendValues || [];
         const nodeWidgets = node.widgets || node.barChart?.widgets;
         if (!legends.length && nodeWidgets?.length > 0) {
@@ -337,8 +357,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             color: w.color || "#000000",
           }));
         }
-
-        // Apply template fallback
         if (!xAxis.length) xAxis = templateXAxis;
         if (!legends.length) legends = templateLegends;
 
@@ -347,17 +365,18 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           label,
           ...legends.map(() => ""),
         ]);
-        const data = [headers, ...rows];
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        const sheetName = getUniqueSheetName(
-          node.title || node.name || "Tier",
-          node.id,
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        XLSX.utils.book_append_sheet(
+          wb,
+          ws,
+          getUniqueSheetName(node.title || node.name || "Tier", node.id),
         );
-        XLSX.utils.book_append_sheet(wb, ws, sheetName);
       });
 
-      const filename = `${projectName || "Project"}_ID_${ids.join("_")}.xlsx`;
-      XLSX.writeFile(wb, filename);
+      XLSX.writeFile(
+        wb,
+        `${projectName || "Project"}_ID_${ids.join("_")}.xlsx`,
+      );
       toast.success("Excel downloaded successfully", { id: toastId });
     } catch (error) {
       console.error("Excel download failed", error);
@@ -368,7 +387,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   };
 
   const renderQuickActionButton = () => {
-    if (isEmployeePage)
+    if (isPage.employee)
       return (
         <PrimaryButton
           title="Add Employee"
@@ -377,8 +396,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           onClick={() => setIsEmployeeModalOpen(true)}
         />
       );
-
-    if (isAllProgramPage)
+    if (isPage.allProgram)
       return (
         <PrimaryButton
           title="Add Program"
@@ -387,8 +405,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           onClick={() => setActiveModal("Add Program")}
         />
       );
-
-    if (isProgramOverviewPage)
+    if (isPage.programOverview || isPage.highway)
       return (
         <PrimaryButton
           title="Add Project"
@@ -398,17 +415,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         />
       );
 
-    if (isHighwayExpansionPage)
-      return (
-        <PrimaryButton
-          title="Add Project"
-          leftIcon={<Plus />}
-          type="Primary"
-          onClick={() => setIsProjectModalOpen(true)}
-        />
-      );
-
-    if (isProjectBuilderPage) {
+    if (isPage.projectBuilder) {
       if (isPreview || isPublished) {
         return (
           <div className="flex gap-4">
@@ -416,17 +423,15 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
               title="Import CSV"
               type="Outline"
               leftIcon={<Upload />}
-              onClick={() => {
-                navigate("/client-panel/project-builder/file-upload");
-              }}
+              onClick={() =>
+                navigate("/client-panel/project-builder/file-upload")
+              }
             />
             <PrimaryButton
               title="Download CSV"
               leftIcon={<Download />}
               type="Primary"
-              onClick={() => {
-                handleDownloadCSV();
-              }}
+              onClick={handleDownloadCSV}
             />
           </div>
         );
@@ -441,9 +446,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           <PrimaryButton
             title="Save as Draft"
             type="Outline"
-            onClick={() => {
-              toast.success("Project saved as draft");
-            }}
+            onClick={() => toast.success("Project saved as draft")}
           />
           <PrimaryButton
             title="Publish"
@@ -456,29 +459,25 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         </div>
       );
     }
+
     const shouldHideAddProgram =
-      isProjectReviewPage ||
-      isActivityLogPage ||
-      isProjectDetailsPage ||
-      isSupportPage;
-    return (
-      <>
-        <div>
-          {!shouldHideAddProgram && (
-            <PrimaryButton
-              title="Add Program"
-              leftIcon={<Plus />}
-              type="Primary"
-              onClick={() => setActiveModal("Add Program")}
-            />
-          )}
-        </div>
-      </>
-    );
+      isPage.projectReview ||
+      isPage.activityLog ||
+      isPage.projectDetails ||
+      isPage.support;
+    return !shouldHideAddProgram ? (
+      <PrimaryButton
+        title="Add Program"
+        leftIcon={<Plus />}
+        type="Primary"
+        onClick={() => setActiveModal("Add Program")}
+      />
+    ) : null;
   };
+
   return (
     <div>
-      {/* Header */}
+      {/* Header Bar */}
       <div className="flex flex-col lg:flex-row items-center py-5 justify-between gap-4 lg:gap-0">
         <div className="flex items-center gap-4 w-full lg:w-auto min-w-0">
           <SidebarTrigger className="md:hidden shrink-0" />
@@ -496,7 +495,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
 
         <div className="flex-1 w-full lg:w-auto flex justify-center mt-2 lg:mt-0 relative group px-0 lg:px-4">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-
           {searchTerm && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 max-h-[400px] overflow-y-auto z-50 py-2">
               {filteredPrograms.length === 0 &&
@@ -527,7 +525,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-900">
-                              {program.name}
+                              {program.programName || program.name}
                             </p>
                             <p className="text-xs text-gray-500">Program</p>
                           </div>
@@ -535,7 +533,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
                       ))}
                     </div>
                   )}
-
                   {filteredProjects.length > 0 && (
                     <div>
                       <h3 className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -578,7 +575,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             onClick={() => setIsNotificationOpen(true)}
             className="p-2 md:p-3"
           />
-          {isProjectDetailsPage && (
+          {isPage.projectDetails && (
             <PrimaryButton
               leftIcon={<Upload className="text-xl md:text-2xl" />}
               type="Outline"
@@ -590,227 +587,102 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             isOpen={isNotificationOpen}
             onClose={() => setIsNotificationOpen(false)}
           />
-
-          {/* <div className="hidden sm:block">
-            <PrimaryButton
-              title="Last 1 Week"
-              leftIcon={<CalendarDays className="size-4 md:size-5" />}
-              rightIcon={<ChevronDown className="size-4 md:size-5" />}
-              type="Outline"
-            />
-          </div> */}
-
           <div className="relative">{renderQuickActionButton()}</div>
-
-          {/* Activity Modals */}
-          {isEmployeeModalOpen && (
-            <AddEmployeeModal
-              open={isEmployeeModalOpen}
-              onClose={() => setIsEmployeeModalOpen(false)}
-            />
-          )}
-
-          {isProjectModalOpen && isProgramOverviewPage && (
-            <CreateProject
-              programId={programId as string}
-              onClose={() => setIsProjectModalOpen(false)}
-              onSuccess={handleProjectSuccess}
-            />
-          )}
-
-          {isProjectModalOpen && isHighwayExpansionPage && (
-            <NewProjectModal
-              open={isProjectModalOpen}
-              onClose={() => setIsProjectModalOpen(false)}
-              onSuccess={(projectName: string) => {
-                setIsProjectModalOpen(false);
-                setSuccessData({
-                  programName: projectName || "New Project",
-                  id: "",
-                });
-                setSuccessOpen(true);
-              }}
-            />
-          )}
-
-          {activeModal === "Add Program" && (
-            <CreateProgramModal
-              open
-              onOpenChange={(open) => !open && setActiveModal(null)}
-              onSuccess={handleProgramSuccess}
-              title="Add Program"
-            />
-          )}
-
-          {successData && (
-            <SuccessModal
-              open={successOpen}
-              onOpenChange={setSuccessOpen}
-              programName={successData.programName}
-              redirectPath={`/client-panel/program-builder`}
-            />
-          )}
-
-          {projectSuccessData && (
-            <ProjectSuccessModal
-              open={projectSuccessOpen}
-              onOpenChange={setProjectSuccessOpen}
-              projectName={projectSuccessData.projectName}
-              projectId={projectSuccessData.projectId}
-              programId={programId}
-            />
-          )}
         </div>
       </div>
 
-      {/* Breadcrumb */}
+      {/* Optimized Breadcrumb Section */}
       <div className="overflow-x-auto no-scrollbar py-1">
         <Breadcrumb className="my-2 min-w-max">
           <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/client-panel">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            {currentRoute && (
-              <>
+            {breadcrumbData.map((item, index) => (
+              <React.Fragment key={index}>
                 <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link
-                      to={currentRoute.path as string}
-                      className="text-[#356DF0] font-semibold flex items-center gap-1"
-                    >
-                      {currentRoute.icon &&
-                        isValidElement(currentRoute.icon) &&
-                        cloneElement(
-                          currentRoute.icon as ReactElement<{
-                            className?: string;
-                          }>,
-                          { className: "w-4 h-4" },
-                        )}
-                      {currentRoute.name}
-                    </Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-
-                {showProgramOverviewBreadcrumb && (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbLink asChild>
-                        <Link
-                          to={`/client-panel/all-program/program-overview/${programId}`}
-                          className="text-[#356DF0]"
-                        >
-                          Program Overview
-                        </Link>
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                  </>
-                )}
-                {isProjectReviewDetailsPage && (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-[#356DF0]">
-                        {projectName || "Project Details"}
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                )}
-                {isOverviewProjectDetailsPage && (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-[#356DF0]">
-                        {projectName || "Project Details"}
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                )}
-                {isPublishPage && (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbLink asChild>
-                        <Link
-                          to="/client-panel/project-builder"
-                          className="text-[#356DF0]"
-                        >
-                          {projectName || "Project"}
-                        </Link>
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-[#356DF0]">
-                        Publish
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                )}
-                {isImportCSVPage && (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbLink asChild>
-                        <Link
-                          to="/client-panel/project-builder"
-                          className="text-[#356DF0]"
-                        >
-                          {projectName || "Project"}
-                        </Link>
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbLink asChild>
-                        <Link
-                          to="/client-panel/project-builder/publish"
-                          className="text-[#356DF0]"
-                        >
-                          Publish
-                        </Link>
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-[#356DF0]">
-                        Import CSV
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                )}
-                {isProjectBuilderPage &&
-                  !isPublishPage &&
-                  !isImportCSVPage &&
-                  projectName && (
-                    <>
-                      <BreadcrumbSeparator />
-                      <BreadcrumbItem>
-                        <BreadcrumbPage className="text-[#356DF0]">
-                          {projectName}
-                        </BreadcrumbPage>
-                      </BreadcrumbItem>
-                    </>
+                  {item.isPage ? (
+                    <BreadcrumbPage className="text-[#356DF0]">
+                      {item.label}
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Link
+                        to={item.path || "#"}
+                        className={
+                          index > 0
+                            ? "text-[#356DF0] font-semibold flex items-center gap-1"
+                            : ""
+                        }
+                      >
+                        {item.icon &&
+                          isValidElement(item.icon) &&
+                          cloneElement(
+                            item.icon as ReactElement<{ className?: string }>,
+                            { className: "w-4 h-4" },
+                          )}
+                        {item.label}
+                      </Link>
+                    </BreadcrumbLink>
                   )}
-              </>
-            )}
-            {isProjectDetailsPage && !isOverviewProjectDetailsPage && (
-              <>
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="text-[#356DF0]">
-                    {projectName}
-                  </BreadcrumbPage>
                 </BreadcrumbItem>
-              </>
-            )}
+                {index < breadcrumbData.length - 1 && <BreadcrumbSeparator />}
+              </React.Fragment>
+            ))}
           </BreadcrumbList>
         </Breadcrumb>
       </div>
 
-      {isProjectDetailsPage && (
+      {/* Modals */}
+      {isEmployeeModalOpen && (
+        <AddEmployeeModal
+          open={isEmployeeModalOpen}
+          onClose={() => setIsEmployeeModalOpen(false)}
+        />
+      )}
+      {isProjectModalOpen && isPage.programOverview && (
+        <CreateProject
+          programId={programId as string}
+          onClose={() => setIsProjectModalOpen(false)}
+          onSuccess={handleProjectSuccess}
+        />
+      )}
+      {isProjectModalOpen && isPage.highway && (
+        <NewProjectModal
+          open={isProjectModalOpen}
+          onClose={() => setIsProjectModalOpen(false)}
+          onSuccess={(name: string) => {
+            setIsProjectModalOpen(false);
+            setSuccessData({ programName: name || "New Project", id: "" });
+            setSuccessOpen(true);
+          }}
+        />
+      )}
+      {activeModal === "Add Program" && (
+        <CreateProgramModal
+          open
+          onOpenChange={(open) => !open && setActiveModal(null)}
+          onSuccess={handleProgramSuccess}
+          title="Add Program"
+        />
+      )}
+      {successOpen && (
+        <SuccessModal
+          open={successOpen}
+          onOpenChange={setSuccessOpen}
+          programName={successData.programName}
+          redirectPath={`/client-panel/program-builder`}
+        />
+      )}
+      {projectSuccessOpen && projectSuccessData && (
+        <ProjectSuccessModal
+          open={projectSuccessOpen}
+          onOpenChange={setProjectSuccessOpen}
+          projectName={projectSuccessData.projectName}
+          projectId={projectSuccessData.projectId}
+          programId={programId}
+        />
+      )}
+
+      {/* Upload Dialog */}
+      {isPage.projectDetails && (
         <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
           <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] overflow-y-auto p-0 border-0 bg-transparent shadow-none [&>button]:right-4 [&>button]:top-4 [&>button]:bg-white [&>button]:rounded-full [&>button]:p-1">
             <FileUpload
