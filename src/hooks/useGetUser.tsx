@@ -12,7 +12,7 @@ const Role = {
 };
 
 export const useGetUser = () => {
-  const { data, isLoading, isError } = useGetProfileQuery({});
+  const { data, isLoading, isError } = useGetProfileQuery();
   const user = data?.data as User | undefined;
   const currentRoute =
     user?.role && Role[user.role as keyof typeof Role]
@@ -25,7 +25,9 @@ export const useGetUser = () => {
     error: isError,
     name: user?.name || "",
     role: user?.role || "",
-    profileImage: user?.profileImage || "",
+    profileImage:
+      import.meta.env.VITE_API_BASE_URL?.replace("/api/v1", "/") +
+        user?.profileImage || "",
     email: user?.email || "",
     id: user?.id || "",
     status: user?.status || "",

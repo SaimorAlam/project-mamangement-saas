@@ -1,8 +1,15 @@
+import { ManagerUser } from "@/types/User";
 import baseApi from "../BaseApi/BaseApi";
+
+export interface GenericResponse<T> {
+  status: string;
+  message: string;
+  data: T;
+}
 
 const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllUsers: builder.query({
+    getAllUsers: builder.query<GenericResponse<ManagerUser[]>, Record<string, string | number | boolean>>({
       query: (args) => {
         const params = new URLSearchParams();
         Object.entries(args).forEach(([key, value]) => {
@@ -18,14 +25,14 @@ const userApi = baseApi.injectEndpoints({
       },
       providesTags: ["Users"],
     }),
-    getProfile: builder.query({
+    getProfile: builder.query<GenericResponse<ManagerUser>, void>({
       query: () => ({
         url: "/users/profile",
         method: "GET",
       }),
       providesTags: ["Users"],
     }),
-    updateUsers: builder.mutation({
+    updateUsers: builder.mutation<GenericResponse<ManagerUser>, FormData | Record<string, string | boolean | number | null>>({
       query: (data) => ({
         url: "/users",
         method: "PATCH",
