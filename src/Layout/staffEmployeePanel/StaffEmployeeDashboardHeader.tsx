@@ -60,8 +60,6 @@ const StaffEmployeeDashboardHeader = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 grow">
-          {/* Search */}
           <GlobalSearch />
 
           {/* Right Controls */}
@@ -120,7 +118,6 @@ const StaffEmployeeDashboardHeader = () => {
               />
             )}
           </div>
-        </div>
       </div>
 
       {/* Breadcrumb */}
