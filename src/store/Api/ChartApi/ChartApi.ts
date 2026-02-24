@@ -81,6 +81,24 @@ const chartApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Charts"],
     }),
+    createProgramChart: builder.mutation({
+      query: (data) => {
+        console.log(data);
+        return {
+          url: `/chart/create-chart-build`,
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["Charts"],
+    }),
+    getProgramBuilderChart: builder.query({
+      query: (id: string) => ({
+        url: `/chart/program-builder/program/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Charts"],
+    }),
   }),
 });
 
@@ -91,11 +109,15 @@ export const {
   useGetChartByIdQuery,
   useLazyGetChartByIdQuery,
   useGetChartByProjectIdQuery,
+  useLazyGetChartByProjectIdQuery,
   useGetRootChartQuery,
+  useLazyGetRootChartQuery,
   useFindChildrenValueQuery,
   useLazyFindChildrenValueQuery,
   useGetAllTheLeafChartQuery,
   useLazyGetAllTheLeafChartQuery,
   useUploadChartDataMutation,
+  useCreateProgramChartMutation,
+  useGetProgramBuilderChartQuery,
 } = chartApi;
 export default chartApi;

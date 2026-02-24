@@ -236,10 +236,16 @@ export default function PieChartWidget({
               parsed.length > 0 &&
               Array.isArray(parsed[0])
             ) {
-              xAxisLabels = parsed.slice(1).map((row: any) => row[0]);
+              // Smart header detection: a header row has legend labels (strings) in data columns.
+              // We skip it because the download process manually adds a header row.
+              const hasHeader =
+                parsed[0].length > 1 && typeof parsed[0][1] === "string";
+              xAxisLabels = (hasHeader ? parsed.slice(1) : parsed).map(
+                (row: any) => row[0],
+              );
             }
-          } catch (e) {
-            console.error("Failed to parse xAxis for node", node.id, e);
+          } catch {
+            toast.error("Failed to parse xAxis for node");
           }
         }
 
@@ -269,8 +275,7 @@ export default function PieChartWidget({
       const filename = `${widgetTitle}_ID_${ids.join("_")}.xlsx`;
       XLSX.writeFile(wb, filename);
       toast.success("Excel downloaded successfully");
-    } catch (error) {
-      console.error("Excel download failed", error);
+    } catch {
       toast.error("Failed to download Excel");
     } finally {
       setIsDownloading(false);

@@ -8,46 +8,104 @@ This workflow documents the complete end-to-end data flow for chart creation, co
 
 ---
 
-## Architecture Overview
+## Architecture & Prop Flow
 
+This diagram illustrates how props and actions flow through the component hierarchy during chart creation and after publishing.
+
+### 1. Component & Prop Hierarchy
+```mermaid
+flowchart TD
+    subgraph "Parent Context: Project Builder"
+        PB["<b>ClientProjectBuilder.tsx</b><br/><i>State: selectedWidgets</i>"]
+    end
+
+    PB -- "selectedWidgets,<br/>handleWidgetDelete()" --> View["<b>ProjectDashboardView.tsx</b>"]
+
+    subgraph "Dynamic Creation Phase"
+        View -- "onDelete,<br/>isPreview=false" --> Module["<b>ChartModule</b><br/>(e.g., StackedBarChartModule)"]
+        Module -- "isCreationMode=true,<br/>onToggleWidget" --> Chart["<b>ChartComponent</b><br/>(e.g., StackedBarChart)"]
+        Module -- "onDelete, onClose" --> Config["<b>WidgetConfig</b><br/>(WidgetForChartModuleOne)"]
+    end
+
+    subgraph "Published / Persistent Phase"
+        View -- "Refetched Data" --> DC["<b>DefaultChartData.tsx</b>"]
+        DC -- "isPreview=true" --> ChartP["<b>ChartComponent</b><br/>(Static View)"]
+    end
+
+    Config -- "Mutation Success" --> Action["onDelete() + onClose()"]
+    Action -- "Clears sidebar selection" --> PB
 ```
-┌──────────────────────────────────┐
-│   Project Builder (Creation)     │
-│  ┌────────────────────────────┐  │
-│  │   Chart Module (per type)  │  │
-│  │   e.g. LineChartModule     │  │
-│  └──────────┬─────────────────┘  │
-│             │ renders             │
-│  ┌──────────▼─────────────────┐  │
-│  │  Configuration Component   │  │
-│  │  (WidgetForChartModuleOne  │  │
-│  │   or PieChartConfig)       │  │
-│  └──────────┬─────────────────┘  │
-│             │ handleSaveChanges   │
-│  ┌──────────▼─────────────────┐  │
-│  │  createChart API mutation  │  │
-│  └──────────┬─────────────────┘  │
-└─────────────┼────────────────────┘
-              │ persisted to backend
-              ▼
-┌──────────────────────────────────┐
-│   Dashboard (Project Details)    │
-│  ┌────────────────────────────┐  │
-│  │  DashboardTab / Default    │  │
-│  │  ChartData renderer        │  │
-│  └──────────┬─────────────────┘  │
-│             │ parses + renders    │
-│  ┌──────────▼─────────────────┐  │
-│  │  Chart Component           │  │
-│  │  (wrapped in ChartCard-    │  │
-│  │   Wrapper)                 │  │
-│  └──────────┬─────────────────┘  │
-│             │ user interactions   │
-│  ┌──────────▼─────────────────┐  │
-│  │  Tier / Download / Upload  │  │
-│  └────────────────────────────┘  │
-└──────────────────────────────────┘
+
+### 2. Chart Creation Sequence
+```mermaid
+sequenceDiagram
+    participant PB as ClientProjectBuilder
+    participant View as ProjectDashboardView
+    participant Module as ChartModule
+    participant Chart as ChartComponent
+    participant Config as WidgetConfig
+    participant API as ChartApi (Backend)
+
+    PB->>View: Prop: selectedWidgets, handleWidgetDelete
+    View->>Module: Prop: onDelete={handleWidgetDelete}, isPreview=false
+    
+    Module->>Chart: Render (Sample Data mode)
+    Note over Module, Chart: User clicks gear icon
+    Module->>Config: Render Config Panel
+    
+    Note over Config, API: User clicks 'Save Changes'
+    Config->>API: createChart(payload)
+    API-->>Config: { success: true }
+    
+    Note right of Config: Success Callback
+    Config->>Module: onClose() (Hides UI)
+    Config->>PB: onDelete() (Removes widget ID from selection)
+    
+    Note over PB, View: State Update triggers refetch
+    View->>API: useGetRootChartQuery()
+    API-->>View: Fetched Charts Data
+    View->>Chart: Render in DefaultChartData (Real Data mode)
 ```
+
+### 3. Visual logic Flow (Prop Passing)
+```text
+[ ClientProjectBuilder ]
+   │
+   │ prop: handleWidgetDelete ────────────────┐
+   ▼                                          │
+[ ProjectDashboardView ]                      │
+   │                                          │
+   │ prop: onDelete={handleWidgetDelete} ─────┤
+   ▼                                          │
+[ ChartModule (e.g. StackedBarChartModule) ]  │
+   │                                          │
+   ├─ prop: onToggleWidget ──▶ [ Chart Component ]
+   │                                          │
+   └─ prop: onDelete={onDelete} ──────────────▼
+                                     [ WidgetConfig Panel ]
+                                              │
+                                              │ API Success
+                                              ▼
+                                     ┌──────────────────┐
+                                     │  onDelete() Call │ ───▶ [ Triggers Parent State Update ]
+                                     └──────────────────┘
+```
+
+---
+
+## Detailed Component Roles & Lifecycle
+
+This section explains the logical responsibility of each component and how they link together.
+
+| Component | Primary Task | Why? (Rationale) | Connection: Before | Connection: After |
+| :--- | :--- | :--- | :--- | :--- |
+| **ClientProjectBuilder** | Root state holder & orchestrator. | Centralizes the user's sidebar selections so they persist across re-renders. | **User Input:** Widget sidebar click. | **ProjectDashboardView:** Passes selected IDs down. |
+| **ProjectDashboardView** | Layout manager & data fetcher. | Decides whether to show "Placeholder" charts (Creation mode) or "Real" charts (API mode). | **ClientProjectBuilder:** Receives `selectedWidgets`. | **DefaultChartData:** Passes refetched API data. |
+| **ChartRegistry** | Central lookup table. | Decouples the sidebar from the components; allows adding new chart types in one place. | **ProjectDashboardView:** Looked up via widget ID. | **Chart Module:** Lazy-loads the specific module. |
+| **Chart Module** *(e.g. StackedBarModule)* | Local configuration state manager. | Encapsulates colors, ranges, and titles *before* they are saved to the server. | **ChartRegistry:** Rendered when a widget is selected. | **WidgetConfig + ChartComponent:** Passes local states to both. |
+| **WidgetConfig** *(Panel)* | API interface & data validation. | Handles the complex logic of preparing the JSON payload for the `createChart` mutation. | **Chart Module:** Triggered when user clicks the "Gear" icon. | **Backend API:** Sends data. **Parent State:** Calls `onDelete` to clear selection. |
+| **DefaultChartData** / **DashboardTab** | Persisted data mapper. | Maps the flat API list of charts back into their specific visual components. | **ProjectDashboardView / API:** Receives fetched chart list. | **Chart Component:** Renders the final visual chart with `isPreview=true`. |
+| **Chart Component** *(e.g. StackedBarChart)* | Data visualization engine. | Purely responsible for rendering the chart and handling Excel exports/tiers. | **Chart Module** (Creation) or **DefaultChartData** (Published). | **Visual Output:** Displays to user. |
 
 ---
 

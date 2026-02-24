@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Parse xAxis data from LINE chart API response
- * Format: [["day", "line1", "line2"], ["Jan", 10, 20], ["Feb", 15, 25], ...]
+ * Format: [["Jan", 10, 20], ["Feb", 15, 25], ...]
+ * All rows are data rows — no header row in the new format.
  * Returns: { labels: ["Jan", "Feb", ...], data: { [sheetName]: [...] } }
  */
 
@@ -41,22 +42,26 @@ export const parseLineChartData = (
     return { labels: [], data: {} as { [key: string]: LineChartData[] } };
   }
 
-  // First row is the header
-  const headers = parsedXAxis[0];
-  if (!Array.isArray(headers) || headers.length === 0) {
-    return { labels: [], data: {} as { [key: string]: LineChartData[] } };
-  }
+  // Smart header detection: a header row has legend labels (strings) in data columns,
+  // whereas data rows have numbers (0 by default in creation mode).
+  const hasHeader =
+    parsedXAxis.length > 0 &&
+    Array.isArray(parsedXAxis[0]) &&
+    parsedXAxis[0].length > 1 &&
+    typeof parsedXAxis[0][1] === "string";
 
-  // Extract labels from the first column of data rows (skip header)
-  const labels = parsedXAxis.slice(1).map((row: any) => String(row[0] || ""));
+  const dataRows = hasHeader ? parsedXAxis.slice(1) : parsedXAxis;
 
-  // Transform data into the format expected by LineChart
-  const chartData: LineChartData[] = parsedXAxis.slice(1).map((row: any) => {
+  // Extract labels from the first column of every data row
+  const labels = dataRows.map((row: any) => String(row[0] || ""));
+
+  // Transform data: first element is the label, subsequent elements are dataset values
+  const chartData: LineChartData[] = dataRows.map((row: any) => {
     const dataPoint: LineChartData = { name: String(row[0] || "") };
 
     // Map each legend to its corresponding column value
     legendValues.forEach((legend, index) => {
-      const columnIndex = index + 1; // Skip first column (label)
+      const columnIndex = index + 1; // values start at index 1
       dataPoint[legend.field] = Number(row[columnIndex]) || 0;
     });
 

@@ -10,7 +10,7 @@ import ProjectWidget from "@/common/Charts/CompletedCharts/Widgets/ProjectWidget
 import GanttChart from "@/common/Charts/GanttChart";
 
 import LineChartModule from "@/common/Charts/CompletedCharts/LineChart/LineChartModule";
-import ChartModuleOne from "@/components/client/ProjectBuilder/chartModules/ChartModuleOne";
+import ChartModuleOne from "@/common/Charts/CompletedCharts/ChartModule/ChartModuleOne";
 // import ChartModuleTwo from "@/components/client/ProjectBuilder/chartModules/ChartModuleTwo";
 import PieChartModule from "../../common/Charts/CompletedCharts/PieChart/PieChartModule";
 import HorizontalBarChartModule from "../../common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChartModule";

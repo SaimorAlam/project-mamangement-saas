@@ -325,6 +325,14 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     }
   }, [reduxProgramId, reduxProjectId, selectedProgram, selectedProject]);
 
+  // Clear projectId from slice if in Program Builder context
+  useEffect(() => {
+    if (isProgramBuilder) {
+      dispatch(setProjectId(""));
+      setSelectedProject("");
+    }
+  }, [isProgramBuilder, dispatch]);
+
   const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setSelectedProgram(val);

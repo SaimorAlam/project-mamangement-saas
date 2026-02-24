@@ -3,6 +3,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { Trash2, Download } from "lucide-react";
 import { MdOutlineWidgets } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
+// import { useLocation } from "react-router-dom";
 
 type MenuActions = {
   onCopy?: () => void;
@@ -41,6 +42,8 @@ const ChartCardWrapper = ({
   className = "",
   isPreview = false,
 }: Props) => {
+  // const location = useLocation()
+  // const isProgramBuilder = location.pathname.includes("program-builder")
   const [showPopover, setShowPopover] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
   console.log(chartId);

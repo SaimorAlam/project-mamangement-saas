@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
-// import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { useAppSelector } from "@/hooks/useRedux";
-import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
+import {
+  useCreateChartMutation,
+  useCreateProgramChartMutation,
+  useLazyGetRootChartQuery,
+} from "@/store/Api/ChartApi/ChartApi";
+import { useLazyGetProjectsByProgramIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { toast } from "sonner";
 import { useGetUser } from "@/hooks/useGetUser";
 import { useLocation } from "react-router-dom";
@@ -52,13 +56,20 @@ const WidgetForChartModuleOne = ({
   onClose?: () => void;
   onDelete?: () => void;
 }) => {
+  // ── detect Program Builder context ────────────────────────────────────────
+  const { pathname, state: locationState } = useLocation();
+  const isProgramBuilder = pathname.split("/")[2] === "program-builder";
+  const projectIdFromState = (locationState as { projectId?: string } | null)
+    ?.projectId;
+
   const [projectId, setProjectId] = useState<string>("");
   const { name, role, profileImage, loading } = useGetUser();
   const projectIdFromSlice = useAppSelector(
     (state) => state?.chartSlice?.projectId,
   );
-  const location = useLocation();
-  const projectIdFromState = location.state?.projectId;
+  const programIdFromSlice = useAppSelector(
+    (state) => state?.chartSlice?.programId,
+  );
 
   useEffect(() => {
     if (projectIdFromSlice) {
@@ -68,6 +79,127 @@ const WidgetForChartModuleOne = ({
       setProjectId(projectIdFromState);
     }
   }, [projectIdFromSlice, projectIdFromState]);
+
+  // ── Program Builder: Y-Axis cascading state ───────────────────────────────
+  const [yAxisProjectId, setYAxisProjectId] = useState<string>("");
+  const [yAxisChartId, setYAxisChartId] = useState<string>("");
+  const [yAxisDataScope, setYAxisDataScope] = useState<string>("");
+  const [createProgramChart] = useCreateProgramChartMutation();
+  const [
+    getProjectsByProgram,
+    { data: programProjectsData, isLoading: isProgramProjectsLoading },
+  ] = useLazyGetProjectsByProgramIdQuery();
+
+  const [
+    getRootChartByProject,
+    { data: projectChartsData, isLoading: isProjectChartsLoading },
+  ] = useLazyGetRootChartQuery();
+
+  // Fetch projects when entering program-builder context
+  useEffect(() => {
+    if (isProgramBuilder && programIdFromSlice) {
+      getProjectsByProgram({ programId: programIdFromSlice });
+    }
+  }, [isProgramBuilder, programIdFromSlice, getProjectsByProgram]);
+
+  // Fetch root charts when a project is selected in y-axis panel
+  useEffect(() => {
+    if (isProgramBuilder && yAxisProjectId) {
+      getRootChartByProject(yAxisProjectId);
+    }
+  }, [isProgramBuilder, yAxisProjectId, getRootChartByProject]);
+
+  // Loose API item type used only within this component for response mapping
+  type RawApiItem = Record<string, unknown>;
+
+  const programProjects: { id: string; name: string }[] =
+    (programProjectsData?.data?.data as RawApiItem[] | undefined)?.map((p) => ({
+      id: p.id as string,
+      name: p.name as string,
+    })) ?? [];
+
+  const rootCharts: { id: string; title: string; xAxis: unknown }[] = (
+    (projectChartsData?.data ?? []) as RawApiItem[]
+  ).map((c) => ({
+    id: c.id as string,
+    title: c.title as string,
+    xAxis: c.xAxis,
+  }));
+
+  const selectedRootChart = rootCharts.find((c) => c.id === yAxisChartId);
+
+  // Parse xAxis labels — skip header row, take first column of each data row
+  const xAxisSliceLabels: string[] = (() => {
+    if (!selectedRootChart?.xAxis) return [];
+    try {
+      let parsed: unknown = selectedRootChart.xAxis;
+      if (typeof parsed === "string") {
+        parsed = JSON.parse(parsed);
+      }
+      // Handle scenario where it's wrapped in { labels: [...] }
+      if (parsed && !Array.isArray(parsed) && typeof parsed === "object") {
+        parsed = (parsed as Record<string, unknown>).labels;
+      }
+
+      if (Array.isArray(parsed)) {
+        // If it's a 2D array of [label, value, ...], take first column
+        if (Array.isArray(parsed[0])) {
+          return (parsed as unknown[][]).map((row) => String(row[0] || ""));
+        }
+        // If it's already a flat array of labels
+        return (parsed as unknown[]).map((v) => String(v));
+      }
+      return [];
+    } catch (err) {
+      console.error("Error parsing xAxis for mapping:", err);
+      return [];
+    }
+  })();
+  const [mappedData, setMappedData] = useState<
+    (null | { projectId: string; charttableId: string; rowname: string })[]
+  >([]);
+
+  const handleAddMapping = () => {
+    if (!yAxisDataScope) {
+      toast.error("Please select a data scope first");
+      return;
+    }
+
+    // Find first empty index in xAxisValues (up to numOfXAxisDataSet)
+    let targetIndex = -1;
+    for (let i = 0; i < numOfXAxisDataSet; i++) {
+      if (!xAxisValues[i]) {
+        targetIndex = i;
+        break;
+      }
+    }
+
+    if (targetIndex === -1) {
+      toast.error(
+        "All X-Axis fields are filled. Increase frequency/dataset count if needed.",
+      );
+      return;
+    }
+
+    // Map the selected scope to the next available X-axis field
+    handleXAxisValueChange(targetIndex, yAxisDataScope);
+
+    setMappedData((prev) => {
+      const next = [...prev];
+      // Ensure the array is long enough
+      while (next.length <= targetIndex) {
+        next.push(null);
+      }
+      next[targetIndex] = {
+        projectId: yAxisProjectId,
+        charttableId: yAxisChartId,
+        rowname: yAxisDataScope,
+      };
+      return next;
+    });
+
+    toast.success(`Mapped "${yAxisDataScope}" to Field ${targetIndex + 1}`);
+  };
 
   const [filter, setFilter] = useState<string>("");
   const [showFilter, setShowFilter] = useState(false);
@@ -133,7 +265,6 @@ const WidgetForChartModuleOne = ({
       return updated;
     });
   };
-
   // const [_getChartTitleId, { isLoading }] = useGetChartTitleIdMutation();
 
   const handleSaveChanges = async () => {
@@ -145,11 +276,16 @@ const WidgetForChartModuleOne = ({
       }
     }
 
-    for (let i = 0; i < xAxisValues.length; i++) {
+    for (let i = 0; i < numOfXAxisDataSet; i++) {
       if (!xAxisValues[i]) {
         toast.error(`Please fill in the value for X-Axis field ${i + 1}`);
         return;
       }
+    }
+
+    if (numOfXAxisDataSet < 1) {
+      toast.error(`Please add at least 1 X-Axis value`);
+      return;
     }
 
     if (legendValues.length < minLegend) {
@@ -158,44 +294,110 @@ const WidgetForChartModuleOne = ({
       );
       return;
     }
-    if (xAxisValues.length < 1) {
-      toast.error(`Please add at least 1 X-Axis value`);
-      return;
-    }
     if (!widgetCategory) {
       toast.error(`Please input category : ${widgetCategory}`);
       console.log("category: ", widgetCategory);
       return;
     }
 
+    if (isProgramBuilder) {
+      if (!yAxisProjectId) {
+        toast.error("Please select a project for Y-Axis mapping");
+        return;
+      }
+      if (!yAxisChartId) {
+        toast.error("Please select a source chart for Y-Axis mapping");
+        return;
+      }
+      if (!yAxisDataScope) {
+        toast.error("Please select a data scope for Y-Axis mapping");
+        return;
+      }
+    }
+
     const toastId = toast.loading("Creating chart...");
+    // const payload = {
+    //   numberOfDataset: numOfLegendDataSet,
+    //   firstFieldDataset: startingRange,
+    //   lastFieldDataset: endingRange,
+    //   widgets: legendValues.map((l) => ({
+    //     legendName: l.label,
+    //     color: l.color,
+    //   })),
+    //   title: widgetTitle,
+    //   status: "ACTIVE",
+    //   category: widgetCategory,
+    //   xAxis: JSON.stringify([
+    //     // ["Label", ...legendValues.map((l) => l.label)],
+    //     ...xAxisValues.map((label) => [
+    //       label,
+    //       ...Array(numOfLegendDataSet).fill(0),
+    //     ]),
+    //   ]),
+    //   yAxis: JSON.stringify({}),
+    //   zAxis: JSON.stringify({}),
+    //   projectId: projectId ? projectId : projectIdFromState,
+    //   ...(isProgramBuilder && {
+    //     programid: programIdFromSlice,
+    //     projectnumber: numOfXAxisDataSet,
+    //     filter_By: filter || "string",
+    //     valueDiteacts: mappedData
+    //       .slice(0, numOfXAxisDataSet)
+    //       .filter((item): item is NonNullable<typeof item> => !!item),
+    //   }),
+    //   rootchart: true,
+    //   roottitle: widgetTitle,
+    //   grouptitle: widgetTitle,
+    // };
     const payload = {
       numberOfDataset: numOfLegendDataSet,
       firstFieldDataset: startingRange,
       lastFieldDataset: endingRange,
+
       widgets: legendValues.map((l) => ({
         legendName: l.label,
         color: l.color,
       })),
+
+      filter_By: filter || "string",
       title: widgetTitle,
       status: "ACTIVE",
       category: widgetCategory,
-      xAxis: JSON.stringify([
-        // ["Label", ...legendValues.map((l) => l.label)],
-        ...xAxisValues.map((label) => [
-          label,
-          ...Array(numOfLegendDataSet).fill(0),
+
+      // -------- PROJECT-SPECIFIC FIELDS --------
+      ...(!isProgramBuilder && {
+        xAxis: JSON.stringify([
+          [widgetTitle, ...legendValues.map((l) => l.label)],
+          ...xAxisValues.map((label) => [
+            label,
+            ...Array(numOfLegendDataSet).fill(0),
+          ]),
         ]),
-      ]),
-      yAxis: JSON.stringify({}),
-      zAxis: JSON.stringify({}),
-      projectId: projectId ? projectId : projectIdFromState,
-      rootchart: true,
-      roottitle: widgetTitle,
-      grouptitle: widgetTitle,
+
+        yAxis: JSON.stringify([]),
+        zAxis: JSON.stringify([]),
+
+        projectId: projectId ?? projectIdFromState,
+        rootchart: true,
+        roottitle: widgetTitle,
+        grouptitle: widgetTitle,
+      }),
+
+      // -------- PROGRAM-SPECIFIC FIELDS --------
+      ...(isProgramBuilder && {
+        programid: programIdFromSlice,
+        projectnumber: numOfXAxisDataSet,
+
+        valueDiteacts: mappedData
+          .slice(0, numOfXAxisDataSet)
+          .filter((item): item is NonNullable<typeof item> => !!item),
+      }),
     };
+
     try {
-      const res = await createChart(payload).unwrap();
+      const res = isProgramBuilder
+        ? await createProgramChart(payload).unwrap()
+        : await createChart(payload).unwrap();
       if (res?.success) {
         toast.success("Chart created successfully", { id: toastId });
         onDelete?.();
@@ -280,9 +482,16 @@ const WidgetForChartModuleOne = ({
                           : "th"
                   } field name here...`}
                   value={xAxisValues[index] || ""}
-                  onChange={(e) =>
-                    handleXAxisValueChange(index, e.target.value)
-                  }
+                  onChange={(e) => {
+                    handleXAxisValueChange(index, e.target.value);
+                    if (isProgramBuilder) {
+                      setMappedData((prev) => {
+                        const next = [...prev];
+                        next[index] = null;
+                        return next;
+                      });
+                    }
+                  }}
                   className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none"
                 />
               ))}
@@ -357,10 +566,10 @@ const WidgetForChartModuleOne = ({
             Data Mapping for Y-Axis
           </h3>
 
-          {/* Number of Data sets */}
+          {/* Number of Data sets (Legends) */}
           <div className="flex items-center mb-3">
             <label className="text-xs text-gray-700 flex-1">
-              Number of Data sets:
+              Number of Legend sets:
             </label>
             <input
               type="number"
@@ -372,31 +581,187 @@ const WidgetForChartModuleOne = ({
             />
           </div>
 
-          {/* 1st field Data */}
-          <div className="flex items-center mb-2">
-            <label className="text-xs text-gray-700 flex-1">
-              1st field Data:
-            </label>
-            <input
-              type="number"
-              onChange={(e) => setStartingRange(Number(e.target.value))}
-              defaultValue={startingRange}
-              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
-            />
-          </div>
+          {isProgramBuilder ? (
+            /* ── Program Builder: cascading Project → Chart → Scope dropdowns ── */
+            <div className="space-y-3">
+              {/* Project */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-700 w-24 shrink-0">
+                  Project:
+                </label>
+                <div className="relative flex-1">
+                  <select
+                    value={yAxisProjectId}
+                    onChange={(e) => {
+                      setYAxisProjectId(e.target.value);
+                      setYAxisChartId("");
+                      setYAxisDataScope("");
+                    }}
+                    disabled={isProgramProjectsLoading}
+                    className="w-full pr-7 pl-2 py-1.5 bg-white border border-gray-300 rounded text-xs text-gray-600 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    <option value="">
+                      {isProgramProjectsLoading
+                        ? "Loading..."
+                        : "Select project"}
+                    </option>
+                    {programProjects.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg
+                      className="w-3 h-3 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
 
-          {/* Last field Data */}
-          <div className="flex items-center mb-2">
-            <label className="text-xs text-gray-700 flex-1">
-              Last field Data:
-            </label>
-            <input
-              type="number"
-              onChange={(e) => setEndingRange(Number(e.target.value))}
-              defaultValue={endingRange}
-              className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
-            />
-          </div>
+              {/* Source Chart */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-700 w-24 shrink-0">
+                  Source Chart:
+                </label>
+                <div className="relative flex-1">
+                  <select
+                    value={yAxisChartId}
+                    onChange={(e) => {
+                      setYAxisChartId(e.target.value);
+                      setYAxisDataScope("");
+                    }}
+                    disabled={!yAxisProjectId || isProjectChartsLoading}
+                    className="w-full pr-7 pl-2 py-1.5 bg-white border border-gray-300 rounded text-xs text-gray-600 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    <option value="">
+                      {isProjectChartsLoading
+                        ? "Loading..."
+                        : !yAxisProjectId
+                          ? "Select project first"
+                          : rootCharts.length === 0
+                            ? "No root charts"
+                            : "Select chart"}
+                    </option>
+                    {rootCharts.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg
+                      className="w-3 h-3 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Data Scope — xAxis slice labels */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-700 w-24 shrink-0">
+                  Data Scope:
+                </label>
+                <div className="relative flex-1">
+                  <select
+                    value={yAxisDataScope}
+                    onChange={(e) => setYAxisDataScope(e.target.value)}
+                    disabled={!yAxisChartId || xAxisSliceLabels.length === 0}
+                    className="w-full pr-7 pl-2 py-1.5 bg-white border border-gray-300 rounded text-xs text-gray-600 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    <option value="">
+                      {!yAxisChartId
+                        ? "Select chart first"
+                        : xAxisSliceLabels.length === 0
+                          ? "No labels found"
+                          : "Select scope"}
+                    </option>
+                    {xAxisSliceLabels.map((label) => (
+                      <option key={label} value={label}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg
+                      className="w-3 h-3 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Map to X-Axis Button */}
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={handleAddMapping}
+                  disabled={!yAxisDataScope}
+                  className="px-3 py-1.5 text-[10px] font-semibold text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
+                >
+                  Map to X-Axis
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* ── Project Builder: standard numeric range inputs ── */
+            <div className="space-y-2">
+              {/* 1st field Data */}
+              <div className="flex items-center">
+                <label className="text-xs text-gray-700 flex-1">
+                  1st field Data:
+                </label>
+                <input
+                  type="number"
+                  onChange={(e) => setStartingRange(Number(e.target.value))}
+                  defaultValue={startingRange}
+                  className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+                />
+              </div>
+
+              {/* Last field Data */}
+              <div className="flex items-center">
+                <label className="text-xs text-gray-700 flex-1">
+                  Last field Data:
+                </label>
+                <input
+                  type="number"
+                  onChange={(e) => setEndingRange(Number(e.target.value))}
+                  defaultValue={endingRange}
+                  className="w-16 px-2 py-1 text-xs text-center border border-gray-300 rounded focus:outline-none"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Display Settings Section */}
