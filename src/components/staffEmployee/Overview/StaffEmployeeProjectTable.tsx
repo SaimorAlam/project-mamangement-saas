@@ -21,7 +21,7 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
+import { AssignedStaffAvatars } from "@/components/client/AssignedStaffAvatars";
 // import DeleteModal from "@/common/Modal/DeleteModal";
 // import { useDeleteManagerProjectMutation } from "@/store/Api/staffManagerApi/StaffManagerApi";
 // import EditProjectModal from "./EditProjectModal";
@@ -256,12 +256,19 @@ const StaffEmployeeProjectTable = ({
                                 </TableCell>
 
                                 <TableCell className="px-6 py-3.5">
-                                    <RenderStaffAvatars
-                                        staff={Array.from({ length: 3 }, (_, i) => ({
-                                            id: i.toString(),
-                                            name: `Staff ${i + 1}`,
-                                            avatar: "https://randomuser.me/api/portraits/men/19.jpg",
-                                        }))}
+                                    <AssignedStaffAvatars
+                                        manager={(project as any).manager}
+                                        employees={Array.isArray((project as any).projectEmployees)
+                                            ? (project as any).projectEmployees.map((pe: any) => pe.employee)
+                                            : (project as any).projectEmployees
+                                                ? [(project as any).projectEmployees.employee]
+                                                : []}
+                                        viewers={Array.isArray((project as any).projectViewers)
+                                            ? (project as any).projectViewers.map((pv: any) => pv.viewer)
+                                            : (project as any).projectViewers
+                                                ? [(project as any).projectViewers.viewer]
+                                                : []}
+                                        maxVisible={3}
                                     />
                                 </TableCell>
 
