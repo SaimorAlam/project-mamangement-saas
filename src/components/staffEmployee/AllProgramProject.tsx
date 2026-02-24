@@ -309,7 +309,7 @@ const AllProgramProject = ({
             projects={projects as StaffEmployeeProject[]}
           />
 
-        {showViewAll  ? (
+          {showViewAll ? (
             <div className="pt-2">
               <Link to="/staff-employee-panel/projects">
                 <Button
@@ -322,19 +322,19 @@ const AllProgramProject = ({
                 </Button>
               </Link>
             </div>
-          ):(
-          <Pagination
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            itemsPerPage={itemsPerPage}
-            totalPages={totalPages}
-            filteredDataLength={projects.length}
-          />
+          ) : (
+            <Pagination
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              itemsPerPage={itemsPerPage}
+              totalPages={totalPages}
+              filteredDataLength={projects.length}
+            />
           )}
         </div>
       ) : (
         <div className="border border-gray-100 rounded-md min-h-88 p-2">
-          <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-4 gap-5">
             {projects?.map((projectData: StaffEmployeeProject) => {
               return (
                 <div key={projectData.id}>
@@ -343,7 +343,7 @@ const AllProgramProject = ({
               );
             })}
           </div>
-          {showViewAll  ? (
+          {showViewAll ? (
             <div className="pt-2">
               <Link to="/staff-employee-panel/projects">
                 <Button
@@ -356,16 +356,16 @@ const AllProgramProject = ({
                 </Button>
               </Link>
             </div>
-          ):(
+          ) : (
             <div className="mt-3">
-          <Pagination
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            itemsPerPage={itemsPerPage}
-            totalPages={totalPages}
-            filteredDataLength={projects.length}
-          />
-          </div>
+              <Pagination
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                totalPages={totalPages}
+                filteredDataLength={projects.length}
+              />
+            </div>
           )}
         </div>
       )}
