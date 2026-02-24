@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Filter,
   TableIcon,
+  Search,
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
@@ -17,10 +18,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+<<<<<<< HEAD
+import { useGetEmployeeAllProjectsQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
+=======
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
+>>>>>>> 57f4376ef2bbcf78557de2edd2a515bef480948c
 import Pagination from "@/components/client/Pagination";
 import { useEmployeeId } from "@/hooks/useEmployeeId";
-import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import DropdownSelect from "@/common/DropdownSelect";
 import PrimaryButton from "@/common/PrimaryButton";
 import StaffEmployeeProjectTable from "./Overview/StaffEmployeeProjectTable";
@@ -84,7 +88,19 @@ export interface StaffEmployeeProject {
   };
 }
 
-const AllProgramProject = () => {
+interface AllProgramProjectProps {
+  limit?: number;
+  showViewAll?: boolean;
+  showSearch?: boolean;
+  title?: string;
+}
+
+const AllProgramProject = ({
+  limit = 10,
+  showViewAll = true,
+  showSearch = false,
+  title = "Assigned Programs & Projects",
+}: AllProgramProjectProps) => {
   const [viewMode, setViewMode] = useState<"table" | "board">("board");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [priorityFilter, setPriorityFilter] = useState<string>("");
@@ -92,35 +108,27 @@ const AllProgramProject = () => {
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortBy, setSortBy] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
 
-  const itemsPerPage = 10;
+  const itemsPerPage = limit;
 
   const employeeId = useEmployeeId();
 
-  const { data, isLoading } = useGetAllProjectsQuery({
-    employeeId,
+  const { data, isLoading } = useGetEmployeeAllProjectsQuery({
+    employeeId: employeeId || "",
     page: currentPage,
     limit: itemsPerPage,
-    status: statusFilter === "ALL" ? "" : statusFilter,
-    priority: priorityFilter === "ALL" ? "" : priorityFilter,
-    sortBy: sortBy,
+    ...(statusFilter && statusFilter !== "ALL" && { status: statusFilter }),
+    ...(priorityFilter && priorityFilter !== "ALL" && { priority: priorityFilter }),
+    ...(sortBy && { sortBy }),
     sortOrder: sortOrder,
+    ...(showSearch && search && { search }),
   });
 
-  if (isLoading) {
-    return (
-      <>
-        <h4 className="mb-3 text-gray-900 text-xl font-semibold">
-          Assigned Programs & Projects
-        </h4>
-        <SkeletonLoading count={3} height="h-66" />
-      </>
-    );
-  }
-
   const projects = data?.data?.projects?.data || [];
-
-  const totalPages = Math.ceil(projects.length / itemsPerPage);
+  const meta = data?.data?.meta;
+  const total = meta?.total ?? 0;
+  const totalPages = meta?.totalPages ?? Math.ceil(total / itemsPerPage);
   const statusOptions = [
     { value: "ALL", title: "All Status" },
     { value: "PENDING", title: "PENDING" },
@@ -138,27 +146,48 @@ const AllProgramProject = () => {
     { value: "NORMAL", title: "Default" },
   ];
 
-  if (projects.length === 0) {
+  if (isLoading) {
     return (
       <>
-        <h4 className="mb-3 text-gray-900 text-xl font-semibold">
-          Assigned Programs & Projects
-        </h4>
-        <div className="border border-[#E2E8F0] rounded-lg flex items-center justify-center h-96 text-gray-500 text-xl">
-          Yet no projects found
+        <h4 className="mb-3 text-gray-900 text-xl font-semibold">{title}</h4>
+        <div className="flex items-center justify-center h-96 text-gray-500 text-xl">
+          Loading...
         </div>
       </>
     );
   }
 
+  // if (projects.length === 0) {
+  //   return (
+  //     <>
+  //       <h4 className="mb-3 text-gray-900 text-xl font-semibold">{title}</h4>
+  //       <div className="border border-[#E2E8F0] rounded-lg flex items-center justify-center h-96 text-gray-500 text-xl">
+  //         Yet no projects found
+  //       </div>
+  //     </>
+  //   );
+  // }
+
   return (
     <div className="pb-6 min-h-[500px]">
       {/* Header  */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6">
-        <h4 className=" text-gray-900 text-xl font-semibold">
-          Assigned Programs & Projects
-        </h4>
+        <h4 className=" text-gray-900 text-xl font-semibold">{title}</h4>
         <div className="flex items-center gap-3">
+          {showSearch && (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -transform -translate-y-1/2 text-gray-400 size-4" />
+              <input
+                value={search}
+                onChange={(e) => {
+                  setCurrentPage(1);
+                  setSearch(e.target.value);
+                }}
+                placeholder="Search project..."
+                className="pl-9 pr-4 py-2 border border-[#CAD2DB] rounded-md text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
           {/* View Toggle */}
           <div className="flex items-center bg-white gap-3">
             <PrimaryButton
@@ -290,17 +319,32 @@ const AllProgramProject = () => {
             projects={projects as StaffEmployeeProject[]}
           />
 
-          <Pagination
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            itemsPerPage={itemsPerPage}
-            totalPages={totalPages}
-            filteredDataLength={projects.length}
-          />
+          {showViewAll ? (
+            <div className="pt-2">
+              <Link to="/staff-employee-panel/projects">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                >
+                  {/* Display total count */}
+                  View all
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <Pagination
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              itemsPerPage={itemsPerPage}
+              totalPages={totalPages}
+              filteredDataLength={projects.length}
+            />
+          )}
         </div>
       ) : (
         <div className="border border-gray-100 rounded-md min-h-88 p-2">
-          <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-4 gap-5">
             {projects?.map((projectData: StaffEmployeeProject) => {
               return (
                 <div key={projectData.id}>
@@ -309,18 +353,28 @@ const AllProgramProject = () => {
               );
             })}
           </div>
-          {projects.length > 8 && (
-            <div className="pt-6">
+          {showViewAll ? (
+            <div className="pt-2">
               <Link to="/staff-employee-panel/projects">
                 <Button
                   variant="ghost"
                   className="w-full justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                 >
                   {/* Display total count */}
-                  View all {projects.length}
+                  View all
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
+            </div>
+          ) : (
+            <div className="mt-3">
+              <Pagination
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                totalPages={totalPages}
+                filteredDataLength={projects.length}
+              />
             </div>
           )}
         </div>

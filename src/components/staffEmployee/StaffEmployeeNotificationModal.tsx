@@ -1,137 +1,11 @@
-import { useMemo, useState } from "react";
-import { X, Settings } from "lucide-react";
+
+import { useState } from "react";
+import { X, Settings, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { useGetNotificationsQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
-
-/* =====================================================
-   API TYPE (REAL RESPONSE)
-===================================================== */
-
-interface NotificationApiItem {
-  id: string;
-  senderId: string;
-  receiverIds: string[];
-  projectId: string | null;
-  context: string;
-  type: "NEW_EMPLOYEE_ASSIGNED";
-  isRead: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/* =====================================================
-   EXISTING UI TYPES (UNCHANGED)
-===================================================== */
-
-export interface NotificationAction {
-  label: string;
-  variant?:
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
-  onClick: () => void;
-}
-
-export interface NotificationItem {
-  id: string;
-  type: "project" | "team" | "system" | "file";
-  user: {
-    name: string;
-    avatar: string;
-    initials: string;
-  };
-  action: string;
-  target?: string;
-  timestamp: string;
-  team?: string;
-  actions?: NotificationAction[];
-  attachment?: {
-    name: string;
-    type: "pdf" | "doc" | "image";
-  };
-  status?: "new" | "read";
-}
-
-/* =====================================================
-   HELPERS
-===================================================== */
-
-const timeAgo = (date: string) => {
-  const diff = Date.now() - new Date(date).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins} mins ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs} hrs ago`;
-  return `${Math.floor(hrs / 24)} days ago`;
-};
-
-const getInitials = (name: string) =>
-  name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
-
-/**
- * Extracts:
- * action -> "created a new project"
- * target -> "Project Alpha"
- */
-const parseContext = (context: string) => {
-  const match = context.match(/"(.*?)"/);
-  return {
-    action: match ? context.replace(match[0], "").trim() : context,
-    target: match ? match[1] : undefined,
-  };
-};
-
-/* =====================================================
-   MAPPER (API → EXISTING UI SHAPE)
-===================================================== */
-
-const mapApiToNotificationItem = (
-  api: NotificationApiItem
-): NotificationItem => {
-  const { action, target } = parseContext(api.context);
-
-  const systemUser = "System";
-
-  return {
-    id: api.id,
-    type: api.projectId ? "project" : "system",
-    user: {
-      name: systemUser,
-      avatar: "",
-      initials: getInitials(systemUser),
-    },
-    action,
-    target,
-    timestamp: timeAgo(api.createdAt),
-    status: api.isRead ? "read" : "new",
-    actions: [
-      {
-        label: "View",
-        variant: "default",
-        onClick: () => {
-          console.log("View notification:", api.id);
-        },
-      },
-    ],
-  };
-};
-
-/* =====================================================
-   COMPONENT
-===================================================== */
+import { useNotification, NotificationItem } from "@/context/NotificationContext";
+import { useNavigate } from "react-router-dom";
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -152,15 +26,10 @@ export default function StaffEmployeeNotificationModal({
   className,
 }: NotificationModalProps) {
   const [activeTab, setActiveTab] = useState("all");
+  const { notifications, isConnected } = useNotification();
+  const navigate = useNavigate();
 
-  const { data } = useGetNotificationsQuery({});
-
-  const notifications: NotificationItem[] = useMemo(() => {
-    if (!data?.data) return [];
-    return data.data.map(mapApiToNotificationItem);
-  }, [data]);
-
-  const filteredNotifications = notifications.filter((n) => {
+  const filteredNotifications = notifications.filter((n: NotificationItem) => {
     switch (activeTab) {
       case "inbox":
         return n.status === "new";
@@ -175,25 +44,28 @@ export default function StaffEmployeeNotificationModal({
 
   if (!isOpen) return null;
 
-  /* =====================================================
-     JSX BELOW IS 100% YOUR ORIGINAL STYLE
-  ===================================================== */
-
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black/30 z-40"
-        onClick={onClose}
-      ></div>
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose}></div>
+
       <div
         className={cn(
-          "absolute right-14 top-15 h-[85vh] w-96 bg-white rounded-lg z-50 flex flex-col shadow-xl",
-          className
+          "absolute right-0 top-2 md:top-15 h-[85vh] w-96 bg-white rounded-lg z-50 flex flex-col shadow-xl",
+          className,
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <h4 className="font-semibold text-lg">Notifications</h4>
+          <div className="flex items-center gap-2">
+            <h4 className="font-semibold text-lg">Notifications</h4>
+            <div
+              className={cn(
+                "w-2 h-2 rounded-full",
+                isConnected ? "bg-green-500" : "bg-red-500"
+              )}
+              title={isConnected ? "Connected to realtime updates" : "Disconnected"}
+            />
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -215,7 +87,7 @@ export default function StaffEmployeeNotificationModal({
                   "text-sm font-medium transition-colors pb-1 cursor-pointer",
                   activeTab === tab.id
                     ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-gray-500 hover:text-gray-700",
                 )}
               >
                 {tab.label}
@@ -234,27 +106,26 @@ export default function StaffEmployeeNotificationModal({
               <div
                 key={notification.id}
                 className={cn(
-                  "p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors",
-                  notification.status === "new" && "bg-blue-50"
+                  "p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors",
+                  notification.status === "new" && "bg-blue-50/10",
                 )}
               >
-                <div className="flex space-x-3">
-                  <Avatar className="h-10 w-10 flex-shrink-0">
-                    <AvatarImage
-                      src={
-                        notification.user.avatar || "/placeholder.svg"
-                      }
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-10 w-10 shrink-0 border border-gray-200 flex items-center justify-center">
+                    {/* <AvatarImage
+                      src={notification.user.avatar || "/placeholder.svg"}
                       alt={notification.user.name}
-                    />
-                    <AvatarFallback className="text-xs font-medium">
+                    /> */}
+                    {/* <AvatarFallback className="text-xs font-medium">
                       {notification.user.initials}
-                    </AvatarFallback>
+                    </AvatarFallback> */}
+                    <Bell className="h-4 w-4 text-gray-400" />
                   </Avatar>
 
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-900">
                       <span className="font-medium">
-                        {notification.user.name}
+                        {/* {notification.user.name} */}
                       </span>{" "}
                       {notification.action}{" "}
                       {notification.target && (
@@ -277,8 +148,8 @@ export default function StaffEmployeeNotificationModal({
                             key={index}
                             variant={action.variant || "outline"}
                             size="sm"
-                            onClick={action.onClick}
-                            className="h-7 px-3 text-xs"
+                            onClick={() => navigate(`/staff-employee-panel/projects/project-details/${notification.projectId}`)}
+                            className="h-7 px-3 text-xs bg-gray-100 hover:cursor-pointer hover:text-blue-600"
                           >
                             {action.label}
                           </Button>

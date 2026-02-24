@@ -12,7 +12,7 @@ import {
   useGetFavoriteProjectsQuery,
   useRemoveProjectFromFavoriteMutation
 } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import RenderStaffAvatars from "../client/RenderStaffAvater";
+import { AssignedStaffAvatars } from "@/components/client/AssignedStaffAvatars";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useNavigate } from "react-router-dom";
 
@@ -242,8 +242,19 @@ const StaffEmployeeProjectCard = ({
             <div>
               <h3 className="mb-1">Assigned People</h3>
               {/* Kept intentionally even if data is not available */}
-              <RenderStaffAvatars
-                staff={assignedStaffImg}
+              <AssignedStaffAvatars
+                manager={(project as any).manager}
+                employees={Array.isArray((project as any).projectEmployees)
+                  ? (project as any).projectEmployees.map((pe: any) => pe.employee)
+                  : (project as any).projectEmployees
+                    ? [(project as any).projectEmployees.employee]
+                    : []}
+                viewers={Array.isArray((project as any).projectViewers)
+                  ? (project as any).projectViewers.map((pv: any) => pv.viewer)
+                  : (project as any).projectViewers
+                    ? [(project as any).projectViewers.viewer]
+                    : []}
+                maxVisible={3}
               />
               {/* -- */}
             </div>
