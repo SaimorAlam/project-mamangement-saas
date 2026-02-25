@@ -9,13 +9,6 @@ import PrimaryButton from "@/common/PrimaryButton";
 import UserProfileSettings from "@/pages/client/Settings/Components/UserProfileSettings";
 import { toast } from "sonner";
 
-interface BrandingState {
-  primaryColor: string;
-  secondaryColor: string;
-  logo: File | null;
-  favicon: File | null;
-}
-
 interface PreferencesState {
   defaultLanguage: string;
   defaultTimezone: string;

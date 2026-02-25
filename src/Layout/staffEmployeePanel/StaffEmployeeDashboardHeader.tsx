@@ -1,4 +1,4 @@
-import React, { cloneElement, useState } from "react";
+import React, { cloneElement, useState, useMemo, isValidElement, ReactElement } from "react";
 import { Bell, Eye, FileText, Upload } from "lucide-react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
@@ -20,19 +20,66 @@ import StaffEmployeeNotificationModal from "@/components/staffEmployee/StaffEmpl
 
 const StaffEmployeeDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const ClientSidebarGroups = getStaffEmployeeSidebarItems();
-  const { breadcrumb } = useHeaderContext();
-  // const shortedLocation = breadcrumb.split(",").pop();
-  const { name } = useGetUser();
-  const { unreadCount } = useNotification();
-
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
 
-  const allRoutes = ClientSidebarGroups.flatMap((group) => group.items);
-  const currentRoute = allRoutes.find((route) => route.path === currentPath);
+  const { breadcrumb } = useHeaderContext();
+  const { name } = useGetUser();
+  const { unreadCount } = useNotification();
+
+  const allRoutes = useMemo(
+    () => getStaffEmployeeSidebarItems().flatMap((group) => group.items),
+    []
+  );
+
+  // Build breadcrumb path by finding matching routes
+  const breadcrumbData = useMemo(() => {
+    const items: Array<{
+      label: string;
+      path?: string;
+      icon?: React.ReactNode;
+      isPage?: boolean;
+    }> = [{ label: "Home", path: "/staff-employee-panel" }];
+
+    // Find the current route
+    let currentRoute = allRoutes.find((r) => r.path === currentPath);
+    
+    // If not direct match, check for parent routes with children
+    if (!currentRoute) {
+      for (const route of allRoutes) {
+        if (route.children) {
+          const childMatch = route.children.find(
+            (child) => `${route.path}/${child.path}` === currentPath
+          );
+          if (childMatch) {
+            // Add parent to breadcrumb
+            items.push({
+              label: route.name as string,
+              path: route.path as string,
+              icon: route.icon,
+            });
+            // Add child as current page
+            items.push({ label: childMatch.name as string, isPage: true });
+            return items;
+          }
+        }
+      }
+    }
+
+    // Add current route
+    if (currentRoute) {
+      items.push({
+        label: currentRoute.name as string,
+        path: currentRoute.path as string,
+        icon: currentRoute.icon,
+      });
+    }
+
+    return items;
+  }, [currentPath, allRoutes]);
+
+  // currentRoute not used directly; breadcrumbData covers parent/child paths
 
   const previewButtonPaths = [
     "/staff-employee-panel/upload-submission",
@@ -87,7 +134,7 @@ const StaffEmployeeDashboardHeader = () => {
                 leftIcon={<Eye className="text-2xl" />}
                 title="Preview"
                 type={"Outline"}
-                onClick={() => setIsOpen(true)}
+                onClick={() => console.log("clicked")}
               />
             )}
 
@@ -121,34 +168,40 @@ const StaffEmployeeDashboardHeader = () => {
       </div>
 
       {/* Breadcrumb */}
-      <div>
-        <Breadcrumb>
+      <div className="overflow-x-auto no-scrollbar py-1">
+        <Breadcrumb className="my-2 min-w-max">
           <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            {currentRoute ? (
-              <BreadcrumbItem>
-                <BreadcrumbPage className="text-[#356DF0] flex items-center justify-center gap-1 ">
-                  {currentRoute.icon && React.isValidElement(currentRoute.icon)
-                    ? cloneElement(
-                      currentRoute.icon as React.ReactElement<{
-                        className?: string;
-                      }>,
-                      { className: "w-4 h-4" },
-                    )
-                    : null}
-                  {currentRoute.name}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            ) : (
-              <BreadcrumbItem>
-                <BreadcrumbPage></BreadcrumbPage>
-              </BreadcrumbItem>
-            )}
+            {breadcrumbData.map((item, index) => (
+              <React.Fragment key={index}>
+                <BreadcrumbItem>
+                  {item.isPage ? (
+                    <BreadcrumbPage className="text-[#356DF0]">
+                      {item.label}
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Link
+                        to={item.path || "#"}
+                        className={
+                          index > 0
+                            ? "text-[#356DF0] font-semibold flex items-center gap-1"
+                            : ""
+                        }
+                      >
+                        {item.icon &&
+                          isValidElement(item.icon) &&
+                          cloneElement(
+                            item.icon as ReactElement<{ className?: string }>,
+                            { className: "w-4 h-4" }
+                          )}
+                        {item.label}
+                      </Link>
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {index < breadcrumbData.length - 1 && <BreadcrumbSeparator />}
+              </React.Fragment>
+            ))}
           </BreadcrumbList>
         </Breadcrumb>
       </div>
