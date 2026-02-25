@@ -281,7 +281,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         if (typeof xAxis === "string") {
           try {
             xAxis = JSON.parse(xAxis);
-          } catch (e) {
+          } catch {
             /* ignore */
           }
         }
@@ -333,7 +333,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         if (typeof xAxis === "string") {
           try {
             xAxis = JSON.parse(xAxis);
-          } catch (e) {
+          } catch {
             /* ignore */
           }
         }
