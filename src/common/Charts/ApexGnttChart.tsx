@@ -29,6 +29,8 @@ interface GanttTask {
   progress: number;
   type: "group" | "task";
   color: string;
+  enableTaskDrag: boolean;
+  enableTaskResize: boolean;
   isExpanded?: boolean;
   subtasks?: GanttTask[];
   dependencies?: string[]; // IDs of tasks this task follows
@@ -42,6 +44,8 @@ const PROJECT_DATA: GanttTask[] = [
     start: "2025-03-01",
     end: "2025-03-24",
     assigned: "Mike Smith",
+     enableTaskDrag: false,
+    enableTaskResize: false,
     progress: 60,
     type: "group",
     color: "#3b82f6",
@@ -55,6 +59,8 @@ const PROJECT_DATA: GanttTask[] = [
         end: "2025-03-14",
         assigned: "Mike Smith",
         progress: 49,
+        enableTaskDrag: false,
+        enableTaskResize: false,
         type: "task",
         color: "#3b82f6",
       },
@@ -62,10 +68,12 @@ const PROJECT_DATA: GanttTask[] = [
         id: "1-2",
         name: "Surveying & Layout",
         duration: "5 Days",
-        start: "2025-03-05",
+        start: "2025-03-05",    
         end: "2025-03-09",
         assigned: "Mike Smith",
         progress: 49,
+        enableTaskDrag: false,
+        enableTaskResize: false,
         type: "task",
         color: "#3b82f6",
       },
@@ -77,6 +85,8 @@ const PROJECT_DATA: GanttTask[] = [
         end: "2025-03-14",
         assigned: "Mike Smith",
         progress: 49,
+        enableTaskDrag: false,
+        enableTaskResize: false,
         type: "task",
         color: "#3b82f6",
       },
@@ -90,6 +100,8 @@ const PROJECT_DATA: GanttTask[] = [
     end: "2025-03-29",
     assigned: "Jennifer Jones",
     progress: 50,
+    enableTaskDrag: false,
+    enableTaskResize: false,
     type: "group",
     color: "#f97316",
     isExpanded: true,
@@ -102,6 +114,8 @@ const PROJECT_DATA: GanttTask[] = [
         end: "2025-03-26",
         assigned: "Jennifer Jones",
         progress: 49,
+        enableTaskDrag: false,
+        enableTaskResize: false,
         type: "task",
         color: "#f97316",
       },
@@ -113,6 +127,8 @@ const PROJECT_DATA: GanttTask[] = [
         end: "2025-03-29",
         assigned: "Jennifer Jones",
         progress: 49,
+        enableTaskDrag: false,
+        enableTaskResize: false,
         type: "task",
         color: "#f97316",
         dependencies: ["2-1"],
@@ -127,6 +143,8 @@ const PROJECT_DATA: GanttTask[] = [
     end: "2025-04-13",
     assigned: "Sam Watson",
     progress: 30,
+    enableTaskDrag: false,
+    enableTaskResize: false,
     type: "group",
     color: "#ec4899",
     isExpanded: true,
@@ -139,6 +157,8 @@ const PROJECT_DATA: GanttTask[] = [
         end: "2025-05-13",
         assigned: "Sam Watson",
         progress: 45,
+        enableTaskDrag: false,
+        enableTaskResize: false,
         type: "task",
         color: "#ec4899",
       },
@@ -379,6 +399,8 @@ const ApexGnttChart: React.FC = () => {
       progress: newTask.progress || 0,
       type: newTask.type || "task",
       color: newTask.color || "#3b82f6",
+      enableTaskDrag: false,
+      enableTaskResize: false,
       isExpanded: true,
       subtasks: newTask.type === "group" ? [] : undefined,
     };
@@ -422,6 +444,8 @@ const ApexGnttChart: React.FC = () => {
             progress: 0,
             type: "task",
             color: t.color,
+            enableTaskDrag: false,
+            enableTaskResize: false,
           };
           return {
             ...t,
