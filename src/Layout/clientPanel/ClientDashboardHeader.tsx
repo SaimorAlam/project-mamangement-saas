@@ -8,7 +8,7 @@ import React, {
   useMemo,
 } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import * as XLSX from "xlsx";
+// import * as XLSX from "xlsx";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
 import CreateProgramModal from "@/components/client/AllProgram/CreateProgramModal";
@@ -23,7 +23,7 @@ import {
   Plus,
   Upload,
   UserPlus,
-  Download,
+  // Download,
   Layers,
   Briefcase,
 } from "lucide-react";
@@ -47,7 +47,7 @@ import {
   useGetProjectByIdQuery,
   useGetAllProjectsQuery,
 } from "@/store/Api/ProjectApi/ProjectApi";
-import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
+// import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -71,7 +71,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
     (state) => state.chartSlice,
   );
 
-  const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
+  // const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
   const projectId = projectIdFromParams || projectIdFromState;
 
   // Optimized Page Type Detection
@@ -255,136 +255,136 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
     setProjectSuccessOpen(true);
   };
 
-  const handleDownloadCSV = async () => {
-    if (!projectIdFromState) {
-      toast.error("Project ID is missing");
-      return;
-    }
-    const toastId = toast.loading("Downloading...");
-    try {
-      const res = await getAllTheLeafChart(
-        projectIdFromState as string,
-      ).unwrap();
-      const leafCharts = res?.data || [];
-      if (leafCharts.length === 0) {
-        toast.error("No data found to download", { id: toastId });
-        return;
-      }
+  // const handleDownloadCSV = async () => {
+  //   if (!projectIdFromState) {
+  //     toast.error("Project ID is missing");
+  //     return;
+  //   }
+  //   const toastId = toast.loading("Downloading...");
+  //   try {
+  //     const res = await getAllTheLeafChart(
+  //       projectIdFromState as string,
+  //     ).unwrap();
+  //     const leafCharts = res?.data || [];
+  //     if (leafCharts.length === 0) {
+  //       toast.error("No data found to download", { id: toastId });
+  //       return;
+  //     }
 
-      let templateXAxis: string[] = [];
-      let templateLegends: any[] = [];
+  //     let templateXAxis: string[] = [];
+  //     let templateLegends: any[] = [];
 
-      for (const node of leafCharts) {
-        let xAxis = node.xAxisValues || [];
-        if (!xAxis.length && node.xAxis) {
-          try {
-            const parsed =
-              typeof node.xAxis === "string"
-                ? JSON.parse(node.xAxis)
-                : node.xAxis;
-            xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
-          } catch {
-            /* ignore */
-          }
-        }
+  //     for (const node of leafCharts) {
+  //       let xAxis = node.xAxisValues || [];
+  //       if (!xAxis.length && node.xAxis) {
+  //         try {
+  //           const parsed =
+  //             typeof node.xAxis === "string"
+  //               ? JSON.parse(node.xAxis)
+  //               : node.xAxis;
+  //           xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
+  //         } catch {
+  //           /* ignore */
+  //         }
+  //       }
 
-        let legends = node.legendValues || [];
-        const nodeWidgets = node.widgets || node.barChart?.widgets;
-        if (!legends.length && nodeWidgets?.length > 0) {
-          legends = nodeWidgets.map((w: any) => ({
-            label: w.legendName || w.label || "Legend",
-            field: (w.legendName || w.label || "field")
-              .toLowerCase()
-              .replace(/\s+/g, ""),
-            color: w.color || "#000000",
-          }));
-        }
+  //       let legends = node.legendValues || [];
+  //       const nodeWidgets = node.widgets || node.barChart?.widgets;
+  //       if (!legends.length && nodeWidgets?.length > 0) {
+  //         legends = nodeWidgets.map((w: any) => ({
+  //           label: w.legendName || w.label || "Legend",
+  //           field: (w.legendName || w.label || "field")
+  //             .toLowerCase()
+  //             .replace(/\s+/g, ""),
+  //           color: w.color || "#000000",
+  //         }));
+  //       }
 
-        if (xAxis.length > 0 && legends.length > 0) {
-          templateXAxis = xAxis;
-          templateLegends = legends;
-          break;
-        }
-      }
+  //       if (xAxis.length > 0 && legends.length > 0) {
+  //         templateXAxis = xAxis;
+  //         templateLegends = legends;
+  //         break;
+  //       }
+  //     }
 
-      const wb = XLSX.utils.book_new();
-      const ids: string[] = [];
-      const usedNames = new Set<string>();
+  //     const wb = XLSX.utils.book_new();
+  //     const ids: string[] = [];
+  //     const usedNames = new Set<string>();
 
-      const getUniqueSheetName = (name: string, id: string) => {
-        let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
-        const idSuffix = id ? `_${id.slice(-8)}` : "";
-        if (baseName.length + idSuffix.length > 31)
-          baseName = baseName.substring(0, 31 - idSuffix.length);
-        const combinedName = baseName + idSuffix;
-        let uniqueName = combinedName;
-        let counter = 1;
-        while (usedNames.has(uniqueName.toLowerCase())) {
-          const suffix = `_${counter}`;
-          uniqueName =
-            combinedName.substring(
-              0,
-              Math.min(combinedName.length, 31 - suffix.length),
-            ) + suffix;
-          counter++;
-        }
-        usedNames.add(uniqueName.toLowerCase());
-        return uniqueName;
-      };
+  //     const getUniqueSheetName = (name: string, id: string) => {
+  //       let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
+  //       const idSuffix = id ? `_${id.slice(-8)}` : "";
+  //       if (baseName.length + idSuffix.length > 31)
+  //         baseName = baseName.substring(0, 31 - idSuffix.length);
+  //       const combinedName = baseName + idSuffix;
+  //       let uniqueName = combinedName;
+  //       let counter = 1;
+  //       while (usedNames.has(uniqueName.toLowerCase())) {
+  //         const suffix = `_${counter}`;
+  //         uniqueName =
+  //           combinedName.substring(
+  //             0,
+  //             Math.min(combinedName.length, 31 - suffix.length),
+  //           ) + suffix;
+  //         counter++;
+  //       }
+  //       usedNames.add(uniqueName.toLowerCase());
+  //       return uniqueName;
+  //     };
 
-      leafCharts.forEach((node: any) => {
-        ids.push(node.id);
-        let xAxis = node.xAxisValues || [];
-        if (!xAxis.length && node.xAxis) {
-          try {
-            const parsed =
-              typeof node.xAxis === "string"
-                ? JSON.parse(node.xAxis)
-                : node.xAxis;
-            xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
-          } catch {
-            /* ignore */
-          }
-        }
-        let legends = node.legendValues || [];
-        const nodeWidgets = node.widgets || node.barChart?.widgets;
-        if (!legends.length && nodeWidgets?.length > 0) {
-          legends = nodeWidgets.map((w: any) => ({
-            label: w.legendName || w.label || "Legend",
-            field: (w.legendName || w.label || "field")
-              .toLowerCase()
-              .replace(/\s+/g, ""),
-            color: w.color || "#000000",
-          }));
-        }
-        if (!xAxis.length) xAxis = templateXAxis;
-        if (!legends.length) legends = templateLegends;
+  //     leafCharts.forEach((node: any) => {
+  //       ids.push(node.id);
+  //       let xAxis = node.xAxisValues || [];
+  //       if (!xAxis.length && node.xAxis) {
+  //         try {
+  //           const parsed =
+  //             typeof node.xAxis === "string"
+  //               ? JSON.parse(node.xAxis)
+  //               : node.xAxis;
+  //           xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
+  //         } catch {
+  //           /* ignore */
+  //         }
+  //       }
+  //       let legends = node.legendValues || [];
+  //       const nodeWidgets = node.widgets || node.barChart?.widgets;
+  //       if (!legends.length && nodeWidgets?.length > 0) {
+  //         legends = nodeWidgets.map((w: any) => ({
+  //           label: w.legendName || w.label || "Legend",
+  //           field: (w.legendName || w.label || "field")
+  //             .toLowerCase()
+  //             .replace(/\s+/g, ""),
+  //           color: w.color || "#000000",
+  //         }));
+  //       }
+  //       if (!xAxis.length) xAxis = templateXAxis;
+  //       if (!legends.length) legends = templateLegends;
 
-        const headers = ["Label", ...legends.map((l: any) => l.label)];
-        const rows = xAxis.map((label: string) => [
-          label,
-          ...legends.map(() => ""),
-        ]);
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-        XLSX.utils.book_append_sheet(
-          wb,
-          ws,
-          getUniqueSheetName(node.title || node.name || "Tier", node.id),
-        );
-      });
+  //       const headers = ["Label", ...legends.map((l: any) => l.label)];
+  //       const rows = xAxis.map((label: string) => [
+  //         label,
+  //         ...legends.map(() => ""),
+  //       ]);
+  //       const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  //       XLSX.utils.book_append_sheet(
+  //         wb,
+  //         ws,
+  //         getUniqueSheetName(node.title || node.name || "Tier", node.id),
+  //       );
+  //     });
 
-      XLSX.writeFile(
-        wb,
-        `${projectName || "Project"}_ID_${ids.join("_")}.xlsx`,
-      );
-      toast.success("Excel downloaded successfully", { id: toastId });
-    } catch (error) {
-      console.error("Excel download failed", error);
-      toast.error("Failed to download Excel", { id: toastId });
-    } finally {
-      toast.dismiss(toastId);
-    }
-  };
+  //     XLSX.writeFile(
+  //       wb,
+  //       `${projectName || "Project"}_ID_${ids.join("_")}.xlsx`,
+  //     );
+  //     toast.success("Excel downloaded successfully", { id: toastId });
+  //   } catch (error) {
+  //     console.error("Excel download failed", error);
+  //     toast.error("Failed to download Excel", { id: toastId });
+  //   } finally {
+  //     toast.dismiss(toastId);
+  //   }
+  // };
 
   const renderQuickActionButton = () => {
     if (isPage.employee)
