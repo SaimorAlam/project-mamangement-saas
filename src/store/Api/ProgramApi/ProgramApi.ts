@@ -20,7 +20,7 @@ const programApi = baseApi.injectEndpoints({
           }
         });
         return {
-          url: "/program",
+          url: "/program/all",
           method: "GET",
           params,
         };
