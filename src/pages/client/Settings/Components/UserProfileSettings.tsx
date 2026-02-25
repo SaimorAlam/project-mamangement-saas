@@ -265,7 +265,6 @@ const UserProfileSettings = ({ className = "" }: { className?: string }) => {
             <input
               type="text"
               value={profile.phoneNumber}
-              disabled
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 font-medium text-sm"
             />
           </div>
