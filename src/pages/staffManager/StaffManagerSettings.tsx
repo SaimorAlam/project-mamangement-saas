@@ -1,55 +1,82 @@
 import { useEffect, useState } from "react";
 import ToggleSwitchComponent from "@/components/client/Settings/ToggleSwitchComponent";
-import ColorPickerComponent from "@/components/client/Settings/ColorPickerComponent";
-import FileUploadComponent from "@/components/client/Settings/FileUploadComponent";
-import CheckboxGroupComponent from "@/components/client/Settings/CheckboxGroupComponent";
+// import ColorPickerComponent from "@/components/client/Settings/ColorPickerComponent";
+// import FileUploadComponent from "@/components/client/Settings/FileUploadComponent";
 import BoxContainer from "@/common/BoxContainer";
 import DropdownSelect from "@/common/DropdownSelect";
-// import PrimaryButton from "@/common/PrimaryButton";
-import APIConnectionCard from "@/components/client/Settings/APIConnectionCard";
+import PrimaryButton from "@/common/PrimaryButton";
+// import APIConnectionCard from "@/components/client/Settings/APIConnectionCard";
+import UserProfileSettings from "@/pages/client/Settings/Components/UserProfileSettings";
+import { toast } from "sonner";
+
+// interface BrandingState {
+//   primaryColor: string;
+//   secondaryColor: string;
+//   logo: File | null;
+//   favicon: File | null;
+// }
+
+interface PreferencesState {
+  defaultLanguage: string;
+  defaultTimezone: string;
+  allowTimezoneOverride: boolean;
+  showRelativeTimestamps: boolean;
+  dateFormat: string;
+  timeFormat: string;
+  firstDayOfWeek: string;
+  enable2FA: boolean;
+  sessionTimeout: string;
+}
+
+interface NotificationState {
+  onProjectApproval: boolean;
+  onProjectRejection: boolean;
+  fileImportByEmployees: boolean;
+  weeklySummary: boolean;
+  storageLimit: boolean;
+}
 
 const StaffManagerSettings = () => {
-  const [defaultLanguage, setDefaultLanguage] =
-    useState("English (US)");
-  const [defaultTimezone, setDefaultTimezone] = useState(
-    "(UTC-06:00) Pacific Time (US & Canada)"
-  );
-  const [allowTimezoneOverride, setAllowTimezoneOverride] =
-    useState(true);
-  const [showRelativeTimestamps, setShowRelativeTimestamps] =
-    useState(true);
-  const [dateFormat, setDateFormat] = useState("DD/MM/YYYY");
-  const [timeFormat, setTimeFormat] = useState("12 hour");
-  const [firstDayOfWeek, setFirstDayOfWeek] = useState("Sun Day");
-  const [primaryColor, setPrimaryColor] = useState("#7F56D9");
-  const [secondaryColor, setSecondaryColor] = useState("#6366F1");
 
-  // Additional states for other sections
-  // const [currentPlan, setCurrentPlan] = useState("Business");
-  // const [billingCycle, setBillingCycle] = useState("Yearly");
-  // const [nextRenewal, setNextRenewal] = useState("25/6/2026");
-  // const [paymentMethod, setPaymentMethod] = useState("Stripe");
-  // const [enableAutoRenew, setEnableAutoRenew] = useState(true);
-  const [enable2FA, setEnable2FA] = useState(true);
-  const [sessionTimeout, setSessionTimeout] = useState("10 min");
+  // const [branding, setBranding] = useState<BrandingState>({
+  //   primaryColor: "#7F56D9",
+  //   secondaryColor: "#6366F1",
+  //   logo: null,
+  //   favicon: null,
+  // });
 
-  // Notification checkboxes
-  const [notifications, setNotifications] = useState({
+  const [preferences, setPreferences] = useState<PreferencesState>({
+    defaultLanguage: "English (US)",
+    defaultTimezone: "(UTC-06:00) Pacific Time (US & Canada)",
+    allowTimezoneOverride: true,
+    showRelativeTimestamps: true,
+    dateFormat: "DD/MM/YYYY",
+    timeFormat: "12 hour",
+    firstDayOfWeek: "Sunday",
+    enable2FA: true,
+    sessionTimeout: "10 min",
+  });
+
+  const [notifications, setNotifications] = useState<NotificationState>({
     onProjectApproval: true,
     onProjectRejection: true,
     fileImportByEmployees: true,
     weeklySummary: true,
     storageLimit: true,
   });
+
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isSavingPreferences, setIsSavingPreferences] = useState(false);
+  const [isSavingNotifications, setIsSavingNotifications] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000); // update every second
+    }, 1000);
 
-    return () => clearInterval(timer); // cleanup on unmount
+    return () => clearInterval(timer);
   }, []);
+
   const languages = [
     { value: "en-US", title: "English (US)" },
     { value: "en-UK", title: "English (UK)" },
@@ -125,27 +152,22 @@ const StaffManagerSettings = () => {
     {
       id: "onProjectApproval",
       label: "On project Approval",
-      checked: notifications.onProjectApproval,
     },
     {
       id: "onProjectRejection",
       label: "On project Rejection",
-      checked: notifications.onProjectRejection,
     },
     {
       id: "fileImportByEmployees",
       label: "File import by employees",
-      checked: notifications.fileImportByEmployees,
     },
     {
       id: "weeklySummary",
       label: "Weekly Summary",
-      checked: notifications.weeklySummary,
     },
     {
       id: "storageLimit",
       label: "Storage Limit",
-      checked: notifications.storageLimit,
     },
   ];
 
@@ -153,250 +175,319 @@ const StaffManagerSettings = () => {
     setNotifications({ ...notifications, [id]: checked });
   };
 
-  // const handleUpgrade = () => {};
+  const handleSavePreferences = async () => {
+    setIsSavingPreferences(true);
+    try {
+      // Simulate API call - replace with actual API
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      toast.success("Preferences saved successfully");
+    } catch (error) {
+      toast.error("Failed to save preferences");
+    } finally {
+      setIsSavingPreferences(false);
+    }
+  };
+
+  const handleSaveNotifications = async () => {
+    setIsSavingNotifications(true);
+    try {
+      // Simulate API call - replace with actual API
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      toast.success("Notification settings saved successfully");
+    } catch (error) {
+      toast.error("Failed to save notification settings");
+    } finally {
+      setIsSavingNotifications(false);
+    }
+  };
+
+  // const handleSaveBranding = async () => {
+  //   try {
+  //     // Simulate API call - replace with actual API
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
+  //     toast.success("Branding settings saved successfully");
+  //   } catch (error) {
+  //     toast.error("Failed to save branding settings");
+  //   }
+  // };
 
   return (
-    <div className="p-6">
+    <div className=" max-w-[1600px] mx-auto animate-in fade-in duration-500 mb-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            Settings
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Manage your account preferences and application configuration.
+          </p>
+        </div>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Column */}
+        {/* Column 1 */}
         <div className="space-y-8">
-          {/* Language, Date & Time zone Settings */}
-          <BoxContainer>
-            <h4 className="mb-6">
-              Language, Date & Time zone Settings
+          <UserProfileSettings />
+
+          {/* <BoxContainer className="shadow-sm border-gray-100">
+            <h4 className="text-xl font-semibold text-gray-800 mb-6">
+              Setup Your Branding
             </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+              <FileUploadComponent
+                label="Manager Logo *"
+                description="64x64 or 256x256"
+                requirements="SVG, PNG, JPG (max 2MB)"
+                buttonText="Upload Logo"
+              />
+              <FileUploadComponent
+                label="Favicon"
+                description="32x32"
+                requirements="SVG, PNG (max 512KB)"
+                buttonText="Upload Fav"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+              <ColorPickerComponent
+                label="Primary Brand Color"
+                value={branding.primaryColor}
+                onChange={(val: string) =>
+                  setBranding((prev: BrandingState) => ({
+                    ...prev,
+                    primaryColor: val,
+                  }))
+                }
+              />
+              <ColorPickerComponent
+                label="Secondary Brand Color"
+                value={branding.secondaryColor}
+                onChange={(val: string) =>
+                  setBranding((prev: BrandingState) => ({
+                    ...prev,
+                    secondaryColor: val,
+                  }))
+                }
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <PrimaryButton
+                type="Primary"
+                title="Save Branding"
+                onClick={handleSaveBranding}
+              />
+            </div>
+          </BoxContainer> */}
+        </div>
+
+        {/* Column 2 */}
+        <div className="space-y-8">
+          <BoxContainer>
+            <div className="flex justify-between items-center mb-6">
+              <h4 className="text-xl font-semibold text-gray-800">
+                Language, Date & Time zone Settings
+              </h4>
+            </div>
 
             <div className="space-y-6">
               <DropdownSelect
                 label="Default Language"
-                placeholderText={defaultLanguage}
+                placeholderText={preferences.defaultLanguage}
                 dropdownItem={languages}
-                onChange={setDefaultLanguage}
+                onChange={(val: string) =>
+                  setPreferences((prev: PreferencesState) => ({
+                    ...prev,
+                    defaultLanguage: val,
+                  }))
+                }
               />
 
               <DropdownSelect
                 label="Default Timezone"
-                placeholderText={defaultTimezone}
+                placeholderText={preferences.defaultTimezone}
                 dropdownItem={timezones}
-                onChange={setDefaultTimezone}
+                onChange={(val: string) =>
+                  setPreferences((prev: PreferencesState) => ({
+                    ...prev,
+                    defaultTimezone: val,
+                  }))
+                }
               />
 
-              {/* Fixed: Using ToggleSwitchComponent instead of SelectDropdownComponent */}
               <ToggleSwitchComponent
                 label="Allow user-level time zone override"
-                enabled={allowTimezoneOverride}
-                onChange={setAllowTimezoneOverride}
+                enabled={preferences.allowTimezoneOverride}
+                onChange={(val: boolean) =>
+                  setPreferences((prev: PreferencesState) => ({
+                    ...prev,
+                    allowTimezoneOverride: val,
+                  }))
+                }
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <DropdownSelect
                   label="Date Format"
-                  placeholderText={dateFormat}
+                  placeholderText={preferences.dateFormat}
                   dropdownItem={dateFormats}
-                  onChange={setDateFormat}
+                  onChange={(val: string) =>
+                    setPreferences((prev: PreferencesState) => ({
+                      ...prev,
+                      dateFormat: val,
+                    }))
+                  }
                 />
                 <DropdownSelect
                   label="Time Format"
-                  placeholderText={timeFormat}
+                  placeholderText={preferences.timeFormat}
                   dropdownItem={timeFormats}
-                  onChange={setTimeFormat}
+                  onChange={(val: string) =>
+                    setPreferences((prev: PreferencesState) => ({
+                      ...prev,
+                      timeFormat: val,
+                    }))
+                  }
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <DropdownSelect
                   label="First Day of Week"
-                  placeholderText={firstDayOfWeek}
+                  placeholderText={preferences.firstDayOfWeek}
                   dropdownItem={weekDays}
-                  onChange={setFirstDayOfWeek}
+                  onChange={(val: string) =>
+                    setPreferences((prev: PreferencesState) => ({
+                      ...prev,
+                      firstDayOfWeek: val,
+                    }))
+                  }
                 />
                 <div>
                   <ToggleSwitchComponent
                     label="Show relative timestamps"
-                    enabled={showRelativeTimestamps}
-                    onChange={setShowRelativeTimestamps}
+                    enabled={preferences.showRelativeTimestamps}
+                    onChange={(val: boolean) =>
+                      setPreferences((prev: PreferencesState) => ({
+                        ...prev,
+                        showRelativeTimestamps: val,
+                      }))
+                    }
                     className="mb-2"
                   />
-                  {showRelativeTimestamps && (
+                  {preferences.showRelativeTimestamps && (
                     <div className="text-sm text-gray-600 px-3 py-2">
                       {currentTime.toLocaleString()}
                     </div>
                   )}
                 </div>
               </div>
-            </div>
-          </BoxContainer>
 
-          <CheckboxGroupComponent
-            title="Notification Settings"
-            items={notificationItems}
-            onChange={handleNotificationChange}
-          />
-
-          <div className="border border-gray-200 rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">
-              API Connection
-            </h2>
-
-            <div className="flex flex-col sm:flex-row gap-4 mb-4">
-              <APIConnectionCard
-                name="Slack"
-                status="Connected"
-                lastSynced="Today"
-                icon="i"
-              />
-
-              <APIConnectionCard
-                name="Salesforce"
-                status="Connected"
-                lastSynced="Today"
-                icon="i"
-              />
-            </div>
-
-            <div>
-              <APIConnectionCard
-                name="AWS S3"
-                status="Connected"
-                lastSynced="Today"
-                icon="i"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-8">
-          {/* Setup Your Branding */}
-          <BoxContainer>
-            <h4 className=" mb-6">Setup Your Branding</h4>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <FileUploadComponent
-                label="Client logo *"
-                description="64X64 or 256×256px"
-                requirements="SVG, PNG, JPG or GIF (max size 2mb)"
-                buttonText="Upload Logo"
-              />
-
-              <FileUploadComponent
-                label="Favicon (Optional)"
-                description="32X32"
-                requirements="SVG, PNG (max size 512kb)"
-                buttonText="Upload Favicon"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ColorPickerComponent
-                label="Primary brand color *"
-                value={primaryColor}
-                onChange={setPrimaryColor}
-              />
-
-              <ColorPickerComponent
-                label="Secondary brand color *"
-                value={secondaryColor}
-                onChange={setSecondaryColor}
-              />
-            </div>
-          </BoxContainer>
-
-          {/* removed this according to client requirements */}
-          {/* Billing and Plan */}
-          {/* <div className="border border-gray-200 rounded-lg p-6">
-            <h4 className="mb-6">Billing and Plan</h4>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <DropdownSelect
-                label="Current Plan"
-                placeholderText={currentPlan}
-                dropdownItem={plans}
-                onChange={setCurrentPlan}
-              />
-
-              <DropdownSelect
-                label="Billing Cycle"
-                placeholderText={billingCycle}
-                dropdownItem={billingCycles}
-                onChange={setBillingCycle}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Next renewal
-                </label>
-                <input
-                  type="text"
-                  value={nextRenewal}
-                  onChange={(e) => setNextRenewal(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              <div className="flex justify-end pt-4 border-t border-gray-200">
+                <PrimaryButton
+                  type="Primary"
+                  title={isSavingPreferences ? "Saving..." : "Save Preferences"}
+                  onClick={handleSavePreferences}
+                  disabled={isSavingPreferences}
                 />
               </div>
-
-              <DropdownSelect
-                label="Update Payment Method *"
-                placeholderText={paymentMethod}
-                dropdownItem={paymentMethods}
-                onChange={setPaymentMethod}
-              />
             </div>
+          </BoxContainer>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Billing Address *{" "}
-                <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                className="w-full h-[100px] px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
-                defaultValue="123 Business Ave
-Suite 500
-San Francisco, CA 94105"
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <ToggleSwitchComponent
-                label="Enable Auto renew"
-                enabled={enableAutoRenew}
-                onChange={setEnableAutoRenew}
-              />
-
+          <BoxContainer>
+            <div className="flex justify-between items-center mb-6">
+              <h4 className="text-xl font-semibold text-gray-800">
+                Notification Settings
+              </h4>
               <PrimaryButton
                 type="Primary"
-                title="Request to Upgrade"
-                onClick={handleUpgrade}
+                title={isSavingNotifications ? "Saving..." : "Save Changes"}
+                onClick={handleSaveNotifications}
+                disabled={isSavingNotifications}
               />
             </div>
-          </div> */}
 
-          {/* Security Settings */}
-          <div className="border border-gray-200 rounded-lg p-6">
-            <h4 className="mb-6">Security Settings</h4>
-            <div className="grid grid-cols-2 gap-30 items-start">
-              <ToggleSwitchComponent
-                label="Enable 2FA verification"
-                enabled={enable2FA}
-                onChange={setEnable2FA}
-              />
+            <div className="space-y-4">
+              {notificationItems.map((item) => (
+                <div key={item.id} className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={
+                      notifications[item.id as keyof typeof notifications]
+                    }
+                    onChange={(e) =>
+                      handleNotificationChange(item.id, e.target.checked)
+                    }
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label className="text-sm text-gray-700">{item.label}</label>
+                </div>
+              ))}
+            </div>
+          </BoxContainer>
 
-              <div className="w-full sm:w-auto">
+          {/* <div className="">
+            <BoxContainer className="shadow-sm border-gray-100">
+              <h4 className="text-xl font-semibold text-gray-800 mb-6">
+                Security Settings
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <ToggleSwitchComponent
+                  label="Enable 2FA verification"
+                  enabled={preferences.enable2FA}
+                  onChange={(val: boolean) =>
+                    setPreferences((prev: PreferencesState) => ({
+                      ...prev,
+                      enable2FA: val,
+                    }))
+                  }
+                />
                 <DropdownSelect
                   label="Session Timeout Duration"
-                  placeholderText={sessionTimeout}
+                  placeholderText={preferences.sessionTimeout}
                   dropdownItem={[
-                    "10 min",
-                    "30 min",
-                    "1 hour",
-                    "2 hours",
+                    { value: "10 min", title: "10 min" },
+                    { value: "30 min", title: "30 min" },
+                    { value: "1 hour", title: "1 hour" },
+                    { value: "2 hours", title: "2 hours" },
                   ]}
-                  onChange={setSessionTimeout}
+                  onChange={(val: string) =>
+                    setPreferences((prev: PreferencesState) => ({
+                      ...prev,
+                      sessionTimeout: val,
+                    }))
+                  }
                 />
               </div>
-            </div>
+            </BoxContainer>
           </div>
+
+          <div className="">
+            <BoxContainer className="shadow-sm border-gray-100">
+              <h4 className="text-xl font-semibold text-gray-800 mb-6">
+                API Connections
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+                <APIConnectionCard
+                  name="Slack"
+                  status="Active"
+                  icon="/slack.png"
+                  lastSynced="Today"
+                />
+                <APIConnectionCard
+                  name="Salesforce"
+                  status="Pending"
+                  icon="/salesforce.png"
+                  lastSynced="Today"
+                />
+                <APIConnectionCard
+                  name="AWS S3"
+                  status="Active"
+                  icon="/aws.png"
+                  lastSynced="Today"
+                />
+              </div>
+            </BoxContainer>
+          </div> */}
         </div>
       </div>
     </div>

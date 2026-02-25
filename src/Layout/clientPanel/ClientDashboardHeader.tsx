@@ -595,7 +595,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
       <div className="overflow-x-auto no-scrollbar py-1">
         <Breadcrumb className="my-2 min-w-max">
           <BreadcrumbList>
-            {breadcrumbData.map((item, index) => (
+            {breadcrumbData.map((item, index: number) => (
               <React.Fragment key={index}>
                 <BreadcrumbItem>
                   {item.isPage ? (
