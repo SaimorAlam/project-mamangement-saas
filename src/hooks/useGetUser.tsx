@@ -12,7 +12,7 @@ const Role = {
 };
 
 export const useGetUser = () => {
-  const { data, isLoading, isError } = useGetProfileQuery();
+  const { data, isLoading, isError } = useGetProfileQuery({});
   const user = data?.data as User | undefined;
   const currentRoute =
     user?.role && Role[user.role as keyof typeof Role]

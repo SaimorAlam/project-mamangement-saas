@@ -31,7 +31,7 @@ interface ProfileState {
 const IMG_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace("/api/v1", "/");
 
 const UserProfileSettings = ({ className = "" }: { className?: string }) => {
-  const { data: profileData, isLoading: profileLoading } = useGetProfileQuery();
+  const { data: profileData, isLoading: profileLoading } = useGetProfileQuery({});
   const [updateUser, { isLoading: isUpdating }] = useUpdateUsersMutation();
 
   const [profile, setProfile] = useState<ProfileState>({
@@ -174,7 +174,7 @@ const UserProfileSettings = ({ className = "" }: { className?: string }) => {
     <BoxContainer className={`shadow-sm border-gray-100 ${className}`}>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h4 className="text-xl font-bold text-gray-900 tracking-tight">
+          <h4 className="text-xl font-semibold text-gray-900 tracking-tight">
             User Profile & Preferences
           </h4>
           <p className="text-xs text-gray-400 font-medium">
@@ -226,7 +226,7 @@ const UserProfileSettings = ({ className = "" }: { className?: string }) => {
             </label>
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold text-gray-900 truncate">
+            <h2 className="text-xl font-semibold text-gray-900 truncate">
               {profile.name || "User Name"}
             </h2>
             <div className="flex flex-wrap gap-2 mt-2">
@@ -298,7 +298,7 @@ const UserProfileSettings = ({ className = "" }: { className?: string }) => {
         </div>
 
         <div className="space-y-6 pt-4 border-t border-gray-100">
-          <h5 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+          <h5 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
             Security Settings
           </h5>
           <div className="grid">

@@ -172,7 +172,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-500">Last Active</p>
-                <p className="text-gray-900">{formatDate(user.lastActive)}</p>
+                <p className="text-gray-900">{formatDate(user?.lastActive)}</p>
               </div>
             </div>
 
