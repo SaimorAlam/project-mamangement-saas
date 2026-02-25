@@ -18,11 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-<<<<<<< HEAD
 import { useGetEmployeeAllProjectsQuery } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
-=======
-import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
->>>>>>> 57f4376ef2bbcf78557de2edd2a515bef480948c
 import Pagination from "@/components/client/Pagination";
 import { useEmployeeId } from "@/hooks/useEmployeeId";
 import DropdownSelect from "@/common/DropdownSelect";
