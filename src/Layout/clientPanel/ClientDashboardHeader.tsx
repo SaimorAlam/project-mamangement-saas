@@ -416,6 +416,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
       );
 
     if (isPage.projectBuilder) {
+      if (isPage.importCSV) return null;
       if (isPreview || isPublished) {
         return (
           <div className="flex gap-4">
@@ -427,12 +428,12 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
                 navigate("/client-panel/project-builder/file-upload")
               }
             />
-            <PrimaryButton
+            {/* <PrimaryButton
               title="Download CSV"
               leftIcon={<Download />}
               type="Primary"
               onClick={handleDownloadCSV}
-            />
+            /> */}
           </div>
         );
       }
