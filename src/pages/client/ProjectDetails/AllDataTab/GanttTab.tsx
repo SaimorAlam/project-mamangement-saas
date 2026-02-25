@@ -1,10 +1,10 @@
 import React from "react";
-import GanttChart from "@/common/Charts/GanttChart";
+import ApexGnttChart from "@/common/Charts/ApexGnttChart";
 
 const GanttTab: React.FC = () => {
   return (
     <div className="w-full">
-      <GanttChart />
+      <ApexGnttChart />
     </div>
   );
 };

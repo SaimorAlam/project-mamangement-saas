@@ -58,7 +58,11 @@ export default function UserProfile({
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 shrink-0">
                 <img
-                  src={profileImage || "https://api.dicebear.com/9.x/initials/svg?seed=" + (name || "User")}
+                  src={
+                    profileImage ||
+                    "https://api.dicebear.com/9.x/initials/svg?seed=" +
+                      (name || "User")
+                  }
                   alt={name}
                   className="w-full h-full object-cover"
                 />
@@ -104,7 +108,11 @@ export default function UserProfile({
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
                 <img
-                  src={profileImage || "https://api.dicebear.com/9.x/initials/svg?seed=" + (name || "User")}
+                  src={
+                    profileImage ||
+                    "https://api.dicebear.com/9.x/initials/svg?seed=" +
+                      (name || "User")
+                  }
                   alt={name}
                   className="w-full h-full object-cover"
                 />

@@ -283,12 +283,12 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
                           setSelectedProject(project);
                           navigate(`project-details/${project.id}`);
                         }}
-                        className="h-8 w-8 p-0"
+                        className="h-8 w-8 p-0 cursor-pointer"
                       >
                         <Eye className="w-4 h-4 text-[#3B82F6]" />
                       </Button>
 
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer" onClick={() => navigate(`project-details/${project.id}`)}>
                         <Edit className="w-4 h-4 text-[#10B981]" />
                       </Button>
 
@@ -299,7 +299,7 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
                           e.stopPropagation();
                           handleDelete(project.id, project.name);
                         }}
-                        className="h-8 w-8 p-0"
+                        className="h-8 w-8 p-0 cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4 text-[#EF4444]" />
                       </Button>

@@ -41,7 +41,7 @@ const EmployeeTable = () => {
     limit: PAGE_SIZE,
   });
   const loading = isLoading || isFetching || pageLoading;
-
+  console.log(data);
   const users = data?.data?.data || [];
   const meta = data?.data?.meta;
 

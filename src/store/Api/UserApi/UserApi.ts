@@ -1,5 +1,11 @@
 import baseApi from "../BaseApi/BaseApi";
 
+export interface GenericResponse<T> {
+  status: string;
+  message: string;
+  data: T;
+}
+
 const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUsers: builder.query({

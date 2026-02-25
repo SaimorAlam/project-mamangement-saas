@@ -11,7 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { useHeaderContext } from "./ViewerPanelDashboardHeaderContext";
+
 import { getViewerPanelSidebarItems } from "./viewerPanelSidebarItems";
 import ViewerNotificationModal from "./ViewerNotificationModal";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
@@ -20,7 +20,7 @@ const ViewerPanelHeader = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const ClientSidebarGroups = getViewerPanelSidebarItems();
-  const { heading } = useHeaderContext();
+
 
   const location = useLocation();
   const { projectId } = useParams();
@@ -40,7 +40,7 @@ const ViewerPanelHeader = () => {
         {/* Greeting */}
         <div className="flex-1">
           <h1 className="text-[32px] font-semibold">
-            Good Morning👋, {heading}
+            Good Morning👋,
           </h1>
         </div>
 

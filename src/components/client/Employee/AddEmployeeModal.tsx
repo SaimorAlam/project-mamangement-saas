@@ -427,7 +427,7 @@ const AddEmployeeModal = ({
                   </label>
 
                   <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-gray-300 min-h-[42px]">
-                    {field.value.map((projectId: string) => (
+                    {field?.value?.map((projectId: string) => (
                       <span
                         key={projectId}
                         className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md text-gray-700 text-xs"
@@ -438,8 +438,8 @@ const AddEmployeeModal = ({
                         <button
                           type="button"
                           onClick={() => {
-                            const newVal = field.value.filter(
-                              (p) => p !== projectId,
+                            const newVal = field.value?.filter(
+                              (p: string) => p !== projectId,
                             );
                             field.onChange(newVal);
                           }}
@@ -465,9 +465,9 @@ const AddEmployeeModal = ({
                       <option value="" disabled>
                         Select project
                       </option>
-                      {PROJECT_OPTIONS.filter(
+                      {PROJECT_OPTIONS?.filter(
                         (p: any) => !field.value.includes(p.value),
-                      ).map((project: any) => (
+                      )?.map((project: any) => (
                         <option key={project.value} value={project.value}>
                           {project.label}
                         </option>
@@ -504,7 +504,7 @@ const AddEmployeeModal = ({
                         <button
                           type="button"
                           onClick={() => {
-                            const newVal = field.value.filter(
+                            const newVal = field.value?.filter(
                               (s) => s !== skill,
                             );
                             field.onChange(newVal);
