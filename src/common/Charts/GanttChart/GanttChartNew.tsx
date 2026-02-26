@@ -3,9 +3,9 @@ import { useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
-import AddTierModal from "../Modal/AddTierModal";
-import TierChartModal from "../Modal/TierChartModal";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import AddTierModal from "../../Modal/AddTierModal";
+import TierChartModal from "../../Modal/TierChartModal";
+import ChartCardWrapper from "../components/ChartCardWrapper";
 
 /*       TYPES       */
 

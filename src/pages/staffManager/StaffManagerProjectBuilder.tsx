@@ -7,7 +7,7 @@ import ProjectStats from "@/components/client/ProgramBuilder/ProjectStats";
 import ProjectWidget from "@/common/Charts/CompletedCharts/Widgets/ProjectWidget";
 // import ProgressRing from "@/common/Charts/ProgressRingTest";
 // import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
-import GanttChart from "@/common/Charts/GanttChart";
+import GanttChart from "@/common/Charts/GanttChart/GanttChart";
 
 import LineChartModule from "@/common/Charts/CompletedCharts/LineChart/LineChartModule";
 import ChartModuleOne from "@/common/Charts/CompletedCharts/ChartModule/ChartModuleOne";

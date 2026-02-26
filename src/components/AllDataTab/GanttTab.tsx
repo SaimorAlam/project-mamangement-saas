@@ -1,5 +1,5 @@
 import React from "react";
-import GanttChart from "@/common/Charts/GanttChart";
+import GanttChart from "@/common/Charts/GanttChart/GanttChart";
 
 const GanttTab: React.FC = () => {
   return (

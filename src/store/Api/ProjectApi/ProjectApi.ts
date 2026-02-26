@@ -26,7 +26,7 @@ const projectApi = baseApi.injectEndpoints({
           }
         });
         return {
-          url: "/project",
+          url: "/project/all",
           method: "GET",
           params,
         };
