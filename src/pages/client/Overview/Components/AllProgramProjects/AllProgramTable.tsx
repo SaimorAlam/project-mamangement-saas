@@ -119,7 +119,6 @@ const renderPriority = (priority: ProjectPriority) => (
   </div>
 );
 
-
 type SortField =
   | "programName"
   | "name"
@@ -344,7 +343,7 @@ const AllProgramTable = ({
                           >
                             <Eye className="w-4 h-4 text-[#1C73E0] ``" />
                           </Button>
-                           <Button
+                          <Button
                             variant="ghost"
                             size="sm"
                             className="cursor-pointer"
