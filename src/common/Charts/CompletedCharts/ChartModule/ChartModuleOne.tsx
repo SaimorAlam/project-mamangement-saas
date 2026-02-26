@@ -6,7 +6,6 @@ import StackedBarChart from "@/common/Charts/CompletedCharts/StackedBarChart/Sta
 import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
 import MultiAxisLineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
 import WidgetForChartModuleOne from "../Widgets/WidgetForChartModuleOne";
-import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
 import SplineAreaChart from "@/common/Charts/SplineAreaChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
@@ -104,34 +103,18 @@ const ChartModuleOne = ({
     <div className="flex gap-3 h-full">
       <div className="flex-1 h-full sticky top-5">
         {(() => {
-          if (chartName === "bar-chart" || chartName === "heat-map-chart") {
-            // Some names might vary, but use common component
-            if (chartName === "bar-chart") {
-              return (
-                <StackedBarChart
-                  widgetTitle={widgetTitle}
-                  xAxisValues={xAxisValues}
-                  legendValues={legendValues}
-                  numOfLegendDataSet={numOfLegendDataSet}
-                  startingRange={startingRange}
-                  endingRange={endingRange}
-                  onDelete={onDelete}
-                  isPreview={isPreview}
-                  onToggleWidget={handleToggleWidget}
-                  isCreationMode={true}
-                />
-              );
-            }
+          if (chartName === "bar-chart") {
             return (
-              <HeatmapChartNew
+              <StackedBarChart
                 widgetTitle={widgetTitle}
                 xAxisValues={xAxisValues}
                 legendValues={legendValues}
+                numOfLegendDataSet={numOfLegendDataSet}
                 startingRange={startingRange}
                 endingRange={endingRange}
-                onToggleWidget={handleToggleWidget}
                 onDelete={onDelete}
                 isPreview={isPreview}
+                onToggleWidget={handleToggleWidget}
                 isCreationMode={true}
               />
             );
@@ -191,9 +174,7 @@ const ChartModuleOne = ({
                 ? "Area Chart"
                 : chartName === "line-chart"
                   ? "Line Chart"
-                  : chartName === "heat-map-chart"
-                    ? "Heatmap Chart"
-                    : ""
+                  : ""
           }
           widgetTitle={widgetTitle}
           widgetCategory={
@@ -203,9 +184,7 @@ const ChartModuleOne = ({
                 ? "AREA"
                 : chartName === "line-chart"
                   ? "LINE"
-                  : chartName === "heat-map-chart"
-                    ? "HEATMAP"
-                    : "BAR"
+                  : "BAR"
           }
           setWidgetTitle={setWidgetTitle}
           numOfXAxisDataSet={numOfXAxisDataSet}
