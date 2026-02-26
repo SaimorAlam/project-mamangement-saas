@@ -15,6 +15,7 @@ import {
   setChildPayload,
   setGroupTitle,
 } from "@/store/Slices/ChartSlice/ChartSlice";
+import ChartSkeleton from "@/common/Skeleton/ChartSkeleton";
 
 /**
  * Parse xAxis 2D array format from API
@@ -57,7 +58,12 @@ export const parseHeatmapChartData = (
     parsedXAxis[0].length > 1 &&
     typeof parsedXAxis[0][1] === "string";
 
-  const dataRows = hasHeader ? parsedXAxis.slice(1) : parsedXAxis;
+  const dataRows = (hasHeader ? parsedXAxis.slice(1) : parsedXAxis).filter(
+    (row: any) => {
+      const rowName = String(row[0] || "").trim();
+      return rowName !== "" && rowName.toLowerCase() !== "label";
+    }
+  );
 
   // Extract labels from the first column of every data row
   const labels = dataRows.map((row: any) => String(row[0] || ""));
@@ -210,11 +216,16 @@ export default function HeatmapChartNew({
   /*   EFFECTIVE DATA   */
 
   const effectiveLegendValues = useMemo(() => {
-    if (legendValues.length > 0 && legendValues.some((l) => l.label !== "")) {
-      return legendValues.map((l) => ({
-        ...l,
-        field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
-      }));
+    if (
+      legendValues.length > 0 &&
+      legendValues.some((l) => l.label && l.label.trim() !== "")
+    ) {
+      return legendValues
+        .filter((l) => l.label && l.label.trim() !== "")
+        .map((l) => ({
+          ...l,
+          field: l.field || l.label.toLowerCase().replace(/\s+/g, ""),
+        }));
     }
     return [
       { label: "Sample A", field: "field1", color: "#13A490" },
@@ -314,6 +325,8 @@ export default function HeatmapChartNew({
   /*   HELPERS   */
 
   const getColor = (value: number) => {
+    if (value === 0) return "bg-gray-100";
+
     const percent =
       (value - safeStartingRange) / (safeEndingRange - safeStartingRange || 1);
 
@@ -580,7 +593,7 @@ export default function HeatmapChartNew({
       >
         <div className="w-full relative py-6">
           <div className="overflow-x-auto overflow-y-auto max-h-[350px]">
-            <div className="w-full flex flex-col">
+            <div className="w-full flex flex-col p-2">
               {heatmapDisplayData.map((row, rIdx) => (
                 <div key={rIdx} className="flex mb-3 w-full">
                   <div className="w-12 shrink-0 pr-3 text-right text-sm text-gray-700 flex items-center justify-end wrap-break-words">
@@ -661,7 +674,13 @@ export default function HeatmapChartNew({
           onBreadcrumbClick={handleBreadcrumbClick}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childTiers &&
+            {isLoading ? (
+              <>
+                <ChartSkeleton />
+                <ChartSkeleton />
+              </>
+            ) : (
+              childTiers &&
               childTiers.map((tier: any) => {
                 const heatmapConfig = tier?.heatmap || tier;
                 const tierLegends = (heatmapConfig?.widgets || []).map(
@@ -696,7 +715,8 @@ export default function HeatmapChartNew({
                     onNavigate={handleChildNavigate}
                   />
                 );
-              })}
+              })
+            )}
           </div>
         </TierChartModal>
       )}
