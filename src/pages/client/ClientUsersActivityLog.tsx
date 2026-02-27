@@ -3,7 +3,7 @@ import SearchBar from "@/components/client/SearchBar";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { useMemo, useState } from "react";
-import ActivityLogTable from "@/components/client/ActivityLog/ActivityLogTable";
+import ActivityLogTable from "@/pages/client/ActivityLog/ActivityLogTable";
 import Pagination from "@/components/client/Pagination";
 
 const activityLogData = [
@@ -707,9 +707,7 @@ const flattenEntry = (entry: ActivityLogEntry) => {
   return {
     timeStamp: entry.timestamp,
     description: `${entry.description.action}${
-      entry.description.details
-        ? `: ${entry.description.details}`
-        : ""
+      entry.description.details ? `: ${entry.description.details}` : ""
     }`,
     projectName: entry.projectName,
   };
@@ -725,10 +723,7 @@ const ClientUserActivityLog = () => {
     return Object.values(item).some(
       (value) =>
         value &&
-        value
-          .toString()
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
+        value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
     );
   });
 
@@ -745,9 +740,7 @@ const ClientUserActivityLog = () => {
     const csvContent = [
       headers.join(","),
       ...filteredData.map((entry) =>
-        headers
-          .map((key) => `"${entry[key as keyof typeof entry]}"`)
-          .join(",")
+        headers.map((key) => `"${entry[key as keyof typeof entry]}"`).join(","),
       ),
     ].join("\n");
 
@@ -767,10 +760,7 @@ const ClientUserActivityLog = () => {
           User Activity Log
         </h2>
         <div className="flex items-center gap-3">
-          <SearchBar
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           <DateRangePicker />
           <Button
             variant="outline"

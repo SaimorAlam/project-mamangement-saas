@@ -4,10 +4,8 @@ import { Download, Loader2 } from "lucide-react";
 import Pagination from "@/components/client/Pagination";
 import SearchBar from "@/components/client/SearchBar";
 import DateRange from "@/components/client/DateRange";
-import ActivityLogTable from "@/components/client/ActivityLog/ActivityLogTable";
+import ActivityLogTable from "@/pages/client/ActivityLog/ActivityLogTable";
 import { useGetAllActivityLogQuery } from "@/store/Api/ActivityLogApi/ActivityLogApi";
-
-
 
 export default function ClientActivityLog() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,8 +33,14 @@ export default function ClientActivityLog() {
   }, [filteredData, currentPage]);
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  
-  const tableHeaders = ["timestamp", "user", "description", "projectName", "ipAddress"];
+
+  const tableHeaders = [
+    "timestamp",
+    "user",
+    "description",
+    "projectName",
+    "ipAddress",
+  ];
 
   // Export CSV
   const handleExport = () => {

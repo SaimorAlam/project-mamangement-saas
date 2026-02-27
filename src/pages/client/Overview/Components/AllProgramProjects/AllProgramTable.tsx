@@ -49,6 +49,7 @@ export interface StaffEmployeeProject {
   program?: {
     programName?: string;
   };
+  dateDate:string;
   name: string;
   description: string;
   status: ProjectStatus;
@@ -324,10 +325,10 @@ const AllProgramTable = ({
                         {renderPriority(project.priority)}
                       </TableCell>
                       <TableCell className="px-6 py-3.5 text-muted-foreground">
-                        {formatDate(project.startDate)}
+                        {formatDate(project.dateDate)}
                       </TableCell>
                       <TableCell className="px-6 py-3.5 text-muted-foreground">
-                        {formatDate(project.deadline)}
+                        {project.deadline === null ? "-" : formatDate(project.deadline)}
                       </TableCell>
                       <TableCell className="flex items-center gap-2 px-6 py-3.5 text-muted-foreground">
                         <Progress value={project.progress} className="h-2" />

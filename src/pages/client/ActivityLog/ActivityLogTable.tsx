@@ -36,13 +36,18 @@ const getActionIconFromDescription = (description: string) => {
   return getActionIcon(action);
 };
 
-export type ActivityLogEntry = Partial<IActivityLog> & {
-  // Allow index access for table headers
+export type ActivityLogEntry = (Omit<Partial<IActivityLog>, "user"> & {
+  user?: {
+    id?: string;
+    name?: string;
+    avatar?: string;
+  };
+}) & {
   [key: string]: string | number | boolean | null | undefined | object;
 };
 
 interface ActivityLogTableProps {
-  paginatedData: ActivityLogEntry[];
+  paginatedData?: ActivityLogEntry[];
   tableHeaders: string[];
 }
 
@@ -70,9 +75,9 @@ const ActivityLogTable = ({
           </TableRow>
         </TableHeader>
         <TableBody className="rounded-lg">
-          {paginatedData.map((entry, idx) => (
+          {paginatedData?.map((entry, idx) => (
             <TableRow
-              key={entry.id || idx}
+              key={String(entry.id || idx)}
               className="border-b border-[#E2E8F0] hover:bg-muted/30 transition-colors odd:bg-white even:bg-[#F7F9FA]"
             >
               {tableHeaders
@@ -99,16 +104,16 @@ const ActivityLogTable = ({
                       <div className="flex items-center gap-1">
                         <span className="text-lg">
                           {entry.actionType
-                            ? getActionIcon(entry.actionType)
+                            ? getActionIcon(String(entry.actionType))
                             : entry.description && typeof entry.description === "string"
-                            ? getActionIconFromDescription(entry.description)
+                            ? getActionIconFromDescription(entry.description as string)
                             : null}
                         </span>
-                        <span>{typeof entry.description === "string" ? entry.description : ""}</span>
+                        <span>{typeof entry.description === "string" ? entry.description : String(entry.description || "")}</span>
                       </div>
                     ) : key === "timestamp" ? (
                         <span>
-                            {entry.timestamp ? new Date(entry.timestamp).toLocaleString("en-GB", {
+                            {entry.timestamp && (typeof entry.timestamp === "string" || typeof entry.timestamp === "number") ? new Date(entry.timestamp).toLocaleString("en-GB", {
                                 day: "2-digit",
                                 month: "short",
                                 year: "numeric",
