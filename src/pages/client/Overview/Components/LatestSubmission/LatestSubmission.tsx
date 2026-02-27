@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SelectContent,
   SelectItem,
@@ -23,15 +23,16 @@ import { Filter, ArrowDownUp } from "lucide-react";
 import BoxContainer from "@/common/BoxContainer";
 import { useGetAllSubmissionQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
 import ViewSubmissionDialog from "./ViewSubmissionDialog";
+import Pagination from "@/components/client/Pagination";
 
 type SortField = "submission" | "project" | "submittedBy" | "date" | "status";
 type SortOrder = "asc" | "desc";
-type StatusFilter = "ALL" | "APPROVED" | "PENDING" | "RETURNED";
+type StatusFilter = "ALL" | "APPROVED" | "PENDING" | "REJECTED";
 
 const statusStyles: Record<string, string> = {
   PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
   APPROVED: "bg-green-50 text-green-700 border-green-200",
-  RETURNED: "bg-red-50 text-red-700 border-red-200",
+  REJECTED: "bg-red-50 text-red-700 border-red-200",
 };
 
 const TABLE_SKELETON_ROWS = 6;
@@ -49,6 +50,9 @@ const LatestSubmission = () => {
     // endDate: endDate || undefined,
     status: status !== "ALL" ? status : undefined,
   });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   /* ---------- client-side sorting ---------- */
   const sortedSubmissions = useMemo(() => {
@@ -104,6 +108,18 @@ const LatestSubmission = () => {
     }
   };
 
+  const paginatedSubmissions = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return sortedSubmissions.slice(startIndex, startIndex + itemsPerPage);
+  }, [sortedSubmissions, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(sortedSubmissions.length / itemsPerPage);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [status]);
+
   return (
     <BoxContainer>
       <Card className="border-none shadow-none p-0!">
@@ -137,7 +153,7 @@ const LatestSubmission = () => {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Sort By</SelectLabel>
-                    {["ALL", "APPROVED", "PENDING", "RETURNED"].map((s) => (
+                    {["ALL", "APPROVED", "PENDING", "REJECTED"].map((s) => (
                       <SelectItem key={s} value={s}>
                         {s}
                       </SelectItem>
@@ -150,21 +166,29 @@ const LatestSubmission = () => {
         </CardHeader>
 
         {/* Table */}
-        <CardContent className="p-0 border border-gray-200 rounded-xl overflow-hidden">
-          <ScrollArea className="h-[500px] w-full">
-            <table className="w-full text-sm">
+        <CardContent className="p-0 border border-gray-200 rounded-xl overflow-hidden mb-6">
+          <ScrollArea className="w-full min-h-[380px]">
+            <table className="w-full text-sm table-fixed">
               <TableHeader className="sticky top-0 bg-gray-50 z-20">
                 <TableRow>
                   {[
-                    { label: "Submission", field: "submission" },
-                    { label: "Project", field: "project" },
-                    { label: "Submitted By", field: "submittedBy" },
-                    { label: "Date", field: "date" },
-                    { label: "Status", field: "status" },
+                    {
+                      label: "Submission",
+                      field: "submission",
+                      width: "w-[22%]",
+                    },
+                    { label: "Project", field: "project", width: "w-[20%]" },
+                    {
+                      label: "Submitted By",
+                      field: "submittedBy",
+                      width: "w-[18%]",
+                    },
+                    { label: "Date", field: "date", width: "w-[15%]" },
+                    { label: "Status", field: "status", width: "w-[15%]" },
                   ].map((col) => (
                     <TableHead
                       key={col.field}
-                      className={`px-6 py-4 cursor-pointer text-left ${
+                      className={`px-6 py-4 cursor-pointer text-left ${col.width} ${
                         col.field === "status" ? "text-center" : ""
                       }`}
                       onClick={() => handleSort(col.field as SortField)}
@@ -183,7 +207,9 @@ const LatestSubmission = () => {
                       </span>
                     </TableHead>
                   ))}
-                  <TableHead className="px-6 py-4 text-right">Action</TableHead>
+                  <TableHead className="px-6 py-4 text-right w-[10%]">
+                    Action
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -211,8 +237,8 @@ const LatestSubmission = () => {
                       </TableCell>
                     </TableRow>
                   ))
-                ) : sortedSubmissions.length ? (
-                  sortedSubmissions.map((item: any) => (
+                ) : paginatedSubmissions.length ? (
+                  paginatedSubmissions.map((item: any) => (
                     <TableRow key={item.id}>
                       <TableCell className="px-6 py-4 font-medium">
                         {item.submission}
@@ -250,6 +276,16 @@ const LatestSubmission = () => {
             </table>
           </ScrollArea>
         </CardContent>
+
+        {sortedSubmissions.length > itemsPerPage && (
+          <Pagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            totalPages={totalPages}
+            filteredDataLength={sortedSubmissions.length}
+          />
+        )}
       </Card>
     </BoxContainer>
   );

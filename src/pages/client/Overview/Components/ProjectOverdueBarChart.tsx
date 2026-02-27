@@ -17,16 +17,17 @@ const ProjectOverdueBarChart = () => {
     // Map API data
     const projects = data.data.projects;
     const categories = projects.map((p: any) => p.name);
-    const values = projects.map((p: any) => Number(p.overdue));
+    const values = projects.map((p: any) => Number(p.overdueDays));
 
     const colors = projects.map((p: any) => {
-      if (p.overdue > 90) return "#DA4352"; // Critical
-      if (p.overdue > 30) return "#FF974B"; // Medium
+      if (p.overdueDays > 90) return "#DA4352"; // Critical
+      if (p.overdueDays > 30) return "#FF974B"; // Medium
       return "#F5B31A"; // Low
     });
 
     setChartData({
       series: [{ data: values }],
+
       options: {
         chart: {
           type: "bar" as const,
@@ -54,7 +55,12 @@ const ProjectOverdueBarChart = () => {
           labels: { style: { fontSize: "13px" } },
         },
         yaxis: {
-          labels: { style: { fontSize: "13px", fontWeight: 500 } },
+          labels: {
+            style: {
+              fontSize: "13px",
+              fontWeight: 500,
+            },
+          },
         },
         legend: {
           show: true,
@@ -82,12 +88,14 @@ const ProjectOverdueBarChart = () => {
       {isLoading || chartData.series.length === 0 ? (
         <div className="w-full h-[350px] bg-gray-100 animate-pulse rounded-md" />
       ) : (
-        <Chart
-          options={chartData.options}
-          series={chartData.series}
-          type="bar"
-          height={350}
-        />
+        <div className="">
+          <Chart
+            options={chartData.options}
+            series={chartData.series}
+            type="bar"
+            height={350}
+          />
+        </div>
       )}
     </BoxContainer>
   );

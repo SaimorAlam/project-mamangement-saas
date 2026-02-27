@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Filter, List } from "lucide-react";
+import { List } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import BoxContainer from "../../../common/BoxContainer";
+import BoxContainer from "../../../../common/BoxContainer";
 import { useGetAllActivityLogsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import { formatDate } from "@/common/Charts/ProjectInfo";
+import { BsArrowRight } from "react-icons/bs";
+import { Link } from "react-router-dom";
 
 const ActivityLogSkeleton = () => {
   return Array.from({ length: 6 }).map((_, index) => (
@@ -38,11 +40,11 @@ const ActivityLog = () => {
               Activity Log
             </h4>
           </div>
-          {activityData?.length > 0 && (
+          {/* {activityData?.length > 0 && (
             <div className="border border-gray-200 p-2 rounded-lg">
               <Filter size={24} color="#CBD5E1" />
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Activity Items */}
@@ -50,14 +52,14 @@ const ActivityLog = () => {
           {isLoading ? (
             <ActivityLogSkeleton />
           ) : activityData.length > 0 ? (
-            activityData.slice(0, 10).map((activity: any, index: number) => (
+            activityData.slice(0, 5).map((activity: any, index: number) => (
               <div
                 key={activity?.id ?? index}
                 className="flex items-start gap-3"
               >
                 <div className="relative min-h-20 flex">
                   <div className="size-2.5 rounded-full shrink-0 bg-green-600 z-20" />
-                  <div className="absolute inset-x-1/2 left-1 w-px h-full border border-[#CBD5E1]" />
+                  <div className="absolute inset-x-1/2 left-1 w-px h-full border border-gray-200" />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -72,7 +74,7 @@ const ActivityLog = () => {
                       </p>
 
                       <div className="flex flex-col mt-2 text-sm text-[#475569]">
-                        <span>{activity?.ipAddress ?? "-"}</span>
+                        {/* <span>{activity?.ipAddress ?? "-"}</span> */}
                         <span>
                           {activity?.timestamp
                             ? formatDate(activity.timestamp)
@@ -83,7 +85,7 @@ const ActivityLog = () => {
 
                     {activity?.user?.name && (
                       <span className="text-sm text-[#475569]">
-                        {activity.user.name}
+                        By {activity.user.name}
                       </span>
                     )}
                   </div>
@@ -94,6 +96,14 @@ const ActivityLog = () => {
             <div className="flex justify-center items-center h-32 text-gray-500">
               No Data Found
             </div>
+          )}
+          {activityData?.length > 5 && (
+            <Link
+              to="/client-panel/activity-log"
+              className="flex justify-center items-center gap-2 text-blue-500 cursor-pointer hover:text-blue-600 pt-4"
+            >
+              View full audit trail <BsArrowRight />
+            </Link>
           )}
         </div>
       </Card>

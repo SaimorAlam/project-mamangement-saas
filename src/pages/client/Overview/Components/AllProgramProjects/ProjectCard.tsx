@@ -5,7 +5,6 @@ import { Progress } from "@/components/ui/progress";
 import { Flag, Layers } from "lucide-react";
 import { FaStar } from "react-icons/fa6";
 import { toast } from "sonner";
-import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 // import ProjectDetailsModal from "@/components/staffManager/overview/ProjectDetailsModal";
 import {
   useAddFavoriteProjectMutation,
@@ -14,6 +13,8 @@ import {
 } from "@/store/Api/FavoriteProjectApi/FavoriteProjectApi";
 import PrimaryButton from "@/common/PrimaryButton";
 import { useNavigate } from "react-router-dom";
+import { AssignedStaffAvatars } from "@/components/client/AssignedStaffAvatars";
+import { Project } from "@/store/Api/ProjectApi/ProjectType";
 
 export type ProjectStatus =
   | "LIVE"
@@ -22,45 +23,12 @@ export type ProjectStatus =
   | "DRAFT"
   | "IN_REVIEW"
   | "SUBMITTED"
-  | "PENDING";
+  | "PENDING"
+  | "COMPLETED";
 
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-export interface Project {
-  id: string;
-  programId: string;
-  programName?: string;
-  program?: {
-    programName?: string;
-  };
-  name: string;
-  description: string;
-  dateDate:string;
-  status: ProjectStatus;
-  priority: ProjectPriority;
 
-  startDate: string;
-  deadline: string;
-
-  progress: number;
-
-  managerId: string;
-  viewerId: string;
-
-  chartList: unknown[];
-
-  estimatedCompletedDate: string;
-  projectCompleteDate: string | null;
-
-  currentRate: string;
-  budget: string;
-
-  latitude: number | null;
-  longitude: number | null;
-
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface ProjectCardProps {
   project: Project;
@@ -81,6 +49,7 @@ const statusStyles: Record<ProjectStatus, string> = {
   RETURNED: "bg-orange-50 text-orange-700 border-orange-200",
   OVERDUE: "bg-red-50 text-red-700 border-red-200",
   DRAFT: "bg-slate-100 text-slate-600 border-slate-200",
+  COMPLETED: "bg-green-50 text-green-700 border-green-200",
 };
 
 const renderStatusBadge = (status: ProjectStatus) => (
@@ -93,8 +62,19 @@ const renderStatusBadge = (status: ProjectStatus) => (
 );
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
-  const { id, name, program, priority, deadline,dateDate, progress, status } =
-    project;
+  const {
+    id,
+    name,
+    program,
+    priority,
+    deadline,
+    startDate,
+    progress,
+    status,
+    manager,
+    projectEmployees,
+    projectViewers,
+  } = project;
   const navigate = useNavigate();
   const [addFavoriteProject] = useAddFavoriteProjectMutation();
   const [removeFavoriteProject] = useRemoveFavoriteProjectMutation();
@@ -174,24 +154,29 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             <div>
               <h3 className="mb-1">Assigned People</h3>
               {/* Kept intentionally even if data is not available */}
-              <RenderStaffAvatars
-                staff={Array.from({ length: 3 }, (_, i) => ({
-                  id: i.toString(),
-                  name: `Staff ${i + 1}`,
-                  avatar: "https://randomuser.me/api/portraits/men/19.jpg",
-                }))}
+              <AssignedStaffAvatars
+                manager={manager}
+                employees={
+                  projectEmployees?.map((pe: any) => pe.employee) || []
+                }
+                viewers={projectViewers?.map((pv: any) => pv.viewer) || []}
+                maxVisible={3}
               />
             </div>
 
             <div className="flex flex-col gap-y-4 text-sm py-2 px-4">
               <div>
                 <p className="text-gray-500">Project start</p>
-                <p className="font-medium">{formatDate(dateDate)}</p>
+                <p className="font-medium">
+                  {startDate === null ? "-" : formatDate(startDate)}
+                </p>
               </div>
 
               <div>
                 <p className="text-gray-500">Project finish</p>
-                <p className="font-medium">{deadline === null ? "-" : formatDate(deadline)}</p>
+                <p className="font-medium">
+                  {deadline === null ? "-" : formatDate(deadline)}
+                </p>
               </div>
             </div>
           </div>

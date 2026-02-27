@@ -1,4 +1,4 @@
-import ActivityLog from "@/components/client/Overview/ActivityLog";
+import ActivityLog from "@/pages/client/Overview/Components/ActivityLog";
 import ProjectStatusDonutChart from "./Components/ProjectStatusDonutChart";
 import ProjectTimelineColumnChart from "./Components/ProjectTimelineColumnChart";
 import { useGetOverviewStackQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";

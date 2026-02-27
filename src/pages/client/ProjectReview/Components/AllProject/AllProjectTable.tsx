@@ -15,11 +15,12 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import RenderStaffAvatars from "@/components/ViewerPanel/RenderStaffAvater";
-import { Project } from "./AllProject";
+
 import ProjectModal from "./ProjectModal";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
+import { AssignedStaffAvatars } from "@/components/client/AssignedStaffAvatars";
+import { Project } from "@/store/Api/ProjectApi/ProjectType";
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -47,6 +48,7 @@ const statusStyles: Record<Project["status"], string> = {
   PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
   RETURNED: "bg-orange-50 text-orange-700 border-orange-200",
   OVERDUE: "bg-red-50 text-red-700 border-red-200",
+  COMPLETED: "bg-green-50 text-green-700 border-green-200",
   DRAFT: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
@@ -249,13 +251,18 @@ const AllProjectTable = ({ projects }: { projects: Project[] }) => {
                   </TableCell>
 
                   <TableCell className="px-4 py-3.5">
-                    <RenderStaffAvatars
-                      staff={Array.from({ length: 3 }, (_, i) => ({
-                        id: i.toString(),
-                        name: `Staff ${i + 1}`,
-                        avatar:
-                          "https://randomuser.me/api/portraits/men/19.jpg",
-                      }))}
+                    <AssignedStaffAvatars
+                      manager={project.manager}
+                      employees={
+                        project.projectEmployees?.map(
+                          (pe: any) => pe.employee,
+                        ) || []
+                      }
+                      viewers={
+                        project.projectViewers?.map((pv: any) => pv.viewer) ||
+                        []
+                      }
+                      maxVisible={3}
                     />
                   </TableCell>
 
