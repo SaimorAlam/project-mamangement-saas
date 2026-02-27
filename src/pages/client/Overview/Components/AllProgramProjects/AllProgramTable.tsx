@@ -13,20 +13,13 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogDescription,
-// } from "@/components/ui/dialog";
-import RenderStaffAvatars from "@/components/client/RenderStaffAvater";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useDeleteProjectMutation } from "@/store/Api/ProjectApi/ProjectApi";
 import UpdateProjectModal from "@/pages/client/Program/UpdateProjectModal";
+import { AssignedStaffAvatars } from "@/components/client/AssignedStaffAvatars";
+import { Project } from "@/store/Api/ProjectApi/ProjectType";
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -39,39 +32,13 @@ export type ProjectStatus =
   | "DRAFT"
   | "IN_REVIEW"
   | "SUBMITTED"
-  | "PENDING";
+  | "PENDING"
+  | "COMPLETED";
 
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-export interface StaffEmployeeProject {
-  id: string;
-  programId: string;
-  program?: {
-    programName?: string;
-  };
-  dateDate:string;
-  name: string;
-  description: string;
-  status: ProjectStatus;
-  priority: ProjectPriority;
-  startDate: string;
-  deadline: string;
-  progress: number;
-  managerId?: string;
-  employeeIds?: string[];
-  viewerIds?: string[];
-  uploadCycle?: string;
-  SelectDays?: string | string[];
-  selectDate?: string | string[];
-  UploadData?: string | number;
-  workingDay?: string | string[];
-  sortName?: string;
-  budget?: string | number;
-  currentRate?: string | number;
-}
-
 interface AllProgramTableProps {
-  projects: StaffEmployeeProject[];
+  projects: Project[];
   isLoading?: boolean; // optional loading flag
 }
 
@@ -87,6 +54,7 @@ const statusStyles: Record<ProjectStatus, string> = {
   RETURNED: "bg-orange-50 text-orange-700 border-orange-200",
   OVERDUE: "bg-red-50 text-red-700 border-red-200",
   DRAFT: "bg-slate-100 text-slate-600 border-slate-200",
+  COMPLETED: "bg-green-50 text-green-700 border-green-200",
 };
 
 const renderStatusBadge = (status: ProjectStatus) => (
@@ -145,12 +113,10 @@ const AllProgramTable = ({
   const navigate = useNavigate();
   const [deleteProject] = useDeleteProjectMutation();
 
-  const [editProject, setEditProject] = useState<StaffEmployeeProject | null>(
-    null,
-  );
+  const [editProject, setEditProject] = useState<Project | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
-  const handleViewProject = (project: StaffEmployeeProject) => {
+  const handleViewProject = (project: Project) => {
     // setSelectedProject(project);
     // setOpen(true);
     navigate(`/client-panel/overview/project-details/${project.id}`);
@@ -312,23 +278,33 @@ const AllProgramTable = ({
                         {renderStatusBadge(project.status)}
                       </TableCell>
                       <TableCell className="px-6 py-3.5">
-                        <RenderStaffAvatars
-                          staff={Array.from({ length: 3 }, (_, i) => ({
-                            id: i.toString(),
-                            name: `Staff ${i + 1}`,
-                            avatar:
-                              "https://randomuser.me/api/portraits/men/19.jpg",
-                          }))}
+                        <AssignedStaffAvatars
+                          manager={project.manager}
+                          employees={
+                            project.projectEmployees?.map(
+                              (pe: any) => pe.employee,
+                            ) || []
+                          }
+                          viewers={
+                            project.projectViewers?.map(
+                              (pv: any) => pv.viewer,
+                            ) || []
+                          }
+                          maxVisible={3}
                         />
                       </TableCell>
                       <TableCell className="px-6 py-3.5">
                         {renderPriority(project.priority)}
                       </TableCell>
                       <TableCell className="px-6 py-3.5 text-muted-foreground">
-                        {formatDate(project.dateDate)}
+                        {project.startDate === null
+                          ? "-"
+                          : formatDate(project.startDate)}
                       </TableCell>
                       <TableCell className="px-6 py-3.5 text-muted-foreground">
-                        {project.deadline === null ? "-" : formatDate(project.deadline)}
+                        {project.deadline === null
+                          ? "-"
+                          : formatDate(project.deadline)}
                       </TableCell>
                       <TableCell className="flex items-center gap-2 px-6 py-3.5 text-muted-foreground">
                         <Progress value={project.progress} className="h-2" />

@@ -47,6 +47,9 @@ export interface StaffEmployeeProject {
   viewerId: string;
   chartList: unknown[];
   estimatedCompletedDate: string;
+  projectEmployees: unknown[];
+  projectViewers: unknown[];
+  manager: { id: string; userId: string; user: { id: string; name: string; email: string; profileImage: string | null; role: string; }; };
   projectCompleteDate: string | null;
   currentRate: string;
   budget: string;
