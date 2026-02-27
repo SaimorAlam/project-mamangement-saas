@@ -85,6 +85,14 @@ const staffEmployeeApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Employee"],
     }),
+    getAllEmployeeSubmissions: builder.query({
+      query: (params) => ({
+        url: "/submitted/all",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Employee"],
+    }),
     createEmployeeSubmission: builder.mutation<any, {
       information: string;
       submission: string;
@@ -104,6 +112,13 @@ const staffEmployeeApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Employee"],
     }),
+    deleteEmployeeSubmission: builder.mutation<any, string>({
+      query: (id) => ({
+        url: `/submitted/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Employee"],
+    }),
   }),
 });
 
@@ -119,6 +134,8 @@ export const {
   useGetNotificationsQuery,
   useGetEmployeeAllProjectsQuery,
   useCreateEmployeeSubmissionMutation,
+  useGetAllEmployeeSubmissionsQuery,
+  useDeleteEmployeeSubmissionMutation,
 } = staffEmployeeApi;
 
 export default staffEmployeeApi;

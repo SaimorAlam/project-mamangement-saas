@@ -191,7 +191,7 @@ const UploadProject = () => {
           setProjectNote("");
           setAddNotes(false);
           setInformation("");
-          navigate("/staff-employee-panel");
+          navigate(`/staff-employee-panel/projects/project-details/${project}`);
         } catch (apiError: unknown) {
           console.error("API Error:", apiError);
           const err = apiError as { data?: { message?: string }; status?: number };
