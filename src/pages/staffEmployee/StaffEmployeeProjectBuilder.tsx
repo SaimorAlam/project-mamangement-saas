@@ -11,7 +11,7 @@ import ProgressRing from "@/common/Charts/ProgressRingTest";
 // import MultiAxisLineChart from "@/common/Charts/LineChart";
 // import HorizontalBarChart from "@/common/Charts/HorizontalBarChart";
 // import AreaChart from "@/common/Charts/AreaChart";
-import GanttChart from "@/common/Charts/GanttChart";
+import GanttChart from "@/common/Charts/GanttChart/GanttChart";
 import LineChartModule from "@/common/Charts/CompletedCharts/LineChart/LineChartModule";
 import ChartModuleOne from "@/common/Charts/CompletedCharts/ChartModule/ChartModuleOne";
 

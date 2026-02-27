@@ -265,44 +265,36 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
       const res = await getAllTheLeafChart(
         projectIdFromState as string,
       ).unwrap();
-      const leafCharts = res?.data || [];
-      if (leafCharts.length === 0) {
+      const groups = res?.data || [];
+      // Flatten charts from all groups
+      const allCharts = groups.flatMap((group: any) => group.charts || []);
+
+      if (allCharts.length === 0) {
         toast.error("No data found to download", { id: toastId });
         return;
       }
 
-      let templateXAxis: string[] = [];
-      let templateLegends: any[] = [];
-
-      for (const node of leafCharts) {
-        let xAxis = node.xAxisValues || [];
-        if (!xAxis.length && node.xAxis) {
+      // Extract template structure if any chart has xAxis
+      let templateAOA: any[][] = [];
+      for (const node of allCharts) {
+        let xAxis = node.xAxis;
+        if (typeof xAxis === "string") {
           try {
-            const parsed =
-              typeof node.xAxis === "string"
-                ? JSON.parse(node.xAxis)
-                : node.xAxis;
-            xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
+            xAxis = JSON.parse(xAxis);
           } catch {
             /* ignore */
           }
         }
-
-        let legends = node.legendValues || [];
-        const nodeWidgets = node.widgets || node.barChart?.widgets;
-        if (!legends.length && nodeWidgets?.length > 0) {
-          legends = nodeWidgets.map((w: any) => ({
-            label: w.legendName || w.label || "Legend",
-            field: (w.legendName || w.label || "field")
-              .toLowerCase()
-              .replace(/\s+/g, ""),
-            color: w.color || "#000000",
-          }));
-        }
-
-        if (xAxis.length > 0 && legends.length > 0) {
-          templateXAxis = xAxis;
-          templateLegends = legends;
+        if (
+          Array.isArray(xAxis) &&
+          xAxis.length > 1 &&
+          Array.isArray(xAxis[0])
+        ) {
+          templateAOA = xAxis.map((row: any[], rIdx: number) =>
+            row.map((cell: any, cIdx: number) =>
+              rIdx === 0 || cIdx === 0 ? cell : "",
+            ),
+          );
           break;
         }
       }
@@ -332,52 +324,91 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         return uniqueName;
       };
 
-      leafCharts.forEach((node: any) => {
+      allCharts.forEach((node: any) => {
         ids.push(node.id);
-        let xAxis = node.xAxisValues || [];
-        if (!xAxis.length && node.xAxis) {
+        let currentAOA: any[][] = [];
+
+        // Try to get structure from current node's xAxis
+        let xAxis = node.xAxis;
+        if (typeof xAxis === "string") {
           try {
-            const parsed =
-              typeof node.xAxis === "string"
-                ? JSON.parse(node.xAxis)
-                : node.xAxis;
-            xAxis = Array.isArray(parsed) ? parsed : parsed.labels || [];
+            xAxis = JSON.parse(xAxis);
           } catch {
             /* ignore */
           }
         }
-        let legends = node.legendValues || [];
-        const nodeWidgets = node.widgets || node.barChart?.widgets;
-        if (!legends.length && nodeWidgets?.length > 0) {
-          legends = nodeWidgets.map((w: any) => ({
-            label: w.legendName || w.label || "Legend",
-            field: (w.legendName || w.label || "field")
-              .toLowerCase()
-              .replace(/\s+/g, ""),
-            color: w.color || "#000000",
-          }));
-        }
-        if (!xAxis.length) xAxis = templateXAxis;
-        if (!legends.length) legends = templateLegends;
 
-        const headers = ["Label", ...legends.map((l: any) => l.label)];
-        const rows = xAxis.map((label: string) => [
-          label,
-          ...legends.map(() => ""),
-        ]);
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-        XLSX.utils.book_append_sheet(
-          wb,
-          ws,
-          getUniqueSheetName(node.title || node.name || "Tier", node.id),
-        );
+        if (
+          Array.isArray(xAxis) &&
+          xAxis.length > 1 &&
+          Array.isArray(xAxis[0])
+        ) {
+          currentAOA = xAxis.map((row: any[], rIdx: number) =>
+            row.map((cell: any, cIdx: number) =>
+              rIdx === 0 || cIdx === 0 ? cell : "",
+            ),
+          );
+        } else {
+          // Fallback legacy structure reconstruction
+          const nodeWidgets =
+            node.widgets ||
+            node.barChart?.widgets ||
+            node.multiAxisChart?.widgets ||
+            node.horizontalBarChart?.widgets ||
+            node.areaChart?.widgets ||
+            node.pi?.widgets ||
+            [];
+
+          if (nodeWidgets.length > 0) {
+            const legends = nodeWidgets.map(
+              (w: any) => w.legendName || w.label || "Legend",
+            );
+            const xAxisLabels =
+              node.xAxisValues ||
+              (node.xAxis &&
+              Array.isArray(node.xAxis) &&
+              !Array.isArray(node.xAxis[0])
+                ? node.xAxis
+                : ["Data"]);
+
+            const headers = ["Label", ...legends];
+            const rows = xAxisLabels.map((label: string) => [
+              label,
+              ...legends.map(() => ""),
+            ]);
+            currentAOA = [headers, ...rows];
+          }
+        }
+
+        // Use global template if specific chart still has no structure
+        if (currentAOA.length === 0 && templateAOA.length > 0) {
+          currentAOA = templateAOA;
+        }
+
+        if (currentAOA.length > 0) {
+          const ws = XLSX.utils.aoa_to_sheet(currentAOA);
+          XLSX.utils.book_append_sheet(
+            wb,
+            ws,
+            getUniqueSheetName(node.title || node.name || "Tier", node.id),
+          );
+        }
       });
 
+      if (wb.SheetNames.length === 0) {
+        toast.error("No valid chart structure found to generate Excel", {
+          id: toastId,
+        });
+        return;
+      }
+
+      const filenameIds =
+        ids.length > 5 ? ids.slice(0, 5).join("_") + "_more" : ids.join("_");
       XLSX.writeFile(
         wb,
-        `${projectName || "Project"}_ID_${ids.join("_")}.xlsx`,
+        `${projectName || "Project"}_Template_${filenameIds}.xlsx`,
       );
-      toast.success("Excel downloaded successfully", { id: toastId });
+      toast.success("Excel template downloaded successfully", { id: toastId });
     } catch (error) {
       console.error("Excel download failed", error);
       toast.error("Failed to download Excel", { id: toastId });
@@ -416,6 +447,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
       );
 
     if (isPage.projectBuilder) {
+      if (isPage.importCSV) return null;
       if (isPreview || isPublished) {
         return (
           <div className="flex gap-4">

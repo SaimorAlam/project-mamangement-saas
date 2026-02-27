@@ -2,7 +2,7 @@ import { useState } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
-import GanttChartNew from "@/common/Charts/GanttChartNew";
+import GanttChartNew from "@/common/Charts/GanttChart/GanttChartNew";
 
 type GanttChartNewModuleProps = {
   onDelete?: () => void;
