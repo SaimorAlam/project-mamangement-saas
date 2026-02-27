@@ -79,7 +79,7 @@ const staffEmployeeApi = baseApi.injectEndpoints({
     }),
     getEmployeeAllProjects: builder.query({
       query: (params) => ({
-        url: "/project",
+        url: "/project/all",
         method: "GET",
         params,
       }),

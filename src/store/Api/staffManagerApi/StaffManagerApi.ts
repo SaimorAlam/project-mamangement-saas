@@ -31,7 +31,7 @@ const userApi = baseApi.injectEndpoints({
     }),
     getAllManagerProgramsForProgramPage: builder.query({
       query: (params) => ({
-        url: "/program",
+        url: "/program/all",
         method: "GET",
         params,
       }),
@@ -75,7 +75,7 @@ const userApi = baseApi.injectEndpoints({
     }),
     getProgramAllProjects: builder.query({
       query: (params) => ({
-        url: "/project",
+        url: "/project/all",
         method: "GET",
         params,
       }),
