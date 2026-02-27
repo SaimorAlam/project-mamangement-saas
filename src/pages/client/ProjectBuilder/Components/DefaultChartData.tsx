@@ -211,8 +211,13 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
           );
         }
         if (categoryKey === "HEATMAP") {
+          const heatmapConfig = item?.heatmap || chartData;
+          const numDatasets = heatmapConfig?.numberOfDataset || 1;
+          const firstField = heatmapConfig?.firstFieldDataset || 0;
+          const lastField = heatmapConfig?.lastFieldDataset || 100;
+
           const legendValues =
-            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+            (heatmapConfig?.widgets || [])?.map((w: any) => ({
               label: w.legendName || w.label,
               color: w.color,
               field: (w.legendName || w.label)
@@ -220,7 +225,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 .replace(/\s+/g, ""),
             })) || [];
 
-          const { labels } = parseXAxisData(
+          const { labels, data } = parseXAxisData(
             xAxisData,
             legendValues,
             item?.title,
@@ -236,6 +241,8 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 startingRange={firstField}
                 endingRange={lastField}
                 chartId={item?.id}
+                projectId={item?.projectId}
+                allUploadedData={data}
               />
             </div>
           );

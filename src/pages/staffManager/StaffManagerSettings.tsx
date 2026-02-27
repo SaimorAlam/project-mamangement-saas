@@ -181,7 +181,7 @@ const StaffManagerSettings = () => {
       // Simulate API call - replace with actual API
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Preferences saved successfully");
-    } catch (error) {
+    } catch  {
       toast.error("Failed to save preferences");
     } finally {
       setIsSavingPreferences(false);
@@ -194,7 +194,7 @@ const StaffManagerSettings = () => {
       // Simulate API call - replace with actual API
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Notification settings saved successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to save notification settings");
     } finally {
       setIsSavingNotifications(false);

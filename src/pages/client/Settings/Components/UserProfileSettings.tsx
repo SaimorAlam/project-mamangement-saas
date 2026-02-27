@@ -28,7 +28,7 @@ interface ProfileState {
   sessionTimeout: string;
 }
 
-const IMG_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace("/api/v1", "/");
+// const IMG_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace("/api/v1", "/");
 
 const UserProfileSettings = ({ className = "" }: { className?: string }) => {
   const { data: profileData, isLoading: profileLoading } = useGetProfileQuery({});
@@ -65,7 +65,7 @@ const UserProfileSettings = ({ className = "" }: { className?: string }) => {
         verification2FA: user.verification2FA || false,
         userStatus: user.userStatus || "active",
         imagePreview: user.profileImage
-          ? `${IMG_BASE_URL}${user.profileImage}`
+          ? `${user.profileImage}`
           : "",
         // Initialize other fields with current state or backend defaults if they existed
       }));

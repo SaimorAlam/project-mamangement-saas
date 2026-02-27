@@ -35,7 +35,7 @@ export interface Project {
   };
   name: string;
   description: string;
-
+  dateDate:string;
   status: ProjectStatus;
   priority: ProjectPriority;
 
@@ -93,7 +93,7 @@ const renderStatusBadge = (status: ProjectStatus) => (
 );
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
-  const { id, name, program, priority, deadline, startDate, progress, status } =
+  const { id, name, program, priority, deadline,dateDate, progress, status } =
     project;
   const navigate = useNavigate();
   const [addFavoriteProject] = useAddFavoriteProjectMutation();
@@ -186,12 +186,12 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             <div className="flex flex-col gap-y-4 text-sm py-2 px-4">
               <div>
                 <p className="text-gray-500">Project start</p>
-                <p className="font-medium">{formatDate(startDate)}</p>
+                <p className="font-medium">{formatDate(dateDate)}</p>
               </div>
 
               <div>
                 <p className="text-gray-500">Project finish</p>
-                <p className="font-medium">{formatDate(deadline)}</p>
+                <p className="font-medium">{deadline === null ? "-" : formatDate(deadline)}</p>
               </div>
             </div>
           </div>

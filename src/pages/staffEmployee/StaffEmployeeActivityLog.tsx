@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 import Pagination from "@/components/client/Pagination";
 import SearchBar from "@/components/client/SearchBar";
 import DateRange from "@/components/client/DateRange";
-import ActivityLogTable from "@/components/client/ActivityLog/ActivityLogTable";
+import ActivityLogTable, { ActivityLogEntry } from "@/pages/client/ActivityLog/ActivityLogTable";
 
 const activityLogData = [
   {
@@ -679,18 +679,11 @@ const activityLogData = [
   },
 ];
 
-export interface ActivityItem {
-  id: string;
-  type: "success" | "error" | "info";
-  title: string;
-  description: string;
-  timestamp: string;
-  metadata?: string;
-}
-export interface ActivityLogEntry {
+export interface MockActivityLogEntry {
   id: string;
   timestamp: string;
   user: {
+    id?: string;
     name: string;
     avatar: string;
   };
@@ -703,17 +696,16 @@ export interface ActivityLogEntry {
 }
 
 // Flatten nested objects for table rendering
-const flattenEntry = (entry: ActivityLogEntry) => {
+const flattenEntry = (entry: MockActivityLogEntry): ActivityLogEntry => {
   return {
     ...entry,
     user: {
+      id: entry.user.id || "",
       name: entry.user.name,
       avatar: entry.user.avatar,
     },
     description: `${entry.description.action}${
-      entry.description.details
-        ? `: ${entry.description.details}`
-        : ""
+      entry.description.details ? `: ${entry.description.details}` : ""
     }`,
   };
 };
@@ -730,11 +722,8 @@ export default function StaffEmployeeActivityLog() {
     Object.values(entry).some(
       (value) =>
         value &&
-        value
-          .toString()
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-    )
+        value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
+    ),
   );
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -750,9 +739,7 @@ export default function StaffEmployeeActivityLog() {
     const csvContent = [
       headers.join(","),
       ...filteredData.map((entry) =>
-        headers
-          .map((key) => `"${entry[key as keyof typeof entry]}"`)
-          .join(",")
+        headers.map((key) => `"${entry[key as keyof typeof entry]}"`).join(","),
       ),
     ].join("\n");
 
@@ -772,10 +759,7 @@ export default function StaffEmployeeActivityLog() {
           All Employees Activity Log
         </h2>
         <div className="flex items-center gap-3">
-          <SearchBar
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           <DateRange />
           <Button
             variant="outline"

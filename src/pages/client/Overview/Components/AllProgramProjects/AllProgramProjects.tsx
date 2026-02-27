@@ -64,7 +64,7 @@ const AllProgramProject = () => {
   const [sortBy, setSortBy] = useState<keyof StaffEmployeeProject>("startDate");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 4;
 
   const { data, isLoading } = useGetAllProjectsQuery({});
   const projects = data?.data?.projects?.data || [];
@@ -252,7 +252,8 @@ const AllProgramProject = () => {
         </>
       ) : (
         <>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+        <div className="">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">            
             {paginatedProjects.length > 0 ? (
               paginatedProjects.map((project) => (
                 <ProjectCard key={project.id} project={project} />
@@ -263,6 +264,7 @@ const AllProgramProject = () => {
               </div>
             )}
           </div>
+        </div>
           {sortedProjects.length > itemsPerPage && (
             <div className="pt-6 flex justify-center">
               <Pagination

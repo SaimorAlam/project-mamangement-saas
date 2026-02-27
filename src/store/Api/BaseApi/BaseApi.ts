@@ -71,6 +71,7 @@ const baseApi = createApi({
     "Nodes",
     "Charts",
     "ChartHistory",
+    "Notification",
   ],
 });
 export default baseApi;

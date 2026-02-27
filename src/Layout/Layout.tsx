@@ -1,4 +1,4 @@
-import Footer from "./Footer";
+// import Footer from "./Footer";
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 
@@ -25,7 +25,7 @@ const Layout: React.FC = () => {
       <main>
         <Outlet />
       </main>
-      {!isDashboardRoute && <Footer />}
+      {/* {!isDashboardRoute && <Footer />} */}
     </div>
   );
 };

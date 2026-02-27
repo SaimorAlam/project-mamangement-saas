@@ -148,9 +148,12 @@ const SupportDashboard = () => {
 
   // Handlers
   const handleSendMessage = async (e: React.FormEvent) => {
+    console.log("Sending message...");
     e.preventDefault();
-    if ((!inputValue.trim() && !selectedFile) || !socket || !selectedTicket)
+    if ((!inputValue.trim() && !selectedFile) || !socket || !selectedTicket){
+      console.log("No message or file or socket or ticket");
       return;
+    }
 
     let fileUrl = "";
     if (selectedFile) {
@@ -166,7 +169,7 @@ const SupportDashboard = () => {
       message: inputValue || null,
       fileUrl: fileUrl || null,
     };
-
+    console.log(messagePayload,"Message Payload")
     socket.emit("sendMessage", messagePayload);
 
     setInputValue("");

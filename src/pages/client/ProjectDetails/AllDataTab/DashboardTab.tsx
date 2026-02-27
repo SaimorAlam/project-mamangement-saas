@@ -19,7 +19,9 @@ import HorizontalBarChart, {
   parseHorizontalBarData,
 } from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
 import { chartTypes } from "@/utils/ChartCategory";
-import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
+import HeatmapChartNew, {
+  parseHeatmapChartData,
+} from "@/common/Charts/HeatmapChartNew";
 import PieChartWidget from "@/common/Charts/CompletedCharts/PieChart/PieChart";
 import ColumnBarChart from "@/common/Charts/ColumnBarChart";
 import RadarChartNew from "@/common/Charts/RadarChartNew";
@@ -163,8 +165,9 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "HEATMAP") {
+            const heatmapConfig = item?.heatmap || chartData;
             const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              (heatmapConfig?.widgets || [])?.map((w: any) => ({
                 label: w.legendName || w.label,
                 color: w.color,
                 field: (w.legendName || w.label)
@@ -172,7 +175,7 @@ const DashboardTab = () => {
                   .replace(/\s+/g, ""),
               })) || [];
 
-            const { labels } = parseXAxisData(
+            const { labels, data } = parseHeatmapChartData(
               item?.xAxis,
               legendValues,
               item?.title,
@@ -184,10 +187,14 @@ const DashboardTab = () => {
                 widgetTitle={item?.title}
                 xAxisValues={labels}
                 legendValues={legendValues}
-                numOfLegendDataSet={chartData?.numberOfDataset}
-                startingRange={chartData?.firstFieldDataset}
-                endingRange={chartData?.lastFieldDataset}
+                numOfLegendDataSet={heatmapConfig?.numberOfDataset}
+                startingRange={heatmapConfig?.firstFieldDataset}
+                endingRange={heatmapConfig?.lastFieldDataset}
                 chartId={item?.id}
+                projectId={projectId}
+                allUploadedData={data}
+                tierLevel={0}
+                isPreview={true}
               />
             );
           }
