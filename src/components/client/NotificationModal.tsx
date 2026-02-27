@@ -1,47 +1,13 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { X, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-
-export interface NotificationAction {
-  label: string;
-  variant?:
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
-  onClick: () => void;
-}
-
-export interface NotificationItem {
-  id: string;
-  type: "project" | "team" | "system" | "file" | "access";
-  user: {
-    name: string;
-    avatar: string;
-    initials: string;
-    online?: boolean;
-  };
-  action: string;
-  target?: string;
-  timestamp: string;
-  team?: string;
-  actions?: NotificationAction[];
-  attachment?: {
-    name: string;
-    type: "pdf" | "pptx" | "doc" | "image";
-  };
-  comment?: {
-    mention: string;
-    text: string;
-    hasReply?: boolean;
-  };
-  status?: "new" | "read";
-  priority?: "high" | "medium" | "low";
-}
+import { connectSocket } from "@/lib/socket";
+import { useAppSelector } from "@/hooks/useRedux";
+import { useGetNotificationsQuery, useUpdateNotificationMutation } from "@/store/Api/NotificationApi/NotificationApi";
+import { NotificationItem } from "@/types/notification";
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -194,9 +160,43 @@ export default function NotificationModal({
   className,
 }: NotificationModalProps) {
   const [activeTab, setActiveTab] = useState("all");
+  const token = useAppSelector((state) => state.auth.user?.accessToken);
+  
+  const { data: notificationData } = useGetNotificationsQuery(undefined, {
+    skip: !token || !isOpen,
+  });
+  const [updateNotification] = useUpdateNotificationMutation();
+
+  const handleNotificationClick = async (id: string, isRead: boolean) => {
+    if (!isRead) {
+      try {
+        await updateNotification(id).unwrap();
+      } catch (error) {
+        console.error("Failed to update notification status", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!token) return;
+    
+    const socketInstance = connectSocket(token as string);
+    
+    const handleNotification = (data: any) => {
+      console.log(data, "notification");
+    };
+
+    socketInstance.on("notification", handleNotification);
+    
+    return () => {
+      socketInstance.off("notification", handleNotification);
+    };
+  }, [token]);
+  
+  const currentNotifications = notificationData?.data || notificationData || notifications;
 
   // 🔹 Filtering logic
-  const filteredNotifications = notifications.filter((n) => {
+  const filteredNotifications = (currentNotifications as NotificationItem[]).filter((n) => {
     switch (activeTab) {
       case "inbox":
         return n.status === "new";
@@ -318,9 +318,10 @@ export default function NotificationModal({
               <div
                 key={notification.id}
                 className={cn(
-                  "p-5 border-b border-gray-100 transition-colors",
-                  notification.status === "new" ? "bg-white" : "bg-white",
+                  "p-5 border-b border-gray-100 transition-colors cursor-pointer hover:bg-gray-50",
+                  notification.status === "new" ? "bg-blue-50/30" : "bg-white",
                 )}
+                onClick={() => handleNotificationClick(notification.id, notification.status === "read")}
               >
                 <div className="flex space-x-3">
                   <div className="relative shrink-0 h-10 w-10">

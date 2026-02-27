@@ -11,7 +11,11 @@ export const connectSocket = (token: string) => {
     if (!socket.connected) {
         socket.auth = { token };
         socket.connect();
+        socket.on("connect", ()=>{
+            console.log("🔌 Connected to socket ID: ",socket.id);
+        })
     }
+    return socket;
 };
 
 export const disconnectSocket = () => {
