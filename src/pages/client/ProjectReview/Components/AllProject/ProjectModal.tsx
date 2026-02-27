@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Project } from "./AllProjectCard";
+import { Project } from "@/store/Api/ProjectApi/ProjectType";
 
 interface ProjectDetailsModalProps {
   project: Project;
