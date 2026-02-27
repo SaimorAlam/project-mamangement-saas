@@ -1,47 +1,16 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { X, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-
-export interface NotificationAction {
-  label: string;
-  variant?:
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
-  onClick: () => void;
-}
-
-export interface NotificationItem {
-  id: string;
-  type: "project" | "team" | "system" | "file" | "access";
-  user: {
-    name: string;
-    avatar: string;
-    initials: string;
-    online?: boolean;
-  };
-  action: string;
-  target?: string;
-  timestamp: string;
-  team?: string;
-  actions?: NotificationAction[];
-  attachment?: {
-    name: string;
-    type: "pdf" | "pptx" | "doc" | "image";
-  };
-  comment?: {
-    mention: string;
-    text: string;
-    hasReply?: boolean;
-  };
-  status?: "new" | "read";
-  priority?: "high" | "medium" | "low";
-}
+import { connectSocket } from "@/lib/socket";
+import { useAppSelector } from "@/hooks/useRedux";
+import {
+  useGetNotificationsQuery,
+  useUpdateNotificationMutation,
+} from "@/store/Api/NotificationApi/NotificationApi";
+import { NotificationItem } from "@/types/notification";
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -194,9 +163,46 @@ export default function NotificationModal({
   className,
 }: NotificationModalProps) {
   const [activeTab, setActiveTab] = useState("all");
+  const token = useAppSelector((state) => state.auth.user?.accessToken);
+
+  const { data: notificationData } = useGetNotificationsQuery(undefined, {
+    skip: !token || !isOpen,
+  });
+  const [updateNotification] = useUpdateNotificationMutation();
+
+  const handleNotificationClick = async (id: string, isRead: boolean) => {
+    if (!isRead) {
+      try {
+        await updateNotification(id).unwrap();
+      } catch (error) {
+        console.error("Failed to update notification status", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!token) return;
+
+    const socketInstance = connectSocket(token as string);
+
+    const handleNotification = (data: any) => {
+      console.log(data, "notification");
+    };
+
+    socketInstance.on("notification", handleNotification);
+
+    return () => {
+      socketInstance.off("notification", handleNotification);
+    };
+  }, [token]);
+
+  const currentNotifications =
+    notificationData?.data || notificationData || notifications;
 
   // 🔹 Filtering logic
-  const filteredNotifications = notifications.filter((n) => {
+  const filteredNotifications = (
+    currentNotifications as NotificationItem[]
+  ).filter((n) => {
     switch (activeTab) {
       case "inbox":
         return n.status === "new";
@@ -318,22 +324,28 @@ export default function NotificationModal({
               <div
                 key={notification.id}
                 className={cn(
-                  "p-5 border-b border-gray-100 transition-colors",
-                  notification.status === "new" ? "bg-white" : "bg-white",
+                  "p-5 border-b border-gray-100 transition-colors cursor-pointer hover:bg-gray-50",
+                  notification.status === "new" ? "bg-blue-50/30" : "bg-white",
                 )}
+                onClick={() =>
+                  handleNotificationClick(
+                    notification.id,
+                    notification.status === "read",
+                  )
+                }
               >
                 <div className="flex space-x-3">
                   <div className="relative shrink-0 h-10 w-10">
                     <Avatar className="h-10 w-10 border border-gray-100">
                       <AvatarImage
-                        src={notification.user.avatar || "/placeholder.svg"}
-                        alt={notification.user.name}
+                        src={notification?.user?.avatar || "/placeholder.svg"}
+                        alt={notification?.user?.name}
                       />
                       <AvatarFallback className="text-xs font-medium bg-gray-50">
-                        {notification.user.initials}
+                        {notification?.user?.initials}
                       </AvatarFallback>
                     </Avatar>
-                    {notification.user.online && (
+                    {notification?.user?.online && (
                       <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-[#10B981] ring-2 ring-white" />
                     )}
                   </div>
@@ -341,14 +353,14 @@ export default function NotificationModal({
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] leading-relaxed text-gray-700">
                       <span className="font-bold text-gray-900">
-                        {notification.user.name}
+                        {notification?.user?.name}
                       </span>{" "}
                       <span className="text-gray-500">
-                        {notification.action}
+                        {notification?.action}
                       </span>{" "}
-                      {notification.target && (
+                      {notification?.target && (
                         <span className="text-[#2563EB] font-semibold">
-                          {notification.target}
+                          {notification?.target}
                         </span>
                       )}
                     </p>
@@ -368,15 +380,15 @@ export default function NotificationModal({
                     </div>
 
                     {/* Comment box */}
-                    {notification.comment && (
+                    {notification?.comment && (
                       <div className="mt-3 p-3 bg-[#F8FAFC] rounded-lg border border-gray-50">
                         <p className="text-[13px] text-gray-600">
                           <span className="font-bold text-gray-900">
-                            {notification.comment.mention}
+                            {notification?.comment?.mention}
                           </span>{" "}
-                          {notification.comment.text}
+                          {notification?.comment?.text}
                         </p>
-                        {notification.comment.hasReply && (
+                        {notification?.comment?.hasReply && (
                           <div className="mt-3 relative">
                             <input
                               type="text"
@@ -403,25 +415,25 @@ export default function NotificationModal({
                     )}
 
                     {/* Attachment preview */}
-                    {notification.attachment && (
+                    {notification?.attachment && (
                       <div className="mt-3 flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden h-12">
-                        {getFileIcon(notification.attachment.type)}
+                        {getFileIcon(notification?.attachment?.type)}
                         <span className="text-[12px] font-medium text-gray-600 truncate flex-1 pr-4">
-                          {notification.attachment.name}
+                          {notification?.attachment?.name}
                         </span>
                       </div>
                     )}
 
                     {/* Actions buttons */}
-                    {notification.actions &&
-                      notification.actions.length > 0 && (
+                    {notification?.actions &&
+                      notification?.actions?.length > 0 && (
                         <div
                           className={cn(
                             "flex items-center gap-2 mt-4",
-                            notification.type === "project" && "justify-end",
+                            notification?.type === "project" && "justify-end",
                           )}
                         >
-                          {notification.actions.map((action, index) => (
+                          {notification?.actions?.map((action, index) => (
                             <Button
                               key={index}
                               variant={

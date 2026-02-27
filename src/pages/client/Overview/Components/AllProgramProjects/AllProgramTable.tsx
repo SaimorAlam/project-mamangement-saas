@@ -49,6 +49,7 @@ export interface StaffEmployeeProject {
   program?: {
     programName?: string;
   };
+  dateDate:string;
   name: string;
   description: string;
   status: ProjectStatus;
@@ -119,87 +120,6 @@ const renderPriority = (priority: ProjectPriority) => (
   </div>
 );
 
-/* -------------------------------------------------------------------------- */
-/*                               MODAL                                        */
-/* -------------------------------------------------------------------------- */
-
-// const ProjectModal = ({
-//   project,
-//   open,
-//   setOpen,
-// }: {
-//   project: StaffEmployeeProject;
-//   open: boolean;
-//   setOpen: (open: boolean) => void;
-// }) => (
-//   <Dialog open={open} onOpenChange={setOpen}>
-//     <DialogContent className="p-0 rounded-2xl max-w-3xl overflow-hidden">
-//       <div className="bg-linear-to-r from-slate-50 to-white px-6 py-5 border-gray-200 border-b">
-//         <DialogHeader>
-//           <DialogTitle className="font-semibold text-gray-900 text-xl">
-//             {project.name}
-//           </DialogTitle>
-//           <DialogDescription className="text-muted-foreground text-sm">
-//             Project details overview
-//           </DialogDescription>
-//         </DialogHeader>
-//       </div>
-
-//       <div className="space-y-6 px-6 py-6">
-//         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Project ID</p>
-//           <p className="font-medium text-gray-900">{project.id}</p>
-//         </div>
-
-//         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Status</p>
-//           {renderStatusBadge(project.status)}
-//         </div>
-
-//         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Deadline</p>
-//           <p className="font-medium text-gray-900">
-//             {formatDate(project.deadline)}
-//           </p>
-//         </div>
-
-//         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Priority</p>
-//           {renderPriority(project.priority)}
-//         </div>
-
-//         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Progress</p>
-//           <div className="bg-slate-200 rounded-full w-full h-2.5 overflow-hidden">
-//             <div
-//               className="bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full h-full"
-//               style={{ width: `${project.progress}%` }}
-//             />
-//           </div>
-//           <p className="mt-1 font-medium text-sm">{project.progress}%</p>
-//         </div>
-
-//         <div className="text-sm">
-//           <p className="mb-1 text-muted-foreground">Description</p>
-//           <p className="leading-relaxed">
-//             {project.description || "No description provided."}
-//           </p>
-//         </div>
-//       </div>
-
-//       <div className="flex justify-end gap-2 bg-slate-50 px-6 py-4 border-gray-200 border-t">
-//         <Button variant="outline" onClick={() => setOpen(false)}>
-//           Close
-//         </Button>
-//       </div>
-//     </DialogContent>
-//   </Dialog>
-// );
-
-/* -------------------------------------------------------------------------- */
-/*                               TABLE                                        */
-/* -------------------------------------------------------------------------- */
-
 type SortField =
   | "programName"
   | "name"
@@ -211,7 +131,7 @@ type SortField =
 
 type SortOrder = "asc" | "desc";
 
-const TABLE_SKELETON_ROWS = 6;
+const TABLE_SKELETON_ROWS = 4;
 
 const AllProgramTable = ({
   projects,
@@ -330,7 +250,7 @@ const AllProgramTable = ({
   };
   return (
     <Card className="shadow-none border-none w-full">
-      <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full min-h-[420px]">
+      <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full ">
         {projects.length > 0 ? (
           <Table>
             <TableHeader>
@@ -405,10 +325,10 @@ const AllProgramTable = ({
                         {renderPriority(project.priority)}
                       </TableCell>
                       <TableCell className="px-6 py-3.5 text-muted-foreground">
-                        {formatDate(project.startDate)}
+                        {formatDate(project.dateDate)}
                       </TableCell>
                       <TableCell className="px-6 py-3.5 text-muted-foreground">
-                        {formatDate(project.deadline)}
+                        {project.deadline === null ? "-" : formatDate(project.deadline)}
                       </TableCell>
                       <TableCell className="flex items-center gap-2 px-6 py-3.5 text-muted-foreground">
                         <Progress value={project.progress} className="h-2" />
@@ -424,7 +344,7 @@ const AllProgramTable = ({
                           >
                             <Eye className="w-4 h-4 text-[#1C73E0] ``" />
                           </Button>
-                           <Button
+                          <Button
                             variant="ghost"
                             size="sm"
                             className="cursor-pointer"

@@ -25,9 +25,7 @@ export const useGetUser = () => {
     error: isError,
     name: user?.name || "",
     role: user?.role || "",
-    profileImage:
-      import.meta.env.VITE_API_BASE_URL?.replace("/api/v1", "/") +
-        user?.profileImage || "",
+    profileImage: user?.profileImage || "",
     email: user?.email || "",
     id: user?.id || "",
     status: user?.status || "",
