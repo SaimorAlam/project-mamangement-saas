@@ -151,6 +151,25 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Manager"],
     }),
+    createSubmission: builder.mutation<any, {
+      information: string;
+      submission: string;
+      projectId: string;
+      ipAddress?: string;
+      elements: {
+        chartId: string;
+        xAxis: string;
+        yAxis: string;
+        zAxis: string;
+      }[];
+    }>({
+      query: (data) => ({
+        url: `/submitted`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Manager", "Employee"],
+    }),
   }),
 });
 
@@ -176,6 +195,7 @@ export const {
   useRemoveProjectFromFavoriteMutation,
   useGetNotificationQuery,
   useGetGlobalSearchItemsQuery,
+  useCreateSubmissionMutation,
 } = userApi;
 
 export default userApi;

@@ -85,6 +85,40 @@ const staffEmployeeApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Employee"],
     }),
+    getAllEmployeeSubmissions: builder.query({
+      query: (params) => ({
+        url: "/submitted/all",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Employee"],
+    }),
+    createEmployeeSubmission: builder.mutation<any, {
+      information: string;
+      submission: string;
+      projectId: string;
+      ipAddress?: string;
+      elements: {
+        chartId: string;
+        xAxis: string;
+        yAxis: string;
+        zAxis: string;
+      }[];
+    }>({
+      query: (data) => ({
+        url: `/submitted`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Employee"],
+    }),
+    deleteEmployeeSubmission: builder.mutation<any, string>({
+      query: (id) => ({
+        url: `/submitted/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Employee"],
+    }),
   }),
 });
 
@@ -99,6 +133,9 @@ export const {
   useRemoveFavouriteProjectMutation,
   useGetNotificationsQuery,
   useGetEmployeeAllProjectsQuery,
+  useCreateEmployeeSubmissionMutation,
+  useGetAllEmployeeSubmissionsQuery,
+  useDeleteEmployeeSubmissionMutation,
 } = staffEmployeeApi;
 
 export default staffEmployeeApi;

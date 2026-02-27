@@ -27,7 +27,7 @@ const clientData = [
     growth_type: "up",
     description: "Awaiting for approval",
     link_text: "View all",
-    link: "/staff-employee-panel/projects/status/PENDING",
+    link: "/staff-employee-panel/project-review",
     icon: "FolderIcon",
     icon_bg_color: "#069576",
   },
