@@ -18,8 +18,9 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Eye } from "lucide-react";
 import ViewSubmissionModal from "./overview/ViewSubmissionModal";
-import { useState } from "react";
 import EditSubmissionModal from "./overview/EditSubmissionModal";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export interface Submission {
   id: number;
@@ -31,7 +32,7 @@ export interface Submission {
     };
   };
   createdAt: string;
-  status: "APPROVED" | "PENDING" | "RETURNED" | "DRAFT";
+  status: "APPROVED" | "PENDING" | "REJECTED" | "DRAFT";
 }
 
 type SubmissionTableProps = {
@@ -44,6 +45,11 @@ export default function SubmissionTable({
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] =
     useState<any>(null);
+  const navigate = useNavigate();
+
+  // Show only first 5
+  const visibleSubmissions = submissions.slice(0, 5);
+  const hasMoreThanFive = submissions.length > 5;
 
   const getInitials = (name: string) =>
     name
@@ -59,14 +65,14 @@ export default function SubmissionTable({
   const statusClasses: Record<string, string> = {
     APPROVED: "text-[#0B5A4A] bg-[#EBFFF2] border border-[#ABEFD5]",
     PENDING: "text-[#665CFF] bg-[#F2F2FF] border border-[#C7C2FF]",
-    RETURNED: "text-[#B00020] bg-[#FFEAEA] border border-[#FFB3B3]",
+    REJECTED: "text-[#B00020] bg-[#FFEAEA] border border-[#FFB3B3]",
     DRAFT: "text-[#6B7280] bg-[#F3F4F6] border border-[#D1D5DB]",
   };
 
   const statusLabels = {
     APPROVED: "APPROVED",
     PENDING: "PENDING",
-    RETURNED: "RETURNED",
+    REJECTED: "REJECTED",
     DRAFT: "DRAFT",
   };
 
@@ -84,9 +90,9 @@ export default function SubmissionTable({
     <>
       <Card className="w-full shadow-none border-none">
         <CardContent className="p-0 border border-[#E2E8F0] rounded-lg w-full">
-          {/* Scroll wrapper around full table */}
-          <ScrollArea className="h-[400px] w-full">
-            <Table className="overflow-x">
+
+          <ScrollArea className="w-full">
+            <Table>
               <TableHeader>
                 <TableRow className="border-b border-[#E2E8F0] bg-[#F7F9FA]">
                   <TableHead className="text-base font-medium text-[#1D2028] px-6 py-3.5">
@@ -106,8 +112,9 @@ export default function SubmissionTable({
                   </TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                {submissions.map((submission) => (
+                {visibleSubmissions.map((submission) => (
                   <TableRow
                     key={submission.id}
                     className="border-b border-[#E2E8F0] hover:bg-muted/30 transition-colors odd:bg-white even:bg-[#F7F9FA]"
@@ -115,10 +122,11 @@ export default function SubmissionTable({
                     <TableCell className="text-base font-medium px-6 py-3.5">
                       {submission.submission}
                     </TableCell>
+
                     <TableCell className="px-6 py-3.5">
                       <div className="flex items-center space-x-3">
                         {submission.employee.user.profileImage && (
-                          <Avatar className="size-10">
+                          <Avatar className="size-10 border border-gray-300">
                             <AvatarImage
                               src={
                                 submission.employee.user.profileImage
@@ -137,6 +145,7 @@ export default function SubmissionTable({
                         </span>
                       </div>
                     </TableCell>
+
                     <TableCell className="px-6 py-3.5 text-base text-muted-foreground">
                       {submission.createdAt?.split("T")[0]}
                     </TableCell>
@@ -144,13 +153,13 @@ export default function SubmissionTable({
                     <TableCell className="px-6 py-3.5">
                       <Badge
                         variant="outline"
-                        className={`py-1.5 px-3 min-w-20 ${
-                          statusClasses[submission.status]
-                        }`}
+                        className={`py-1.5 px-3 min-w-20 ${statusClasses[submission.status]
+                          }`}
                       >
                         {statusLabels[submission.status]}
                       </Badge>
                     </TableCell>
+
                     <TableCell className="px-6 py-3.5">
                       <div className="flex items-center space-x-2">
                         <Button
@@ -159,16 +168,18 @@ export default function SubmissionTable({
                           className="size-6 p-0 hover:bg-muted hover:scale-105 hover:cursor-pointer"
                           title="View submission"
                           onClick={() => {
-                            setSelectedSubmission(submission); // project = submission object
-                            setViewOpen(true);
+                            setSelectedSubmission(submission);
+                            navigate(
+                              `/staff-manager-panel/projects/project-details/${submission.id}`
+                            );
                           }}
                         >
-                          <Eye className="size-6 text-[#1C73E0] " />
-
+                          <Eye className="size-6 text-[#1C73E0]" />
                           <span className="sr-only">
                             View submission
                           </span>
                         </Button>
+
                         <Button
                           variant="ghost"
                           size="sm"
@@ -177,25 +188,41 @@ export default function SubmissionTable({
                           title="Edit submission"
                         >
                           <EditSubmissionModal data={submission} />
-
                           <span className="sr-only">
                             Edit submission
                           </span>
                         </Button>
                       </div>
                     </TableCell>
-                    <ViewSubmissionModal
-                      open={viewOpen}
-                      onClose={() => setViewOpen(false)}
-                      data={selectedSubmission}
-                    />
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </ScrollArea>
+
+          {/* 🔥 View All Button */}
+          {hasMoreThanFive && (
+            <div className="flex justify-center py-4">
+              <button
+                onClick={() =>
+                  navigate("/staff-manager-panel/project-review")
+                }
+                className="text-[#1C73E0] text-sm font-semibold hover:underline transition"
+              >
+                View All
+              </button>
+            </div>
+          )}
+
         </CardContent>
       </Card>
+
+      {/* Modal */}
+      <ViewSubmissionModal
+        open={viewOpen}
+        onClose={() => setViewOpen(false)}
+        data={selectedSubmission}
+      />
     </>
   );
 }

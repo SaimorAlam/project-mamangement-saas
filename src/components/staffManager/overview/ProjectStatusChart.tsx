@@ -28,7 +28,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 };
 
 export default function ProjectStatusChart() {
-  const [sortBy, setSortBy] = useState(1);
+  const [sortBy, setSortBy] = useState(12);
 
   const { data: submissionData, isLoading: submissionLoading } =
     useGetSubmissionStatusQuery({ month: sortBy });

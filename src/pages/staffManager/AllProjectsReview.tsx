@@ -41,6 +41,8 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 import ProjectReviewOverviewCard from "./ProjectReviewOverviewCard";
+import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface IProjectTableProps {
   title?: string;
@@ -72,6 +74,7 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
   const [viewOpen, setViewOpen] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const navigate = useNavigate();
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
@@ -140,10 +143,10 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
   const formatDate = (date?: string) =>
     date
       ? new Date(date).toLocaleDateString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
       : "-";
 
   const handleExportPDF = () => {
@@ -159,9 +162,9 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
       priorityFilter ? `Status: ${priorityFilter}` : "Status: All",
       dateRange?.from && dateRange?.to
         ? `Date: ${format(dateRange.from, "dd MMM yyyy")} - ${format(
-            dateRange.to,
-            "dd MMM yyyy",
-          )}`
+          dateRange.to,
+          "dd MMM yyyy",
+        )}`
         : "Date: All",
     ];
 
@@ -216,6 +219,14 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
     REJECTED: "RETURNED",
   };
 
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+
+
   return (
     <>
       <ProjectReviewOverviewCard />
@@ -248,9 +259,9 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                       <CalendarIcon size={16} />
                       {dateRange?.from && dateRange?.to
                         ? `${format(dateRange.from, "MMM dd, yyyy")} - ${format(
-                            dateRange.to,
-                            "MMM dd, yyyy",
-                          )}`
+                          dateRange.to,
+                          "MMM dd, yyyy",
+                        )}`
                         : "Select Range"}
                     </Button>
                   </PopoverTrigger>
@@ -349,10 +360,19 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                   {sortedProjects.map((project) => (
                     <tr key={project.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">{project.project.name}</td>
-                      <td className="px-6 py-4">
-                        {project.assignStuff?.avatars?.length
-                          ? `${project.assignStuff.avatars.length} Staff`
-                          : "No Staff"}
+                      <td className="px-6 py-3.5">
+                        {project?.employee?.user?.profileImage ? (
+                          <Avatar className="size-10 border border-gray-300">
+                            <AvatarImage src={project?.employee?.user?.profileImage} />
+                            <AvatarFallback className="text-base font-normal">
+                              {getInitials(project?.employee?.user?.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <AvatarFallback>
+                            {getInitials(project?.employee?.user?.name)}
+                          </AvatarFallback>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <Badge
@@ -376,7 +396,7 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                           className="text-blue-600 cursor-pointer"
                           onClick={() => {
                             setSelectedSubmission(project);
-                            setViewOpen(true);
+                            navigate(`/staff-manager-panel/projects/project-details/${project.id}`)
                           }}
                         />
                         <PencilLine

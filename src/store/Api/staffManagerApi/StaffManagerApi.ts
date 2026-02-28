@@ -54,13 +54,20 @@ const userApi = baseApi.injectEndpoints({
       providesTags: ["Manager"],
     }),
     getAllLatestSubmissions: builder.query({
-      query: (params) => ({
-        url: "/manager/all-manager-submission",
-        method: "GET",
-        params,
+      query: () => ({
+        url: "/submitted/all",
+        method: "GET"
       }),
       providesTags: ["Manager"],
     }),
+    // getAllLatestSubmissions: builder.query({
+    //   query: (params) => ({
+    //     url: "/manager/all-manager-submission",
+    //     method: "GET",
+    //     params,
+    //   }),
+    //   providesTags: ["Manager"],
+    // }),
     deleteManagerProject: builder.mutation<any, { id: string }>({
       query: ({ id }) => ({
         url: `/project/manager-project-softdelete/${id}`,
