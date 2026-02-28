@@ -92,7 +92,7 @@ const ClientOverview = () => {
     <div className="">
       {/* Icon and Home */}
 
-      <div className="grid grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 my-6">
+      <div className="grid grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
         {isLoading
           ? Array.from({ length: 6 }).map((_, index) => (
               <DashboardPanelStatsCardSkeleton key={index} />

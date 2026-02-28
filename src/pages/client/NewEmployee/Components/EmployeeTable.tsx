@@ -195,7 +195,7 @@ const EmployeeTable = () => {
   };
 
   return (
-    <div className="border border-gray-200 w-full rounded-xl my-10 overflow-hidden">
+    <div className="border border-gray-200 w-full rounded-xl overflow-hidden">
       {/* Header + Filters */}
       <div className="flex flex-col lg:flex-row justify-between items-center py-4 px-6 gap-4 bg-white">
         {selectedIds.length > 0 ? (

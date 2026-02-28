@@ -184,7 +184,7 @@ const ClientAllProgram = ({
   };
 
   return (
-    <div className="py-6 min-h-screen">
+    <div className=" min-h-screen">
       <div className="bg-white border border-gray-200 rounded-lg">
         {/* Header */}
         <div className="flex md:flex-row flex-col justify-between items-center gap-3 px-6 py-4 border-gray-200 border-b">
