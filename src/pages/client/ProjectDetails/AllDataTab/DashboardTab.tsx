@@ -641,7 +641,7 @@ const DashboardTab = () => {
   }, [chartComponents]);
 
   return (
-    <div>
+    <div className="mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ClientProjectInfo projectData={data?.data} isLoading={isLoading} />
         <div className="col-span-2 h-full">
