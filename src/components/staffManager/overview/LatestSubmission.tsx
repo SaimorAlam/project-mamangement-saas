@@ -13,30 +13,6 @@ import SubmissionTable from "../SubmissionTable";
 import { useGetAllLatestSubmissionsQuery } from "@/store/Api/staffManagerApi/StaffManagerApi";
 import SkeletonLoading from "@/common/Skeleton/SkeletonLoading";
 
-// const submissionsData = [
-//     {
-//         id: 1,
-//         submission: "Q3 Marketing Performance Report",
-//         submittedBy: {
-//             name: "Kathryn Murphy",
-//             avatar:
-//                 "https://images.unsplash.com/photo-1494790108755-2616b169b1b8?w=32&h=32&fit=crop&crop=face",
-//         },
-//         date: "Today, 9:41 AM",
-//         status: "approved",
-//     },
-//     {
-//         id: 2,
-//         submission: "Customer Feedback Analysis",
-//         submittedBy: {
-//             name: "Leslie Alexander",
-//             avatar:
-//                 "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face",
-//         },
-//         date: "Yesterday, 2:30 PM",
-//         status: "in_review",
-//     },
-// ];
 
 const LatestSubmission = () => {
   const [submissions, setSubmissions] = useState([]);
@@ -44,8 +20,6 @@ const LatestSubmission = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const { data, isLoading } = useGetAllLatestSubmissionsQuery({
-    fromDate: "2024-01-01",
-    toDate: "2026-12-12",
   });
 
   const submissionsData = data?.data || [];
@@ -54,35 +28,8 @@ const LatestSubmission = () => {
     setSubmissions(submissionsData);
   }, []);
 
-  // const sortedSubmissions = [...submissions].sort((a, b) => {
-  //     if (sortBy === "date") {
-  //         if (sortOrder === "asc") {
-  //             return new Date(a.date).getTime() - new Date(b.date).getTime();
-  //         } else {
-  //             return new Date(b.date).getTime() - new Date(a.date).getTime();
-  //         }
-  //     }
-  //     if (sortBy === "name") {
-  //         if (sortOrder === "asc") {
-  //             return a.submission.localeCompare(b.submission);
-  //         } else {
-  //             return b.submission.localeCompare(a.submission);
-  //         }
-  //     }
-  //     if (sortBy === "status") {
-  //         if (sortOrder === "asc") {
-  //             return a.status.localeCompare(b.status);
-  //         } else {
-  //             return b.status.localeCompare(a.status);
-  //         }
-  //     }
-  //     return 0;
-  // });
-
   const sortedSubmissions = submissions;
   console.log("working sorted", sortedSubmissions);
-
-  // if (error) return <div className="text-gray-400 text-center">Something went wrong.</div>;
 
   return (
     <BoxContainer>

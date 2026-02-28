@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
-import { FaSpinner, FaEdit, FaTrash } from "react-icons/fa";
+import { FaSpinner, FaTrash } from "react-icons/fa";
 import PriorityDropdown from "@/components/client/AllProgram/PriorityDropdown";
 import Pagination from "@/common/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -49,7 +49,7 @@ const StaffManagerAllProject = ({
 
     const debouncedSearch = useDebounce(search, 500);
 
-    const [editProject, setEditProject] = useState<UpdateProjectPayload | null>(
+    const [editProject,] = useState<UpdateProjectPayload | null>(
         null,
     );
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -271,7 +271,7 @@ const StaffManagerAllProject = ({
                                     </td>
 
                                     <td className="px-6 py-4 space-x-2">
-                                        <button
+                                        {/* <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setEditProject(project);
@@ -280,7 +280,16 @@ const StaffManagerAllProject = ({
                                             className="cursor-pointer"
                                         >
                                             <FaEdit className="text-blue-600" />
-                                        </button>
+                                        </button> */}
+                                        {/* <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(project);
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            <FaTrash className="text-red-600" />
+                                        </button> */}
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();

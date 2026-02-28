@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
+import { useGetUser } from "@/hooks/useGetUser";
+import { useGetProgramByIdQuery } from "@/store/Api/ProgramApi/ProgramApi";
 
 interface Tag {
   id: string;
@@ -7,23 +9,48 @@ interface Tag {
   color: string;
 }
 
-const SideManager: React.FC = () => {
+const SideManager = ({ programId }: { programId?: any }) => {
+  const { name, email, profileImage } = useGetUser();
+
   const [tags, setTags] = useState<Tag[]>([]);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTagName, setNewTagName] = useState("");
 
-  const programManager = {
-    name: "Alex Thompson",
-    email: "alex.thompson@example.com",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+  const { data: programResponse } = useGetProgramByIdQuery(programId);
+  const program = programResponse?.data;
+
+  const today = new Date();
+
+  const startDate = program?.datetime
+    ? new Date(program.datetime)
+    : null;
+
+  const endDate = program?.deadline
+    ? new Date(program.deadline)
+    : null;
+
+  // Format function
+  const formatDate = (date: Date | null) => {
+    if (!date) return "Not set";
+    return date.toLocaleDateString();
   };
 
+  // Calculate remaining days
+  let remainingDays = 0;
+
+  if (endDate) {
+    const diff = endDate.getTime() - today.getTime();
+    remainingDays = Math.max(
+      Math.ceil(diff / (1000 * 60 * 60 * 24)),
+      0
+    );
+  }
+
   const programDuration = {
-    startDate: "21-Oct-2024",
-    endDate: "21-Oct-2024",
-    remainingDays: 45,
-    progress: 35, // percentage
+    startDate: formatDate(startDate),
+    endDate: formatDate(endDate),
+    remainingDays,
+    progress: program?.progress || 0,
   };
 
   const handleAddTag = () => {
@@ -62,16 +89,16 @@ const SideManager: React.FC = () => {
           </h3>
           <div className="flex items-center gap-3">
             <img
-              src={programManager.avatar}
-              alt={programManager.name}
+              src={profileImage}
+              alt={name}
               className="w-11 h-11 rounded-full object-cover"
             />
             <div>
               <p className="text-sm font-medium text-gray-900">
-                {programManager.name}
+                {name}
               </p>
               <p className="text-xs text-gray-500">
-                {programManager.email}
+                {email}
               </p>
             </div>
           </div>
@@ -83,7 +110,6 @@ const SideManager: React.FC = () => {
             Program Duration
           </h3>
 
-          {/* Date Range */}
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
@@ -94,8 +120,11 @@ const SideManager: React.FC = () => {
                   {programDuration.startDate}
                 </p>
               </div>
+
               <div>
-                <p className="text-xs text-gray-500 mb-1">End Date</p>
+                <p className="text-xs text-gray-500 mb-1">
+                  End Date
+                </p>
                 <p className="text-sm font-medium text-gray-900">
                   {programDuration.endDate}
                 </p>
@@ -112,6 +141,7 @@ const SideManager: React.FC = () => {
                   {programDuration.remainingDays} days
                 </p>
               </div>
+
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
                   className="bg-blue-500 h-2 rounded-full transition-all duration-300"
