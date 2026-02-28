@@ -21,7 +21,7 @@ import HorizontalBarChart, {
 import { chartTypes } from "@/utils/ChartCategory";
 import HeatmapChartNew, {
   parseHeatmapChartData,
-} from "@/common/Charts/HeatmapChartNew";
+} from "@/common/Charts/CompletedCharts/HeatMap/HeatmapChartNew";
 import PieChartWidget from "@/common/Charts/CompletedCharts/PieChart/PieChart";
 import ColumnBarChart from "@/common/Charts/ColumnBarChart";
 import RadarChartNew from "@/common/Charts/RadarChartNew";
@@ -610,16 +610,31 @@ const DashboardTab = () => {
   const chartRows = useMemo(() => {
     if (!chartComponents || chartComponents.length <= 1) return [];
 
-    const remaining = chartComponents.slice(1);
+    const remainingItems = chartComponents.slice(1);
     const rows = [];
-    const bucketSize = 2; // Fixed 2 columns for sub-charts for a cleaner, stable layout
+    let i = 0;
 
-    for (let i = 0; i < remaining.length; i += bucketSize) {
+    while (i < remainingItems.length) {
+      const itemsLeft = remainingItems.length - i;
+      // Alternate between 2 and 3 columns (Row 0: 2, Row 1: 3, Row 2: 2...)
+      let capacity: number = rows.length % 2 === 0 ? 2 : 3;
+
+      // Special logic to avoid leaving a single item on the last row
+      if (itemsLeft === 4) {
+        capacity = 2; // Split 4 into 2 + 2 instead of 3 + 1
+      } else if (itemsLeft === 3) {
+        capacity = 3; // Take all 3 at once instead of 2 + 1
+      } else if (itemsLeft < capacity) {
+        capacity = itemsLeft;
+      }
+
+      const chunk = remainingItems.slice(i, i + capacity);
       rows.push({
-        cols: bucketSize,
-        items: remaining.slice(i, i + bucketSize),
+        cols: capacity,
+        items: chunk,
         key: `row-${rows.length}`,
       });
+      i += chunk.length;
     }
 
     return rows;
@@ -645,7 +660,9 @@ const DashboardTab = () => {
         chartRows.map((row) => (
           <div
             key={row.key}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6"
+            className={`grid grid-cols-1 gap-6 mt-6 ${
+              row.cols === 3 ? "md:grid-cols-3" : "md:grid-cols-2"
+            }`}
           >
             {row.items}
           </div>

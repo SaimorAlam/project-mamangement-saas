@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
 } from "@/common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
-import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
+import HeatmapChartNew from "@/common/Charts/CompletedCharts/HeatMap/HeatmapChartNew";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 

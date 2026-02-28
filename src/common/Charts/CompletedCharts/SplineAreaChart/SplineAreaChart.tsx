@@ -183,6 +183,7 @@ export default function SplineAreaChart({
         type: "area",
         height: 350,
         toolbar: { show: false },
+        zoom: { enabled: false },
         dropShadow: {
           enabled: true,
           top: 3,
@@ -226,7 +227,7 @@ export default function SplineAreaChart({
         intersect: false,
       },
       legend: {
-        show: true,
+        show: false,
         position: "top",
         horizontalAlign: "right",
       },
@@ -432,6 +433,28 @@ export default function SplineAreaChart({
         }}
         isDownloading={isDownloading}
         isPreview={isPreview}
+        customHeaderContent={
+          <div className="flex items-center gap-4">
+            <div className="flex gap-4">
+              {effectiveLegendValues.slice(0, 3).map((l) => (
+                <div key={l.field} className="flex items-center gap-1.5">
+                  <div
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                    {l.label}
+                  </span>
+                </div>
+              ))}
+              {effectiveLegendValues.length > 3 && (
+                <span className="text-xs text-gray-400">
+                  +{effectiveLegendValues.length - 3} more
+                </span>
+              )}
+            </div>
+          </div>
+        }
         footer={
           childTiers.length > 0 ? (
             <p className="text-sm text-blue-600 font-medium text-center">

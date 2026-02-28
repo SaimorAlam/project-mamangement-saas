@@ -6,7 +6,7 @@ import HorizontalBarChart, {
 } from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
 import LineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
 import { parseLineChartData } from "@/utils/parseLineChartData";
-import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
+import HeatmapChartNew from "@/common/Charts/CompletedCharts/HeatMap/HeatmapChartNew";
 import PieChartWidget from "@/common/Charts/CompletedCharts/PieChart/PieChart";
 import ColumnBarChart from "@/common/Charts/ColumnBarChart";
 import RadarChartNew from "@/common/Charts/RadarChartNew";

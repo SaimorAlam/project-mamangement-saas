@@ -69,7 +69,7 @@ export const CHART_REGISTRY: Record<string, ChartRegistryItem> = {
     name: "Heat Map Chart",
     component: lazy(
       () =>
-        import("@/components/client/ProjectBuilder/chartModules/HeatmapChartModule"),
+        import("@/common/Charts/CompletedCharts/HeatMap/HeatmapChartModule"),
     ),
   },
   "spline-area-chart": {
