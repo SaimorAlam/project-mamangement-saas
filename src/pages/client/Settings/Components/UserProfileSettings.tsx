@@ -19,7 +19,6 @@ interface ProfileState {
   userStatus: string;
   profileImage: File | null;
   imagePreview: string;
-  // New fields from parents
   allowTimezoneOverride: boolean;
   showRelativeTimestamps: boolean;
   dateFormat: string;
