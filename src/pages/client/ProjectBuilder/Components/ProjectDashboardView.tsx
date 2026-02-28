@@ -17,6 +17,7 @@ import {
 
 interface ProjectDashboardViewProps {
   projectId: string;
+  isProgramBuilder?: boolean; // Context flag
   isPreviewOrPublished: boolean;
   selectedWidgets: string[];
   activeWidget: string;
@@ -28,6 +29,7 @@ interface ProjectDashboardViewProps {
 
 const ProjectDashboardView = ({
   projectId,
+  isProgramBuilder = false,
   isPreviewOrPublished,
   selectedWidgets,
   activeWidget,
@@ -38,23 +40,27 @@ const ProjectDashboardView = ({
 }: ProjectDashboardViewProps) => {
   const { programId } = useAppSelector((state) => state.chartSlice);
 
+  // Fetch only relevant charts based on context
   const { data: projectsChart } = useGetRootChartQuery(projectId, {
-    skip: !projectId,
+    skip: isProgramBuilder || !projectId,
   });
 
   const { data: programCharts } = useGetProgramBuilderChartQuery(programId, {
-    skip: !programId,
+    skip: !isProgramBuilder || !programId,
   });
 
   const projectsChartsData = useMemo(() => {
-    if (projectId) return projectsChart?.data;
-    return null;
-  }, [projectsChart, projectId]);
+    if (isProgramBuilder) return null;
+    return projectsChart?.data || null;
+  }, [projectsChart, isProgramBuilder]);
 
   const programChartsData = useMemo(() => {
-    if (programId) return programCharts?.data?.charts;
-    return null;
-  }, [programCharts, programId]);
+    if (!isProgramBuilder) return null;
+    return programCharts?.data?.charts || null;
+  }, [programCharts, isProgramBuilder]);
+
+  // Consolidate for rendering
+  const finalChartsData = projectsChartsData || programChartsData;
 
   return (
     <Suspense fallback={<ProjectBuilderPlaceholderChartSkeleton />}>
@@ -70,20 +76,13 @@ const ProjectDashboardView = ({
               : "flex flex-col gap-6"
           }`}
         >
-          {projectsChartsData && projectsChartsData.length > 0 && (
+          {finalChartsData && finalChartsData.length > 0 && (
             <div className={isPreviewOrPublished ? "col-span-full" : ""}>
-              <DefaultChartData projectsChartsData={projectsChartsData} />
+              <DefaultChartData projectsChartsData={finalChartsData} />
             </div>
           )}
 
-          {programChartsData && programChartsData.length > 0 && (
-            <div className={isPreviewOrPublished ? "col-span-full" : ""}>
-              <DefaultChartData projectsChartsData={programChartsData} />
-            </div>
-          )}
-
-          {(!projectsChartsData || projectsChartsData.length === 0) &&
-            (!programChartsData || programChartsData.length === 0) &&
+          {(!finalChartsData || finalChartsData.length === 0) &&
             selectedWidgets.length === 0 && (
               <div className={isPreviewOrPublished ? "col-span-full" : ""}>
                 {!hiddenDefaultWidgets.includes("project-stats") && (

@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { X } from "lucide-react";
 import { useAppSelector } from "@/hooks/useRedux";
 import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
 import { toast } from "sonner";
 import { useGetUser } from "@/hooks/useGetUser";
-import { useLocation } from "react-router-dom";
 
 export type LegendValue = {
   label: string;
@@ -33,18 +32,7 @@ const PieChartConfiguration = ({
   onClose,
   onDelete,
 }: PieChartConfigurationProps) => {
-  const [projectId, setProjectId] = useState<string>("");
   const projectIdFromSlice = useAppSelector((state) => state.chartSlice.projectId);
-  const location = useLocation();
-  const projectIdFromState = location.state?.projectId;
-
-  useEffect(() => {
-    if (projectIdFromSlice) {
-      setProjectId(projectIdFromSlice);
-    } else if (projectIdFromState) {
-      setProjectId(projectIdFromState);
-    }
-  }, [projectIdFromSlice, projectIdFromState]);
 
   const [createChart, { isLoading }] = useCreateChartMutation();
   const { name, role, profileImage } = useGetUser();
@@ -137,7 +125,7 @@ const PieChartConfiguration = ({
       xAxis: JSON.stringify(xAxisData),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
-      projectId: projectId,
+      projectId: projectIdFromSlice,
       rootchart: true,
       roottitle: widgetTitle,
       grouptitle: widgetTitle,

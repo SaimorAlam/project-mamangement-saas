@@ -76,7 +76,7 @@ export const CHART_REGISTRY: Record<string, ChartRegistryItem> = {
     name: "Spline Area Chart",
     component: lazy(
       () =>
-        import("@/common/Charts/CompletedCharts/ChartModule/ChartModuleOne"),
+        import("@/common/Charts/CompletedCharts/SplineAreaChart/SplineAreaChartModule"),
     ),
   },
   "sparklines-chart": {

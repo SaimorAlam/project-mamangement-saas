@@ -735,21 +735,28 @@ const CreateProject = ({
                                           <span className="text-slate-700">
                                             {dates
                                               .slice(0, 2)
-                                              .map((d: any, i: number) => (
-                                                <React.Fragment key={d}>
-                                                  {d < 10 ? `0${d}` : d}/--/----
-                                                  {i === 0 &&
-                                                    dates.length > 1 &&
-                                                    " & "}
-                                                </React.Fragment>
-                                              ))}
+                                              .map((d: any, i: number) => {
+                                                const dateObj = new Date(
+                                                  new Date().getFullYear(),
+                                                  new Date().getMonth(),
+                                                  d,
+                                                );
+                                                return (
+                                                  <React.Fragment key={d}>
+                                                    {format(dateObj, "dd/MM/yyyy")}
+                                                    {i === 0 &&
+                                                      dates.length > 1 &&
+                                                      " & "}
+                                                  </React.Fragment>
+                                                );
+                                              })}
                                             {dates.length === 1 &&
-                                              " & --/--/----"}
+                                              " & DD/MM/YYYY"}
                                           </span>
                                         );
                                       }
                                       return (
-                                        <span>--/--/---- & --/--/----</span>
+                                        <span>DD/MM/YYYY & DD/MM/YYYY</span>
                                       );
                                     })()}
                                   </div>
@@ -830,16 +837,18 @@ const CreateProject = ({
                                         dates = [];
                                       }
                                       if (dates && dates.length > 0) {
+                                        const dateObj = new Date(
+                                          new Date().getFullYear(),
+                                          new Date().getMonth(),
+                                          dates[0],
+                                        );
                                         return (
                                           <span className="text-slate-700">
-                                            {dates[0] < 10
-                                              ? `0${dates[0]}`
-                                              : dates[0]}
-                                            /--/----
+                                            {format(dateObj, "dd/MM/yyyy")}
                                           </span>
                                         );
                                       }
-                                      return <span>--/--/----</span>;
+                                      return <span>DD/MM/YYYY</span>;
                                     })()}
                                   </div>
                                   <div className="flex items-center gap-2">
