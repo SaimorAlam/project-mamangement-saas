@@ -10,7 +10,9 @@ import {
   useGetNotificationsQuery,
   useUpdateNotificationMutation,
 } from "@/store/Api/NotificationApi/NotificationApi";
+import { useGetAllUsersQuery } from "@/store/Api/UserApi/UserApi";
 import { NotificationItem } from "@/types/notification";
+import { formatDistanceToNow } from "date-fns";
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -151,7 +153,6 @@ const defaultNotifications: NotificationItem[] = [
 
 const tabs = [
   { id: "all", label: "All" },
-  { id: "inbox", label: "Inbox" },
   { id: "project", label: "Project" },
   { id: "team", label: "Team" },
 ];
@@ -165,10 +166,19 @@ export default function NotificationModal({
   const [activeTab, setActiveTab] = useState("all");
   const token = useAppSelector((state) => state.auth.user?.accessToken);
 
-  const { data: notificationData } = useGetNotificationsQuery(undefined, {
-    skip: !token || !isOpen,
+  const { data: notificationData } = useGetNotificationsQuery({
+    skip: !isOpen,
   });
+  const { data: userData } = useGetAllUsersQuery(
+    {},
+    {
+      skip: !isOpen,
+    },
+  );
+  console.log(notificationData, "Notification");
   const [updateNotification] = useUpdateNotificationMutation();
+
+  const users = userData?.data?.data || userData?.data || [];
 
   const handleNotificationClick = async (id: string, isRead: boolean) => {
     if (!isRead) {
@@ -196,24 +206,48 @@ export default function NotificationModal({
     };
   }, [token]);
 
-  const currentNotifications =
-    notificationData?.data || notificationData || notifications;
+  const currentNotifications = notificationData?.data || notifications || [];
 
   // 🔹 Filtering logic
-  const filteredNotifications = (
-    currentNotifications as NotificationItem[]
-  ).filter((n) => {
+  const filteredNotifications = (currentNotifications as any[]).filter((n) => {
+    const type = n.type?.toLowerCase() || "";
+
     switch (activeTab) {
-      case "inbox":
-        return n.status === "new";
       case "project":
-        return n.type === "project";
+        return type.includes("project") || type.includes("activity");
       case "team":
-        return n.type === "team";
+        return (
+          type.includes("team") ||
+          type.includes("employee") ||
+          type.includes("manager")
+        );
       default:
         return true; // "all"
     }
   });
+
+  const getSenderInfo = (senderId: string) => {
+    if (!Array.isArray(users)) return null;
+    const sender = users.find((u: any) => u.id === senderId);
+    if (sender) {
+      return {
+        name: sender.name,
+        avatar: sender.avatar || sender.profileImage,
+        initials: sender.name?.substring(0, 2).toUpperCase(),
+      };
+    }
+    return null;
+  };
+
+  const getTimeAgo = (dateString: string) => {
+    try {
+      if (!dateString) return "just now";
+      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+    } catch (error) {
+      console.error(error);
+      return "just now";
+    }
+  };
 
   const getFileIcon = (type: string) => {
     switch (type) {
@@ -320,149 +354,180 @@ export default function NotificationModal({
 
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           {filteredNotifications.length > 0 ? (
-            filteredNotifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={cn(
-                  "p-5 border-b border-gray-100 transition-colors cursor-pointer hover:bg-gray-50",
-                  notification.status === "new" ? "bg-blue-50/30" : "bg-white",
-                )}
-                onClick={() =>
-                  handleNotificationClick(
-                    notification.id,
-                    notification.status === "read",
-                  )
-                }
-              >
-                <div className="flex space-x-3">
-                  <div className="relative shrink-0 h-10 w-10">
-                    <Avatar className="h-10 w-10 border border-gray-100">
-                      <AvatarImage
-                        src={notification?.user?.avatar || "/placeholder.svg"}
-                        alt={notification?.user?.name}
-                      />
-                      <AvatarFallback className="text-xs font-medium bg-gray-50">
-                        {notification?.user?.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    {notification?.user?.online && (
-                      <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-[#10B981] ring-2 ring-white" />
-                    )}
-                  </div>
+            filteredNotifications.map((notification) => {
+              const senderInfo = getSenderInfo(notification.senderId);
+              const displayName =
+                senderInfo?.name ||
+                notification?.sender?.name ||
+                notification?.user?.name ||
+                "Notification";
+              const displayAvatar =
+                senderInfo?.avatar ||
+                notification?.sender?.avatar ||
+                notification?.user?.avatar ||
+                "/placeholder.svg";
+              const displayInitials =
+                senderInfo?.initials ||
+                (notification?.sender?.name ||
+                  notification?.user?.name ||
+                  "S")
+                  .substring(0, 2)
+                  .toUpperCase();
 
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] leading-relaxed text-gray-700">
-                      <span className="font-bold text-gray-900">
-                        {notification?.user?.name}
-                      </span>{" "}
-                      <span className="text-gray-500">
-                        {notification?.action}
-                      </span>{" "}
-                      {notification?.target && (
-                        <span className="text-[#2563EB] font-semibold">
-                          {notification?.target}
-                        </span>
-                      )}
-                    </p>
-
-                    <div className="flex items-center space-x-1.5 mt-0.5">
-                      <span className="text-[11px] text-gray-400">
-                        {notification.timestamp}
-                      </span>
-                      {notification.team && (
-                        <>
-                          <span className="text-[11px] text-gray-400">•</span>
-                          <span className="text-[11px] text-gray-400">
-                            {notification.team}
-                          </span>
-                        </>
+              return (
+                <div
+                  key={notification.id}
+                  className={cn(
+                    "p-5 border-b border-gray-100 transition-colors cursor-pointer hover:bg-gray-50",
+                    (notification.isRead !== undefined
+                      ? !notification.isRead
+                      : notification.status === "new")
+                      ? "bg-blue-50/30"
+                      : "bg-white",
+                  )}
+                  onClick={() =>
+                    handleNotificationClick(
+                      notification.id,
+                      notification.isRead !== undefined
+                        ? notification.isRead
+                        : notification.status === "read",
+                    )
+                  }
+                >
+                  <div className="flex space-x-3">
+                    <div className="relative shrink-0 h-10 w-10">
+                      <Avatar className="h-10 w-10 border border-gray-100">
+                        <AvatarImage src={displayAvatar} alt={displayName} />
+                        <AvatarFallback className="text-xs font-medium bg-gray-50">
+                          {displayInitials}
+                        </AvatarFallback>
+                      </Avatar>
+                      {(notification?.sender?.online ||
+                        notification?.user?.online) && (
+                        <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-[#10B981] ring-2 ring-white" />
                       )}
                     </div>
 
-                    {/* Comment box */}
-                    {notification?.comment && (
-                      <div className="mt-3 p-3 bg-[#F8FAFC] rounded-lg border border-gray-50">
-                        <p className="text-[13px] text-gray-600">
-                          <span className="font-bold text-gray-900">
-                            {notification?.comment?.mention}
-                          </span>{" "}
-                          {notification?.comment?.text}
-                        </p>
-                        {notification?.comment?.hasReply && (
-                          <div className="mt-3 relative">
-                            <input
-                              type="text"
-                              placeholder="Reply"
-                              className="w-full h-9 bg-white border border-gray-200 rounded-lg px-3 text-[12px] focus:outline-none focus:ring-1 focus:ring-blue-500 pr-10"
-                            />
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
-                              <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM5 19V5H19V19H5ZM14.14 11.86L11 15L9 13L6 16H18L14.14 11.86Z"
-                                  fill="#94A3B8"
-                                />
-                              </svg>
-                            </div>
-                          </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] leading-relaxed text-gray-700">
+                        <span className="font-bold text-gray-900">
+                          {displayName}
+                        </span>{" "}
+                        <span className="text-gray-500">
+                          {notification?.context || notification?.action}
+                        </span>{" "}
+                        {notification?.target && (
+                          <span className="text-[#2563EB] font-semibold">
+                            {notification?.target}
+                          </span>
+                        )}
+                      </p>
+
+                      <div className="flex items-center space-x-1.5 mt-0.5">
+                        <span className="text-[11px] text-gray-400">
+                          {notification.createdAt
+                            ? getTimeAgo(notification.createdAt)
+                            : notification.timestamp}
+                        </span>
+                        {notification.type && (
+                          <>
+                            <span className="text-[11px] text-gray-400">•</span>
+                            <span className="text-[11px] text-gray-400 capitalize">
+                              {notification.type
+                                .replace(/_/g, " ")
+                                .toLowerCase()}
+                            </span>
+                          </>
                         )}
                       </div>
-                    )}
 
-                    {/* Attachment preview */}
-                    {notification?.attachment && (
-                      <div className="mt-3 flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden h-12">
-                        {getFileIcon(notification?.attachment?.type)}
-                        <span className="text-[12px] font-medium text-gray-600 truncate flex-1 pr-4">
-                          {notification?.attachment?.name}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Actions buttons */}
-                    {notification?.actions &&
-                      notification?.actions?.length > 0 && (
-                        <div
-                          className={cn(
-                            "flex items-center gap-2 mt-4",
-                            notification?.type === "project" && "justify-end",
+                      {/* Comment box */}
+                      {notification?.comment && (
+                        <div className="mt-3 p-3 bg-[#F8FAFC] rounded-lg border border-gray-50">
+                          <p className="text-[13px] text-gray-600">
+                            <span className="font-bold text-gray-900">
+                              {notification?.comment?.mention}
+                            </span>{" "}
+                            {notification?.comment?.text}
+                          </p>
+                          {notification?.comment?.hasReply && (
+                            <div className="mt-3 relative">
+                              <input
+                                type="text"
+                                placeholder="Reply"
+                                className="w-full h-9 bg-white border border-gray-200 rounded-lg px-3 text-[12px] focus:outline-none focus:ring-1 focus:ring-blue-500 pr-10"
+                              />
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
+                                <svg
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM5 19V5H19V19H5ZM14.14 11.86L11 15L9 13L6 16H18L14.14 11.86Z"
+                                    fill="#94A3B8"
+                                  />
+                                </svg>
+                              </div>
+                            </div>
                           )}
-                        >
-                          {notification?.actions?.map((action, index) => (
-                            <Button
-                              key={index}
-                              variant={
-                                action.variant === "default"
-                                  ? "default"
-                                  : "outline"
-                              }
-                              size="sm"
-                              onClick={action.onClick}
-                              className={cn(
-                                "h-9 px-5 text-[12px] font-semibold rounded-lg transition-all",
-                                action.variant === "default"
-                                  ? "bg-[#2563EB] hover:bg-blue-700 text-white border-none shadow-sm"
-                                  : action.variant === "destructive"
-                                    ? "bg-[#FEE2E2] text-[#EF4444] border-none hover:bg-red-200"
-                                    : action.variant === "secondary"
-                                      ? "bg-[#E0E7FF] text-[#4F46E5] border-none hover:bg-blue-200"
-                                      : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50",
-                              )}
-                            >
-                              {action.label}
-                            </Button>
-                          ))}
                         </div>
                       )}
+
+                      {/* Attachment preview */}
+                      {notification?.attachment && (
+                        <div className="mt-3 flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden h-12">
+                          {getFileIcon(notification?.attachment?.type)}
+                          <span className="text-[12px] font-medium text-gray-600 truncate flex-1 pr-4">
+                            {notification?.attachment?.name}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Actions buttons */}
+                      {notification?.actions &&
+                        notification?.actions?.length > 0 && (
+                          <div
+                            className={cn(
+                              "flex items-center gap-2 mt-4",
+                              notification?.type === "project" && "justify-end",
+                            )}
+                          >
+                            {notification?.actions?.map(
+                              (action: any, index: number) => (
+                                <Button
+                                  key={index}
+                                  variant={
+                                    action.variant === "default"
+                                      ? "default"
+                                      : "outline"
+                                  }
+                                  size="sm"
+                                  onClick={action.onClick}
+                                  className={cn(
+                                    "h-9 px-5 text-[12px] font-semibold rounded-lg transition-all",
+                                    action.variant === "default"
+                                      ? "bg-[#2563EB] hover:bg-blue-700 text-white border-none shadow-sm"
+                                      : action.variant === "destructive"
+                                        ? "bg-[#FEE2E2] text-[#EF4444] border-none hover:bg-red-200"
+                                        : action.variant === "secondary"
+                                          ? "bg-[#E0E7FF] text-[#4F46E5] border-none hover:bg-blue-200"
+                                          : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50",
+                                  )}
+                                >
+                                  {action.label}
+                                </Button>
+                              ),
+                            )}
+                          </div>
+                        )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="p-6 text-center text-sm text-gray-500">
               No notifications found.
@@ -470,22 +535,6 @@ export default function NotificationModal({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-white">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-gray-700 font-semibold hover:bg-gray-100 bg-white border border-gray-200 h-10 px-6 rounded-lg cursor-pointer transition-all"
-          >
-            Archive All
-          </Button>
-          <Button
-            size="sm"
-            className="bg-[#2563EB] hover:bg-blue-700 text-white font-semibold h-10 px-6 rounded-lg cursor-pointer shadow-sm transition-all"
-          >
-            Mark All as Read
-          </Button>
-        </div>
       </div>
     </>
   );
