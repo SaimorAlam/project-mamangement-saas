@@ -37,6 +37,7 @@ import HorizontalStackedBarChart from "@/common/Charts/HorizontalStackedBarChart
 import ComboChart from "@/common/Charts/ComboChart";
 import CandleChart from "@/common/Charts/CandleChart";
 import { parsePieChartData } from "@/utils/parsePieChartData";
+import SplineAreaChart from "@/common/Charts/CompletedCharts/SplineAreaChart/SplineAreaChart";
 
 const DashboardTab = () => {
   const { projectId } = useParams();
@@ -252,6 +253,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset}
                 endingRange={chartData?.lastFieldDataset}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -282,6 +284,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset}
                 endingRange={chartData?.lastFieldDataset}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -333,6 +336,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -348,6 +352,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -377,6 +382,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -399,6 +405,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -421,6 +428,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -436,6 +444,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -465,6 +474,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -497,6 +507,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -529,6 +540,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -545,6 +557,39 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
+              />
+            );
+          }
+
+          if (categoryKey === "SPLINE") {
+            const legendValues =
+              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+                label: w.legendName || w.label,
+                color: w.color,
+                field: (w.legendName || w.label)
+                  ?.toLowerCase()
+                  .replace(/\s+/g, ""),
+              })) || [];
+
+            const { labels, data } = parseXAxisData(
+              item?.xAxis,
+              legendValues,
+              item?.title,
+            );
+
+            return (
+              <SplineAreaChart
+                key={item.id}
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                startingRange={chartData?.firstFieldDataset || 0}
+                endingRange={chartData?.lastFieldDataset || 100}
+                chartId={item?.id}
+                projectId={projectId}
+                allUploadedData={data}
+                isPreview={true}
               />
             );
           }
@@ -567,21 +612,14 @@ const DashboardTab = () => {
 
     const remaining = chartComponents.slice(1);
     const rows = [];
-    let i = 0;
+    const bucketSize = 2; // Fixed 2 columns for sub-charts for a cleaner, stable layout
 
-    while (i < remaining.length) {
-      // Randomly decide between 2 or 3 columns
-      // 50% chance for each
-      const cols = Math.random() > 0.5 ? 3 : 2;
-      const bucketSize = cols;
-
+    for (let i = 0; i < remaining.length; i += bucketSize) {
       rows.push({
-        cols,
+        cols: bucketSize,
         items: remaining.slice(i, i + bucketSize),
         key: `row-${rows.length}`,
       });
-
-      i += bucketSize;
     }
 
     return rows;
@@ -591,7 +629,7 @@ const DashboardTab = () => {
     <div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ClientProjectInfo projectData={data?.data} isLoading={isLoading} />
-        <div className="col-span-2">
+        <div className="col-span-2 h-full">
           {rootChartLoading ? <ChartSkeleton /> : <>{chartComponents[0]}</>}
         </div>
       </div>
@@ -607,9 +645,7 @@ const DashboardTab = () => {
         chartRows.map((row) => (
           <div
             key={row.key}
-            className={`grid grid-cols-1 md:${
-              row.cols === 2 ? "grid-cols-2" : "grid-cols-3"
-            } gap-6 mt-6`}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6"
           >
             {row.items}
           </div>
