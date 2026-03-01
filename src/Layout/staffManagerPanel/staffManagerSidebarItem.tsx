@@ -3,13 +3,13 @@ import {
   FileChartColumnIncreasing,
   Folder,
   Grid2x2,
-  Headphones,
-  Info,
-  Milestone,
-  Phone,
-  UserStar,
-  Ticket,
-  TicketPlus,
+  // Headphones,
+  // Info,
+  // Milestone,
+  // Phone,
+  // UserStar,
+  // Ticket,
+  // TicketPlus,
   Megaphone,
   Building2,
   Store,
@@ -91,45 +91,45 @@ export const getStaffManagerSidebarItems = (): SidebarGroup[] => {
     {
       label: "Support",
       items: [
-        {
-          icon: <Info />,
-          name: "Help",
-          path: "/staff-manager-panel/help",
-          children: [
-            {
-              icon: <Headphones />,
-              path: "support",
-              name: "Support",
-              children: [
-                {
-                  index: true,
-                  icon: <Ticket />,
-                  name: "Support Ticket",
-                },
-                {
-                  icon: <TicketPlus />,
-                  path: "create-tickets",
-                  name: "Create Ticket",
-                },
-              ],
-            },
-            {
-              icon: <UserStar />,
-              path: "feedback",
-              name: "Feedback",
-            },
-            {
-              icon: <Milestone />,
-              path: "product-tour",
-              name: "Product Tour",
-            },
-            {
-              icon: <Phone />,
-              path: "contact-us",
-              name: "Contact US",
-            },
-          ],
-        },
+        // {
+        //   icon: <Info />,
+        //   name: "Help",
+        //   path: "/staff-manager-panel/help",
+        //   children: [
+        //     {
+        //       icon: <Headphones />,
+        //       path: "support",
+        //       name: "Support",
+        //       children: [
+        //         {
+        //           index: true,
+        //           icon: <Ticket />,
+        //           name: "Support Ticket",
+        //         },
+        //         {
+        //           icon: <TicketPlus />,
+        //           path: "create-tickets",
+        //           name: "Create Ticket",
+        //         },
+        //       ],
+        //     },
+        //     {
+        //       icon: <UserStar />,
+        //       path: "feedback",
+        //       name: "Feedback",
+        //     },
+        //     {
+        //       icon: <Milestone />,
+        //       path: "product-tour",
+        //       name: "Product Tour",
+        //     },
+        //     {
+        //       icon: <Phone />,
+        //       path: "contact-us",
+        //       name: "Contact US",
+        //     },
+        //   ],
+        // },
         {
           icon: <IoSettingsOutline className="size-6" />,
           name: "Settings",

@@ -369,9 +369,11 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                             </AvatarFallback>
                           </Avatar>
                         ) : (
-                          <AvatarFallback>
-                            {getInitials(project?.employee?.user?.name)}
-                          </AvatarFallback>
+                          <Avatar className="size-10 border border-gray-300">
+                            <AvatarFallback>
+                              {getInitials(project?.employee?.user?.name)}
+                            </AvatarFallback>
+                          </Avatar>
                         )}
                       </td>
                       <td className="px-6 py-4">

@@ -44,7 +44,7 @@ const StaffEmployeeDashboardHeader = () => {
 
     // Find the current route
     let currentRoute = allRoutes.find((r) => r.path === currentPath);
-    
+
     // If not direct match, check for parent routes with children
     if (!currentRoute) {
       for (const route of allRoutes) {
@@ -99,7 +99,7 @@ const StaffEmployeeDashboardHeader = () => {
           <SidebarTrigger className="md:hidden shrink-0" />
           <div className="max-w-xl">
             <h1 className="text-[32px] font-semibold">
-              {name ? name : "Mr./Mrs. Employee"}
+              Hi, {name ? name : "Mr./Mrs. Employee"}
             </h1>
             <div className="flex items-center gap-2">
               <p className="text-base text-gray-500">{breadcrumb}</p>
@@ -107,45 +107,45 @@ const StaffEmployeeDashboardHeader = () => {
           </div>
         </div>
 
-          <StaffEmployeeGlobalSearch />
+        <StaffEmployeeGlobalSearch />
 
-          {/* Right Controls */}
-          <div className="flex items-center justify-between gap-2 relative">
-            {/* Notifications */}
-            <div className="relative">
-              <PrimaryButton
-                leftIcon={<Bell className="text-2xl" />}
-                type={"Outline"}
-                onClick={() => setIsOpen(true)}
-              />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              )}
-            </div>
-            <StaffEmployeeNotificationModal
-              isOpen={isOpen}
-              onClose={() => setIsOpen(false)}
+        {/* Right Controls */}
+        <div className="flex items-center justify-between gap-2 relative">
+          {/* Notifications */}
+          <div className="relative">
+            <PrimaryButton
+              leftIcon={<Bell className="text-2xl" />}
+              type={"Outline"}
+              onClick={() => setIsOpen(true)}
             />
-
-            {previewButtonPaths.includes(currentPath) && (
-              <PrimaryButton
-                leftIcon={<Eye className="text-2xl" />}
-                title="Preview"
-                type={"Outline"}
-                onClick={() => console.log("clicked")}
-              />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
             )}
+          </div>
+          <StaffEmployeeNotificationModal
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+          />
 
-            {saveDraftButtonPaths.includes(currentPath) && (
-              <PrimaryButton
-                leftIcon={<FileText className="text-2xl" />}
-                title="Save Draft"
-                type={"Outline"}
-              />
-            )}
-            {/* {publishButtonPaths.includes(currentPath) && (
+          {previewButtonPaths.includes(currentPath) && (
+            <PrimaryButton
+              leftIcon={<Eye className="text-2xl" />}
+              title="Preview"
+              type={"Outline"}
+              onClick={() => console.log("clicked")}
+            />
+          )}
+
+          {saveDraftButtonPaths.includes(currentPath) && (
+            <PrimaryButton
+              leftIcon={<FileText className="text-2xl" />}
+              title="Save Draft"
+              type={"Outline"}
+            />
+          )}
+          {/* {publishButtonPaths.includes(currentPath) && (
               <PrimaryButton
                 leftIcon={<Upload className="text-2xl" />}
                 title="Submit for Review"
@@ -154,17 +154,17 @@ const StaffEmployeeDashboardHeader = () => {
               />
             )} */}
 
-            {uploadSubmissionButtonPaths.includes(currentPath) && (
-              <PrimaryButton
-                leftIcon={<Upload className="text-2xl" />}
-                title="Upload Submission"
-                type="Primary"
-                onClick={() =>
-                  navigate("/staff-employee-panel/upload-submission")
-                }
-              />
-            )}
-          </div>
+          {uploadSubmissionButtonPaths.includes(currentPath) && (
+            <PrimaryButton
+              leftIcon={<Upload className="text-2xl" />}
+              title="Upload Submission"
+              type="Primary"
+              onClick={() =>
+                navigate("/staff-employee-panel/upload-submission")
+              }
+            />
+          )}
+        </div>
       </div>
 
       {/* Breadcrumb */}
