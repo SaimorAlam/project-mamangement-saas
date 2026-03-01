@@ -353,7 +353,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
           );
         }
         if (categoryKey === "AREA") {
-          const legendValues =
+          let legendValues =
             (chartData?.widgets || item?.widgets)?.map((w: any) => ({
               label: w.legendName || w.label,
               color: w.color,
@@ -361,6 +361,35 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 ?.toLowerCase()
                 .replace(/\s+/g, ""),
             })) || [];
+
+          // If no widgets, try to extract labels from xAxis header
+          if (legendValues.length === 0 && xAxisData) {
+            try {
+              const parsed =
+                typeof xAxisData === "string"
+                  ? JSON.parse(xAxisData)
+                  : xAxisData;
+              const dataArr = Array.isArray(parsed)
+                ? parsed
+                : parsed?.labels || [];
+
+              if (
+                dataArr.length > 0 &&
+                Array.isArray(dataArr[0]) &&
+                dataArr[0].length > 1 &&
+                typeof dataArr[0][1] === "string"
+              ) {
+                // Header detected
+                legendValues = dataArr[0].slice(1).map((label: string) => ({
+                  label: label,
+                  color: "#13A490", // Default color for Area
+                  field: label.toLowerCase().replace(/\s+/g, ""),
+                }));
+              }
+            } catch {
+              /* ignore */
+            }
+          }
 
           const { labels, data } = parseXAxisData(
             xAxisData,
@@ -385,7 +414,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
           );
         }
         if (categoryKey === "SPLINE") {
-          const legendValues =
+          let legendValues =
             (chartData?.widgets || item?.widgets)?.map((w: any) => ({
               label: w.legendName || w.label,
               color: w.color,
@@ -393,6 +422,35 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 ?.toLowerCase()
                 .replace(/\s+/g, ""),
             })) || [];
+
+          // If no widgets, try to extract labels from xAxis header
+          if (legendValues.length === 0 && xAxisData) {
+            try {
+              const parsed =
+                typeof xAxisData === "string"
+                  ? JSON.parse(xAxisData)
+                  : xAxisData;
+              const dataArr = Array.isArray(parsed)
+                ? parsed
+                : parsed?.labels || [];
+
+              if (
+                dataArr.length > 0 &&
+                Array.isArray(dataArr[0]) &&
+                dataArr[0].length > 1 &&
+                typeof dataArr[0][1] === "string"
+              ) {
+                // Header detected
+                legendValues = dataArr[0].slice(1).map((label: string) => ({
+                  label: label,
+                  color: "#3b82f6", // Default color
+                  field: label.toLowerCase().replace(/\s+/g, ""),
+                }));
+              }
+            } catch {
+              /* ignore */
+            }
+          }
 
           const { labels, data } = parseXAxisData(
             xAxisData,

@@ -13,6 +13,7 @@ import { useLazyFindChildrenValueQuery, useLazyGetAllTheLeafChartQuery } from "@
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setChildPayload, setGroupTitle } from "@/store/Slices/ChartSlice/ChartSlice";
 import { parseXAxisData } from "../StackedBarChart/StackedBarChart";
+import { chartTypes } from "@/utils/ChartCategory";
 
 /* ---------- TYPES ---------- */
 
@@ -437,15 +438,17 @@ export default function SplineAreaChart({
           <div className="flex items-center gap-4">
             <div className="flex gap-4">
               {effectiveLegendValues.slice(0, 3).map((l) => (
-                <div key={l.field} className="flex items-center gap-1.5">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: l.color }}
-                  />
-                  <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
-                    {l.label}
-                  </span>
-                </div>
+                l.label && (
+                  <div key={l.field} className="flex items-center gap-1.5">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: l.color }}
+                    />
+                    <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                      {l.label}
+                    </span>
+                  </div>
+                )
               ))}
               {effectiveLegendValues.length > 3 && (
                 <span className="text-xs text-gray-400">
@@ -488,12 +491,50 @@ export default function SplineAreaChart({
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {childTiers?.map((tier: any) => {
-              const legends = (tier.widgets || []).map((w: any) => ({
+              const categoryKey = tier.category?.toUpperCase() || "SPLINE";
+              const chartProperty = chartTypes[categoryKey] || "splineChart";
+              let tierWidgets =
+                tier.widgets || tier[chartProperty]?.widgets || [];
+
+              // If no widgets, try to extract labels from xAxis header
+              if (tierWidgets.length === 0 && tier.xAxis) {
+                try {
+                  const parsed =
+                    typeof tier.xAxis === "string"
+                      ? JSON.parse(tier.xAxis)
+                      : tier.xAxis;
+                  const dataArr = Array.isArray(parsed)
+                    ? parsed
+                    : parsed?.labels || [];
+
+                  if (
+                    dataArr.length > 0 &&
+                    Array.isArray(dataArr[0]) &&
+                    dataArr[0].length > 1 &&
+                    typeof dataArr[0][1] === "string"
+                  ) {
+                    // Header detected
+                    tierWidgets = dataArr[0].slice(1).map((label: string) => ({
+                      legendName: label,
+                    }));
+                  }
+                } catch {
+                  /* ignore */
+                }
+              }
+
+              const legends = (tierWidgets.length > 0
+                ? tierWidgets
+                : legendValues
+              ).map((w: any, idx: number) => ({
                 label: w.legendName || w.label,
                 field: (w.legendName || w.label)
                   ?.toLowerCase()
                   .replace(/\s+/g, ""),
-                color: w.color,
+                color:
+                  w.color ||
+                  legendValues[idx]?.color ||
+                  ["#3b82f6", "#f97316", "#ec4899", "#10b981", "#f59e0b"][idx % 5],
               }));
 
               const { labels, data: tierData } = parseXAxisData(
