@@ -188,8 +188,8 @@ const AllProgramProject = ({
               title="Boards"
               leftIcon={<AlignStartHorizontal className="w-4 h-4" />}
               className={`${viewMode === "board"
-                  ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
-                  : "bg-white border-black text-black! hover:text-black!"
+                ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
+                : "bg-white border-black text-black! hover:text-black!"
                 }`}
               onClick={() => setViewMode("board")}
             />
@@ -199,8 +199,8 @@ const AllProgramProject = ({
               title="Tables"
               leftIcon={<TableIcon className="w-4 h-4" />}
               className={`${viewMode === "table"
-                  ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
-                  : "bg-white border-black text-black! hover:text-black!"
+                ? "bg-black text-white border-black hover:bg-black! hover:text-white!"
+                : "bg-white border-black text-black! hover:text-black!"
                 }`}
               onClick={() => setViewMode("table")}
             />
@@ -334,7 +334,7 @@ const AllProgramProject = ({
           )}
         </div>
       ) : (
-        <div className="border border-gray-100 rounded-md min-h-88 p-2">
+        <div className=" min-h-88 p-2">
           <div className="grid grid-cols-1 md:grid-cols-2  xl:grid-cols-4 gap-5">
             {projects?.map((projectData: StaffEmployeeProject) => {
               return (

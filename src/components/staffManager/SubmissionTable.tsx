@@ -18,7 +18,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Eye } from "lucide-react";
 import ViewSubmissionModal from "./overview/ViewSubmissionModal";
-import EditSubmissionModal from "./overview/EditSubmissionModal";
+// import EditSubmissionModal from "./overview/EditSubmissionModal";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -58,9 +58,9 @@ export default function SubmissionTable({
       .join("")
       .toUpperCase();
 
-  const handleEdit = (id: number) => {
-    console.log("Edit submission:", id);
-  };
+  // const handleEdit = (id: number) => {
+  //   console.log("Edit submission:", id);
+  // };
 
   const statusClasses: Record<string, string> = {
     APPROVED: "text-[#0B5A4A] bg-[#EBFFF2] border border-[#ABEFD5]",
@@ -125,23 +125,23 @@ export default function SubmissionTable({
 
                     <TableCell className="px-6 py-3.5">
                       <div className="flex items-center space-x-3">
-                        {submission.employee.user.profileImage && (
+                        {submission?.employee?.user?.profileImage && (
                           <Avatar className="size-10 border border-gray-300">
                             <AvatarImage
                               src={
-                                submission.employee.user.profileImage
+                                submission?.employee?.user?.profileImage
                               }
-                              alt={submission.employee.user.name}
+                              alt={submission?.employee?.user?.name}
                             />
                             <AvatarFallback className="text-base font-normal">
                               {getInitials(
-                                submission.employee.user.name
+                                submission?.employee?.user?.name
                               )}
                             </AvatarFallback>
                           </Avatar>
                         )}
                         <span className="text-base font-normal">
-                          {submission.employee.user.name}
+                          {submission?.employee?.user?.name}
                         </span>
                       </div>
                     </TableCell>
@@ -180,7 +180,7 @@ export default function SubmissionTable({
                           </span>
                         </Button>
 
-                        <Button
+                        {/* <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEdit(submission.id)}
@@ -191,7 +191,7 @@ export default function SubmissionTable({
                           <span className="sr-only">
                             Edit submission
                           </span>
-                        </Button>
+                        </Button> */}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -200,7 +200,7 @@ export default function SubmissionTable({
             </Table>
           </ScrollArea>
 
-          {/* 🔥 View All Button */}
+          {/* View All Button */}
           {hasMoreThanFive && (
             <div className="flex justify-center py-4">
               <button
