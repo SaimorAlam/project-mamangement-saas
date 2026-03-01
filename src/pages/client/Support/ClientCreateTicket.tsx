@@ -24,6 +24,7 @@ const ClientCreateTicket = () => {
   const [message, setMessage] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,7 +46,7 @@ const ClientCreateTicket = () => {
 
       const formData = new FormData();
       formData.append("issueType", issueType);
-      formData.append("message", message);
+      formData.append("description", message);
 
       if (attachment) {
         formData.append("attachment", attachment);
@@ -58,6 +59,7 @@ const ClientCreateTicket = () => {
       setIssueType("");
       setMessage("");
       setAttachment(null);
+      setOpen(false);
     } catch {
       toast.error("Something went wrong while creating the ticket");
     } finally {
@@ -66,7 +68,7 @@ const ClientCreateTicket = () => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="flex items-center gap-2 px-4 py-4 rounded-md bg-blue-500 text-white text-sm font-medium hover:bg-blue-600">
           <Plus className="w-4 h-4" />

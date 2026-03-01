@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState, MouseEvent } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import AddTierModal from "../Modal/AddTierModal";
-import TierChartModal from "../Modal/TierChartModal";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import AddTierModal from "../../../Modal/AddTierModal";
+import TierChartModal from "../../../Modal/TierChartModal";
+import ChartCardWrapper from "../../components/ChartCardWrapper";
 import {
   useLazyFindChildrenValueQuery,
   useLazyGetAllTheLeafChartQuery,
@@ -62,7 +62,7 @@ export const parseHeatmapChartData = (
     (row: any) => {
       const rowName = String(row[0] || "").trim();
       return rowName !== "" && rowName.toLowerCase() !== "label";
-    }
+    },
   );
 
   // Extract labels from the first column of every data row
@@ -596,7 +596,7 @@ export default function HeatmapChartNew({
             <div className="w-full flex flex-col p-2">
               {heatmapDisplayData.map((row, rIdx) => (
                 <div key={rIdx} className="flex mb-3 w-full">
-                  <div className="w-12 shrink-0 pr-3 text-right text-sm text-gray-700 flex items-center justify-end wrap-break-words">
+                  <div className="w-fit shrink-0 pr-3 text-right text-sm text-gray-700 flex items-center justify-end wrap-break-words">
                     {row.label}
                   </div>
 

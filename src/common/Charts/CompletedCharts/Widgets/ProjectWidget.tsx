@@ -471,10 +471,10 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       </div>
 
       {/* Widget Library */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
         <div className="p-4">
           {/* Widget List */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 ">
             {widgets.map((widget) => (
               <div
                 key={widget.id}

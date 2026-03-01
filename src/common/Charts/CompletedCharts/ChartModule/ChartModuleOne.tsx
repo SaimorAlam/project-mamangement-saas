@@ -6,7 +6,6 @@ import StackedBarChart from "@/common/Charts/CompletedCharts/StackedBarChart/Sta
 import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
 import MultiAxisLineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
 import WidgetForChartModuleOne from "../Widgets/WidgetForChartModuleOne";
-import SplineAreaChart from "@/common/Charts/SplineAreaChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
 
@@ -132,20 +131,7 @@ const ChartModuleOne = ({
                 isCreationMode={true}
               />
             );
-          } else if (chartName === "spline-area-chart") {
-            return (
-              <SplineAreaChart
-                widgetTitle={widgetTitle}
-                xAxisValues={xAxisValues}
-                legendValues={legendValues}
-                startingRange={startingRange}
-                endingRange={endingRange}
-                onToggleWidget={handleToggleWidget}
-                onDelete={onDelete}
-                isPreview={isPreview}
-                isCreationMode={true}
-              />
-            );
+
           } else if (chartName === "line-chart") {
             return (
               <MultiAxisLineChart

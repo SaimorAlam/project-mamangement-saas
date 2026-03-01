@@ -15,12 +15,10 @@ import { toast } from "sonner";
 import { logOut } from "@/store/Slices/AuthSlice/authSlice";
 
 interface UserProfileButtonProps {
-  onSettingsClick?: () => void;
   state?: "expanded" | "collapsed";
 }
 
 export default function UserProfile({
-  onSettingsClick,
   state,
 }: UserProfileButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -127,8 +125,8 @@ export default function UserProfile({
 
         <DropdownMenuSeparator className="border border-[#E2E8F0] h-px" />
 
-        <DropdownMenuItem onClick={onSettingsClick} className="cursor-pointer">
-          Settings
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link to="settings">Settings</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild className="cursor-pointer">

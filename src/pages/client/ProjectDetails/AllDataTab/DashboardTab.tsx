@@ -21,7 +21,7 @@ import HorizontalBarChart, {
 import { chartTypes } from "@/utils/ChartCategory";
 import HeatmapChartNew, {
   parseHeatmapChartData,
-} from "@/common/Charts/HeatmapChartNew";
+} from "@/common/Charts/CompletedCharts/HeatMap/HeatmapChartNew";
 import PieChartWidget from "@/common/Charts/CompletedCharts/PieChart/PieChart";
 import ColumnBarChart from "@/common/Charts/ColumnBarChart";
 import RadarChartNew from "@/common/Charts/RadarChartNew";
@@ -37,6 +37,7 @@ import HorizontalStackedBarChart from "@/common/Charts/HorizontalStackedBarChart
 import ComboChart from "@/common/Charts/ComboChart";
 import CandleChart from "@/common/Charts/CandleChart";
 import { parsePieChartData } from "@/utils/parsePieChartData";
+import SplineAreaChart from "@/common/Charts/CompletedCharts/SplineAreaChart/SplineAreaChart";
 
 const DashboardTab = () => {
   const { projectId } = useParams();
@@ -252,6 +253,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset}
                 endingRange={chartData?.lastFieldDataset}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -282,6 +284,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset}
                 endingRange={chartData?.lastFieldDataset}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -333,6 +336,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -348,6 +352,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -377,6 +382,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -399,6 +405,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -421,6 +428,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -436,6 +444,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -465,6 +474,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -497,6 +507,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -529,6 +540,7 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
               />
             );
           }
@@ -545,6 +557,39 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                isPreview={true}
+              />
+            );
+          }
+
+          if (categoryKey === "SPLINE") {
+            const legendValues =
+              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+                label: w.legendName || w.label,
+                color: w.color,
+                field: (w.legendName || w.label)
+                  ?.toLowerCase()
+                  .replace(/\s+/g, ""),
+              })) || [];
+
+            const { labels, data } = parseXAxisData(
+              item?.xAxis,
+              legendValues,
+              item?.title,
+            );
+
+            return (
+              <SplineAreaChart
+                key={item.id}
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                startingRange={chartData?.firstFieldDataset || 0}
+                endingRange={chartData?.lastFieldDataset || 100}
+                chartId={item?.id}
+                projectId={projectId}
+                allUploadedData={data}
+                isPreview={true}
               />
             );
           }
@@ -565,33 +610,41 @@ const DashboardTab = () => {
   const chartRows = useMemo(() => {
     if (!chartComponents || chartComponents.length <= 1) return [];
 
-    const remaining = chartComponents.slice(1);
+    const remainingItems = chartComponents.slice(1);
     const rows = [];
     let i = 0;
 
-    while (i < remaining.length) {
-      // Randomly decide between 2 or 3 columns
-      // 50% chance for each
-      const cols = Math.random() > 0.5 ? 3 : 2;
-      const bucketSize = cols;
+    while (i < remainingItems.length) {
+      const itemsLeft = remainingItems.length - i;
+      // Alternate between 2 and 3 columns (Row 0: 2, Row 1: 3, Row 2: 2...)
+      let capacity: number = rows.length % 2 === 0 ? 2 : 3;
 
+      // Special logic to avoid leaving a single item on the last row
+      if (itemsLeft === 4) {
+        capacity = 2; // Split 4 into 2 + 2 instead of 3 + 1
+      } else if (itemsLeft === 3) {
+        capacity = 3; // Take all 3 at once instead of 2 + 1
+      } else if (itemsLeft < capacity) {
+        capacity = itemsLeft;
+      }
+
+      const chunk = remainingItems.slice(i, i + capacity);
       rows.push({
-        cols,
-        items: remaining.slice(i, i + bucketSize),
+        cols: capacity,
+        items: chunk,
         key: `row-${rows.length}`,
       });
-
-      i += bucketSize;
+      i += chunk.length;
     }
 
     return rows;
   }, [chartComponents]);
 
   return (
-    <div>
+    <div className="mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ClientProjectInfo projectData={data?.data} isLoading={isLoading} />
-        <div className="col-span-2">
+        <div className="col-span-2 h-full">
           {rootChartLoading ? <ChartSkeleton /> : <>{chartComponents[0]}</>}
         </div>
       </div>
@@ -607,9 +660,9 @@ const DashboardTab = () => {
         chartRows.map((row) => (
           <div
             key={row.key}
-            className={`grid grid-cols-1 md:${
-              row.cols === 2 ? "grid-cols-2" : "grid-cols-3"
-            } gap-6 mt-6`}
+            className={`grid grid-cols-1 gap-6 mt-6 ${
+              row.cols === 3 ? "md:grid-cols-3" : "md:grid-cols-2"
+            }`}
           >
             {row.items}
           </div>

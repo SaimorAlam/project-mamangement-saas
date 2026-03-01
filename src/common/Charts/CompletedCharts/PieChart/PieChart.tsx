@@ -357,7 +357,7 @@ export default function PieChartWidget({
         isDownloading={isDownloading}
         isPreview={isPreview}
         customHeaderContent={
-          <div className="flex gap-4">
+          <div className="flex items-center gap-4">
             {chartData.slice(0, 3).map((item) => (
               <div key={item.name} className="flex items-center gap-1.5">
                 <div

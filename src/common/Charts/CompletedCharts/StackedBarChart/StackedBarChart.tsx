@@ -512,25 +512,27 @@ export default function StackedBarChart({
         isDownloading={isDownloading}
         isPreview={isPreview}
         customHeaderContent={
-          <div className="flex gap-4">
-            {effectiveLegendValues.slice(0, 3).map((l) =>
-              l.label ? (
-                <div key={l.field} className="flex items-center gap-1.5">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: l.color }}
-                  />
-                  <span className="text-xs text-gray-500 font-medium">
-                    {l.label}
-                  </span>
-                </div>
-              ) : null,
-            )}
-            {effectiveLegendValues.length > 3 && (
-              <span className="text-xs text-gray-400">
-                +{effectiveLegendValues.length - 3} more
-              </span>
-            )}
+          <div className="flex items-center gap-4">
+            <div className="flex gap-4">
+              {effectiveLegendValues.slice(0, 3).map((l) =>
+                l.label ? (
+                  <div key={l.field} className="flex items-center gap-1.5">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: l.color }}
+                    />
+                    <span className="text-xs text-gray-500 font-medium">
+                      {l.label}
+                    </span>
+                  </div>
+                ) : null,
+              )}
+              {effectiveLegendValues.length > 3 && (
+                <span className="text-xs text-gray-400">
+                  +{effectiveLegendValues.length - 3} more
+                </span>
+              )}
+            </div>
           </div>
         }
         footer={

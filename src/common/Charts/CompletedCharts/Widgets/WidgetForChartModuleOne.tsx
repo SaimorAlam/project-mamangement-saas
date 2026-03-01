@@ -57,12 +57,9 @@ const WidgetForChartModuleOne = ({
   onDelete?: () => void;
 }) => {
   // ── detect Program Builder context ────────────────────────────────────────
-  const { pathname, state: locationState } = useLocation();
+  const { pathname } = useLocation();
   const isProgramBuilder = pathname.split("/")[2] === "program-builder";
-  const projectIdFromState = (locationState as { projectId?: string } | null)
-    ?.projectId;
 
-  const [projectId, setProjectId] = useState<string>("");
   const { name, role, profileImage, loading } = useGetUser();
   const projectIdFromSlice = useAppSelector(
     (state) => state?.chartSlice?.projectId,
@@ -70,15 +67,6 @@ const WidgetForChartModuleOne = ({
   const programIdFromSlice = useAppSelector(
     (state) => state?.chartSlice?.programId,
   );
-
-  useEffect(() => {
-    if (projectIdFromSlice) {
-      setProjectId(projectIdFromSlice);
-    }
-    if (projectIdFromState) {
-      setProjectId(projectIdFromState);
-    }
-  }, [projectIdFromSlice, projectIdFromState]);
 
   // ── Program Builder: Y-Axis cascading state ───────────────────────────────
   const [yAxisProjectId, setYAxisProjectId] = useState<string>("");
@@ -377,7 +365,7 @@ const WidgetForChartModuleOne = ({
         yAxis: JSON.stringify([]),
         zAxis: JSON.stringify([]),
 
-        projectId: projectId ?? projectIdFromState,
+        projectId: projectIdFromSlice,
         rootchart: true,
         roottitle: widgetTitle,
         grouptitle: widgetTitle,

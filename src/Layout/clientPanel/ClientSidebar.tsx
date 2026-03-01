@@ -31,7 +31,6 @@ import { useGetFavoriteProjectsQuery } from "@/store/Api/FavoriteProjectApi/Favo
 
 const ClientSidebar = () => {
   const location = useLocation();
-  const [open, setOpen] = useState(false);
   const { state, isMobile } = useSidebar();
 
   const { data, isLoading } = useGetFavoriteProjectsQuery({});
@@ -107,7 +106,11 @@ const ClientSidebar = () => {
     return false;
   };
 
-  const renderSidebarItem = (item: any, parentPath = "") => {
+  const NavItem = ({ item, parentPath = "" }: { item: any; parentPath?: string }) => {
+    const { isMobile, setOpenMobile } = useSidebar();
+    const isExpandedState = state === "expanded" || isMobile;
+    const [isOpen, setIsOpen] = useState(false);
+    
     const fullPath = item.index
       ? parentPath
       : item.path?.startsWith("/")
@@ -119,7 +122,7 @@ const ClientSidebar = () => {
     if (item.children && item.children.length > 0) {
       return (
         <SidebarMenuItem key={fullPath} className="w-full">
-          <DropdownMenu onOpenChange={(v) => setOpen(v)}>
+          <DropdownMenu onOpenChange={setIsOpen}>
             <DropdownMenuTrigger
               asChild
               className={`border-none ${isExpanded ? "py-3!" : "py-2!"}`}
@@ -127,7 +130,7 @@ const ClientSidebar = () => {
               <button
                 className={`self-stretch rounded-[10px] inline-flex items-center 
                   ${
-                    isExpanded
+                    isExpandedState
                       ? "px-4 py-3 justify-start w-full"
                       : "px-1 justify-center"
                   }
@@ -139,25 +142,25 @@ const ClientSidebar = () => {
               >
                 <div
                   className={`flex items-center ${
-                    isExpanded ? "justify-between w-full" : "justify-center"
+                    isExpandedState ? "justify-between w-full" : "justify-center"
                   }`}
                 >
                   <span
-                    className={`flex items-center ${isExpanded ? "gap-2" : ""}`}
+                    className={`flex items-center ${isExpandedState ? "gap-2" : ""}`}
                   >
                     <span className="size-6 shrink-0">{item.icon}</span>
-                    {isExpanded && (
+                    {isExpandedState && (
                       <span className="text-base font-normal truncate">
                         {item.name}
                       </span>
                     )}
                   </span>
 
-                  {isExpanded && (
+                  {isExpandedState && (
                     <ChevronRight
                       size={20}
                       className={`shrink-0 ${
-                        open ? "rotate-90 duration-200" : ""
+                        isOpen ? "rotate-90 duration-200" : ""
                       }`}
                     />
                   )}
@@ -166,9 +169,9 @@ const ClientSidebar = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
-              side={!isExpanded ? "right" : "bottom"}
-              align={!isExpanded ? "start" : "end"}
-              className="bg-white border border-[#CBD5E1] p-1 space-y-1 min-w-[200px]"
+              side={!isExpandedState ? "right" : "bottom"}
+              align={!isExpandedState ? "start" : "end"}
+              className="bg-white border border-[#CBD5E1] p-1  min-w-[200px]"
             >
               {item.children.map((child: any) => (
                 <DropdownMenuItem
@@ -177,7 +180,7 @@ const ClientSidebar = () => {
                   className="p-0 w-full"
                 >
                   <div className="w-full">
-                    {renderSidebarItem(child, fullPath)}
+                    <NavItem item={child} parentPath={fullPath} />
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -189,12 +192,17 @@ const ClientSidebar = () => {
 
     return (
       <SidebarMenuItem key={fullPath}>
-        <Link to={fullPath}>
+        <Link 
+          to={fullPath} 
+          onClick={() => {
+            if (isMobile) setOpenMobile(false);
+          }}
+        >
           <SidebarMenuButton
             asChild
             className={`self-stretch rounded-[10px] inline-flex items-center w-full
               ${
-                isExpanded
+                isExpandedState
                   ? "px-4 py-5 justify-start"
                   : "px-2 py-3 justify-center"
               }
@@ -204,9 +212,9 @@ const ClientSidebar = () => {
                   : "text-gray-900"
               }`}
           >
-            <div className={`flex items-center ${isExpanded ? "gap-2" : ""}`}>
+            <div className={`flex items-center ${isExpandedState ? "gap-2" : ""}`}>
               <span className="size-6 shrink-0">{item.icon}</span>
-              {isExpanded && (
+              {isExpandedState && (
                 <span className="text-base font-normal w-full truncate">
                   {item.name}
                 </span>
@@ -245,7 +253,7 @@ const ClientSidebar = () => {
               <img
                 src={Logo}
                 alt="Logo"
-                className="w-[176px] h-auto hover:scale-110 duration-300"
+                className="w-44 h-auto hover:scale-110 duration-300"
               />
             </Link>
           }
@@ -269,7 +277,9 @@ const ClientSidebar = () => {
                   <SidebarMenu className="space-y-2.5">
                     {group.label === "Favorites" && isLoading
                       ? renderFavoritesSkeleton()
-                      : group.items.map((item: any) => renderSidebarItem(item))}
+                      : group.items.map((item: any) => (
+                          <NavItem key={item.path} item={item} />
+                        ))}
                   </SidebarMenu>
 
                   {isExpanded && <hr className="w-56 text-slate-300 my-5" />}

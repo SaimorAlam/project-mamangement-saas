@@ -129,6 +129,7 @@ export default function CandleChart({
           type: "candlestick" as const,
           height: 350,
           toolbar: { show: false },
+          zoom: { enabled: false },
         },
         plotOptions: {
           candlestick: {
@@ -268,32 +269,34 @@ export default function CandleChart({
         isDownloading={isDownloading}
         isPreview={isPreview}
         customHeaderContent={
-          legendValues.length > 0 && (
-            <div className="flex gap-4">
-              {legendValues[0]?.label && (
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: legendValues[0].color }}
-                  />
-                  <span className="text-xs text-gray-500 font-medium">
-                    Up: {legendValues[0].label}
-                  </span>
-                </div>
-              )}
-              {legendValues[1]?.label && (
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: legendValues[1].color }}
-                  />
-                  <span className="text-xs text-gray-500 font-medium">
-                    Down: {legendValues[1].label}
-                  </span>
-                </div>
-              )}
-            </div>
-          )
+          <div className="flex items-center gap-4">
+            {legendValues.length > 0 && (
+              <div className="flex gap-4">
+                {legendValues[0]?.label && (
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: legendValues[0].color }}
+                    />
+                    <span className="text-xs text-gray-500 font-medium">
+                      Up: {legendValues[0].label}
+                    </span>
+                  </div>
+                )}
+                {legendValues[1]?.label && (
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: legendValues[1].color }}
+                    />
+                    <span className="text-xs text-gray-500 font-medium">
+                      Down: {legendValues[1].label}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         }
         footer={
           childTiers.length > 0 ? (

@@ -6,7 +6,7 @@ import HorizontalBarChart, {
 } from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
 import LineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
 import { parseLineChartData } from "@/utils/parseLineChartData";
-import HeatmapChartNew from "@/common/Charts/HeatmapChartNew";
+import HeatmapChartNew from "@/common/Charts/CompletedCharts/HeatMap/HeatmapChartNew";
 import PieChartWidget from "@/common/Charts/CompletedCharts/PieChart/PieChart";
 import ColumnBarChart from "@/common/Charts/ColumnBarChart";
 import RadarChartNew from "@/common/Charts/RadarChartNew";
@@ -23,6 +23,7 @@ import ComboChart from "@/common/Charts/ComboChart";
 import CandleChart from "@/common/Charts/CandleChart";
 import { chartTypes } from "@/utils/ChartCategory";
 import { parsePieChartData } from "@/utils/parsePieChartData";
+import SplineAreaChart from "@/common/Charts/CompletedCharts/SplineAreaChart/SplineAreaChart";
 
 const parseXAxisData = (
   xAxis: any[][] | string,
@@ -379,6 +380,37 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 chartId={item?.id}
                 projectId={item?.projectId}
                 allUploadedData={data}
+              />
+            </div>
+          );
+        }
+        if (categoryKey === "SPLINE") {
+          const legendValues =
+            (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            })) || [];
+
+          const { labels, data } = parseXAxisData(
+            xAxisData,
+            legendValues,
+            item?.title,
+          );
+
+          return (
+            <div key={item.id} className="w-full">
+              <SplineAreaChart
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                startingRange={firstField}
+                endingRange={lastField}
+                chartId={item?.id}
+                allUploadedData={data}
+                projectId={item?.projectId}
               />
             </div>
           );
