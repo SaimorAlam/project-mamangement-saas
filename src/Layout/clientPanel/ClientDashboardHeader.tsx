@@ -52,6 +52,7 @@ import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import FileUpload from "@/pages/client/ProjectBuilder/Components/FileUpload";
+import { useGetNotificationsQuery } from "@/store/Api/NotificationApi/NotificationApi";
 
 interface ClientDashboardHeaderProps {
   name?: string;
@@ -205,6 +206,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const { data: allProgramsData } = useGetAllProgramQuery({});
   const { data: allProjectsData } = useGetAllProjectsQuery({});
+  const { data: notificationData } = useGetNotificationsQuery({});
+
+  const unreadCount = useMemo(() => {
+    return (notificationData?.data || []).filter((n: any) => !n.isRead).length;
+  }, [notificationData]);
 
   // Search Logic
   const filteredPrograms = useMemo(() => {
@@ -601,12 +607,19 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         </div>
 
         <div className="flex items-center justify-end gap-2 md:gap-4 lg:gap-6 relative w-full lg:w-auto mt-2 lg:mt-0">
-          <PrimaryButton
-            leftIcon={<Bell className="text-xl md:text-2xl" />}
-            type="Outline"
-            onClick={() => setIsNotificationOpen(true)}
-            className="p-2 md:p-3"
-          />
+          <div className="relative">
+            <PrimaryButton
+              leftIcon={<Bell className="text-xl md:text-2xl" />}
+              type="Outline"
+              onClick={() => setIsNotificationOpen(true)}
+              className="p-2 md:p-3"
+            />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </div>
           {isPage.projectDetails && (
             <PrimaryButton
               leftIcon={<Upload className="text-xl md:text-2xl" />}

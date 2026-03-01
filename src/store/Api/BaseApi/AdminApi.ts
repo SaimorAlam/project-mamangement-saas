@@ -56,7 +56,8 @@ const baseQueryWithReauth: BaseQueryFn<
 const adminApi = createApi({
     reducerPath: "adminApi",
     baseQuery: baseQueryWithReauth,
-    endpoints: () => ({})
+    endpoints: () => ({}),
+    tagTypes: ["MyTickets"]
 })
 
 export default adminApi

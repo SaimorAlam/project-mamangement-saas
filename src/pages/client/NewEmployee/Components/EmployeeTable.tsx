@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FieldGroup } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
+import { useBulkDeleteEmployeeMutation } from "@/store/Api/EmployeeApi/EmployeeApi";
 
 const EmployeeTable = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -33,7 +34,7 @@ const EmployeeTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [pageLoading, setPageLoading] = useState(false);
-
+  const [bulkDeleteEmployee] = useBulkDeleteEmployeeMutation();
   const PAGE_SIZE = 10;
 
   const { data, isLoading, isFetching } = useGetAllUsersQuery({
@@ -180,12 +181,15 @@ const EmployeeTable = () => {
       });
 
       if (result.isConfirmed) {
-        console.log(ids);
-        // await deleteUser(id).unwrap();
-        Swal.fire("Deleted!", "Employee removed.", "success");
+        const res = await bulkDeleteEmployee(ids).unwrap();
+        if (res.success) {
+          Swal.fire("Deleted!", "Employee(s) removed.", "success");
+          setSelectedIds([]);
+        }
       }
     } catch (err: any) {
       Swal.fire("Error", err?.data?.message || "Something went wrong", "error");
+      setSelectedIds([]);
     }
   };
 
@@ -195,7 +199,7 @@ const EmployeeTable = () => {
   };
 
   return (
-    <div className="border border-gray-200 w-full rounded-xl my-10 overflow-hidden">
+    <div className="border border-gray-200 w-full rounded-xl overflow-hidden">
       {/* Header + Filters */}
       <div className="flex flex-col lg:flex-row justify-between items-center py-4 px-6 gap-4 bg-white">
         {selectedIds.length > 0 ? (

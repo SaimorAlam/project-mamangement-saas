@@ -1,4 +1,4 @@
-import ActivityLog from "@/components/client/Overview/ActivityLog";
+import ActivityLog from "@/pages/client/Overview/Components/ActivityLog";
 import ProjectStatusDonutChart from "./Components/ProjectStatusDonutChart";
 import ProjectTimelineColumnChart from "./Components/ProjectTimelineColumnChart";
 import { useGetOverviewStackQuery } from "@/store/Api/ClientDashboardApi/ClientDashboardApi";
@@ -92,7 +92,7 @@ const ClientOverview = () => {
     <div className="">
       {/* Icon and Home */}
 
-      <div className="grid grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 my-6">
+      <div className="grid grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
         {isLoading
           ? Array.from({ length: 6 }).map((_, index) => (
               <DashboardPanelStatsCardSkeleton key={index} />

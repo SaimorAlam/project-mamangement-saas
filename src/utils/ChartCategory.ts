@@ -17,4 +17,5 @@ export const chartTypes: { [key: string]: string } = {
   FUNNEL: "funnelChart",
   WATERFALL: "waterfallChart",
   CANDLESTICK: "candlestickChart",
+  SPLINE: "splineChart",
 };

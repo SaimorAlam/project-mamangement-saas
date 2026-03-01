@@ -9,18 +9,21 @@ const ClientSupportApi = adminApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["MyTickets"],
     }),
     getMyTickets: builder.query({
       query: () => ({
         url: "client-support/my-tickets",
         method: "GET",
       }),
+      providesTags: ["MyTickets"],
     }),
     getTicketMessages: builder.query({
       query: (id: string) => ({
         url: `client-support/${id}/my-ticket`,
         method: "GET",
       }),
+      providesTags: ["MyTickets"],
     }),
   }),
 });

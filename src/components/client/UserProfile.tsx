@@ -15,7 +15,6 @@ import { toast } from "sonner";
 import { logOut } from "@/store/Slices/AuthSlice/authSlice";
 
 interface UserProfileButtonProps {
-  onSettingsClick?: () => void;
   state?: "expanded" | "collapsed";
 }
 

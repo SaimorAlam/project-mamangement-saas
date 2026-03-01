@@ -25,7 +25,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-
+import { Project } from "@/store/Api/ProjectApi/ProjectType";
 /* -------------------- Types -------------------- */
 
 export type ProjectStatus =
@@ -39,28 +39,6 @@ export type ProjectStatus =
 
 export type ProjectPriority = "HIGH" | "MEDIUM" | "LOW";
 
-export interface Project {
-  id: string;
-  programId: string;
-  programName?: string;
-  name: string;
-  description: string;
-  status: ProjectStatus;
-  priority: ProjectPriority;
-  startDate: string;
-  deadline: string;
-  progress: number;
-  managerId: string;
-  chartList: unknown[];
-  estimatedCompletedDate: string;
-  projectCompleteDate: string | null;
-  currentRate: string;
-  budget: string;
-  latitude: number | null;
-  longitude: number | null;
-  createdAt: string;
-  updatedAt: string;
-}
 
 /* -------------------- Component -------------------- */
 

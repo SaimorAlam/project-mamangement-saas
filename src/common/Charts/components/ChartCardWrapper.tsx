@@ -75,7 +75,7 @@ const ChartCardWrapper = ({
 
   return (
     <div
-      className={`w-full bg-white border border-gray-200 rounded-lg p-6 ${
+      className={`w-full bg-white border border-gray-200 rounded-lg p-6 h-full! ${
         onHeaderClick ? "cursor-pointer hover:shadow-lg transition-shadow" : ""
       } ${className}`}
       onClick={() => {

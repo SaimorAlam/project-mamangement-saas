@@ -6,6 +6,8 @@ import {
   setSelectedWidgets,
   setIsPreview,
   setIsPublished,
+  setProjectId,
+  setProgramId,
   resetChartState,
 } from "@/store/Slices/ChartSlice/ChartSlice";
 import { toast } from "sonner";
@@ -30,10 +32,24 @@ const ClientProjectBuilder = () => {
     dispatch(setIsPublished(false));
   }, [dispatch]);
 
-  // Reset state when builder type changes
+  const location = useLocation();
+  const locationState = location.state as {
+    projectId?: string;
+    programId?: string;
+  } | null;
+
+  // Reset state when builder type changes & Pick up IDs from location state
   useEffect(() => {
     dispatch(resetChartState());
-  }, [isProgramBuilder, dispatch]);
+
+    if (locationState?.projectId) {
+      dispatch(setProjectId(locationState.projectId));
+    }
+    if (locationState?.programId) {
+      dispatch(setProgramId(locationState.programId));
+    }
+  }, [isProgramBuilder, dispatch, locationState?.projectId, locationState?.programId]);
+// Removed redundant useEffect since we'll handle it inside the isProgramBuilder one if needed or just initialize properly
 
   const handleWidgetSelect = (widgetId: string) => {
     if (widgetId) {
@@ -112,6 +128,7 @@ const ClientProjectBuilder = () => {
       )}
       <ProjectDashboardView
         projectId={projectId as string}
+        isProgramBuilder={isProgramBuilder}
         isPreviewOrPublished={isPreviewOrPublished}
         selectedWidgets={selectedWidgets}
         activeWidget={activeWidget}

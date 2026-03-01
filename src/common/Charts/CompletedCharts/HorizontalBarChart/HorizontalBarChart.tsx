@@ -509,6 +509,28 @@ export default function HorizontalBarChart({
             </p>
           ) : undefined
         }
+        customHeaderContent={
+          <div className="flex items-center gap-4">
+            <div className="flex gap-4">
+              {effectiveLegendValues.slice(0, 3).map((l) => (
+                <div key={l.field} className="flex items-center gap-1.5">
+                  <div
+                    className="w-2.5 h-2.5 rounded-full shadow-sm"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  <span className="text-xs font-semibold text-gray-600 whitespace-nowrap">
+                    {l.label}
+                  </span>
+                </div>
+              ))}
+              {effectiveLegendValues.length > 3 && (
+                <span className="text-xs text-gray-400">
+                  +{effectiveLegendValues.length - 3} more
+                </span>
+              )}
+            </div>
+          </div>
+        }
       >
         <div className="relative">
           <ResponsiveContainer
@@ -559,22 +581,6 @@ export default function HorizontalBarChart({
             </BarChart>
           </ResponsiveContainer>
 
-          {/* Legend Display */}
-          {chartData.length > 0 && (
-            <div className="flex justify-center flex-wrap gap-6 mt-6 pb-2 border-t border-gray-50 pt-4">
-              {effectiveLegendValues.map((l) => (
-                <div key={l.field} className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full shadow-sm"
-                    style={{ backgroundColor: l.color }}
-                  />
-                  <span className="text-xs font-semibold text-gray-600">
-                    {l.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </ChartCardWrapper>
 

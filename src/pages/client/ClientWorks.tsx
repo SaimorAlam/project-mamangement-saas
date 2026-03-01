@@ -1,6 +1,6 @@
 import AllProgramProject from "@/components/client/Overview/AllProgramProject";
 import UpcomingDeadline from "@/components/client/Overview/UpcomingDeadline";
-import ActivityLog from "@/components/client/Overview/ActivityLog";
+import ActivityLog from "@/pages/client/Overview/Components/ActivityLog";
 import ApexDonutChart from "@/common/Charts/ApexDonutChart";
 import LatestSubmission from "@/components/client/Overview/LatestSubmission";
 import ApexBarChart from "@/common/Charts/ApexBarChart";
