@@ -354,14 +354,15 @@ const StaffEmployeeDashboardHeader = () => {
           {isOnProjectDetails && (
             <>
               {/* Preview toggle — same Redux action as client panel */}
-              <PrimaryButton
+              {/* <PrimaryButton
                 title={isPreview ? "Exit Preview" : "Preview"}
                 type="Outline"
                 onClick={() => dispatch(setIsPreview(!isPreview))}
-              />
+              /> */}
 
               {/* Save as Draft — same UX as client panel */}
               <PrimaryButton
+                leftIcon={<FileText className="text-2xl" />}
                 title="Save as Draft"
                 type="Outline"
                 onClick={() => toast.success("Project saved as draft")}
