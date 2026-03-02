@@ -23,7 +23,7 @@ import HeatmapChartNew, {
   parseHeatmapChartData,
 } from "@/common/Charts/CompletedCharts/HeatMap/HeatmapChartNew";
 import PieChartWidget from "@/common/Charts/CompletedCharts/PieChart/PieChart";
-import ColumnBarChart from "@/common/Charts/ColumnBarChart";
+import ColumnBarChart from "@/common/Charts/CompletedCharts/ColumnChart/ColumnBarChart";
 import RadarChartNew from "@/common/Charts/RadarChartNew";
 import DoughnutChart from "@/common/Charts/DoughnutChart";
 import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
@@ -38,6 +38,7 @@ import ComboChart from "@/common/Charts/ComboChart";
 import CandleChart from "@/common/Charts/CandleChart";
 
 import SplineAreaChart from "@/common/Charts/CompletedCharts/SplineAreaChart/SplineAreaChart";
+import SparkLinesChart from "@/common/Charts/SparkLinesChart";
 
 const DashboardTab = () => {
   const { projectId } = useParams();
@@ -210,7 +211,11 @@ const DashboardTab = () => {
                   .replace(/\s+/g, ""),
               })) || [];
 
-            const { data } = parseXAxisData(item?.xAxis, legendValues, item?.title);
+            const { data } = parseXAxisData(
+              item?.xAxis,
+              legendValues,
+              item?.title,
+            );
 
             return (
               <PieChartWidget
@@ -580,6 +585,38 @@ const DashboardTab = () => {
 
             return (
               <SplineAreaChart
+                key={item.id}
+                widgetTitle={item?.title}
+                xAxisValues={labels}
+                legendValues={legendValues}
+                startingRange={chartData?.firstFieldDataset || 0}
+                endingRange={chartData?.lastFieldDataset || 100}
+                chartId={item?.id}
+                projectId={projectId}
+                allUploadedData={data}
+                isPreview={true}
+              />
+            );
+          }
+
+          if (categoryKey === "SPARKLINE") {
+            const legendValues =
+              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
+                label: w.legendName || w.label,
+                color: w.color,
+                field: (w.legendName || w.label)
+                  ?.toLowerCase()
+                  .replace(/\s+/g, ""),
+              })) || [];
+
+            const { labels, data } = parseXAxisData(
+              item?.xAxis,
+              legendValues,
+              item?.title,
+            );
+
+            return (
+              <SparkLinesChart
                 key={item.id}
                 widgetTitle={item?.title}
                 xAxisValues={labels}

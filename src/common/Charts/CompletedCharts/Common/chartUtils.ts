@@ -75,22 +75,35 @@ export const sanitizeSheetName = (
 };
 
 /**
+ * Checks if a row is a header row.
+ * A header row has all columns from index 1 onward as non-numeric strings
+ * (i.e. legend names like "Site 1", "Site 2") rather than numeric data values.
+ */
+const isXAxisHeaderRow = (row: any[]): boolean => {
+  if (!Array.isArray(row) || row.length < 2) return false;
+  const dataCols = row.slice(1);
+  return dataCols.every(
+    (v) => typeof v === "string" && v.trim() !== "" && isNaN(Number(v)),
+  );
+};
+
+/**
  * Parse xAxis 2D array format from API.
- * Format: [["Point1", 10, ...], ["Point2", 20, ...], ...]
+ * Format:
+ *   Row 0 (header): ["Chart Title" | "Labels", "Legend 1", "Legend 2", ...]
+ *   Row 1+  (data):  ["Jan", 10, 20, ...]  ← numeric values
  */
 export const parseCommonChartData = (
   xAxis: any[][] | string | { labels: any[][] },
   legendValues: LegendValue[],
   widgetTitle: string,
-  skipHeaderRow: boolean = true,
 ) => {
   let parsedXAxis: any = xAxis;
 
   if (typeof xAxis === "string") {
     try {
       parsedXAxis = JSON.parse(xAxis);
-    } catch (error) {
-      console.error("Error parsing xAxis JSON:", error);
+    } catch {
       parsedXAxis = [];
     }
   }
@@ -105,19 +118,12 @@ export const parseCommonChartData = (
     return { labels: [], data: {} as { [key: string]: ChartData[] } };
   }
 
-  // Smart header detection - check if first cell is "Label"
-  const hasHeader =
-    rawData.length > 0 &&
-    Array.isArray(rawData[0]) &&
-    String(rawData[0][0] || "").toLowerCase() === "label";
-
-  const dataSlice = (hasHeader && skipHeaderRow) ? rawData.slice(1) : rawData;
-
-  // Filter out any row that is strictly a header row or empty
-  const filteredRows = dataSlice.filter((row: any) => {
+  // Row 0 is ALWAYS the header (chart name / "Labels" / legend names).
+  // Skip it unconditionally, then also drop any remaining blank rows.
+  const filteredRows = rawData.slice(1).filter((row: any) => {
     if (!Array.isArray(row) || row.length === 0) return false;
     const firstCol = String(row[0] || "").trim();
-    return firstCol !== "" && firstCol.toLowerCase() !== "label";
+    return firstCol !== "";
   });
 
   const labels = filteredRows.map((row: any) => String(row[0] || ""));
@@ -160,12 +166,21 @@ export const generateHeatmapChartData = (
 /**
  * Tries to extract legend values from an unparsed xAxis JSON string or Array,
  * mainly used for finding implicit labels when no widgets exist.
+ * Works with both "Label"/"Labels" headers and descriptive headers (like chart names).
  */
 export const extractLegendsFromXAxis = (xAxisRaw: any): string[] => {
   try {
-    const parsed = typeof xAxisRaw === "string" ? JSON.parse(xAxisRaw) : xAxisRaw;
+    const parsed =
+      typeof xAxisRaw === "string" ? JSON.parse(xAxisRaw) : xAxisRaw;
     const dataArr = Array.isArray(parsed) ? parsed : parsed?.labels || [];
-    if (dataArr.length > 0 && Array.isArray(dataArr[0]) && dataArr[0].length > 1 && String(dataArr[0][0]).toLowerCase() === "label") {
+    if (
+      dataArr.length > 0 &&
+      Array.isArray(dataArr[0]) &&
+      dataArr[0].length > 1 &&
+      (String(dataArr[0][0]).toLowerCase() === "label" ||
+        String(dataArr[0][0]).toLowerCase() === "labels" ||
+        isXAxisHeaderRow(dataArr[0]))
+    ) {
       return dataArr[0].slice(1).map((lbl: any) => String(lbl));
     }
   } catch {
@@ -194,23 +209,17 @@ export const resolveChartData = (
     end: number,
   ) => ChartData[],
 ) => {
-  const { data: parsedStructure } = parseCommonChartData(
-    [],
-    [],
-    widgetTitle,
-  );
-  const sheetName = Object.keys(parsedStructure)[0];
+  // Use sanitizeSheetName directly — calling parseCommonChartData([], ...) would
+  // return an empty object, making Object.keys()[0] === undefined, which means
+  // allUploadedData lookup would always fail.
+  const sheetName = sanitizeSheetName(widgetTitle);
   const dataToUse = allUploadedData?.[sheetName];
 
-  // Priority 1: Real Uploaded Data (must have non-zero content)
-  const hasRealData =
-    dataToUse &&
-    dataToUse.length > 0 &&
-    dataToUse.some((row: any) =>
-      effectiveLegendValues.some((l) => Number(row[l.field] || 0) > 0),
-    );
+  // Priority 1: Real Uploaded Data
+  // If we have data from the API, we use it, even if all values are current zero.
+  const hasUploadedData = dataToUse && dataToUse.length > 0;
 
-  if (hasRealData) {
+  if (hasUploadedData) {
     return { chartData: dataToUse as ChartData[], isSampleData: false };
   }
 
@@ -245,4 +254,3 @@ export const resolveChartData = (
     isSampleData: true,
   };
 };
-

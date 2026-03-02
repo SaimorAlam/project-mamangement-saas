@@ -18,7 +18,7 @@ import ProgressRingModule from "./../../components/client/ProjectBuilder/chartMo
 import GaugeChartModule from "./../../components/client/ProjectBuilder/chartModules/GaugeChartModule";
 import HistogramChartModule from "./../../components/client/ProjectBuilder/chartModules/HistogramChartModule";
 import BubbleChartModule from "./../../components/client/ProjectBuilder/chartModules/BubbleChartModule";
-import ColumnBarChartModule from "@/components/client/ProjectBuilder/chartModules/ColumnBarChartModule";
+import ColumnBarChartModule from "@/common/Charts/CompletedCharts/ColumnChart/ColumnBarChartModule";
 import FunnelChartModule from "@/components/client/ProjectBuilder/chartModules/FunnelChartModule";
 import ScatterChartModule from "@/components/client/ProjectBuilder/chartModules/ScatterChartModule";
 import ParetoChartModule from "@/components/client/ProjectBuilder/chartModules/ParetoChartModule";

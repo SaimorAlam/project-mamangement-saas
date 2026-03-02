@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import ProjectConfiguration, {
   LegendValue,
-} from "../../../../common/Charts/CompletedCharts/Widgets/WidgetForChartModuleOne";
-import ColumnBarChart from "@/common/Charts/ColumnBarChart";
+} from "../Widgets/WidgetForChartModuleOne";
+import ColumnBarChart from "@/common/Charts/CompletedCharts/ColumnChart/ColumnBarChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
+import { toast } from "sonner";
 
 const ColumnBarChartModule = ({
   onDelete,
@@ -32,7 +33,7 @@ const ColumnBarChartModule = ({
   useEffect(() => {
     dispatch(
       setWidgetConfig({
-        id: "column-bar-chart",
+        id: "column-chart",
         config: {
           widgetTitle,
           xAxisValues,
@@ -66,7 +67,7 @@ const ColumnBarChartModule = ({
       setNumOfXAxisDataSet(value);
     } else {
       setNumOfXAxisDataSet(1);
-      alert(
+      toast.info(
         `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
@@ -111,6 +112,7 @@ const ColumnBarChartModule = ({
           onToggleWidget={handleToggleWidget}
           onDelete={onDelete}
           isPreview={isPreview}
+          isCreationMode={true}
         />
       </div>
       {!isPreview && showWidget && (

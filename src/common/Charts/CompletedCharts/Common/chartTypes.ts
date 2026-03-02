@@ -28,7 +28,9 @@ export type ChartType =
   | "PIE"
   | "HEATMAP"
   | "LINE"
-  | "SPLINE";
+  | "SPLINE"
+  | "SPARKLINE"
+  | "COLUMN";
 
 /** Common prop shape shared by all chart components */
 export type BaseChartProps = {
@@ -50,4 +52,3 @@ export type BaseChartProps = {
   onNavigate?: (level: number) => void;
   widgets?: any[];
 };
-

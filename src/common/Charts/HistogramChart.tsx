@@ -61,6 +61,7 @@ type Props = {
   chartId?: string;
   onDelete?: () => void;
   isPreview?: boolean;
+  allUploadedData?: any;
 };
 
 /*       HELPER FUNCTIONS       */

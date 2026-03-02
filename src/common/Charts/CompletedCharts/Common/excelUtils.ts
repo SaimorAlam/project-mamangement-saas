@@ -11,7 +11,8 @@ export type ChartExcelType =
   | "lineChart"
   | "horizontalBarChart"
   | "heatmap"
-  | "pie";
+  | "pie"
+  | "sparklineChart";
 
 export const getUniqueSheetName = (
   usedNames: Set<string>,
@@ -36,7 +37,7 @@ export const getUniqueSheetName = (
 };
 
 export const downloadChartDataAsExcel = async (
-  title: string,
+  _title: string,
   projectId: string,
   getAllTheLeafChart: any,
   widgetTitle: string,
@@ -45,6 +46,7 @@ export const downloadChartDataAsExcel = async (
   numOfLegendDataSet: number = 3,
   setIsDownloading: (loading: boolean) => void,
   chartType: ChartExcelType = "areaChart",
+  chartId?: string,
 ) => {
   if (!projectId) {
     toast.error("Project ID is missing");
@@ -53,11 +55,40 @@ export const downloadChartDataAsExcel = async (
   setIsDownloading(true);
   try {
     const res = await getAllTheLeafChart(projectId).unwrap();
-    const leafCharts =
-      res?.data?.find((item: any) => item.grouptitle === title) || [];
-      
-    if (!leafCharts.charts || leafCharts.charts.length === 0) {
-      // Fallback simple download
+    const allGroups: any[] = res?.data || [];
+
+    // 1. Find the group that likely belongs to this root chart.
+    // We check if any chart in the group points to our root chartId as parent,
+    // or if the root chart itself is in the group.
+    const targetGroup = allGroups.find((g: any) =>
+      g.charts?.some((c: any) => c.id === chartId || c.parentId === chartId)
+    );
+
+    let targets: any[] = [];
+    if (targetGroup) {
+      // Collect all descendants in this group. 
+      // Since 'Only level children' is often flattened, we take all children of the root.
+      targets = targetGroup.charts.filter(
+        (c: any) => c.parentId === chartId || c.id === chartId
+      );
+
+      // If we found the root or its children but there are deeper levels, 
+      // the API usually includes them in the same group.
+      // If we still have no targets, or if the user specifically wanted 'leafs',
+      // we can take all charts in the group as they usually represent the full leaf set for that group.
+      if (targets.length === 0) {
+        targets = targetGroup.charts;
+      }
+    }
+
+    // 2. Fallback: If no group matched via ID, try matching by the group title as a last resort
+    if (targets.length === 0) {
+      const g = allGroups.find((item: any) => item.grouptitle === _title);
+      if (g) targets = g.charts || [];
+    }
+
+    if (targets.length === 0) {
+      // Still nothing found — download a blank template for the current chart
       const wb = XLSX.utils.book_new();
       const headers = ["Label", ...effectiveLegendValues.map((l) => l.label)];
       const rows = effectiveXAxisValues.map((label) => [
@@ -75,7 +106,7 @@ export const downloadChartDataAsExcel = async (
     const ids: string[] = [];
     const usedNames = new Set<string>();
 
-    leafCharts?.charts?.forEach((node: any) => {
+    targets.forEach((node: any) => {
       ids.push(node.id);
       let xAxisItems: string[] = [];
       try {
@@ -90,18 +121,17 @@ export const downloadChartDataAsExcel = async (
 
         if (Array.isArray(rawData) && rawData.length > 0) {
           if (Array.isArray(rawData[0])) {
-            // Smart header detection - check if first cell of the first row is "Label"
-            const hasHeader = String(rawData[0][0] || "").toLowerCase() === "label";
-            const dataSlice = hasHeader ? rawData.slice(1) : rawData;
-
-            xAxisItems = dataSlice
-              .map((row: any) => String(row[0] || ""))
-              .filter((val) => val.trim().toLowerCase() !== "label" && val.trim() !== "");
-          } else {
-            // Simple flat array
+            // Row 0 is ALWAYS the header — skip it unconditionally
             xAxisItems = rawData
+              .slice(1)
+              .map((row: any) => String(row[0] || ""))
+              .filter((val) => val.trim() !== "");
+          } else {
+            // Simple flat array — skip the first element (header)
+            xAxisItems = rawData
+              .slice(1)
               .map((v: any) => String(v || ""))
-              .filter((val) => val.trim().toLowerCase() !== "label" && val.trim() !== "");
+              .filter((val) => val.trim() !== "");
           }
         }
       } catch (err) {

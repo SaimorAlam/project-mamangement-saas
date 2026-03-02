@@ -79,6 +79,13 @@ export const CHART_REGISTRY: Record<string, ChartRegistryItem> = {
         import("@/common/Charts/CompletedCharts/SplineAreaChart/SplineAreaChartModule"),
     ),
   },
+  "column-chart": {
+    name: "Column Chart",
+    component: lazy(
+      () =>
+        import("@/common/Charts/CompletedCharts/ColumnChart/ColumnBarChartModule"),
+    ),
+  },
   "sparklines-chart": {
     name: "Sparklines Chart",
     component: lazy(
@@ -121,13 +128,7 @@ export const CHART_REGISTRY: Record<string, ChartRegistryItem> = {
         import("@/components/client/ProjectBuilder/chartModules/BubbleChartModule"),
     ),
   },
-  "column-chart": {
-    name: "Column Chart",
-    component: lazy(
-      () =>
-        import("@/components/client/ProjectBuilder/chartModules/ColumnBarChartModule"),
-    ),
-  },
+
   "funnel-chart": {
     name: "Funnel Chart",
     component: lazy(

@@ -8,10 +8,12 @@ import {
   setIsPublished,
   setProjectId,
   setProgramId,
-  resetChartState,
 } from "@/store/Slices/ChartSlice/ChartSlice";
 import { toast } from "sonner";
 import ProjectDashboardView from "./Components/ProjectDashboardView";
+
+const SESSION_KEY_PROJECT = "chartBuilder_projectId";
+const SESSION_KEY_PROGRAM = "chartBuilder_programId";
 
 const ClientProjectBuilder = () => {
   const dispatch = useAppDispatch();
@@ -38,17 +40,27 @@ const ClientProjectBuilder = () => {
     programId?: string;
   } | null;
 
-  // Reset state when builder type changes & Pick up IDs from location state
+  // On mount / context change: prioritise locationState, then sessionStorage fallback.
+  // This keeps IDs alive across page refreshes (sessionStorage survives refresh but not tab close).
   useEffect(() => {
-    dispatch(resetChartState());
+    const resolvedProjectId =
+      locationState?.projectId ||
+      sessionStorage.getItem(SESSION_KEY_PROJECT) ||
+      "";
+    const resolvedProgramId =
+      locationState?.programId ||
+      sessionStorage.getItem(SESSION_KEY_PROGRAM) ||
+      "";
 
-    if (locationState?.projectId) {
-      dispatch(setProjectId(locationState.projectId));
-    }
-    if (locationState?.programId) {
-      dispatch(setProgramId(locationState.programId));
-    }
-  }, [isProgramBuilder, dispatch, locationState?.projectId, locationState?.programId]);
+    if (resolvedProjectId) dispatch(setProjectId(resolvedProjectId));
+    if (resolvedProgramId) dispatch(setProgramId(resolvedProgramId));
+
+    // Persist whatever we just resolved back into sessionStorage
+    if (resolvedProjectId)
+      sessionStorage.setItem(SESSION_KEY_PROJECT, resolvedProjectId);
+    if (resolvedProgramId)
+      sessionStorage.setItem(SESSION_KEY_PROGRAM, resolvedProgramId);
+  }, [dispatch, locationState?.projectId, locationState?.programId]);
 // Removed redundant useEffect since we'll handle it inside the isProgramBuilder one if needed or just initialize properly
 
   const handleWidgetSelect = (widgetId: string) => {

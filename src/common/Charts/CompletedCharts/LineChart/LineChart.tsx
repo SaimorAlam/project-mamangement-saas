@@ -34,11 +34,13 @@ export const parseLineChartData = (
 
 export default function MultiAxisLineChart(props: BaseChartProps) {
   const getTierLegends = (tier: any) => {
-      return (tier?.lineChart?.widgets || tier?.widgets || []).map((w: any) => ({
-          label: w.legendName || w.label,
-          field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
-          color: w.color,
-      }));
+    return (
+      tier?.multiAxisChart?.widgets || tier?.lineChart?.widgets || tier?.widgets || []
+    ).map((w: any) => ({
+      label: w.legendName || w.label,
+      field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
+      color: w.color,
+    }));
   };
 
   return (

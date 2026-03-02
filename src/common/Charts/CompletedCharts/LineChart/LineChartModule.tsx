@@ -5,6 +5,7 @@ import ProjectConfiguration, {
 import MultiAxisLineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
+import { toast } from "sonner";
 
 const LineChartModule = ({
   onDelete,
@@ -66,7 +67,7 @@ const LineChartModule = ({
       setNumOfXAxisDataSet(value);
     } else {
       setNumOfXAxisDataSet(1);
-      alert(
+      toast(
         `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }

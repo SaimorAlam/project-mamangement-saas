@@ -8,19 +8,20 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  // Legend,
 } from "recharts";
 import { generateChartData } from "@/utils/clientPannelHelpers/programBuilderHelpers";
 
 // Common Imports
 import { BaseChartProps } from "../Common/chartTypes";
-import { parseCommonChartData } from "../Common/chartUtils";
+import {
+  parseCommonChartData,
+} from "../Common/chartUtils";
 import BaseChartContainer from "../Common/BaseChartContainer";
 
 /**
- * Parse xAxis 2D array format from API for Stacked Bar
+ * Parse xAxis 2D array format from API for Column Chart
  */
-export const parseXAxisData = (
+export const parseColumnChartData = (
   xAxis: any[][] | string | { labels: any[][] },
   legendValues: any[],
   widgetTitle: string,
@@ -30,33 +31,29 @@ export const parseXAxisData = (
 
 /*      COMPONENT      */
 
-export default function StackedBarChart(props: BaseChartProps) {
+export default function ColumnBarChart(props: BaseChartProps) {
   const getTierLegends = (tier: any) => {
-    return (tier?.barChart?.widgets || tier?.widgets || []).map((w: any) => ({
-      label: w.legendName || w.label,
-      field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
-      color: w.color,
-    }));
+      const columnChartConfig = tier?.columnChart || tier;
+      return (columnChartConfig?.widgets || tier?.widgets || []).map((w: any) => ({
+          label: w.legendName || w.label,
+          field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
+          color: w.color,
+      }));
   };
 
   return (
     <BaseChartContainer
       {...props}
-      category="BAR"
+      category="COLUMN"
       excelType="barChart"
       generatorFunc={generateChartData}
       getTierLegends={getTierLegends}
-      parseTierData={parseXAxisData}
+      parseTierData={parseColumnChartData}
       renderChildChart={(tier, childProps) => (
-        <StackedBarChart {...childProps} key={tier.id} />
+        <ColumnBarChart {...childProps} key={tier.id} />
       )}
     >
-      {({
-        chartData,
-        safeStartingRange,
-        safeEndingRange,
-        effectiveLegendValues,
-      }) => (
+      {({ chartData, safeStartingRange, safeEndingRange, effectiveLegendValues }) => (
         <div className="h-[400px] w-full relative">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
@@ -85,11 +82,7 @@ export default function StackedBarChart(props: BaseChartProps) {
                     <div className="bg-white p-3 border rounded shadow-lg">
                       <p className="font-semibold mb-2">{row.name}</p>
                       {effectiveLegendValues.map((l) => (
-                        <p
-                          key={l.field}
-                          style={{ color: l.color }}
-                          className="text-sm"
-                        >
+                        <p key={l.field} style={{ color: l.color }} className="text-sm">
                           {l.label}: {row[l.field]}
                         </p>
                       ))}
@@ -99,20 +92,15 @@ export default function StackedBarChart(props: BaseChartProps) {
                 cursor={{ fill: "transparent" }}
               />
 
-              {effectiveLegendValues.map((l, index) => (
+              {effectiveLegendValues.map((l) => (
                 <Bar
                   key={l.field}
                   dataKey={l.field}
-                  stackId="a"
                   fill={l.color}
-                  radius={
-                    index === effectiveLegendValues.length - 1
-                      ? [4, 4, 0, 0]
-                      : 0
-                  }
+                  radius={[4, 4, 0, 0]}
+                  barSize={40}
                 />
               ))}
-              {/* <Legend verticalAlign="bottom" height={36} /> */}
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -49,6 +49,7 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
   isPreview?: boolean;
+  allUploadedData?: any;
 };
 
 /*       COMPONENT       */
@@ -98,6 +99,21 @@ export default function ScatterChart({
   };
 
   const scatterDataSets = useMemo(() => {
+    // Prioritize uploaded data if available
+    const sheetName = (widgetTitle || "Sheet")
+      .replace(/[:/?*[\\]\\]/g, " ")
+      .trim()
+      .substring(0, 31);
+    const uploadedData = allUploadedData?.[sheetName];
+    if (uploadedData && uploadedData.length > 0) {
+      // Expect uploadedData to be an array of points {x,y,z}
+      return [{
+        name: widgetTitle || "Scatter",
+        data: uploadedData,
+        color: legendValues[0]?.color || "#8884d8",
+      }];
+    }
+
     if (!legendValues.length) return [];
 
     return legendValues
@@ -107,7 +123,7 @@ export default function ScatterChart({
         data: generateScatterData(index * 37, 6),
         color: legend.color,
       }));
-  }, [legendValues, startingRange, endingRange, generateScatterData]);
+  }, [legendValues, startingRange, endingRange, generateScatterData, allUploadedData, widgetTitle]);
 
   /*   TOTAL POINTS   */
   const totalPoints = useMemo(() => {

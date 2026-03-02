@@ -157,6 +157,7 @@ export default function BaseChartContainer({
         numOfLegendDataSet,
         setIsDownloading,
         excelType,
+        chartId,
       );
     }
   };
@@ -220,7 +221,8 @@ export default function BaseChartContainer({
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
-          onDownload: tierLevel === 0 ? handleDownload : undefined,
+          onDownload:
+            !isCreationMode && tierLevel === 0 ? handleDownload : undefined,
           onDelete: onDelete,
           onAddTier: !isCreationMode
             ? () => handleAddTierClick(widgetTitle)
@@ -233,6 +235,7 @@ export default function BaseChartContainer({
           <ChartLegendHeader effectiveLegendValues={effectiveLegendValues} />
         }
         footer={<ChartChildTierFooter childTiers={childTiers} />}
+        chartId={chartId}
       >
         {children({
           chartData,

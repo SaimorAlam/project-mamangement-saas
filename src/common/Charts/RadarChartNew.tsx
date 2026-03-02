@@ -48,6 +48,7 @@ type Props = {
   chartId?: string;
   onDelete?: () => void;
   isPreview?: boolean;
+  allUploadedData?: any;
 };
 
 /*     COMPONENT     */
@@ -64,6 +65,7 @@ export default function RadarChartNew({
   chartId = "root",
   onDelete,
   isPreview = false,
+  allUploadedData,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -77,6 +79,20 @@ export default function RadarChartNew({
 
   const radarData: RadarDataPoint[] = useMemo(() => {
     if (!xAxisValues.length || !legendValues.length) return [];
+
+    // Prioritize uploaded data if available
+    const sheetName = (widgetTitle || "Sheet")
+      .replace(/[:/?*[\]\\]/g, " ")
+      .trim()
+      .substring(0, 31);
+    
+    const uploadedData = allUploadedData?.[sheetName];
+    if (uploadedData && uploadedData.length > 0) {
+      return uploadedData.map((row: any) => ({
+        metric: row.name,
+        ...row,
+      }));
+    }
 
     return xAxisValues.filter(Boolean).map((metric, index) => {
       const dataPoint: RadarDataPoint = { metric };
@@ -96,7 +112,7 @@ export default function RadarChartNew({
 
       return dataPoint;
     });
-  }, [xAxisValues, legendValues, startingRange, endingRange]);
+  }, [xAxisValues, legendValues, startingRange, endingRange, allUploadedData, widgetTitle]);
 
   /* ========= CENTER METRIC ========= */
 

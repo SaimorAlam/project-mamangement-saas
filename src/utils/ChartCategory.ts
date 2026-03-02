@@ -18,4 +18,5 @@ export const chartTypes: { [key: string]: string } = {
   WATERFALL: "waterfallChart",
   CANDLESTICK: "candlestickChart",
   SPLINE: "splineChart",
+  SPARKLINE: "sparklineChart",
 };

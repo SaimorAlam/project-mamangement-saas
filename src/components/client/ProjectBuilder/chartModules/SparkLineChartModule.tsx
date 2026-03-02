@@ -5,6 +5,7 @@ import ProjectConfiguration, {
 import SparkLinesChart from "@/common/Charts/SparkLinesChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
+import { toast } from "sonner";
 
 const SparkLineChartModule = ({
   onDelete,
@@ -64,7 +65,7 @@ const SparkLineChartModule = ({
       setNumOfXAxisDataSet(value);
     } else {
       setNumOfXAxisDataSet(1);
-      alert(
+      toast.info(
         `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }

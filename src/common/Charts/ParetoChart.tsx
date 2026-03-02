@@ -33,6 +33,7 @@ type Props = {
   chartId?: string;
   onDelete?: () => void;
   isPreview?: boolean;
+  allUploadedData?: any;
 };
 
 /*       COMPONENT       */
@@ -279,6 +280,7 @@ export default function ParetoChart({
                 chartId={tier.id}
                 isPreview={isPreview}
                 onDelete={onDelete}
+                allUploadedData={[]} // Assuming an empty array or appropriate default if not provided
               />
             ))}
           </div>
