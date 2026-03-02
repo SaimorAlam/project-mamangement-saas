@@ -28,12 +28,18 @@ import StaffEmployeeGlobalSearch from "@/components/staffEmployee/StaffEmployeeG
 import StaffEmployeeNotificationModal from "@/components/staffEmployee/StaffEmployeeNotificationModal";
 import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { setIsPreview } from "@/store/Slices/ChartSlice/ChartSlice";
 
 const StaffEmployeeDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  // Mirror client panel: read isPreview from Redux
+  const { isPreview } = useAppSelector((state) => state.chartSlice);
 
   const { breadcrumb } = useHeaderContext();
   const { name } = useGetUser();
@@ -284,7 +290,8 @@ const StaffEmployeeDashboardHeader = () => {
     return items;
   }, [currentPath, allRoutes, isOnProjectDetails, projectName]);
 
-  // ─── Conditional button visibility ────────────────────────────────────────
+  // ── Conditional button visibility ────────────────────────────────────────
+  // These paths show the legacy standalone preview/save-draft (project builder page)
   const previewButtonPaths = ["/staff-employee-panel/project-builder"];
   const saveDraftButtonPaths = ["/staff-employee-panel/project-builder"];
 
@@ -326,7 +333,7 @@ const StaffEmployeeDashboardHeader = () => {
             onClose={() => setIsOpen(false)}
           />
 
-          {/* Preview – only on project-builder */}
+          {/* ── Project-builder-only buttons ── */}
           {previewButtonPaths.includes(currentPath) && (
             <PrimaryButton
               leftIcon={<Eye className="text-2xl" />}
@@ -335,8 +342,6 @@ const StaffEmployeeDashboardHeader = () => {
               onClick={() => console.log("preview clicked")}
             />
           )}
-
-          {/* Save Draft – only on project-builder */}
           {saveDraftButtonPaths.includes(currentPath) && (
             <PrimaryButton
               leftIcon={<FileText className="text-2xl" />}
@@ -345,25 +350,42 @@ const StaffEmployeeDashboardHeader = () => {
             />
           )}
 
-          {/* Download Charts – only on project details page */}
+          {/* ── Project-details buttons (mirrors client panel project builder) ── */}
           {isOnProjectDetails && (
-            <PrimaryButton
-              leftIcon={<Download />}
-              title="Download Charts"
-              type="Primary"
-              onClick={handleDownloadCharts}
-            />
-          )}
+            <>
+              {/* Preview toggle — same Redux action as client panel */}
+              <PrimaryButton
+                leftIcon={<Eye className="text-2xl" />}
+                title={isPreview ? "Exit Preview" : "Preview"}
+                type="Outline"
+                onClick={() => dispatch(setIsPreview(!isPreview))}
+              />
 
-          {/* Upload Submission – only on project details page */}
-          {isOnProjectDetails && (
-            <PrimaryButton
-              leftIcon={<Upload className="text-2xl" />}
-              title="Upload Submission"
-              type="Primary"
-              className="bg-green-700 hover:bg-green-800"
-              onClick={handleUploadSubmission}
-            />
+              {/* Save as Draft — same UX as client panel */}
+              <PrimaryButton
+                leftIcon={<FileText className="text-2xl" />}
+                title="Save as Draft"
+                type="Outline"
+                onClick={() => toast.success("Project saved as draft")}
+              />
+
+              {/* Download Charts */}
+              <PrimaryButton
+                leftIcon={<Download />}
+                title="Download Charts"
+                type="Primary"
+                onClick={handleDownloadCharts}
+              />
+
+              {/* Upload Submission */}
+              <PrimaryButton
+                leftIcon={<Upload className="text-2xl" />}
+                title="Upload Submission"
+                type="Primary"
+                className="bg-green-700 hover:bg-green-800"
+                onClick={handleUploadSubmission}
+              />
+            </>
           )}
         </div>
       </div>
