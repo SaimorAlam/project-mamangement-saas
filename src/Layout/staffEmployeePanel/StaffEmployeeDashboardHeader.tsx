@@ -45,14 +45,14 @@ const StaffEmployeeDashboardHeader = () => {
   const { name } = useGetUser();
   const { unreadCount } = useNotification();
 
-  // ─── Detect project-details page & extract projectId ───────────────────────
+  //  Detect project-details page & extract projectId 
   const projectDetailsMatch = currentPath.match(
     /\/projects\/project-details\/([^/]+)/
   );
   const projectIdFromUrl = projectDetailsMatch?.[1] ?? null;
   const isOnProjectDetails = !!projectIdFromUrl;
 
-  // ─── Fetch project to get programId ────────────────────────────────────────
+  //  Fetch project to get programId 
   const { data: projectData } = useGetProjectByIdQuery(
     projectIdFromUrl as string,
     { skip: !projectIdFromUrl }
@@ -63,7 +63,7 @@ const StaffEmployeeDashboardHeader = () => {
     projectData?.data?.project?.programId ??
     null;
 
-  // ─── Chart download (mirrors client panel logic) ───────────────────────────
+  //  Chart download (mirrors client panel logic) 
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
 
   const handleDownloadCharts = async () => {
@@ -355,7 +355,6 @@ const StaffEmployeeDashboardHeader = () => {
             <>
               {/* Preview toggle — same Redux action as client panel */}
               <PrimaryButton
-                leftIcon={<Eye className="text-2xl" />}
                 title={isPreview ? "Exit Preview" : "Preview"}
                 type="Outline"
                 onClick={() => dispatch(setIsPreview(!isPreview))}
@@ -363,7 +362,6 @@ const StaffEmployeeDashboardHeader = () => {
 
               {/* Save as Draft — same UX as client panel */}
               <PrimaryButton
-                leftIcon={<FileText className="text-2xl" />}
                 title="Save as Draft"
                 type="Outline"
                 onClick={() => toast.success("Project saved as draft")}
@@ -372,7 +370,7 @@ const StaffEmployeeDashboardHeader = () => {
               {/* Download Charts */}
               <PrimaryButton
                 leftIcon={<Download />}
-                title="Download Charts"
+                className="bg-green-700 hover:bg-green-800"
                 type="Primary"
                 onClick={handleDownloadCharts}
               />
@@ -382,7 +380,7 @@ const StaffEmployeeDashboardHeader = () => {
                 leftIcon={<Upload className="text-2xl" />}
                 title="Upload Submission"
                 type="Primary"
-                className="bg-green-700 hover:bg-green-800"
+
                 onClick={handleUploadSubmission}
               />
             </>

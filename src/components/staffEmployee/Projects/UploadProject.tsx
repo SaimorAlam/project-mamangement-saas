@@ -7,6 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
+import { useUploadChartDataMutation } from "@/store/Api/ChartApi/ChartApi";
 import PrimaryButton from "@/common/PrimaryButton";
 import * as XLSX from "xlsx";
 import { useCreateEmployeeSubmissionMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
@@ -35,22 +36,20 @@ const UploadProject = () => {
   const datePickerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Sync URL params → state if params change (e.g., user navigates back/forward)
+  // Sync URL params → state if params change
   useEffect(() => {
     if (presetProgramId) setProgram(presetProgramId);
     if (presetProjectId) setProject(presetProjectId);
   }, [presetProgramId, presetProjectId]);
 
-  // Fetch device public IP on mount; fallback to "::1" if unavailable
+  // Fetch device public IP; fallback to "::1"
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
       .then((data) => {
         if (data?.ip) setIpAddress(data.ip);
       })
-      .catch(() => {
-        // keep default "::1"
-      });
+      .catch(() => { });
   }, []);
 
   // ── API hooks ─────────────────────────────────────────────────────────────
@@ -61,8 +60,11 @@ const UploadProject = () => {
   });
   const [createEmployeeSubmission, { isLoading: isSubmitting }] =
     useCreateEmployeeSubmissionMutation();
+  // Same mutation the CLIENT PANEL uses to actually write chart values to the DB
+  const [uploadChartData, { isLoading: isUploading }] =
+    useUploadChartDataMutation();
 
-  // ── Derived: filter projects by selected program ──────────────────────────
+  // ── Derived: all projects & filter by program ─────────────────────────────
   const allProjects: any[] =
     projects?.data?.projects?.data || projects?.data?.data || [];
 
@@ -79,7 +81,7 @@ const UploadProject = () => {
     [leafChartsData]
   );
 
-  // ── Date options ───────────────────────────────────────────────────────────
+  // ── Date options ──────────────────────────────────────────────────────────
   const dateOptions = [
     { value: "last1week", label: "Last 1 Week" },
     { value: "last1month", label: "Last 1 Month" },
@@ -108,9 +110,7 @@ const UploadProject = () => {
     if (selectedFile) setFile(selectedFile);
   };
 
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleImportClick = () => fileInputRef.current?.click();
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -118,9 +118,8 @@ const UploadProject = () => {
     if (droppedFile) setFile(droppedFile);
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
     e.preventDefault();
-  };
 
   const handleClearData = () => {
     setFile(null);
@@ -129,16 +128,28 @@ const UploadProject = () => {
     setInformation("");
   };
 
-  // ── Handle program change: reset project if it doesn't belong anymore ─────
+  // ── Program change: reset project if it no longer belongs ────────────────
   const handleProgramChange = (newProgramId: string) => {
     setProgram(newProgramId);
-    // Only reset project if the currently selected project doesn't belong to new program
     const currentProjectBelongs = allProjects.some(
       (p: any) =>
         p.id === project &&
         (p.programId === newProgramId || p.program?.id === newProgramId)
     );
     if (!currentProjectBelongs) setProject("");
+  };
+
+  // ── Helper: resolve full chart UUID from an 8-char sheet-name suffix ─────
+  // The download function appends `_${id.slice(-8)}` to sheet names.
+  // We match that suffix against the leaf chart list to recover the full UUID.
+  const resolveChartId = (idSuffix: string): string => {
+    if (!idSuffix) return idSuffix;
+    const matched = allLeafCharts.find(
+      (c: any) =>
+        c.id === idSuffix ||           // exact match (full ID stored as-is)
+        c.id?.slice(-8) === idSuffix   // standard: last 8 chars match
+    );
+    return matched?.id ?? idSuffix; // fallback to raw suffix if no match
   };
 
   // ── Submit ────────────────────────────────────────────────────────────────
@@ -164,69 +175,89 @@ const UploadProject = () => {
         }
 
         /**
-         * Build elements array — one entry per sheet.
+         * Build arrays for BOTH APIs:
          *
-         * Sheet name format (from our Download Charts button):
-         *   "Chart Title_XXXXXXXX"  ← last 8 chars of the full chart UUID
+         * 1. `chartsPayload` → uploadChartData (PATCH /chart/bulk/value-change)
+         *    This is what actually writes the values into the chart DB records.
+         *    Format matches the client panel's FileUpload.tsx exactly:
+         *      { id: fullChartUUID, xAxis, yAxis, zAxis }
          *
-         * We match the 8-char suffix against allLeafCharts to recover the FULL
-         * chart UUID (same approach used in the client panel).
-         * If no match is found we fall back to using the raw suffix so it still
-         * works with manually-named sheets.
+         * 2. `elements` → createEmployeeSubmission (POST /submitted)
+         *    This creates the submission record for manager review.
+         *      { chartId: fullChartUUID, xAxis, yAxis, zAxis }
          */
+        const chartsPayload: any[] = [];
         const elements: any[] = [];
 
         workbook.SheetNames.forEach((sheetName) => {
           const sheet = workbook.Sheets[sheetName];
           const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-          // Extract ID suffix (everything after last underscore)
+          // Extract ID suffix (everything after the last underscore)
           const lastUnderscoreIndex = sheetName.lastIndexOf("_");
           let idSuffix = sheetName;
           if (lastUnderscoreIndex !== -1) {
             idSuffix = sheetName.substring(lastUnderscoreIndex + 1).trim();
           }
+          if (!idSuffix) idSuffix = sheetName;
 
-          // Resolve to full chart UUID by matching last-8 suffix against leaf charts
-          const matchedChart = allLeafCharts.find(
-            (c: any) =>
-              c.id === idSuffix || // exact match (unlikely but safe)
-              c.id?.slice(-8) === idSuffix // standard: last 8 chars match
-          );
-          const chartId = matchedChart?.id ?? idSuffix;
+          // Resolve full chart UUID
+          const fullChartId = resolveChartId(idSuffix);
 
-          const xAxisStr = JSON.stringify(jsonData);
-          const yAxisStr = JSON.stringify(jsonData);
-          const zAxisStr = JSON.stringify(jsonData);
+          // xAxis format matches client panel: { labels: <2D array from sheet> }
+          const xAxisStr = JSON.stringify({ labels: jsonData });
+          const yAxisStr = JSON.stringify({ values: [] });
+          const zAxisStr = JSON.stringify({ values: [] });
 
+          // For uploadChartData (client-panel compatible format)
+          chartsPayload.push({
+            id: fullChartId,
+            xAxis: xAxisStr,
+            yAxis: yAxisStr,
+            zAxis: zAxisStr,
+          });
+
+          // For createEmployeeSubmission
           elements.push({
-            chartId,
+            chartId: fullChartId,
             xAxis: xAxisStr,
             yAxis: yAxisStr,
             zAxis: zAxisStr,
           });
         });
 
-        if (elements.length === 0) {
+        if (chartsPayload.length === 0) {
           toast.error("Could not build chart elements from file.");
           return;
         }
 
-        const payload = {
-          information: information || "Submission from staff employee panel",
-          submission: projectNote || "Draft submission for manager review",
-          projectId: project,
-          ipAddress,
-          elements,
-        };
-
         try {
-          await createEmployeeSubmission(payload).unwrap();
-          toast.success("Submission uploaded successfully!");
+          // ── Step 1: Write chart values to the DB (same call as client panel) ──
+          const toastId = toast.loading("Uploading chart data…");
+          await uploadChartData({ charts: chartsPayload }).unwrap();
+          toast.success(
+            `${chartsPayload.length} chart(s) updated successfully!`,
+            { id: toastId }
+          );
+
+          // ── Step 2: Create submission record for manager review ───────────────
+          const submissionPayload = {
+            information: information || "Submission from staff employee panel",
+            submission: projectNote || "Draft submission for manager review",
+            projectId: project,
+            ipAddress,
+            elements,
+          };
+          await createEmployeeSubmission(submissionPayload).unwrap();
+          toast.success("Submission sent to manager for review!");
+
+          // Reset form
           setFile(null);
           setProjectNote("");
           setAddNotes(false);
           setInformation("");
+
+          // Navigate back to the project details page
           navigate(
             `/staff-employee-panel/projects/project-details/${project}`
           );
@@ -249,8 +280,8 @@ const UploadProject = () => {
     }
   };
 
-  // ── Derived labels for pre-selected program/project ───────────────────────
-  const preselected = presetProgramId && presetProjectId;
+  const isProcessing = isSubmitting || isUploading;
+  const preselected = !!(presetProgramId && presetProjectId);
 
   return (
     <div className="min-h-screen w-full my-6 bg-white text-black border border-gray-200 rounded-lg flex items-start justify-center px-4 pt-10">
@@ -264,7 +295,6 @@ const UploadProject = () => {
             Program and project are pre-selected from the project details page.
           </p>
         )}
-
         {!preselected && (
           <p className="text-center text-sm text-gray-500 mb-6">
             Select a Program &amp; Project first, then upload your filled Excel
@@ -339,9 +369,10 @@ const UploadProject = () => {
         {project && leafChartsData?.data && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
             <p className="text-xs text-blue-700 font-medium">
-              {allLeafCharts.length} chart(s) found for this project. Upload the
-              Excel file downloaded from the project details page — each sheet
-              corresponds to one chart.
+              {allLeafCharts.length} chart(s) found for this project. Upload
+              the Excel file downloaded from the project details page — each
+              sheet corresponds to one chart and will update its values
+              directly.
             </p>
           </div>
         )}
@@ -359,8 +390,8 @@ const UploadProject = () => {
               <div className="flex items-center gap-2">
                 <Calendar size={16} className="text-gray-500" />
                 <span className="text-sm">
-                  {dateOptions.find((opt) => opt.value === dateOption)?.label ||
-                    "Select date range"}
+                  {dateOptions.find((opt) => opt.value === dateOption)
+                    ?.label || "Select date range"}
                 </span>
               </div>
               <ChevronDown
@@ -415,7 +446,7 @@ const UploadProject = () => {
           )}
         </div>
 
-        {/* Upload Section – shown only when program + project + date are set and no file yet */}
+        {/* Upload drop zone */}
         {program && project && dateOption && !file && (
           <>
             <div className="flex justify-center mb-6">
@@ -429,8 +460,9 @@ const UploadProject = () => {
             </h3>
 
             <p className="text-center text-sm text-gray-400 mb-6">
-              Upload the Excel file you downloaded from the project details page.
-              Each sheet in the file corresponds to a chart.
+              Upload the Excel file you downloaded from the project details
+              page. Each sheet corresponds to one chart and its values will be
+              updated immediately.
             </p>
 
             <div
@@ -439,12 +471,10 @@ const UploadProject = () => {
               className="border border-dashed border-gray-500 rounded-lg p-10 text-center mb-4"
             >
               <Upload size={32} className="mx-auto text-gray-400 mb-4" />
-
               <p className="text-sm text-gray-600 mb-2">
                 Drag and drop your XLSX file here
               </p>
               <p className="text-sm text-gray-400 mb-2">or</p>
-
               <label className="text-blue-400 cursor-pointer">
                 Browse your device →
                 <input
@@ -489,7 +519,8 @@ const UploadProject = () => {
             <p className="text-xs text-gray-300">{file.name}</p>
             {allLeafCharts.length > 0 && (
               <p className="text-xs text-blue-400 mt-1">
-                {allLeafCharts.length} chart(s) will be updated from this file.
+                {allLeafCharts.length} chart(s) will be updated when you
+                submit.
               </p>
             )}
           </div>
@@ -528,7 +559,7 @@ const UploadProject = () => {
 
               <PrimaryButton
                 leftIcon={<Upload className="text-2xl" />}
-                title={isSubmitting ? "Submitting…" : "Submit for Review"}
+                title={isProcessing ? "Processing…" : "Submit for Review"}
                 type={"Primary"}
                 onClick={handleSubmit}
               />
