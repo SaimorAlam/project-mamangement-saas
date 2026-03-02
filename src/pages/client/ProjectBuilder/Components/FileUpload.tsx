@@ -129,20 +129,43 @@ const FileUpload: React.FC<FileUploadProps> = ({
             id = sheetName;
           }
 
-          // CLEANUP: If the first row is a header row (e.g. ["Label", "Cost", ...]), strip it.
-          // This prevents the "corruption at the source" where the header is saved as a data point.
-          let cleanedData = jsonData;
-          if (
-            jsonData.length > 0 &&
-            Array.isArray(jsonData[0]) &&
-            String(jsonData[0][0]).toLowerCase() === "label"
-          ) {
-            cleanedData = jsonData.slice(1);
+          // PROCESS DATA STRUCTURE: Ensure we always have [HeaderRow, DataRow, ...]
+          const rawRows = jsonData.filter(
+            (row) =>
+              Array.isArray(row) &&
+              row.length > 0 &&
+              String(row[0] || "").trim() !== "",
+          );
+
+          if (rawRows.length === 0) return;
+
+          // 1. Detect if the first row is a header (all strings)
+          const isHeader = rawRows[0].every((cell: any) => {
+            if (cell === null || cell === undefined || String(cell).trim() === "")
+              return true;
+            return typeof cell === "string" && isNaN(Number(cell));
+          });
+
+          let finalXAxisData: any[][];
+
+          if (isHeader) {
+            // Keep existing header but normalize first cell
+            const normalizedHeader = [...rawRows[0]];
+            normalizedHeader[0] = "Label";
+            finalXAxisData = [normalizedHeader, ...rawRows.slice(1)];
+          } else {
+            // No header detected - synthesize one to maintain structure
+            const colCount = Math.max(...rawRows.map((r) => r.length));
+            const syntheticHeader = ["Label"];
+            for (let i = 1; i < colCount; i++) {
+              syntheticHeader.push(`Legend ${i}`);
+            }
+            finalXAxisData = [syntheticHeader, ...rawRows];
           }
 
           chartsPayload.push({
             id: id,
-            xAxis: JSON.stringify({ labels: cleanedData }),
+            xAxis: JSON.stringify(finalXAxisData),
             yAxis: JSON.stringify({ values: [] }),
             zAxis: JSON.stringify({ values: [] }),
           });
