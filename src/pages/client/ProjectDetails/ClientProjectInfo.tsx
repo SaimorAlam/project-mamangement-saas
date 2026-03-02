@@ -36,6 +36,7 @@ const ClientProjectInfo = ({ projectData, isLoading }: ProjectInfoProps) => {
   if (isLoading) return <ClientProjectInfo.Skeleton />;
   console.log(projectData, "projectData");
   const infoItems = [
+    { label: "Project Name", value: projectData?.project?.name },
     { label: "Start Date", value: formatDate(projectData?.project?.startDate) },
     {
       label: "Contract Duration",
@@ -67,9 +68,8 @@ const ClientProjectInfo = ({ projectData, isLoading }: ProjectInfoProps) => {
         {infoItems.map((item, index) => (
           <div
             key={index}
-            className={`flex items-center justify-between py-4 px-4 ${
-              index % 2 === 0 ? "bg-[#F4F7FE]" : "bg-transparent"
-            } rounded-lg`}
+            className={`flex items-center justify-between py-4 px-4 ${index % 2 === 0 ? "bg-[#F4F7FE]" : "bg-transparent"
+              } rounded-lg`}
           >
             <span className="text-base font-medium text-[#4B5563]">
               {item.label}
