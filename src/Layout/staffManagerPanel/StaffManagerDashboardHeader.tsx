@@ -39,7 +39,7 @@ const StaffManagerDashboardHeader = () => {
 
     // Find the current route
     let currentRoute = allRoutes.find((r) => r.path === currentPath);
-    
+
     // If not direct match, check for parent routes with children
     if (!currentRoute) {
       for (const route of allRoutes) {
@@ -98,7 +98,7 @@ const StaffManagerDashboardHeader = () => {
           <SidebarTrigger className="md:hidden shrink-0" />
           <div className="min-w-0">
             <h1 className="text-2xl md:text-[32px] font-semibold truncate">
-              Good Morning {userName || name}, 👋
+              Good Afternoon {userName || name}, 👋
             </h1>
             <p className="text-sm md:text-base text-gray-500 truncate">
               This is dashboard overview of Acme Corporation
@@ -134,7 +134,7 @@ const StaffManagerDashboardHeader = () => {
               title="Preview"
               type={"Outline"}
               onClick={() => console.log("clicked")
-                }
+              }
             />
           )}
 

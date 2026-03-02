@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { UploadCloud, ChevronDown, Upload, Calendar } from "lucide-react";
 import { FaRoad } from "react-icons/fa";
 import DatePicker from "react-datepicker";
@@ -9,12 +10,18 @@ import { useGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import PrimaryButton from "@/common/PrimaryButton";
 import * as XLSX from "xlsx";
 import { useCreateEmployeeSubmissionMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const UploadProject = () => {
-  const [program, setProgram] = useState("");
-  const [project, setProject] = useState("");
+  // ── URL search params (set when navigating from project details) ──────────
+  const [searchParams] = useSearchParams();
+  const presetProgramId = searchParams.get("programId") ?? "";
+  const presetProjectId = searchParams.get("projectId") ?? "";
+
+  // ── form state ────────────────────────────────────────────────────────────
+  const [program, setProgram] = useState(presetProgramId);
+  const [project, setProject] = useState(presetProjectId);
   const [information, setInformation] = useState("");
   const [ipAddress, setIpAddress] = useState<string>("::1");
   const [dateOption, setDateOption] = useState("last1week");
@@ -28,6 +35,12 @@ const UploadProject = () => {
   const datePickerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  // Sync URL params → state if params change (e.g., user navigates back/forward)
+  useEffect(() => {
+    if (presetProgramId) setProgram(presetProgramId);
+    if (presetProjectId) setProject(presetProjectId);
+  }, [presetProgramId, presetProjectId]);
+
   // Fetch device public IP on mount; fallback to "::1" if unavailable
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
@@ -40,7 +53,7 @@ const UploadProject = () => {
       });
   }, []);
 
-  // API hooks
+  // ── API hooks ─────────────────────────────────────────────────────────────
   const { data: programs } = useGetAllProgramQuery({});
   const { data: projects } = useGetAllProjectsQuery({});
   const { data: leafChartsData } = useGetAllTheLeafChartQuery(project, {
@@ -49,6 +62,24 @@ const UploadProject = () => {
   const [createEmployeeSubmission, { isLoading: isSubmitting }] =
     useCreateEmployeeSubmissionMutation();
 
+  // ── Derived: filter projects by selected program ──────────────────────────
+  const allProjects: any[] =
+    projects?.data?.projects?.data || projects?.data?.data || [];
+
+  const filteredProjects = useMemo(() => {
+    if (!program) return allProjects;
+    return allProjects.filter(
+      (p: any) => p.programId === program || p.program?.id === program
+    );
+  }, [program, allProjects]);
+
+  // ── Flat list of all leaf charts for full-ID matching ─────────────────────
+  const allLeafCharts: any[] = useMemo(
+    () => (leafChartsData?.data || []).flatMap((g: any) => g.charts || []),
+    [leafChartsData]
+  );
+
+  // ── Date options ───────────────────────────────────────────────────────────
   const dateOptions = [
     { value: "last1week", label: "Last 1 Week" },
     { value: "last1month", label: "Last 1 Month" },
@@ -58,17 +89,13 @@ const UploadProject = () => {
 
   const handleDateOptionChange = (value: string) => {
     setDateOption(value);
-
     if (value !== "custom") {
       setIsDatePickerOpen(false);
-
       const end = new Date();
       const start = new Date();
-
       if (value === "last1week") start.setDate(end.getDate() - 7);
       if (value === "last1month") start.setMonth(end.getMonth() - 1);
       if (value === "last3months") start.setMonth(end.getMonth() - 3);
-
       setCustomStartDate(start);
       setCustomEndDate(end);
     } else {
@@ -78,9 +105,7 @@ const UploadProject = () => {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-    }
+    if (selectedFile) setFile(selectedFile);
   };
 
   const handleImportClick = () => {
@@ -90,28 +115,11 @@ const UploadProject = () => {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
-      setFile(droppedFile);
-    }
+    if (droppedFile) setFile(droppedFile);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-  };
-
-  const downloadCsvTemplate = () => {
-    const csvContent =
-      "Day,On Time,Absent,Late\nSunday,,,\nMonday,,,\nTuesday,,,";
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "project_data_template.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   const handleClearData = () => {
@@ -121,6 +129,19 @@ const UploadProject = () => {
     setInformation("");
   };
 
+  // ── Handle program change: reset project if it doesn't belong anymore ─────
+  const handleProgramChange = (newProgramId: string) => {
+    setProgram(newProgramId);
+    // Only reset project if the currently selected project doesn't belong to new program
+    const currentProjectBelongs = allProjects.some(
+      (p: any) =>
+        p.id === project &&
+        (p.programId === newProgramId || p.program?.id === newProgramId)
+    );
+    if (!currentProjectBelongs) setProject("");
+  };
+
+  // ── Submit ────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
     if (!file) {
       toast.error("Please select a file first.");
@@ -142,22 +163,37 @@ const UploadProject = () => {
           return;
         }
 
-        // Build elements array — one entry per sheet.
-        // Sheet name format: "Some Label_CHARTID"
-        // If no underscore, the whole sheet name is used as chartId.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        /**
+         * Build elements array — one entry per sheet.
+         *
+         * Sheet name format (from our Download Charts button):
+         *   "Chart Title_XXXXXXXX"  ← last 8 chars of the full chart UUID
+         *
+         * We match the 8-char suffix against allLeafCharts to recover the FULL
+         * chart UUID (same approach used in the client panel).
+         * If no match is found we fall back to using the raw suffix so it still
+         * works with manually-named sheets.
+         */
         const elements: any[] = [];
 
         workbook.SheetNames.forEach((sheetName) => {
           const sheet = workbook.Sheets[sheetName];
           const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+          // Extract ID suffix (everything after last underscore)
           const lastUnderscoreIndex = sheetName.lastIndexOf("_");
-          let chartId = sheetName;
+          let idSuffix = sheetName;
           if (lastUnderscoreIndex !== -1) {
-            chartId = sheetName.substring(lastUnderscoreIndex + 1).trim();
+            idSuffix = sheetName.substring(lastUnderscoreIndex + 1).trim();
           }
-          if (!chartId) chartId = sheetName;
+
+          // Resolve to full chart UUID by matching last-8 suffix against leaf charts
+          const matchedChart = allLeafCharts.find(
+            (c: any) =>
+              c.id === idSuffix || // exact match (unlikely but safe)
+              c.id?.slice(-8) === idSuffix // standard: last 8 chars match
+          );
+          const chartId = matchedChart?.id ?? idSuffix;
 
           const xAxisStr = JSON.stringify(jsonData);
           const yAxisStr = JSON.stringify(jsonData);
@@ -191,10 +227,15 @@ const UploadProject = () => {
           setProjectNote("");
           setAddNotes(false);
           setInformation("");
-          navigate(`/staff-employee-panel/projects/project-details/${project}`);
+          navigate(
+            `/staff-employee-panel/projects/project-details/${project}`
+          );
         } catch (apiError: unknown) {
           console.error("API Error:", apiError);
-          const err = apiError as { data?: { message?: string }; status?: number };
+          const err = apiError as {
+            data?: { message?: string };
+            status?: number;
+          };
           toast.error(
             err?.data?.message || "Failed to submit. Please try again."
           );
@@ -208,12 +249,28 @@ const UploadProject = () => {
     }
   };
 
+  // ── Derived labels for pre-selected program/project ───────────────────────
+  const preselected = presetProgramId && presetProjectId;
+
   return (
     <div className="min-h-screen w-full my-6 bg-white text-black border border-gray-200 rounded-lg flex items-start justify-center px-4 pt-10">
       <div className="w-full max-w-xl">
-        <h2 className="text-center text-lg font-semibold mb-6">
-          Select Project &amp; Program Name First
+        <h2 className="text-center text-lg font-semibold mb-2">
+          Upload Project Submission
         </h2>
+
+        {preselected && (
+          <p className="text-center text-xs text-blue-600 mb-6">
+            Program and project are pre-selected from the project details page.
+          </p>
+        )}
+
+        {!preselected && (
+          <p className="text-center text-sm text-gray-500 mb-6">
+            Select a Program &amp; Project first, then upload your filled Excel
+            template.
+          </p>
+        )}
 
         {/* Program Select */}
         <div className="mb-4">
@@ -221,21 +278,26 @@ const UploadProject = () => {
           <div className="relative">
             <select
               value={program}
-              onChange={(e) => setProgram(e.target.value)}
+              onChange={(e) => handleProgramChange(e.target.value)}
               className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md appearance-none"
             >
               <option value="">Select program name</option>
-              {programs?.data?.data?.map((p: { id: string; programName: string }) => (
-                <option key={p.id} value={p.id}>
-                  {p.programName}
-                </option>
-              ))}
+              {programs?.data?.data?.map(
+                (p: { id: string; programName: string }) => (
+                  <option key={p.id} value={p.id}>
+                    {p.programName}
+                  </option>
+                )
+              )}
             </select>
-            <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
+            <ChevronDown
+              className="absolute right-3 top-2.5 text-gray-500"
+              size={16}
+            />
           </div>
         </div>
 
-        {/* Project Select */}
+        {/* Project Select – filtered by selected program */}
         <div className="mb-4">
           <label className="text-sm mb-1 block">Project Name *</label>
           <div className="relative">
@@ -243,15 +305,21 @@ const UploadProject = () => {
               value={project}
               onChange={(e) => setProject(e.target.value)}
               className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md appearance-none"
+              disabled={!program}
             >
-              <option value="">Select Project Name</option>
-              {projects?.data?.projects?.data.map((p: { id: string; name: string }) => (
+              <option value="">
+                {program ? "Select Project Name" : "Select a program first"}
+              </option>
+              {filteredProjects.map((p: { id: string; name: string }) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
                 </option>
               ))}
             </select>
-            <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
+            <ChevronDown
+              className="absolute right-3 top-2.5 text-gray-500"
+              size={16}
+            />
           </div>
         </div>
 
@@ -271,15 +339,18 @@ const UploadProject = () => {
         {project && leafChartsData?.data && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
             <p className="text-xs text-blue-700 font-medium">
-              {leafChartsData.data.length} chart(s) found for this project.
-              Each sheet in your file should match a chart ID.
+              {allLeafCharts.length} chart(s) found for this project. Upload the
+              Excel file downloaded from the project details page — each sheet
+              corresponds to one chart.
             </p>
           </div>
         )}
 
         {/* Date Range Selector */}
         <div className="mb-8">
-          <label className="text-sm mb-1 block">Data Upload Date Range *</label>
+          <label className="text-sm mb-1 block">
+            Data Upload Date Range *
+          </label>
           <div className="relative" ref={datePickerRef}>
             <div
               onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
@@ -322,9 +393,7 @@ const UploadProject = () => {
                         const [start, end] = dates;
                         setCustomStartDate(start);
                         setCustomEndDate(end);
-                        if (end) {
-                          setIsDatePickerOpen(false);
-                        }
+                        if (end) setIsDatePickerOpen(false);
                       }}
                       startDate={customStartDate}
                       endDate={customEndDate}
@@ -340,13 +409,13 @@ const UploadProject = () => {
 
           {(customStartDate || customEndDate) && (
             <p className="text-xs text-gray-500 mt-2">
-              Selected: {customStartDate?.toLocaleDateString()} -{" "}
+              Selected: {customStartDate?.toLocaleDateString()} –{" "}
               {customEndDate?.toLocaleDateString() || "Ongoing"}
             </p>
           )}
         </div>
 
-        {/* Upload Section */}
+        {/* Upload Section – shown only when program + project + date are set and no file yet */}
         {program && project && dateOption && !file && (
           <>
             <div className="flex justify-center mb-6">
@@ -356,12 +425,12 @@ const UploadProject = () => {
             </div>
 
             <h3 className="text-center text-lg font-semibold mb-2">
-              No file Added to this Project Yet
+              No File Added Yet
             </h3>
 
             <p className="text-center text-sm text-gray-400 mb-6">
-              You haven't uploaded any data for this project. Start by
-              importing a CSV or spreadsheet file.
+              Upload the Excel file you downloaded from the project details page.
+              Each sheet in the file corresponds to a chart.
             </p>
 
             <div
@@ -372,7 +441,7 @@ const UploadProject = () => {
               <Upload size={32} className="mx-auto text-gray-400 mb-4" />
 
               <p className="text-sm text-gray-600 mb-2">
-                Drag and drop your CSV/XLSX file here
+                Drag and drop your XLSX file here
               </p>
               <p className="text-sm text-gray-400 mb-2">or</p>
 
@@ -408,27 +477,25 @@ const UploadProject = () => {
               onChange={handleFileSelect}
               className="hidden"
             />
-
-            <div className="text-center">
-              <button
-                onClick={downloadCsvTemplate}
-                className="text-sm text-blue-400 hover:underline"
-              >
-                Download Sample CSV Template →
-              </button>
-            </div>
           </>
         )}
 
+        {/* Selected file confirmation */}
         {file && (
           <div className="bg-gray-900 border border-gray-700 rounded-md p-4 text-center mb-6">
             <p className="text-sm text-green-400 mb-2">
               File Selected Successfully
             </p>
             <p className="text-xs text-gray-300">{file.name}</p>
+            {allLeafCharts.length > 0 && (
+              <p className="text-xs text-blue-400 mt-1">
+                {allLeafCharts.length} chart(s) will be updated from this file.
+              </p>
+            )}
           </div>
         )}
 
+        {/* Notes + Submit */}
         {file && (
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -447,7 +514,7 @@ const UploadProject = () => {
               value={projectNote}
               onChange={(e) => setProjectNote(e.target.value)}
               disabled={!addNotes}
-              placeholder="Write a short description..."
+              placeholder="Write a short description…"
               className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm resize-none h-32 disabled:bg-gray-50 disabled:text-gray-400"
             />
 
@@ -461,7 +528,7 @@ const UploadProject = () => {
 
               <PrimaryButton
                 leftIcon={<Upload className="text-2xl" />}
-                title={isSubmitting ? "Submitting..." : "Submit for Review"}
+                title={isSubmitting ? "Submitting…" : "Submit for Review"}
                 type={"Primary"}
                 onClick={handleSubmit}
               />
