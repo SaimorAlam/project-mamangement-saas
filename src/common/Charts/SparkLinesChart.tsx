@@ -9,7 +9,7 @@ import {
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import { downloadCSVForModuleOne } from "@/utils/DownlaodChartCSV";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 import { useChartTools } from "./hooks/useChartTools";
 import { useChartTiers } from "./hooks/useChartTiers";
 
@@ -76,10 +76,10 @@ export default function SparkLinesChart({
       return xAxisValues.map(
         () =>
           Math.floor(Math.random() * (endingRange - startingRange + 1)) +
-          startingRange
+          startingRange,
       );
     },
-    [xAxisValues, startingRange, endingRange]
+    [xAxisValues, startingRange, endingRange],
   );
 
   /* ---------- SERIES ---------- */
@@ -119,7 +119,7 @@ export default function SparkLinesChart({
         xAxisValues,
         legendValues && legendValues.length > 0
           ? legendValues
-          : [{ label: widgetTitle }]
+          : [{ label: widgetTitle }],
       );
     });
   };

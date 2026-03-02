@@ -115,25 +115,34 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
         workbook.SheetNames.forEach((sheetName) => {
           const sheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const jsonData: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
           // Parse sheet name for ID
           const lastUnderscoreIndex = sheetName.lastIndexOf("_");
-          let id = sheetName; // Fallback ID is the whole name
+          let id = sheetName;
 
           if (lastUnderscoreIndex !== -1) {
             id = sheetName.substring(lastUnderscoreIndex + 1);
           }
 
-          // If ID is empty or invalid after split (e.g. "Name_"), fallback to whole name or generate UUID if needed.
-          // For now, using the parsed ID. User said: "If _ does not exist, handle gracefully with fallback ID."
           if (!id.trim()) {
             id = sheetName;
           }
 
+          // CLEANUP: If the first row is a header row (e.g. ["Label", "Cost", ...]), strip it.
+          // This prevents the "corruption at the source" where the header is saved as a data point.
+          let cleanedData = jsonData;
+          if (
+            jsonData.length > 0 &&
+            Array.isArray(jsonData[0]) &&
+            String(jsonData[0][0]).toLowerCase() === "label"
+          ) {
+            cleanedData = jsonData.slice(1);
+          }
+
           chartsPayload.push({
             id: id,
-            xAxis: JSON.stringify({ labels: jsonData }),
+            xAxis: JSON.stringify({ labels: cleanedData }),
             yAxis: JSON.stringify({ values: [] }),
             zAxis: JSON.stringify({ values: [] }),
           });

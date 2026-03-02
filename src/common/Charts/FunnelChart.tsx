@@ -8,7 +8,7 @@ import TierChartModal from "../Modal/TierChartModal";
 
 /*       TYPES       */
 
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 export type TierChart = {
   id: string;

@@ -1,9 +1,13 @@
-
-
 import { useMemo, useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ChevronDown, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import {
+  ChevronRight,
+  ChevronDown,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+} from "lucide-react";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 import { useChartTools } from "./hooks/useChartTools";
 
 /* ---------- TYPES ---------- */
@@ -82,83 +86,94 @@ const TreeNode = ({
   return (
     <div className="flex flex-col">
       <div className="flex items-center gap-2 mb-2 relative group">
-        
         {/* Connector Line (Vertical) */}
         {depth > 0 && (
-           <div 
-             className="absolute -left-4 top-1/2 w-4 h-px bg-gray-300" 
-             style={{ transform: "translateY(-50%)" }}
-           />
+          <div
+            className="absolute -left-4 top-1/2 w-4 h-px bg-gray-300"
+            style={{ transform: "translateY(-50%)" }}
+          />
         )}
 
         {/* Node Card */}
-        <div 
-            className={`
+        <div
+          className={`
                 relative flex items-center justify-between min-w-[200px] p-3 
                 bg-white border rounded shadow-sm hover:shadow-md transition-shadow
                 ${node.highlight ? "border-blue-500 ring-1 ring-blue-100" : "border-gray-200"}
             `}
         >
-            <div className="flex-1">
-                <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">{node.name}</p>
-                <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-lg font-bold text-gray-900">
-                        {new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(node.value)}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                        ({((node.value / maxValue) * 100).toFixed(1)}%)
-                    </span>
-                </div>
-                {/* Visual Bar */}
-                <div className="w-full h-1 bg-gray-100 rounded-full mt-2 overflow-hidden">
-                    <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="h-full rounded-full"
-                        style={{ 
-                          backgroundColor: node.color || (node.highlight ? "#3b82f6" : "#9ca3af")
-                        }}
-                    />
-                </div>
+          <div className="flex-1">
+            <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
+              {node.name}
+            </p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-lg font-bold text-gray-900">
+                {new Intl.NumberFormat("en-US", {
+                  notation: "compact",
+                  compactDisplay: "short",
+                }).format(node.value)}
+              </span>
+              <span className="text-xs text-gray-400">
+                ({((node.value / maxValue) * 100).toFixed(1)}%)
+              </span>
             </div>
+            {/* Visual Bar */}
+            <div className="w-full h-1 bg-gray-100 rounded-full mt-2 overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${percentage}%` }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="h-full rounded-full"
+                style={{
+                  backgroundColor:
+                    node.color || (node.highlight ? "#3b82f6" : "#9ca3af"),
+                }}
+              />
+            </div>
+          </div>
 
-            {/* Expand/Collapse Header Icon - Only if children exist */}
-            {hasChildren && (
-                <button
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className="ml-3 p-1 rounded-full hover:bg-gray-100 text-gray-400 transition-colors"
-                >
-                    {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-            )}
+          {/* Expand/Collapse Header Icon - Only if children exist */}
+          {hasChildren && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="ml-3 p-1 rounded-full hover:bg-gray-100 text-gray-400 transition-colors"
+            >
+              {isExpanded ? (
+                <ChevronDown size={16} />
+              ) : (
+                <ChevronRight size={16} />
+              )}
+            </button>
+          )}
         </div>
 
         {/* Expand Trigger (Right side connector) */}
-        {hasChildren && isExpanded && (
-            <div className="w-8 h-px bg-gray-300" />
-        )}
+        {hasChildren && isExpanded && <div className="w-8 h-px bg-gray-300" />}
       </div>
 
       {/* Children Container */}
       <AnimatePresence>
         {isExpanded && hasChildren && (
-            <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="flex flex-col ml-8 pl-4 border-l border-gray-300 space-y-2 relative"
-            >
-                {node.children!.map((child) => (
-                    <TreeNode key={child.id} node={child} depth={depth + 1} maxValue={node.value} /> // pass parent value as max for relative %
-                ))}
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex flex-col ml-8 pl-4 border-l border-gray-300 space-y-2 relative"
+          >
+            {node.children!.map((child) => (
+              <TreeNode
+                key={child.id}
+                node={child}
+                depth={depth + 1}
+                maxValue={node.value}
+              /> // pass parent value as max for relative %
+            ))}
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
 };
-
 
 /* ---------- MAIN COMPONENT ---------- */
 
@@ -184,7 +199,6 @@ export default function DecompositionTreeChart({
   /* ---------- DATA ---------- */
   const treeData = useMemo(() => data || generateSampleTree(), [data]);
 
-
   /* ---------- ZOOM & PAN HANDLERS ---------- */
   // Use useEffect to attach wheel listener with passive: false
   useEffect(() => {
@@ -195,38 +209,45 @@ export default function DecompositionTreeChart({
       e.preventDefault();
       e.stopPropagation();
       const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      setScale(prev => Math.min(Math.max(prev * delta, 0.5), 3));
+      setScale((prev) => Math.min(Math.max(prev * delta, 0.5), 3));
     };
 
-    container.addEventListener('wheel', handleWheelEvent, { passive: false });
-    
+    container.addEventListener("wheel", handleWheelEvent, { passive: false });
+
     return () => {
-      container.removeEventListener('wheel', handleWheelEvent);
+      container.removeEventListener("wheel", handleWheelEvent);
     };
   }, []);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (e.button === 0) { // Left click only
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-    }
-  }, [position]);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.button === 0) {
+        // Left click only
+        setIsDragging(true);
+        setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+      }
+    },
+    [position],
+  );
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (isDragging) {
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
-    }
-  }, [isDragging, dragStart]);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (isDragging) {
+        setPosition({
+          x: e.clientX - dragStart.x,
+          y: e.clientY - dragStart.y,
+        });
+      }
+    },
+    [isDragging, dragStart],
+  );
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
   }, []);
 
-  const handleZoomIn = () => setScale(prev => Math.min(prev * 1.2, 3));
-  const handleZoomOut = () => setScale(prev => Math.max(prev * 0.8, 0.5));
+  const handleZoomIn = () => setScale((prev) => Math.min(prev * 1.2, 3));
+  const handleZoomOut = () => setScale((prev) => Math.max(prev * 0.8, 0.5));
   const handleResetZoom = () => {
     setScale(1);
     setPosition({ x: 0, y: 0 });
@@ -236,7 +257,7 @@ export default function DecompositionTreeChart({
   const onCopy = () => {
     handleCopy(treeData);
   };
-  
+
   // Flatten tree for CSV download is complex, dumping JSON for now or flat list
   const onDownload = () => {
     // Basic CSV flatten: allow user to see structure
@@ -245,26 +266,34 @@ export default function DecompositionTreeChart({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rows: any[] = [];
     const traverse = (node: TreeDataNode, path: string) => {
-        rows.push({
-            Path: path,
-            Name: node.name,
-            Value: node.value
-        });
-        if(node.children) {
-            node.children.forEach(child => traverse(child, `${path} > ${node.name}`));
-        }
+      rows.push({
+        Path: path,
+        Name: node.name,
+        Value: node.value,
+      });
+      if (node.children) {
+        node.children.forEach((child) =>
+          traverse(child, `${path} > ${node.name}`),
+        );
+      }
     };
     traverse(treeData, "");
-    
+
     // We can use generic text copy/download or build custom csv string
     const header = ["Path", "Name", "Value"].join(",");
-    const csvContent = [header, ...rows.map(r => `${r.Path},${r.Name},${r.Value}`)].join("\n");
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const csvContent = [
+      header,
+      ...rows.map((r) => `${r.Path},${r.Name},${r.Value}`),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `Decomposition_Tree_${widgetTitle.replace(/\s+/g, "_")}.csv`);
+    link.setAttribute(
+      "download",
+      `Decomposition_Tree_${widgetTitle.replace(/\s+/g, "_")}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -315,7 +344,7 @@ export default function DecompositionTreeChart({
         <div
           ref={containerRef}
           className="w-full h-full overflow-hidden cursor-grab active:cursor-grabbing"
-          style={{ touchAction: 'none' }}
+          style={{ touchAction: "none" }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -325,7 +354,7 @@ export default function DecompositionTreeChart({
             className="p-6 min-w-max transition-transform duration-100"
             style={{
               transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-              transformOrigin: '0 0',
+              transformOrigin: "0 0",
             }}
           >
             <TreeNode node={treeData} depth={0} maxValue={treeData.value} />

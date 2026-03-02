@@ -5,7 +5,7 @@ import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 

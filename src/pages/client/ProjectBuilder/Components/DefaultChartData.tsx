@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import StackedBarChart from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
-import { ChartData } from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
+import { ChartData } from "@/common/Charts/CompletedCharts/Common/chartTypes";
 import HorizontalBarChart, {
   parseHorizontalBarData,
 } from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
@@ -22,7 +22,7 @@ import HorizontalStackedBarChart from "@/common/Charts/HorizontalStackedBarChart
 import ComboChart from "@/common/Charts/ComboChart";
 import CandleChart from "@/common/Charts/CandleChart";
 import { chartTypes } from "@/utils/ChartCategory";
-import { parsePieChartData } from "@/utils/parsePieChartData";
+
 import SplineAreaChart from "@/common/Charts/CompletedCharts/SplineAreaChart/SplineAreaChart";
 
 const parseXAxisData = (
@@ -258,7 +258,11 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 .replace(/\s+/g, ""),
             })) || [];
 
-          const pieData = parsePieChartData(xAxisData, legendValues);
+          const { data } = parseXAxisData(
+            xAxisData,
+            legendValues,
+            item?.title,
+          );
 
           return (
             <div key={item.id} className="w-full">
@@ -267,7 +271,7 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
                 legendValues={legendValues}
                 numOfLegendDataSet={numDatasets}
                 chartId={item?.id}
-                allUploadedData={pieData}
+                allUploadedData={data}
                 projectId={item?.projectId}
               />
             </div>

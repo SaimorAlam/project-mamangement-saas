@@ -9,7 +9,7 @@ import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./useChartData";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 /*       TYPES       */
 
 export type ChartData = {

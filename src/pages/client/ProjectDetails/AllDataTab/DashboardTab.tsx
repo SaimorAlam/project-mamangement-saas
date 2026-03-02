@@ -36,7 +36,7 @@ import WaterfallChart from "@/common/Charts/WaterfallChart";
 import HorizontalStackedBarChart from "@/common/Charts/HorizontalStackedBarChart";
 import ComboChart from "@/common/Charts/ComboChart";
 import CandleChart from "@/common/Charts/CandleChart";
-import { parsePieChartData } from "@/utils/parsePieChartData";
+
 import SplineAreaChart from "@/common/Charts/CompletedCharts/SplineAreaChart/SplineAreaChart";
 
 const DashboardTab = () => {
@@ -210,7 +210,7 @@ const DashboardTab = () => {
                   .replace(/\s+/g, ""),
               })) || [];
 
-            const pieData = parsePieChartData(item?.xAxis, legendValues);
+            const { data } = parseXAxisData(item?.xAxis, legendValues, item?.title);
 
             return (
               <PieChartWidget
@@ -219,7 +219,7 @@ const DashboardTab = () => {
                 legendValues={legendValues}
                 numOfLegendDataSet={chartData?.numberOfDataset}
                 chartId={item?.id}
-                allUploadedData={pieData}
+                allUploadedData={data}
                 projectId={item?.projectId}
                 tierLevel={0}
                 isPreview={true}

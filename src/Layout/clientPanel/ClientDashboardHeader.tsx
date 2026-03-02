@@ -280,31 +280,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         return;
       }
 
-      // Extract template structure if any chart has xAxis
-      let templateAOA: any[][] = [];
-      for (const node of allCharts) {
-        let xAxis = node.xAxis;
-        if (typeof xAxis === "string") {
-          try {
-            xAxis = JSON.parse(xAxis);
-          } catch {
-            /* ignore */
-          }
-        }
-        if (
-          Array.isArray(xAxis) &&
-          xAxis.length > 1 &&
-          Array.isArray(xAxis[0])
-        ) {
-          templateAOA = xAxis.map((row: any[], rIdx: number) =>
-            row.map((cell: any, cIdx: number) =>
-              rIdx === 0 || cIdx === 0 ? cell : "",
-            ),
-          );
-          break;
-        }
-      }
-
       const wb = XLSX.utils.book_new();
       const ids: string[] = [];
       const usedNames = new Set<string>();
@@ -334,7 +309,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         ids.push(node.id);
         let currentAOA: any[][] = [];
 
-        // Try to get structure from current node's xAxis
+        // 1. Normalize xAxis data
         let xAxis = node.xAxis;
         if (typeof xAxis === "string") {
           try {
@@ -344,51 +319,82 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           }
         }
 
-        if (
-          Array.isArray(xAxis) &&
-          xAxis.length > 1 &&
-          Array.isArray(xAxis[0])
-        ) {
-          currentAOA = xAxis.map((row: any[], rIdx: number) =>
-            row.map((cell: any, cIdx: number) =>
-              rIdx === 0 || cIdx === 0 ? cell : "",
-            ),
-          );
+        const rawData =
+          xAxis && !Array.isArray(xAxis) && xAxis.labels
+            ? xAxis.labels
+            : xAxis;
+
+        // 2. Extract Data Structure
+        if (Array.isArray(rawData) && rawData.length > 0) {
+          if (Array.isArray(rawData[0])) {
+            // It's a 2D array (table-like)
+            const hasHeader =
+              String(rawData[0][0] || "").toLowerCase() === "label";
+
+            // If it has header, use it; otherwise, synthesize one
+            let baseData = rawData;
+            if (!hasHeader) {
+              const legends = (
+                node.widgets ||
+                node.barChart?.widgets ||
+                node.splineChart?.widgets ||
+                node.areaChart?.widgets ||
+                []
+              ).map((w: any) => w.legendName || "Legend");
+              const syntheticHeader = [
+                "Label",
+                ...(legends.length > 0
+                  ? legends
+                  : Array(rawData[0].length - 1).fill("Legend")),
+              ];
+              baseData = [syntheticHeader, ...rawData];
+            }
+
+            // Clean values for template: keep only headers (row 0) and labels (col 0)
+            currentAOA = baseData.map((row: any[], rIdxIdx: number) =>
+              row.map((cell: any, cIdx: number) => {
+                if (rIdxIdx === 0 || cIdx === 0) return cell;
+                return " "; // Fill with spaces for user input
+              }),
+            );
+          } else {
+            // It's a flat array of labels
+            const legends = (
+              node.widgets ||
+              node.barChart?.widgets ||
+              node.splineChart?.widgets ||
+              node.areaChart?.widgets ||
+              []
+            ).map((w: any) => w.legendName || "Legend");
+            if (legends.length === 0) legends.push("Value");
+
+            const headers = ["Label", ...legends];
+            // Filter out empty or "Label" strings from flat labels
+            const rows = rawData
+              .filter(
+                (lbl: any) =>
+                  String(lbl || "").trim() !== "" &&
+                  String(lbl || "").toLowerCase() !== "label",
+              )
+              .map((lbl: any) => [
+                String(lbl || ""),
+                ...legends.map(() => " "),
+              ]);
+            currentAOA = [headers, ...rows];
+          }
         } else {
-          // Fallback legacy structure reconstruction
+          // 3. Last resort fallback from widgets
           const nodeWidgets =
             node.widgets ||
             node.barChart?.widgets ||
-            node.multiAxisChart?.widgets ||
-            node.horizontalBarChart?.widgets ||
+            node.splineChart?.widgets ||
             node.areaChart?.widgets ||
-            node.pi?.widgets ||
             [];
-
-          if (nodeWidgets.length > 0) {
-            const legends = nodeWidgets.map(
-              (w: any) => w.legendName || w.label || "Legend",
-            );
-            const xAxisLabels =
-              node.xAxisValues ||
-              (node.xAxis &&
-              Array.isArray(node.xAxis) &&
-              !Array.isArray(node.xAxis[0])
-                ? node.xAxis
-                : ["Data"]);
-
+          const legends = nodeWidgets.map((w: any) => w.legendName || "Legend");
+          if (legends.length > 0) {
             const headers = ["Label", ...legends];
-            const rows = xAxisLabels.map((label: string) => [
-              label,
-              ...legends.map(() => ""),
-            ]);
-            currentAOA = [headers, ...rows];
+            currentAOA = [headers, ["Sample Entry", ...legends.map(() => " ")]];
           }
-        }
-
-        // Use global template if specific chart still has no structure
-        if (currentAOA.length === 0 && templateAOA.length > 0) {
-          currentAOA = templateAOA;
         }
 
         if (currentAOA.length > 0) {
