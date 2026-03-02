@@ -74,7 +74,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
 
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
   const projectId = projectIdFromParams || projectIdFromState;
-
   // Optimized Page Type Detection
   const isPage = useMemo(() => {
     const p = currentPath;
@@ -87,7 +86,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         !p.includes("/project-details/"),
       projectDetails: p.includes("/project-details/"),
       projectReview: p.includes("/client-panel/project-review"),
-      projectBuilder: p.includes("/client-panel/project-builder"),
+      projectBuilder:
+        p.includes("/client-panel/project-builder") &&
+        !p.includes("/project-details/"),
       publish: p.includes("/project-builder/publish"),
       importCSV: p.includes("/project-builder/file-upload"),
       projectReviewDetails: p.startsWith(
@@ -327,21 +328,40 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         // 2. Extract Data Structure
         if (Array.isArray(rawData) && rawData.length > 0) {
           if (Array.isArray(rawData[0])) {
-            // It's a 2D array (table-like) - Row 0 is ALWAYS the header
-            const header = [...rawData[0]];
-            header[0] = "Label"; // Standardize first cell
+            // It's a 2D array (table-like)
+            // Check if Row 0 is a header (all items are strings)
+            const isHeader = rawData[0].every((item: any) => typeof item === "string");
+            
+            // Normalize Header
+            const headerRow = isHeader ? [...rawData[0]] : [];
+            if (isHeader) {
+                headerRow[0] = "Label";
+            } else {
+                // If row 0 is data, synthesize header from legends
+                const legends = (
+                    node.widgets ||
+                    node.barChart?.widgets ||
+                    node.splineChart?.widgets ||
+                    node.areaChart?.widgets ||
+                    node.multiAxisChart?.widgets ||
+                    []
+                ).map((w: any) => w.legendName || "Legend");
+                headerRow.push("Label", ...(legends.length > 0 ? legends : Array(rawData[0].length - 1).fill("Legend")));
+            }
 
-            // Data rows are rawData index 1 onwards
-            const rows = rawData.slice(1).map((row: any[]) =>
+            const dataRows = isHeader ? rawData.slice(1) : rawData;
+            const rows = dataRows.map((row: any[]) =>
               row.map((cell: any, cIdx: number) => {
                 if (cIdx === 0) return cell; // Keep label
                 return " "; // Fill with spaces for user input
               }),
             );
 
-            currentAOA = [header, ...rows];
+            currentAOA = [headerRow, ...rows];
           } else {
-            // It's a flat array of labels - Row 0 is the header/title
+            // It's a flat array of labels
+            const isHeader = typeof rawData[0] === "string" && isNaN(Number(rawData[0]));
+            
             const legends = (
               node.widgets ||
               node.barChart?.widgets ||
@@ -353,9 +373,10 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             if (legends.length === 0) legends.push("Value");
 
             const headers = ["Label", ...legends];
-            // Skip index 0 (header) and filter remaining labels
-            const rows = rawData
-              .slice(1)
+            // Skip index 0 only if it's a header
+            const dataLabels = isHeader ? rawData.slice(1) : rawData;
+            
+            const rows = dataLabels
               .filter((lbl: any) => String(lbl || "").trim() !== "")
               .map((lbl: any) => [String(lbl || ""), ...legends.map(() => " ")]);
 
@@ -436,6 +457,17 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           onClick={() => setIsProjectModalOpen(true)}
         />
       );
+
+    if (isPage.projectDetails) {
+      return (
+        <PrimaryButton
+          title="Download CSV"
+          leftIcon={<Download />}
+          type="Primary"
+          onClick={handleDownloadCSV}
+        />
+      );
+    }
 
     if (isPage.projectBuilder) {
       if (isPage.importCSV) return null;

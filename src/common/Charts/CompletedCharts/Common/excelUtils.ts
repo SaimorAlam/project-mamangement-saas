@@ -2,7 +2,6 @@
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { LegendValue } from "./chartTypes";
-import { sanitizeSheetName, extractLegendsFromXAxis } from "./chartUtils";
 
 export type ChartExcelType =
   | "barChart"
@@ -14,27 +13,7 @@ export type ChartExcelType =
   | "pie"
   | "sparklineChart";
 
-export const getUniqueSheetName = (
-  usedNames: Set<string>,
-  name: string,
-  id: string,
-) => {
-  const safeName = sanitizeSheetName(name, 31);
-  const fullName = `${safeName}_${id}`;
-  let finalName = fullName.length > 31 ? fullName.substring(0, 31) : fullName;
 
-  let counter = 1;
-
-  while (usedNames.has(finalName.toLowerCase())) {
-    const suffix = `_${counter}`;
-    const base = fullName.substring(0, 31 - suffix.length);
-    finalName = base + suffix;
-    counter++;
-  }
-
-  usedNames.add(finalName.toLowerCase());
-  return finalName;
-};
 
 export const downloadChartDataAsExcel = async (
   _title: string,
@@ -57,38 +36,25 @@ export const downloadChartDataAsExcel = async (
     const res = await getAllTheLeafChart(projectId).unwrap();
     const allGroups: any[] = res?.data || [];
 
-    // 1. Find the group that likely belongs to this root chart.
-    // We check if any chart in the group points to our root chartId as parent,
-    // or if the root chart itself is in the group.
-    const targetGroup = allGroups.find((g: any) =>
+    // 1. Find the group that belongs to this root chart.
+    // Try matching via ID first (robust)
+    let targetGroup = allGroups.find((g: any) =>
       g.charts?.some((c: any) => c.id === chartId || c.parentId === chartId)
     );
 
+    // 2. Fallback: match by the group title if no group found by ID
+    if (!targetGroup && _title) {
+       targetGroup = allGroups.find((item: any) => item.grouptitle === _title);
+    }
+
     let targets: any[] = [];
     if (targetGroup) {
-      // Collect all descendants in this group. 
-      // Since 'Only level children' is often flattened, we take all children of the root.
-      targets = targetGroup.charts.filter(
-        (c: any) => c.parentId === chartId || c.id === chartId
-      );
-
-      // If we found the root or its children but there are deeper levels, 
-      // the API usually includes them in the same group.
-      // If we still have no targets, or if the user specifically wanted 'leafs',
-      // we can take all charts in the group as they usually represent the full leaf set for that group.
-      if (targets.length === 0) {
-        targets = targetGroup.charts;
-      }
+      // Use all charts in the group as they represent the flattened leaf children for this root.
+      targets = targetGroup.charts || [];
     }
 
-    // 2. Fallback: If no group matched via ID, try matching by the group title as a last resort
+    // 3. Last Resort Fallback: If still nothing found, download current template
     if (targets.length === 0) {
-      const g = allGroups.find((item: any) => item.grouptitle === _title);
-      if (g) targets = g.charts || [];
-    }
-
-    if (targets.length === 0) {
-      // Still nothing found — download a blank template for the current chart
       const wb = XLSX.utils.book_new();
       const headers = ["Label", ...effectiveLegendValues.map((l) => l.label)];
       const rows = effectiveXAxisValues.map((label) => [
@@ -106,44 +72,57 @@ export const downloadChartDataAsExcel = async (
     const ids: string[] = [];
     const usedNames = new Set<string>();
 
-    targets.forEach((node: any) => {
-      ids.push(node.id);
-      let xAxisItems: string[] = [];
-      try {
-        const parsedXAxis =
-          typeof node.xAxis === "string" ? JSON.parse(node.xAxis) : node.xAxis;
+    const getUniqueSheetNameInside = (name: string, id: string) => {
+      const safeName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
+      const fullName = `${safeName}_${id}`;
 
-        // Normalize to raw array (direct or nested in {labels: [...]})
-        const rawData =
-          parsedXAxis && !Array.isArray(parsedXAxis) && parsedXAxis.labels
-            ? parsedXAxis.labels
-            : parsedXAxis;
+      // Enforce Excel 31 character limit
+      let finalName = fullName.length > 31 ? fullName.substring(0, 31) : fullName;
+      let counter = 1;
 
-        if (Array.isArray(rawData) && rawData.length > 0) {
-          if (Array.isArray(rawData[0])) {
-            // Row 0 is ALWAYS the header — skip it unconditionally
-            xAxisItems = rawData
-              .slice(1)
-              .map((row: any) => String(row[0] || ""))
-              .filter((val) => val.trim() !== "");
-          } else {
-            // Simple flat array — skip the first element (header)
-            xAxisItems = rawData
-              .slice(1)
-              .map((v: any) => String(v || ""))
-              .filter((val) => val.trim() !== "");
-          }
-        }
-      } catch (err) {
-        console.warn("Failed to parse node xAxis", err);
+      while (usedNames.has(finalName.toLowerCase())) {
+        const suffix = `_${counter}`;
+        const base = fullName.substring(0, 31 - suffix.length);
+        finalName = base + suffix;
+        counter++;
       }
 
-      if (!xAxisItems.length) xAxisItems = effectiveXAxisValues;
+      usedNames.add(finalName.toLowerCase());
+      return finalName;
+    };
+
+    targets.forEach((node: any) => {
+      ids.push(node.id);
+      
+      let xAxis: string[] = node.xAxisValues || [];
+      if (!xAxis.length && node.xAxis) {
+        try {
+          const parsed = typeof node.xAxis === "string" ? JSON.parse(node.xAxis) : node.xAxis;
+
+          if (Array.isArray(parsed)) {
+            if (parsed.length > 0 && Array.isArray(parsed[0])) {
+              // Smart header detection: a header row has legend labels (strings) in data columns.
+              // We skip it because the download process manually adds a header row.
+              const hasHeader = parsed[0].length > 1 && typeof parsed[0][1] === "string";
+              xAxis = (hasHeader ? parsed.slice(1) : parsed).map((row: any) => row[0]);
+            } else {
+              xAxis = parsed;
+            }
+          } else {
+            xAxis = parsed.labels || [];
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      // Fallback to current chart's xAxis if node has none
+      const xAxisItems = xAxis.length > 0 ? xAxis : effectiveXAxisValues;
 
       let legends = node.legendValues || [];
-      const nodeWidgets = node.widgets || node[chartType]?.widgets;
+      const nodeWidgets = node.widgets || node.barChart?.widgets || node[chartType]?.widgets;
       
-      if (!legends.length && nodeWidgets?.length > 0) {
+      if (!legends.length && nodeWidgets) {
         legends = nodeWidgets.map((w: any) => ({
           label: w.legendName || w.label || "Legend",
           field: (w.legendName || w.label || "field")
@@ -151,27 +130,19 @@ export const downloadChartDataAsExcel = async (
             .replace(/\s+/g, ""),
           color: w.color || "#000000",
         }));
-      } else if (!legends.length) {
-        const implicitLabels = extractLegendsFromXAxis(node.xAxis);
-        if (implicitLabels.length > 0) {
-            legends = implicitLabels.map(lbl => ({
-                label: lbl, field: lbl, color: "#000000"
-            }));
-        }
       }
 
-      if (!legends.length) legends = effectiveLegendValues;
+      // Fallback to current chart's legends if node has none
+      const finalLegends = legends.length > 0 ? legends : effectiveLegendValues;
 
-      const headers = ["Label", ...legends.map((l: any) => l.label)];
-      const maxFill = Math.max(numOfLegendDataSet, legends.length);
+      const headers = ["Label", ...finalLegends.map((l: any) => l.label)];
       const rows = xAxisItems.map((label: string) => [
         label,
-        ...Array(maxFill).fill(" "),
+        ...Array(numOfLegendDataSet).fill(" "),
       ]);
-      
       const data = [headers, ...rows];
       const ws = XLSX.utils.aoa_to_sheet(data);
-      const sheetName = getUniqueSheetName(usedNames, node.title || node.name || "Tier", node.id);
+      const sheetName = getUniqueSheetNameInside(node.title || node.name || "Tier", node.id);
       XLSX.utils.book_append_sheet(wb, ws, sheetName);
     });
 
