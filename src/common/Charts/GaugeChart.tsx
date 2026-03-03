@@ -273,7 +273,6 @@ export default function GaugeChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="Performance Intensity"
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

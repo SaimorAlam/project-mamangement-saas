@@ -242,7 +242,6 @@ export default function CalendarHeatmapChart({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

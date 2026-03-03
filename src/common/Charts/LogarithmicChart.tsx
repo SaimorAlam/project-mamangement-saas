@@ -130,7 +130,6 @@ export default function LogarithmicChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="Logarithmic Scale"
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={openTierModal}
         menuActions={{

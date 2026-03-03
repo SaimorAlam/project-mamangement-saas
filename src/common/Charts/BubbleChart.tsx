@@ -256,7 +256,6 @@ export default function BubbleChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="Bubble Distribution Analysis"
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

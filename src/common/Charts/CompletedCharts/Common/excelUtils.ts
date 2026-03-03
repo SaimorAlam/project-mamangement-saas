@@ -138,7 +138,7 @@ export const downloadChartDataAsExcel = async (
       const headers = ["Label", ...finalLegends.map((l: any) => l.label)];
       const rows = xAxisItems.map((label: string) => [
         label,
-        ...Array(numOfLegendDataSet).fill(" "),
+        ...Array(numOfLegendDataSet).fill(0),
       ]);
       const data = [headers, ...rows];
       const ws = XLSX.utils.aoa_to_sheet(data);

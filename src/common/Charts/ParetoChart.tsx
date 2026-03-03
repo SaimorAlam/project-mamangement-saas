@@ -215,7 +215,6 @@ export default function ParetoChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`${dataPoints.length} categories`}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

@@ -396,7 +396,6 @@ export default function BulletChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
         parentChartName={widgetTitle}
         onSave={() => {
           setShowAddTierModal(false);

@@ -147,7 +147,6 @@ export default function MarimekkoChart({
   return (
     <ChartCardWrapper
       title={widgetTitle}
-      chartId={chartId}
       menuActions={{
         onCopy: handleCopy,
         onDownload: handleDownload,

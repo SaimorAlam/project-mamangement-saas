@@ -26,7 +26,9 @@ import {
   parseCommonChartData,
   getEffectiveLegendValues,
   getSafeRanges,
+  sanitizeSheetName,
 } from "@/common/Charts/CompletedCharts/Common/chartUtils";
+import { parsePieChartData } from "@/utils/parsePieChartData";
 
 /**
  * Checks if a row is a header row.
@@ -145,6 +147,16 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
           numOfLegendDataSet: numDatasets,
         };
 
+        // PIE needs its own data shape — override allUploadedData with
+        // correctly parsed { name, value, color }[] keyed by sheetName.
+        const pieSheetName = sanitizeSheetName(item?.title || "Sheet");
+        const pieData = categoryKey === "PIE"
+          ? parsePieChartData(xAxisData, legendValues)
+          : [];
+        const pieUploadedData = pieData.length > 0
+          ? { [pieSheetName]: pieData }
+          : undefined;
+
         const renderChart = () => {
           switch (categoryKey) {
             case "BAR":
@@ -163,7 +175,12 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             case "HEATMAP":
               return <HeatmapChartNew {...commonProps} />;
             case "PIE":
-              return <PieChartWidget {...commonProps} />;
+              return (
+                <PieChartWidget
+                  {...commonProps}
+                  allUploadedData={pieUploadedData}
+                />
+              );
             case "COLUMN":
               return <ColumnBarChart {...commonProps} />;
             case "RADAR":

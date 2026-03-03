@@ -16,6 +16,7 @@ import { generateAreaChartData } from "@/utils/clientPannelHelpers/programBuilde
 import { BaseChartProps } from "../Common/chartTypes";
 import {
   parseCommonChartData,
+  extractLegendsFromXAxis,
 } from "../Common/chartUtils";
 import BaseChartContainer from "../Common/BaseChartContainer";
 
@@ -34,10 +35,20 @@ export const parseAreaChartData = (
 
 export default function AreaChartWidget(props: BaseChartProps) {
   const getTierLegends = (tier: any) => {
-    return (tier?.areaChart?.widgets || tier?.widgets || []).map((w: any) => ({
-      label: w.legendName || w.label,
-      field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
-      color: w.color,
+    const widgets = tier?.areaChart?.widgets || tier?.widgets || [];
+    if (widgets.length > 0) {
+      return widgets.map((w: any) => ({
+        label: w.legendName || w.label,
+        field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
+        color: w.color,
+      }));
+    }
+    // Fallback if no widgets/metadata
+    const derived = extractLegendsFromXAxis(tier.xAxis);
+    return derived.map((lbl, idx) => ({
+      label: lbl,
+      field: lbl.toLowerCase().replace(/\s+/g, ""),
+      color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
     }));
   };
 

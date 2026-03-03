@@ -327,7 +327,6 @@ export default function HorizontalStackedBarChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="Stacked Distribution"
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
@@ -386,7 +385,6 @@ export default function HorizontalStackedBarChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
         parentChartName={widgetTitle}
       />
 

@@ -327,7 +327,6 @@ export default function ComboChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
         parentChartName={widgetTitle}
       />
 

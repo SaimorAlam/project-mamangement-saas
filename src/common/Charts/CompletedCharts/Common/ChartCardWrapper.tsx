@@ -17,7 +17,7 @@ type Props = {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
-  chartId?: string;
+
   footer?: React.ReactNode;
   menuActions: MenuActions;
   isDownloading?: boolean;
@@ -32,7 +32,7 @@ const ChartCardWrapper = ({
   title,
   subtitle,
   children,
-  chartId,
+
   footer,
   menuActions,
   isDownloading = false,
@@ -46,7 +46,7 @@ const ChartCardWrapper = ({
   // const isProgramBuilder = location.pathname.includes("program-builder")
   const [showPopover, setShowPopover] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
-  console.log(chartId);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

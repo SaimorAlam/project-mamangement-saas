@@ -339,7 +339,6 @@ export default function HistogramChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="Frequency Distribution"
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

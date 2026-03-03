@@ -15,6 +15,11 @@ import StackedBarChart, {
 } from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
 import MultiAxisLineChart from "@/common/Charts/CompletedCharts/LineChart/LineChart";
 import { parseLineChartData } from "@/utils/parseLineChartData";
+import { parsePieChartData } from "@/utils/parsePieChartData";
+import {
+  sanitizeSheetName,
+  extractLegendsFromXAxis,
+} from "@/common/Charts/CompletedCharts/Common/chartUtils";
 import HorizontalBarChart, {
   parseHorizontalBarData,
 } from "@/common/Charts/CompletedCharts/HorizontalBarChart/HorizontalBarChart";
@@ -60,14 +65,23 @@ const DashboardTab = () => {
           const chartData = chartProperty ? item[chartProperty] : null;
 
           if (categoryKey === "LINE") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+            const rawWidgets = (chartData?.widgets || item?.widgets) || [];
+            let legendValues = rawWidgets.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            }));
+
+            if (legendValues.length === 0) {
+              const derived = extractLegendsFromXAxis(item?.xAxis);
+              legendValues = derived.map((lbl, idx) => ({
+                label: lbl,
+                color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+                field: lbl.toLowerCase().replace(/\s+/g, ""),
+              }));
+            }
 
             const { labels, data } = parseLineChartData(
               item?.xAxis,
@@ -132,14 +146,23 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "BAR") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+            const rawWidgets = (chartData?.widgets || item?.widgets) || [];
+            let legendValues = rawWidgets.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            }));
+
+            if (legendValues.length === 0) {
+              const derived = extractLegendsFromXAxis(item?.xAxis);
+              legendValues = derived.map((lbl, idx) => ({
+                label: lbl,
+                color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+                field: lbl.toLowerCase().replace(/\s+/g, ""),
+              }));
+            }
 
             const { labels, data } = parseXAxisData(
               item?.xAxis,
@@ -211,11 +234,13 @@ const DashboardTab = () => {
                   .replace(/\s+/g, ""),
               })) || [];
 
-            const { data } = parseXAxisData(
-              item?.xAxis,
-              legendValues,
-              item?.title,
-            );
+            // Parse the Pie-specific xAxis format → { name, value, color }[]
+            // then key it by sheetName so PieChart's resolvePieData can find it.
+            const pieData = parsePieChartData(item?.xAxis, legendValues);
+            const sheetName = sanitizeSheetName(item?.title || "Sheet");
+            const pieUploadedData = pieData.length > 0
+              ? { [sheetName]: pieData }
+              : undefined;
 
             return (
               <PieChartWidget
@@ -224,8 +249,8 @@ const DashboardTab = () => {
                 legendValues={legendValues}
                 numOfLegendDataSet={chartData?.numberOfDataset}
                 chartId={item?.id}
-                allUploadedData={data}
-                projectId={item?.projectId}
+                allUploadedData={pieUploadedData}
+                projectId={projectId}
                 tierLevel={0}
                 isPreview={true}
               />
@@ -314,16 +339,25 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "AREA") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+            const rawWidgets = (chartData?.widgets || item?.widgets) || [];
+            let legendValues = rawWidgets.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            }));
 
-            const { labels } = parseXAxisData(
+            if (legendValues.length === 0) {
+              const derived = extractLegendsFromXAxis(item?.xAxis);
+              legendValues = derived.map((lbl, idx) => ({
+                label: lbl,
+                color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+                field: lbl.toLowerCase().replace(/\s+/g, ""),
+              }));
+            }
+
+            const { labels, data } = parseXAxisData(
               item?.xAxis,
               legendValues,
               item?.title,
@@ -341,6 +375,8 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset || 0}
                 endingRange={chartData?.lastFieldDataset || 100}
                 chartId={item?.id}
+                projectId={projectId}
+                allUploadedData={data}
                 isPreview={true}
               />
             );
@@ -568,14 +604,23 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "SPLINE") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+            const rawWidgets = (chartData?.widgets || item?.widgets) || [];
+            let legendValues = rawWidgets.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            }));
+
+            if (legendValues.length === 0) {
+              const derived = extractLegendsFromXAxis(item?.xAxis);
+              legendValues = derived.map((lbl, idx) => ({
+                label: lbl,
+                color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+                field: lbl.toLowerCase().replace(/\s+/g, ""),
+              }));
+            }
 
             const { labels, data } = parseXAxisData(
               item?.xAxis,
@@ -600,14 +645,23 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "SPARKLINE") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+            const rawWidgets = (chartData?.widgets || item?.widgets) || [];
+            let legendValues = rawWidgets.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            }));
+
+            if (legendValues.length === 0) {
+              const derived = extractLegendsFromXAxis(item?.xAxis);
+              legendValues = derived.map((lbl, idx) => ({
+                label: lbl,
+                color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+                field: lbl.toLowerCase().replace(/\s+/g, ""),
+              }));
+            }
 
             const { labels, data } = parseXAxisData(
               item?.xAxis,

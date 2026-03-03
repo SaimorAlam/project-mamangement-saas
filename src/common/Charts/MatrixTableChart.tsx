@@ -298,7 +298,6 @@ export default function MatrixTableChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
         parentChartName={widgetTitle}
         onSave={() => {
           // refetch();

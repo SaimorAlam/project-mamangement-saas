@@ -256,7 +256,6 @@ export default function CandleChart({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

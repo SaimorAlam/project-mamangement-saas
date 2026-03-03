@@ -252,7 +252,6 @@ export default function GanttChartNew({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

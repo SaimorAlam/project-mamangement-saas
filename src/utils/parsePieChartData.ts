@@ -67,10 +67,17 @@ export const parsePieChartData = (
 
   // Case 2: Standard Multi-series format (Stacked Bar style)
   // [["Label", "Legend1", "Legend2"], ["Row1", 10, 20]]
-  // For Pie, we usually only care about the first data row's values mapped to legends
   const firstDataRow = dataRows[0];
   if (firstDataRow && firstDataRow.length > 1) {
-    return legendValues.map((legend, index) => ({
+    const effectiveLegends =
+      legendValues.length > 0
+        ? legendValues
+        : headers.slice(1).map((lbl: any) => ({
+            label: String(lbl),
+            color: "#000000",
+          }));
+
+    return effectiveLegends.map((legend: any, index: number) => ({
       name: legend.label,
       value: Number(firstDataRow[index + 1]) || 0,
       color: legend.color,

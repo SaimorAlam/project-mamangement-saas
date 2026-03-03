@@ -213,11 +213,15 @@ export const resolveChartData = (
   // return an empty object, making Object.keys()[0] === undefined, which means
   // allUploadedData lookup would always fail.
   const sheetName = sanitizeSheetName(widgetTitle);
-  const dataToUse = allUploadedData?.[sheetName];
+  let dataToUse = allUploadedData?.[sheetName];
+
+  // Fallback: If allUploadedData is already the data array (bypass keyed lookup)
+  if (!dataToUse && Array.isArray(allUploadedData) && allUploadedData.length > 0) {
+    dataToUse = allUploadedData;
+  }
 
   // Priority 1: Real Uploaded Data
-  // If we have data from the API, we use it, even if all values are current zero.
-  const hasUploadedData = dataToUse && dataToUse.length > 0;
+  const hasUploadedData = Array.isArray(dataToUse) && dataToUse.length > 0;
 
   if (hasUploadedData) {
     return { chartData: dataToUse as ChartData[], isSampleData: false };

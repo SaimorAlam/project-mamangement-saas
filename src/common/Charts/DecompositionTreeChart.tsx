@@ -303,7 +303,6 @@ export default function DecompositionTreeChart({
     <ChartCardWrapper
       title={widgetTitle}
       subtitle="Data Breakdown"
-      chartId={chartId}
       tierLevel={0}
       menuActions={{
         onCopy,

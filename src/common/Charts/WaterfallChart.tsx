@@ -196,7 +196,6 @@ export default function WaterfallChart({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

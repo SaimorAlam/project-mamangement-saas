@@ -27,6 +27,7 @@ type Props = {
   chartId?: string;
   onDelete?: () => void;
   isPreview?: boolean;
+  allUploadedData?: any;
 };
 
 /*       COMPONENT       */
@@ -188,7 +189,6 @@ export default function FunnelChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`${xAxisValues.length} stages`}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

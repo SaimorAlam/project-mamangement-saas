@@ -217,7 +217,6 @@ export default function ScatterChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="3D Scatter Distribution"
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

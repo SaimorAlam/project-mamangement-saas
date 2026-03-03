@@ -284,7 +284,7 @@ const WidgetForChartModuleOne = ({
     }
     if (!widgetCategory) {
       toast.error(`Please input category : ${widgetCategory}`);
-      console.log("category: ", widgetCategory);
+
       return;
     }
 

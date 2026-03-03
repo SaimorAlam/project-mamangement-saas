@@ -175,7 +175,6 @@ export default function BoxPlotChart({
   return (
     <ChartCardWrapper
       title={widgetTitle}
-      chartId={chartId}
       menuActions={{
         onCopy: handleCopy,
         onDownload: handleDownload,

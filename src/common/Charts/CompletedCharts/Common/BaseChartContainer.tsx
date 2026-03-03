@@ -5,9 +5,11 @@ import {
   setChildPayload,
   setGroupTitle,
 } from "@/store/Slices/ChartSlice/ChartSlice";
+import { useParams } from "react-router-dom";
 import AddTierModal from "../../../Modal/AddTierModal";
 import TierChartModal from "../../../Modal/TierChartModal";
 import ChartCardWrapper from "./ChartCardWrapper";
+import { toast } from "sonner";
 
 // Common Imports
 import {
@@ -78,6 +80,9 @@ export default function BaseChartContainer({
   parseTierData,
   renderChildChart,
 }: BaseChartContainerProps) {
+  const { projectId: projectIdFromParams } = useParams();
+  const effectiveProjectId = projectId || projectIdFromParams;
+
   const dispatch = useAppDispatch();
   const groupTitle = useAppSelector((state) => state.chartSlice.groupTitle);
 
@@ -146,10 +151,10 @@ export default function BaseChartContainer({
   /* ---------- ACTIONS ---------- */
 
   const handleDownload = () => {
-    if (projectId) {
+    if (effectiveProjectId) {
       downloadChartDataAsExcel(
         widgetTitle,
-        projectId,
+        effectiveProjectId,
         getAllTheLeafChart,
         widgetTitle,
         effectiveXAxisValues,
@@ -159,6 +164,8 @@ export default function BaseChartContainer({
         excelType,
         chartId,
       );
+    } else {
+      toast.error("Project ID is missing. Cannot download chart data.");
     }
   };
 
@@ -177,16 +184,23 @@ export default function BaseChartContainer({
       title: "",
       status: "ACTIVE",
       category: category,
-      xAxis: JSON.stringify([
-        ["Label", ...effectiveLegendValues.map((l) => l.label)],
-        ...effectiveXAxisValues.map((label) => [
-          label,
-          ...Array(numOfLegendDataSet).fill(0),
-        ]),
-      ]),
+      xAxis: JSON.stringify(
+        category === "PIE"
+          ? [
+              ["Label", ...effectiveLegendValues.map((l) => l.label)],
+              ["Value", ...Array(effectiveLegendValues.length).fill(0)],
+            ]
+          : [
+              ["Label", ...effectiveLegendValues.map((l) => l.label)],
+              ...effectiveXAxisValues.map((label) => [
+                label,
+                ...Array(numOfLegendDataSet || effectiveLegendValues.length).fill(0),
+              ]),
+            ],
+      ),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
-      projectId: projectId,
+      projectId: effectiveProjectId,
       parentId: chartId,
       rootchart: false,
       roottitle: widgetTitle,
@@ -235,7 +249,6 @@ export default function BaseChartContainer({
           <ChartLegendHeader effectiveLegendValues={effectiveLegendValues} />
         }
         footer={<ChartChildTierFooter childTiers={childTiers} />}
-        chartId={chartId}
       >
         {children({
           chartData,
@@ -250,7 +263,6 @@ export default function BaseChartContainer({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
         parentChartName={tierLevel === 0 ? widgetTitle : groupTitle}
       />
 
@@ -282,7 +294,7 @@ export default function BaseChartContainer({
                 endingRange: safeEndingRange,
                 tierLevel: tierLevel + 1,
                 chartId: tier.id,
-                projectId: tier.projectId || projectId,
+                projectId: tier.projectId || effectiveProjectId,
                 allUploadedData: tierData as any,
                 isPreview: isPreview,
                 breadcrumbPath: currentBreadcrumbs,

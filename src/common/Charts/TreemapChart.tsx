@@ -218,7 +218,6 @@ export default function TreemapChart({
     <>
       <ChartCardWrapper
         title={widgetTitle}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

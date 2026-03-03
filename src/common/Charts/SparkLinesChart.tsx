@@ -13,17 +13,26 @@ import {
 import {
   parseCommonChartData,
   generateHeatmapChartData,
+  extractLegendsFromXAxis,
 } from "./CompletedCharts/Common/chartUtils";
 
 export default function SparkLinesChart(props: BaseChartProps) {
   const getTierLegends = (tier: any): LegendValue[] => {
-    return (
-      tier.widgets?.map((w: any) => ({
+    const widgets = tier.widgets || [];
+    if (widgets.length > 0) {
+      return widgets.map((w: any) => ({
         label: w.legendName || w.label,
         color: w.color || "#13A490",
         field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
-      })) || []
-    );
+      }));
+    }
+    // Fallback if no widgets/metadata
+    const derived = extractLegendsFromXAxis(tier.xAxis);
+    return derived.map((lbl, idx) => ({
+      label: lbl,
+      field: lbl.toLowerCase().replace(/\s+/g, ""),
+      color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+    }));
   };
 
   const parseTierData = (xAxis: any, legends: LegendValue[], title: string) => {
@@ -48,11 +57,13 @@ export default function SparkLinesChart(props: BaseChartProps) {
         <div className="w-full h-[400px] flex flex-col gap-4 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
           {effectiveLegendValues.map((legend) => {
             // Extract numbers for this legend field across all data points
-            const dataPoints = chartData.map((d) => Number(d[legend.field]) || 0);
+            const dataPoints = chartData.map(
+              (d) => Number(d[legend.field]) || 0,
+            );
 
             return (
-              <div 
-                key={legend.field} 
+              <div
+                key={legend.field}
                 className="flex-1 flex flex-col min-h-[140px] bg-gray-50/40 rounded-xl p-4 border border-gray-100/60 transition-all hover:bg-gray-50/60 group"
               >
                 <div className="flex items-center justify-between mb-3">
@@ -67,30 +78,39 @@ export default function SparkLinesChart(props: BaseChartProps) {
                   </div>
                   {dataPoints.length > 0 && (
                     <div className="flex flex-col items-end">
-                       <span className="text-[9px] font-bold text-gray-300 uppercase leading-none mb-1">Latest Point</span>
-                       <span className="text-base font-mono font-black tracking-tight" style={{ color: legend.color }}>
-                         {dataPoints[dataPoints.length - 1]}
-                       </span>
+                      <span className="text-[9px] font-bold text-gray-300 uppercase leading-none mb-1">
+                        Latest Point
+                      </span>
+                      <span
+                        className="text-base font-mono font-black tracking-tight"
+                        style={{ color: legend.color }}
+                      >
+                        {dataPoints[dataPoints.length - 1]}
+                      </span>
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex-1 w-full relative min-h-0">
                   <Sparklines data={dataPoints} margin={5} height={60}>
                     <SparklinesLine
                       color={legend.color}
-                      style={{ 
-                        strokeWidth: 3, 
+                      style={{
+                        strokeWidth: 3,
                         stroke: legend.color,
                         fill: `${legend.color}10`,
-                        strokeLinecap: 'round',
-                        strokeLinejoin: 'round'
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round",
                       }}
                     />
                     <SparklinesSpots size={4} />
-                    <SparklinesReferenceLine 
-                      type="avg" 
-                      style={{ stroke: '#94a3b8', strokeDasharray: '6, 4', opacity: 0.6 }} 
+                    <SparklinesReferenceLine
+                      type="avg"
+                      style={{
+                        stroke: "#94a3b8",
+                        strokeDasharray: "6, 4",
+                        opacity: 0.6,
+                      }}
                     />
                   </Sparklines>
                 </div>

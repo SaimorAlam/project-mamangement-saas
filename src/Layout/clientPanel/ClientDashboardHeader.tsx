@@ -263,15 +263,13 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   };
 
   const handleDownloadCSV = async () => {
-    if (!projectIdFromState) {
+    if (!projectId) {
       toast.error("Project ID is missing");
       return;
     }
     const toastId = toast.loading("Downloading...");
     try {
-      const res = await getAllTheLeafChart(
-        projectIdFromState as string,
-      ).unwrap();
+      const res = await getAllTheLeafChart(projectId as string).unwrap();
       const groups = res?.data || [];
       // Flatten charts from all groups
       const allCharts = groups.flatMap((group: any) => group.charts || []);
@@ -353,7 +351,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             const rows = dataRows.map((row: any[]) =>
               row.map((cell: any, cIdx: number) => {
                 if (cIdx === 0) return cell; // Keep label
-                return " "; // Fill with spaces for user input
+                return 0; // Fill with 0 for user input
               }),
             );
 
@@ -378,7 +376,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             
             const rows = dataLabels
               .filter((lbl: any) => String(lbl || "").trim() !== "")
-              .map((lbl: any) => [String(lbl || ""), ...legends.map(() => " ")]);
+              .map((lbl: any) => [String(lbl || ""), ...legends.map(() => 0)]);
 
             currentAOA = [headers, ...rows];
           }
@@ -393,7 +391,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           const legends = nodeWidgets.map((w: any) => w.legendName || "Legend");
           if (legends.length > 0) {
             const headers = ["Label", ...legends];
-            currentAOA = [headers, ["Sample Entry", ...legends.map(() => " ")]];
+            currentAOA = [headers, ["Sample Entry", ...legends.map(() => 0)]];
           }
         }
 
