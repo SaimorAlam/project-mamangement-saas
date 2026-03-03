@@ -28,7 +28,7 @@ import StaffEmployeeGlobalSearch from "@/components/staffEmployee/StaffEmployeeG
 import StaffEmployeeNotificationModal from "@/components/staffEmployee/StaffEmployeeNotificationModal";
 import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
-import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+// import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 // import { setIsPreview } from "@/store/Slices/ChartSlice/ChartSlice";
 
 const StaffEmployeeDashboardHeader = () => {
