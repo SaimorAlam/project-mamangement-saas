@@ -102,16 +102,6 @@ const versions = [
     },
   },
   {
-    id: "7",
-    type: "date",
-    description: "Due Date changed from 24/04/2025 to 10/5/2025",
-    date: "26-7-2024",
-    changedBy: {
-      name: "Aubrey",
-      avatar: "https://i.pravatar.cc/150?u=Aubrey",
-    },
-  },
-  {
     id: "8",
     type: "date",
     description: "Due Date changed from 24/04/2025 to 10/5/2025",
@@ -123,6 +113,16 @@ const versions = [
   },
   {
     id: "9",
+    type: "date",
+    description: "Due Date changed from 24/04/2025 to 10/5/2025",
+    date: "26-7-2024",
+    changedBy: {
+      name: "Aubrey",
+      avatar: "https://i.pravatar.cc/150?u=Aubrey",
+    },
+  },
+  {
+    id: "10",
     type: "date",
     description: "Due Date changed from 24/04/2025 to 10/5/2025",
     date: "26-7-2024",
@@ -166,10 +166,13 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
 
   const filteredVersions = useMemo(() => {
     return versions.filter((v) => {
-      const matchesSearch = v.description.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = v.description
+        .toLowerCase()
+        .includes(search.toLowerCase());
       const matchesType = changeType === "all" || v.type === changeType;
       const matchesDate = dateFilter === "all" || v.date === dateFilter;
-      const matchesUser = userFilter === "all" || v.changedBy.name === userFilter;
+      const matchesUser =
+        userFilter === "all" || v.changedBy.name === userFilter;
       return matchesSearch && matchesType && matchesDate && matchesUser;
     });
   }, [search, changeType, dateFilter, userFilter]);
@@ -194,7 +197,7 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
       <div
         className={cn(
           "absolute right-0 top-14 w-[850px] bg-white rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-100",
-          className
+          className,
         )}
       >
         <div className="flex items-center justify-between p-6 bg-white border-b border-gray-100">
@@ -223,7 +226,9 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
 
           <div className="flex items-center gap-3 ml-auto">
             <div className="flex items-center gap-1.5 min-w-fit">
-              <span className="text-xs font-semibold text-gray-500 whitespace-nowrap">Changes:</span>
+              <span className="text-xs font-semibold text-gray-500 whitespace-nowrap">
+                Changes:
+              </span>
               <Select value={changeType} onValueChange={setChangeType}>
                 <SelectTrigger className="h-9 min-w-24 border-[#E4E7EC] text-xs font-medium">
                   <SelectValue placeholder="All" />
@@ -231,14 +236,18 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   {uniqueTypes.map((type) => (
-                    <SelectItem key={type} value={type} className="capitalize">{type.replace("_", " ")}</SelectItem>
+                    <SelectItem key={type} value={type} className="capitalize">
+                      {type.replace("_", " ")}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="flex items-center gap-1.5 min-w-fit">
-              <span className="text-xs font-semibold text-gray-500 whitespace-nowrap">Date:</span>
+              <span className="text-xs font-semibold text-gray-500 whitespace-nowrap">
+                Date:
+              </span>
               <Select value={dateFilter} onValueChange={setDateFilter}>
                 <SelectTrigger className="h-9 min-w-24 border-[#E4E7EC] text-xs font-medium">
                   <SelectValue placeholder="All" />
@@ -246,14 +255,18 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   {uniqueDates.map((date) => (
-                    <SelectItem key={date} value={date}>{date}</SelectItem>
+                    <SelectItem key={date} value={date}>
+                      {date}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="flex items-center gap-1.5 min-w-fit">
-              <span className="text-xs font-semibold text-gray-500 whitespace-nowrap">Changed By:</span>
+              <span className="text-xs font-semibold text-gray-500 whitespace-nowrap">
+                Changed By:
+              </span>
               <Select value={userFilter} onValueChange={setUserFilter}>
                 <SelectTrigger className="h-9 min-w-32 border-[#E4E7EC] text-xs font-medium">
                   <SelectValue placeholder="All" />
@@ -261,7 +274,9 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   {uniqueUsers.map((user) => (
-                    <SelectItem key={user} value={user}>{user}</SelectItem>
+                    <SelectItem key={user} value={user}>
+                      {user}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -290,7 +305,10 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
             <tbody className="bg-white divide-y divide-[#F2F4F7]">
               {filteredVersions.length > 0 ? (
                 filteredVersions.map((version) => (
-                  <tr key={version.id} className="hover:bg-gray-50/50 transition-colors group">
+                  <tr
+                    key={version.id}
+                    className="hover:bg-gray-50/50 transition-colors group"
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-[#F9FAFB] rounded-lg group-hover:bg-white transition-colors">
@@ -321,13 +339,22 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                     </td>
                     <td className="px-6 py-4 text-right pr-6">
                       <div className="flex items-center justify-end gap-3">
-                        <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer" title="Restore">
+                        <button
+                          className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                          title="Restore"
+                        >
                           <RotateCcw className="w-4 h-4" />
                         </button>
-                        <button className="p-2 text-teal-500 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer" title="Download">
+                        <button
+                          className="p-2 text-teal-500 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
+                          title="Download"
+                        >
                           <Download className="w-4 h-4" />
                         </button>
-                        <button className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Delete">
+                        <button
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                          title="Delete"
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -336,7 +363,10 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-6 py-10 text-center text-gray-500 text-sm">
+                  <td
+                    colSpan={4}
+                    className="px-6 py-10 text-center text-gray-500 text-sm"
+                  >
                     No versions found matching your filters.
                   </td>
                 </tr>
@@ -350,4 +380,3 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
 };
 
 export default VersionHistoryModal;
-
