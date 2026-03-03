@@ -94,16 +94,22 @@ export const downloadChartDataAsExcel = async (
       ids.push(node.id);
       
       let xAxis: string[] = node.xAxisValues || [];
-      if (!xAxis.length && node.xAxis) {
+      let rawDataRows: any[][] = [];
+
+      if (node.xAxis) {
         try {
-          const parsed = typeof node.xAxis === "string" ? JSON.parse(node.xAxis) : node.xAxis;
+          const parsed =
+            typeof node.xAxis === "string" ? JSON.parse(node.xAxis) : node.xAxis;
 
           if (Array.isArray(parsed)) {
             if (parsed.length > 0 && Array.isArray(parsed[0])) {
               // Smart header detection: a header row has legend labels (strings) in data columns.
               // We skip it because the download process manually adds a header row.
-              const hasHeader = parsed[0].length > 1 && typeof parsed[0][1] === "string";
-              xAxis = (hasHeader ? parsed.slice(1) : parsed).map((row: any) => row[0]);
+              const hasHeader =
+                parsed[0].length > 1 && typeof parsed[0][1] === "string";
+              const dataRows = hasHeader ? parsed.slice(1) : parsed;
+              xAxis = dataRows.map((row: any) => String(row[0] || ""));
+              rawDataRows = dataRows;
             } else {
               xAxis = parsed;
             }
@@ -119,8 +125,9 @@ export const downloadChartDataAsExcel = async (
       const xAxisItems = xAxis.length > 0 ? xAxis : effectiveXAxisValues;
 
       let legends = node.legendValues || [];
-      const nodeWidgets = node.widgets || node.barChart?.widgets || node[chartType]?.widgets;
-      
+      const nodeWidgets =
+        node.widgets || node.barChart?.widgets || node[chartType]?.widgets;
+
       if (!legends.length && nodeWidgets) {
         legends = nodeWidgets.map((w: any) => ({
           label: w.legendName || w.label || "Legend",
@@ -135,10 +142,17 @@ export const downloadChartDataAsExcel = async (
       const finalLegends = legends.length > 0 ? legends : effectiveLegendValues;
 
       const headers = ["Label", ...finalLegends.map((l: any) => l.label)];
-      const rows = xAxisItems.map((label: string) => [
-        label,
-        ...Array(finalLegends.length).fill(0),
-      ]);
+      const rows = xAxisItems.map((label: string, rowIndex: number) => {
+        const apiRow = rawDataRows[rowIndex] || [];
+        return [
+          label,
+          ...finalLegends.map((_: any, colIndex: number) => {
+            // apiRow[0] is the label, so values start at colIndex + 1
+            const val = apiRow[colIndex + 1];
+            return val !== undefined && val !== null ? val : 0;
+          }),
+        ];
+      });
       const data = [headers, ...rows];
       const ws = XLSX.utils.aoa_to_sheet(data);
       const sheetName = getUniqueSheetNameInside(node.title || node.name || "Tier", node.id);

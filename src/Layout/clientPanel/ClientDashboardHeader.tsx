@@ -351,7 +351,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             const rows = dataRows.map((row: any[]) =>
               row.map((cell: any, cIdx: number) => {
                 if (cIdx === 0) return cell; // Keep label
-                return 0; // Fill with 0 for user input
+                return cell !== undefined && cell !== null ? cell : 0;
               }),
             );
 
@@ -416,9 +416,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         ids.length > 5 ? ids.slice(0, 5).join("_") + "_more" : ids.join("_");
       XLSX.writeFile(
         wb,
-        `${projectName || "Project"}_Template_${filenameIds}.xlsx`,
+        `${projectName || "Project"}_Data_${filenameIds}.xlsx`,
       );
-      toast.success("Excel template downloaded successfully", { id: toastId });
+      toast.success("Excel downloaded successfully", { id: toastId });
     } catch (error) {
       console.error("Excel download failed", error);
       toast.error("Failed to download Excel", { id: toastId });
