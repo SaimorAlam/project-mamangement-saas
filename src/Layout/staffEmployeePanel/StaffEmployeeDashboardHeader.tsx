@@ -29,17 +29,17 @@ import StaffEmployeeNotificationModal from "@/components/staffEmployee/StaffEmpl
 import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
-import { setIsPreview } from "@/store/Slices/ChartSlice/ChartSlice";
+// import { setIsPreview } from "@/store/Slices/ChartSlice/ChartSlice";
 
 const StaffEmployeeDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
   // Mirror client panel: read isPreview from Redux
-  const { isPreview } = useAppSelector((state) => state.chartSlice);
+  // const { isPreview } = useAppSelector((state) => state.chartSlice);
 
   const { breadcrumb } = useHeaderContext();
   const { name } = useGetUser();
@@ -295,22 +295,52 @@ const StaffEmployeeDashboardHeader = () => {
   const previewButtonPaths = ["/staff-employee-panel/project-builder"];
   const saveDraftButtonPaths = ["/staff-employee-panel/project-builder"];
 
+  // ── Status badge colour helper ────────────────────────────────────────────
+  const statusColor = (status?: string) => {
+    const s = (status || "").toLowerCase();
+    if (s === "active" || s === "live") return "bg-green-100 text-green-700";
+    if (s === "draft") return "bg-yellow-100 text-yellow-700";
+    if (s === "pending") return "bg-orange-100 text-orange-700";
+    if (s === "completed") return "bg-blue-100 text-blue-700";
+    return "bg-gray-100 text-gray-600";
+  };
+
+  const projectStatus = projectData?.data?.project?.status;
+
   return (
     <div>
       <div className="flex flex-col md:flex-row items-start gap-5 py-5 justify-between">
-        {/* Greeting */}
+        {/* Greeting / Project Title */}
         <div className="max-w-xl flex items-center gap-4">
           <SidebarTrigger className="md:hidden shrink-0" />
           <div className="max-w-xl">
-            <h1 className="text-[32px] font-semibold">
-              Hi, {name ? name : "Mr./Mrs. Employee"}
-            </h1>
-            <div className="flex items-center gap-2">
-              <p className="text-base text-gray-500">{breadcrumb}</p>
-            </div>
+            {isOnProjectDetails && projectName ? (
+              <>
+                <h1 className="text-[28px] font-bold truncate">{projectName}</h1>
+                {projectStatus && (
+                  <span
+                    className={`inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-semibold capitalize ${statusColor(projectStatus)}`}
+                  >
+                    {projectStatus}
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                <h1 className="text-[32px] font-semibold">
+                  Hi, {name ? name : "Mr./Mrs. Employee"}
+                </h1>
+                <div className="flex items-center gap-2">
+                  <p className="text-base text-gray-500">{breadcrumb}</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
+        {/* {!isOnProjectDetails && (
+          <StaffEmployeeGlobalSearch />
+        )} */}
         <StaffEmployeeGlobalSearch />
 
         {/* Right Controls */}
@@ -350,7 +380,15 @@ const StaffEmployeeDashboardHeader = () => {
             />
           )}
 
-          {/* ── Project-details buttons (mirrors client panel project builder) ── */}
+          {/* ── Upload Submission (always visible except on project-details where it appears below) ── */}
+          {!isOnProjectDetails && (
+            <PrimaryButton
+              leftIcon={<Upload className="text-2xl" />}
+              title="Upload Submission"
+              type="Primary"
+              onClick={handleUploadSubmission}
+            />
+          )}
           {isOnProjectDetails && (
             <>
               {/* Preview toggle — same Redux action as client panel */}
@@ -359,6 +397,7 @@ const StaffEmployeeDashboardHeader = () => {
                 type="Outline"
                 onClick={() => dispatch(setIsPreview(!isPreview))}
               /> */}
+              {/* <DateRangePicker /> */}
 
               {/* Save as Draft — same UX as client panel */}
               <PrimaryButton

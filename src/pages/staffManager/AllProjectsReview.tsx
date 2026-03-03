@@ -17,7 +17,6 @@ import {
 import {
   ChevronDown,
   Eye,
-  PencilLine,
   Trash2,
   Calendar as CalendarIcon,
 } from "lucide-react";
@@ -398,17 +397,26 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                           className="text-blue-600 cursor-pointer"
                           onClick={() => {
                             setSelectedSubmission(project);
-                            navigate(`/staff-manager-panel/projects/project-details/${project.id}`)
+                            navigate(
+                              `/staff-manager-panel/projects/project-details/${project.project.id}`,
+                              {
+                                state: {
+                                  submissionId: project.id,
+                                  employeeName: project?.employee?.user?.name ?? "Employee",
+                                  fromReview: true,
+                                },
+                              }
+                            );
                           }}
                         />
-                        <PencilLine
+                        {/* <PencilLine
                           size={18}
                           className="text-green-600 cursor-pointer"
                           onClick={() => {
                             setSelectedSubmission(project);
                             setReviewOpen(true);
                           }}
-                        />
+                        /> */}
                         <Trash2
                           size={18}
                           className="text-red-600 cursor-pointer"

@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { UploadCloud, ChevronDown, Upload, Calendar } from "lucide-react";
+import { UploadCloud, ChevronDown, Upload } from "lucide-react";
 import { FaRoad } from "react-icons/fa";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
@@ -13,6 +11,7 @@ import * as XLSX from "xlsx";
 import { useCreateEmployeeSubmissionMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import DateRangePicker from "@/components/client/DateRange";
 
 const UploadProject = () => {
   // ── URL search params (set when navigating from project details) ──────────
@@ -25,15 +24,10 @@ const UploadProject = () => {
   const [project, setProject] = useState(presetProjectId);
   const [information, setInformation] = useState("");
   const [ipAddress, setIpAddress] = useState<string>("::1");
-  const [dateOption, setDateOption] = useState("last1week");
-  const [customStartDate, setCustomStartDate] = useState<Date | null>(null);
-  const [customEndDate, setCustomEndDate] = useState<Date | null>(null);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [addNotes, setAddNotes] = useState(false);
   const [projectNote, setProjectNote] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const datePickerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   // Sync URL params → state if params change
@@ -81,30 +75,6 @@ const UploadProject = () => {
     [leafChartsData]
   );
 
-  // ── Date options ──────────────────────────────────────────────────────────
-  const dateOptions = [
-    { value: "last1week", label: "Last 1 Week" },
-    { value: "last1month", label: "Last 1 Month" },
-    { value: "last3months", label: "Last 3 Months" },
-    { value: "custom", label: "Custom Range" },
-  ];
-
-  const handleDateOptionChange = (value: string) => {
-    setDateOption(value);
-    if (value !== "custom") {
-      setIsDatePickerOpen(false);
-      const end = new Date();
-      const start = new Date();
-      if (value === "last1week") start.setDate(end.getDate() - 7);
-      if (value === "last1month") start.setMonth(end.getMonth() - 1);
-      if (value === "last3months") start.setMonth(end.getMonth() - 3);
-      setCustomStartDate(start);
-      setCustomEndDate(end);
-    } else {
-      setIsDatePickerOpen(true);
-    }
-  };
-
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) setFile(selectedFile);
@@ -139,17 +109,15 @@ const UploadProject = () => {
     if (!currentProjectBelongs) setProject("");
   };
 
-  // ── Helper: resolve full chart UUID from an 8-char sheet-name suffix ─────
-  // The download function appends `_${id.slice(-8)}` to sheet names.
-  // We match that suffix against the leaf chart list to recover the full UUID.
+  // ── Helper: resolve full chart UUID from an 8-char sheet-name suffix ──────
   const resolveChartId = (idSuffix: string): string => {
     if (!idSuffix) return idSuffix;
     const matched = allLeafCharts.find(
       (c: any) =>
-        c.id === idSuffix ||           // exact match (full ID stored as-is)
-        c.id?.slice(-8) === idSuffix   // standard: last 8 chars match
+        c.id === idSuffix ||
+        c.id?.slice(-8) === idSuffix
     );
-    return matched?.id ?? idSuffix; // fallback to raw suffix if no match
+    return matched?.id ?? idSuffix;
   };
 
   // ── Submit ────────────────────────────────────────────────────────────────
@@ -174,18 +142,6 @@ const UploadProject = () => {
           return;
         }
 
-        /**
-         * Build arrays for BOTH APIs:
-         *
-         * 1. `chartsPayload` → uploadChartData (PATCH /chart/bulk/value-change)
-         *    This is what actually writes the values into the chart DB records.
-         *    Format matches the client panel's FileUpload.tsx exactly:
-         *      { id: fullChartUUID, xAxis, yAxis, zAxis }
-         *
-         * 2. `elements` → createEmployeeSubmission (POST /submitted)
-         *    This creates the submission record for manager review.
-         *      { chartId: fullChartUUID, xAxis, yAxis, zAxis }
-         */
         const chartsPayload: any[] = [];
         const elements: any[] = [];
 
@@ -193,7 +149,6 @@ const UploadProject = () => {
           const sheet = workbook.Sheets[sheetName];
           const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-          // Extract ID suffix (everything after the last underscore)
           const lastUnderscoreIndex = sheetName.lastIndexOf("_");
           let idSuffix = sheetName;
           if (lastUnderscoreIndex !== -1) {
@@ -201,29 +156,13 @@ const UploadProject = () => {
           }
           if (!idSuffix) idSuffix = sheetName;
 
-          // Resolve full chart UUID
           const fullChartId = resolveChartId(idSuffix);
-
-          // xAxis format matches client panel: { labels: <2D array from sheet> }
           const xAxisStr = JSON.stringify({ labels: jsonData });
           const yAxisStr = JSON.stringify({ values: [] });
           const zAxisStr = JSON.stringify({ values: [] });
 
-          // For uploadChartData (client-panel compatible format)
-          chartsPayload.push({
-            id: fullChartId,
-            xAxis: xAxisStr,
-            yAxis: yAxisStr,
-            zAxis: zAxisStr,
-          });
-
-          // For createEmployeeSubmission
-          elements.push({
-            chartId: fullChartId,
-            xAxis: xAxisStr,
-            yAxis: yAxisStr,
-            zAxis: zAxisStr,
-          });
+          chartsPayload.push({ id: fullChartId, xAxis: xAxisStr, yAxis: yAxisStr, zAxis: zAxisStr });
+          elements.push({ chartId: fullChartId, xAxis: xAxisStr, yAxis: yAxisStr, zAxis: zAxisStr });
         });
 
         if (chartsPayload.length === 0) {
@@ -240,7 +179,7 @@ const UploadProject = () => {
             { id: toastId }
           );
 
-          // ── Step 2: Create submission record for manager review ───────────────
+          // ── Step 2: Create submission record for manager review ──────────────
           const submissionPayload = {
             information: information || "Submission from staff employee panel",
             submission: projectNote || "Draft submission for manager review",
@@ -258,18 +197,14 @@ const UploadProject = () => {
           setInformation("");
 
           // Navigate back to the project details page
-          navigate(
-            `/staff-employee-panel/projects/project-details/${project}`
-          );
+          navigate(`/staff-employee-panel/projects/project-details/${project}`);
         } catch (apiError: unknown) {
           console.error("API Error:", apiError);
           const err = apiError as {
             data?: { message?: string };
             status?: number;
           };
-          toast.error(
-            err?.data?.message || "Failed to submit. Please try again."
-          );
+          toast.error(err?.data?.message || "Failed to submit. Please try again.");
         }
       };
 
@@ -290,15 +225,13 @@ const UploadProject = () => {
           Upload Project Submission
         </h2>
 
-        {preselected && (
+        {preselected ? (
           <p className="text-center text-xs text-blue-600 mb-6">
             Program and project are pre-selected from the project details page.
           </p>
-        )}
-        {!preselected && (
+        ) : (
           <p className="text-center text-sm text-gray-500 mb-6">
-            Select a Program &amp; Project first, then upload your filled Excel
-            template.
+            Select a Program &amp; Project first, then upload your filled Excel template.
           </p>
         )}
 
@@ -320,10 +253,7 @@ const UploadProject = () => {
                 )
               )}
             </select>
-            <ChevronDown
-              className="absolute right-3 top-2.5 text-gray-500"
-              size={16}
-            />
+            <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
           </div>
         </div>
 
@@ -346,10 +276,7 @@ const UploadProject = () => {
                 </option>
               ))}
             </select>
-            <ChevronDown
-              className="absolute right-3 top-2.5 text-gray-500"
-              size={16}
-            />
+            <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
           </div>
         </div>
 
@@ -369,102 +296,34 @@ const UploadProject = () => {
         {project && leafChartsData?.data && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
             <p className="text-xs text-blue-700 font-medium">
-              {allLeafCharts.length} chart(s) found for this project. Upload
-              the Excel file downloaded from the project details page — each
-              sheet corresponds to one chart and will update its values
-              directly.
+              {allLeafCharts.length} chart(s) found for this project. Upload the
+              Excel file downloaded from the project details page — each sheet
+              corresponds to one chart and will update its values directly.
             </p>
           </div>
         )}
 
-        {/* Date Range Selector */}
+        {/* Date Range Selector – shared DateRangePicker */}
         <div className="mb-8">
-          <label className="text-sm mb-1 block">
-            Data Upload Date Range *
-          </label>
-          <div className="relative" ref={datePickerRef}>
-            <div
-              onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
-              className="w-full bg-gray-50 border border-gray-200 text-black px-4 py-2 rounded-md flex items-center justify-between cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <Calendar size={16} className="text-gray-500" />
-                <span className="text-sm">
-                  {dateOptions.find((opt) => opt.value === dateOption)
-                    ?.label || "Select date range"}
-                </span>
-              </div>
-              <ChevronDown
-                className={`text-gray-500 transition-transform ${isDatePickerOpen ? "rotate-180" : ""
-                  }`}
-                size={16}
-              />
-            </div>
-
-            {isDatePickerOpen && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg">
-                {dateOptions.map((option) => (
-                  <div
-                    key={option.value}
-                    onClick={() => handleDateOptionChange(option.value)}
-                    className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                  >
-                    {option.label}
-                    {dateOption === option.value && (
-                      <span className="text-blue-500">✓</span>
-                    )}
-                  </div>
-                ))}
-
-                {dateOption === "custom" && (
-                  <div className="p-4 border-t border-gray-200">
-                    <DatePicker
-                      selected={customStartDate}
-                      onChange={(dates: [Date | null, Date | null]) => {
-                        const [start, end] = dates;
-                        setCustomStartDate(start);
-                        setCustomEndDate(end);
-                        if (end) setIsDatePickerOpen(false);
-                      }}
-                      startDate={customStartDate}
-                      endDate={customEndDate}
-                      selectsRange
-                      inline
-                      calendarClassName="custom-datepicker"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {(customStartDate || customEndDate) && (
-            <p className="text-xs text-gray-500 mt-2">
-              Selected: {customStartDate?.toLocaleDateString()} –{" "}
-              {customEndDate?.toLocaleDateString() || "Ongoing"}
-            </p>
-          )}
+          <label className="text-sm mb-2 block">Data Upload Date Range *</label>
+          <DateRangePicker />
         </div>
 
         {/* Upload drop zone */}
-        {program && project && dateOption && !file && (
+        {program && project && !file && (
           <>
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
                 <FaRoad size={32} className="text-gray-500" />
               </div>
             </div>
-
             <h3 className="text-center text-lg font-semibold mb-2">
               No File Added Yet
             </h3>
-
             <p className="text-center text-sm text-gray-400 mb-6">
-              Upload the Excel file you downloaded from the project details
-              page. Each sheet corresponds to one chart and its values will be
-              updated immediately.
+              Upload the Excel file you downloaded from the project details page.
+              Each sheet corresponds to one chart and its values will be updated immediately.
             </p>
-
             <div
               onDrop={handleDrop}
               onDragOver={handleDragOver}
@@ -485,11 +344,9 @@ const UploadProject = () => {
                 />
               </label>
             </div>
-
             <p className="text-xs text-gray-500 text-center mb-6">
               Supported formats: .xlsx | Max file size: 10 MB
             </p>
-
             <div className="flex justify-center mb-4">
               <button
                 onClick={handleImportClick}
@@ -499,7 +356,6 @@ const UploadProject = () => {
                 Import Project File
               </button>
             </div>
-
             <input
               ref={fileInputRef}
               type="file"
@@ -513,14 +369,11 @@ const UploadProject = () => {
         {/* Selected file confirmation */}
         {file && (
           <div className="bg-gray-900 border border-gray-700 rounded-md p-4 text-center mb-6">
-            <p className="text-sm text-green-400 mb-2">
-              File Selected Successfully
-            </p>
+            <p className="text-sm text-green-400 mb-2">File Selected Successfully</p>
             <p className="text-xs text-gray-300">{file.name}</p>
             {allLeafCharts.length > 0 && (
               <p className="text-xs text-blue-400 mt-1">
-                {allLeafCharts.length} chart(s) will be updated when you
-                submit.
+                {allLeafCharts.length} chart(s) will be updated when you submit.
               </p>
             )}
           </div>
@@ -540,7 +393,6 @@ const UploadProject = () => {
                 Add Notes for Project Admin/Manager
               </span>
             </div>
-
             <textarea
               value={projectNote}
               onChange={(e) => setProjectNote(e.target.value)}
@@ -548,7 +400,6 @@ const UploadProject = () => {
               placeholder="Write a short description…"
               className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm resize-none h-32 disabled:bg-gray-50 disabled:text-gray-400"
             />
-
             <div className="flex justify-between mt-6">
               <button
                 onClick={handleClearData}
@@ -556,12 +407,12 @@ const UploadProject = () => {
               >
                 Cancel
               </button>
-
               <PrimaryButton
                 leftIcon={<Upload className="text-2xl" />}
                 title={isProcessing ? "Processing…" : "Submit for Review"}
                 type={"Primary"}
                 onClick={handleSubmit}
+                disabled={isProcessing}
               />
             </div>
           </div>
