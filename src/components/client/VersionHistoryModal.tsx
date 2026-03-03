@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import {
   X,
   Search,
-  ChevronDown,
   RotateCcw,
   Download,
   Trash2,
