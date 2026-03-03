@@ -22,7 +22,6 @@ export const downloadChartDataAsExcel = async (
   widgetTitle: string,
   effectiveXAxisValues: string[],
   effectiveLegendValues: LegendValue[],
-  numOfLegendDataSet: number = 3,
   setIsDownloading: (loading: boolean) => void,
   chartType: ChartExcelType = "areaChart",
   chartId?: string,
@@ -59,7 +58,7 @@ export const downloadChartDataAsExcel = async (
       const headers = ["Label", ...effectiveLegendValues.map((l) => l.label)];
       const rows = effectiveXAxisValues.map((label) => [
         label,
-        ...Array(effectiveLegendValues.length).fill(""),
+        ...Array(effectiveLegendValues.length).fill(0),
       ]);
       const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
       XLSX.utils.book_append_sheet(wb, ws, widgetTitle.substring(0, 31));
@@ -138,7 +137,7 @@ export const downloadChartDataAsExcel = async (
       const headers = ["Label", ...finalLegends.map((l: any) => l.label)];
       const rows = xAxisItems.map((label: string) => [
         label,
-        ...Array(numOfLegendDataSet).fill(0),
+        ...Array(finalLegends.length).fill(0),
       ]);
       const data = [headers, ...rows];
       const ws = XLSX.utils.aoa_to_sheet(data);

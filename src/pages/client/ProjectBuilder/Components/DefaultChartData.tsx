@@ -103,21 +103,35 @@ const DefaultChartData = ({ projectsChartsData }: any) => {
             field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
           })) || [];
 
-        let legendValues = getEffectiveLegendValues(rawLegendValues);
+        // Pass empty array as default to detect if we need fallback
+        let legendValues = getEffectiveLegendValues(rawLegendValues, []);
 
-        // Special fallback for AREA/SPLINE if no widgets/legends defined
+        // Special fallback for major chart types if no widgets/legends defined
         if (
           legendValues.length === 0 &&
-          (categoryKey === "AREA" || categoryKey === "SPLINE")
+          [
+            "AREA",
+            "SPLINE",
+            "HEATMAP",
+            "BAR",
+            "COLUMN",
+            "LINE",
+            "HORIZONTAL_BAR",
+          ].includes(categoryKey)
         ) {
           const extracted = extractLegendsFromXAxis(xAxisData);
           if (extracted.length > 0) {
-            legendValues = extracted.map((label: string) => ({
+            legendValues = extracted.map((label: string, idx: number) => ({
               label,
-              color: categoryKey === "AREA" ? "#13A490" : "#3b82f6",
+              color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
               field: label.toLowerCase().replace(/\s+/g, ""),
             }));
           }
+        }
+
+        // Final fallback to samples if still empty
+        if (legendValues.length === 0) {
+          legendValues = getEffectiveLegendValues([]);
         }
 
         // Special case for PARETO which usually has a fixed legend "Pareto"

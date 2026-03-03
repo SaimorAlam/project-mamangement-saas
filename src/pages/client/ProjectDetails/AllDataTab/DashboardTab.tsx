@@ -110,17 +110,23 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "HORIZONTAL_BAR") {
-            const legendValues = (
-              chartData?.widgets ||
-              item?.widgets ||
-              []
-            ).map((w: any) => ({
+            const rawWidgets = (chartData?.widgets || item?.widgets) || [];
+            let legendValues = rawWidgets.map((w: any) => ({
               label: w.legendName || w.label,
               color: w.color,
               field: (w.legendName || w.label)
                 ?.toLowerCase()
                 .replace(/\s+/g, ""),
             }));
+
+            if (legendValues.length === 0) {
+              const derived = extractLegendsFromXAxis(item?.xAxis);
+              legendValues = derived.map((lbl, idx) => ({
+                label: lbl,
+                color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+                field: lbl.toLowerCase().replace(/\s+/g, ""),
+              }));
+            }
 
             const { labels, data } = parseHorizontalBarData(
               item?.xAxis,
@@ -188,17 +194,25 @@ const DashboardTab = () => {
               />
             );
           }
-
           if (categoryKey === "HEATMAP") {
             const heatmapConfig = item?.heatmap || chartData;
-            const legendValues =
-              (heatmapConfig?.widgets || [])?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+            const rawWidgets = heatmapConfig?.widgets || [];
+            let legendValues = rawWidgets.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            }));
+
+            if (legendValues.length === 0) {
+              const derived = extractLegendsFromXAxis(item?.xAxis);
+              legendValues = derived.map((lbl, idx) => ({
+                label: lbl,
+                color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+                field: lbl.toLowerCase().replace(/\s+/g, ""),
+              }));
+            }
 
             const { labels, data } = parseHeatmapChartData(
               item?.xAxis,
@@ -258,16 +272,25 @@ const DashboardTab = () => {
           }
 
           if (categoryKey === "COLUMN") {
-            const legendValues =
-              (chartData?.widgets || item?.widgets)?.map((w: any) => ({
-                label: w.legendName || w.label,
-                color: w.color,
-                field: (w.legendName || w.label)
-                  ?.toLowerCase()
-                  .replace(/\s+/g, ""),
-              })) || [];
+            const rawWidgets = (chartData?.widgets || item?.widgets) || [];
+            let legendValues = rawWidgets.map((w: any) => ({
+              label: w.legendName || w.label,
+              color: w.color,
+              field: (w.legendName || w.label)
+                ?.toLowerCase()
+                .replace(/\s+/g, ""),
+            }));
 
-            const { labels } = parseXAxisData(
+            if (legendValues.length === 0) {
+              const derived = extractLegendsFromXAxis(item?.xAxis);
+              legendValues = derived.map((lbl, idx) => ({
+                label: lbl,
+                color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+                field: lbl.toLowerCase().replace(/\s+/g, ""),
+              }));
+            }
+
+            const { labels, data } = parseXAxisData(
               item?.xAxis,
               legendValues,
               item?.title,
@@ -283,6 +306,8 @@ const DashboardTab = () => {
                 startingRange={chartData?.firstFieldDataset}
                 endingRange={chartData?.lastFieldDataset}
                 chartId={item?.id}
+                projectId={projectId}
+                allUploadedData={data}
                 isPreview={true}
               />
             );

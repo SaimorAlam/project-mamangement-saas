@@ -7,6 +7,7 @@ import { BaseChartProps } from "../Common/chartTypes";
 import {
   parseCommonChartData,
   generateHeatmapChartData,
+  extractLegendsFromXAxis,
 } from "../Common/chartUtils";
 import BaseChartContainer from "../Common/BaseChartContainer";
 
@@ -33,14 +34,24 @@ export default function HeatmapChartNew(props: BaseChartProps) {
   } | null>(null);
 
   const getTierLegends = (tier: any) => {
-      const heatmapConfig = tier?.heatmap || tier;
-      return (heatmapConfig?.widgets || []).map((w: any) => ({
-          label: w.legendName || w.label,
-          field: (w.legendName || w.label)
-              ?.toLowerCase()
-              .replace(/\s+/g, ""),
-          color: w.color,
+    const heatmapConfig = tier?.heatmap || tier;
+    const widgets = heatmapConfig?.widgets || tier?.widgets || [];
+
+    if (widgets.length > 0) {
+      return widgets.map((w: any) => ({
+        label: w.legendName || w.label,
+        field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
+        color: w.color,
       }));
+    }
+
+    // Fallback if no widgets/metadata
+    const derived = extractLegendsFromXAxis(tier.xAxis);
+    return derived.map((lbl, idx) => ({
+      label: lbl,
+      field: lbl.toLowerCase().replace(/\s+/g, ""),
+      color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
+    }));
   };
 
   const getColor = (value: number, start: number, end: number) => {

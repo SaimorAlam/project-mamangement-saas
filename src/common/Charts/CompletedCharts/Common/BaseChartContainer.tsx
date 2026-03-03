@@ -159,7 +159,6 @@ export default function BaseChartContainer({
         widgetTitle,
         effectiveXAxisValues,
         effectiveLegendValues,
-        numOfLegendDataSet,
         setIsDownloading,
         excelType,
         chartId,
