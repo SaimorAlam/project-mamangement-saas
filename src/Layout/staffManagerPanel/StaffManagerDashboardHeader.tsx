@@ -43,7 +43,6 @@ import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import {
   useEditSubmissionMutation,
 } from "@/store/Api/staffManagerApi/StaffManagerApi";
-import DateRangePicker from "@/components/client/DateRange";
 
 const StaffManagerDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -106,11 +105,37 @@ const StaffManagerDashboardHeader = () => {
     };
   }, [currentPath, locationState]);
 
-  // ── Fetch project name for breadcrumb / download ──────────────────────────
+  // ── Fetch project (name + status + programId) ──────────────────────────────
   const { data: projectData } = useGetProjectByIdQuery(projectId as string, {
     skip: !projectId,
   });
   const projectName = projectData?.data?.project?.name;
+  const projectStatus = projectData?.data?.project?.status;
+  const programId =
+    projectData?.data?.project?.program?.id ??
+    projectData?.data?.project?.programId ??
+    null;
+
+  // ── Navigate to Upload Submission (with or without pre-filled IDs) ──────────
+  const handleUploadSubmission = () => {
+    if (projectIdFromUrl && programId) {
+      navigate(
+        `/staff-manager-panel/projects/upload-submission?projectId=${projectIdFromUrl}&programId=${programId}`
+      );
+    } else {
+      navigate("/staff-manager-panel/projects/upload-submission");
+    }
+  };
+
+  // ── Status badge colour helper ─────────────────────────────────────────────
+  const statusColor = (status?: string) => {
+    const s = (status || "").toLowerCase();
+    if (s === "active" || s === "live") return "bg-green-100 text-green-700";
+    if (s === "draft") return "bg-yellow-100 text-yellow-700";
+    if (s === "pending") return "bg-orange-100 text-orange-700";
+    if (s === "completed") return "bg-blue-100 text-blue-700";
+    return "bg-gray-100 text-gray-600";
+  };
 
   // ── Chart download (mirrors client / employee panel logic) ─────────────────
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
@@ -336,15 +361,31 @@ const StaffManagerDashboardHeader = () => {
   return (
     <div className="flex flex-col gap-2 py-5">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
+        {/* Greeting / Project Title */}
         <div className="flex items-center gap-4 min-w-0">
           <SidebarTrigger className="md:hidden shrink-0" />
           <div className="min-w-0">
-            <h1 className="text-2xl md:text-[32px] font-semibold truncate">
-              Good Afternoon {userName || name}, 👋
-            </h1>
-            <p className="text-sm md:text-base text-gray-500 truncate">
-              This is dashboard overview of Acme Corporation
-            </p>
+            {isPage.projectDetails && projectName ? (
+              <>
+                <h1 className="text-[28px] font-bold truncate">{projectName}</h1>
+                {projectStatus && (
+                  <span
+                    className={`inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-semibold capitalize ${statusColor(projectStatus)}`}
+                  >
+                    {projectStatus}
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                <h1 className="text-2xl md:text-[32px] font-semibold truncate">
+                  Good Afternoon {userName || name}, 👋
+                </h1>
+                <p className="text-sm md:text-base text-gray-500 truncate">
+                  This is dashboard overview of Acme Corporation
+                </p>
+              </>
+            )}
           </div>
         </div>
 
@@ -419,12 +460,29 @@ const StaffManagerDashboardHeader = () => {
             </>
           )}
 
-          {/* ── Project-details buttons (download + submit) ──────────────── */}
+          {/* ── Project-details buttons (download + upload submission) ─────────────── */}
           {isPage.projectDetails && !isPage.projectBuilder && (
+            <>
+              <PrimaryButton
+                leftIcon={<Download />}
+                type="Primary"
+                onClick={handleDownloadCharts}
+              />
+              <PrimaryButton
+                leftIcon={<Upload />}
+                type="Primary"
+                onClick={handleUploadSubmission}
+              />
+            </>
+          )}
+
+          {/* ── Upload Submission on non-project-details pages ────────────────── */}
+          {!isPage.projectDetails && !isPage.projectBuilder && (
             <PrimaryButton
-              leftIcon={<Download />}
+              leftIcon={<Upload />}
+              title="Upload Submission"
               type="Primary"
-              onClick={handleDownloadCharts}
+              onClick={handleUploadSubmission}
             />
           )}
 

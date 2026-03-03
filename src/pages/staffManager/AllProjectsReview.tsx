@@ -410,14 +410,14 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                             );
                           }}
                         />
-                        <PencilLine
+                        {/* <PencilLine
                           size={18}
                           className="text-green-600 cursor-pointer"
                           onClick={() => {
                             setSelectedSubmission(project);
                             setReviewOpen(true);
                           }}
-                        />
+                        /> */}
                         <Trash2
                           size={18}
                           className="text-red-600 cursor-pointer"
