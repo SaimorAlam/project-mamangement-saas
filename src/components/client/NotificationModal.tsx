@@ -380,9 +380,7 @@ export default function NotificationModal({
                 "/placeholder.svg";
               const displayInitials =
                 senderInfo?.initials ||
-                (notification?.sender?.name ||
-                  notification?.user?.name ||
-                  "S")
+                (notification?.sender?.name || notification?.user?.name || "S")
                   .substring(0, 2)
                   .toUpperCase();
 
@@ -393,7 +391,9 @@ export default function NotificationModal({
                     "p-5 border-b border-gray-100 transition-all cursor-pointer hover:bg-gray-50 relative",
                     !isRead ? "bg-blue-50/40" : "bg-white",
                   )}
-                  onClick={() => handleNotificationClick(notification.id, isRead)}
+                  onClick={() =>
+                    handleNotificationClick(notification.id, isRead)
+                  }
                 >
                   {!isRead && (
                     <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-blue-600 rounded-full" />
@@ -538,7 +538,6 @@ export default function NotificationModal({
             </div>
           )}
         </div>
-
       </div>
     </>
   );
