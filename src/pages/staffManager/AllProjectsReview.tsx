@@ -398,7 +398,16 @@ const AllProjectsReview = ({ title = "All Projects" }: IProjectTableProps) => {
                           className="text-blue-600 cursor-pointer"
                           onClick={() => {
                             setSelectedSubmission(project);
-                            navigate(`/staff-manager-panel/projects/project-details/${project.id}`)
+                            navigate(
+                              `/staff-manager-panel/projects/project-details/${project.project.id}`,
+                              {
+                                state: {
+                                  submissionId: project.id,
+                                  employeeName: project?.employee?.user?.name ?? "Employee",
+                                  fromReview: true,
+                                },
+                              }
+                            );
                           }}
                         />
                         <PencilLine
