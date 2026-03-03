@@ -7,7 +7,13 @@ import React, {
   isValidElement,
   useMemo,
 } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import * as XLSX from "xlsx";
 import SearchBar from "@/components/client/SearchBar";
 import PrimaryButton from "@/common/PrimaryButton";
@@ -26,6 +32,13 @@ import {
   Download,
   Layers,
   Briefcase,
+  MapPin,
+  GitBranch,
+  List,
+  LayoutGrid,
+  Clock,
+  FileText,
+  AlertTriangle,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -60,6 +73,16 @@ interface ClientDashboardHeaderProps {
 
 const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   const { programId, projectId: projectIdFromParams } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "dashboard";
+
+  const tabs = [
+    { id: "gantt", name: "Gantt", icon: List },
+    { id: "sheet", name: "Sheet", icon: LayoutGrid },
+    { id: "dashboard", name: "Dashboard", icon: Clock },
+    { id: "files", name: "Files", icon: FileText },
+    { id: "raidlog", name: "Raid Log", icon: AlertTriangle },
+  ];
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -213,6 +236,19 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
     return (notificationData?.data || []).filter((n: any) => !n.isRead).length;
   }, [notificationData]);
 
+  const statusColor = (status?: string) => {
+    const s = (status || "").toLowerCase();
+    if (s === "active" || s === "live") return "bg-green-100 text-green-600";
+    if (s === "draft") return "bg-yellow-100 text-yellow-600";
+    if (s === "pending") return "bg-orange-100 text-orange-600";
+    if (s === "completed") return "bg-blue-100 text-blue-600";
+    if (s === "in review")
+      return "bg-orange-50 text-[#FFA800] border-[#FFD994]";
+    return "bg-gray-100 text-gray-600";
+  };
+
+  const projectStatus = ProjectData?.data?.project?.status;
+
   // Search Logic
   const filteredPrograms = useMemo(() => {
     if (!debouncedSearchTerm) return [];
@@ -319,32 +355,37 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         }
 
         const rawData =
-          xAxis && !Array.isArray(xAxis) && xAxis.labels
-            ? xAxis.labels
-            : xAxis;
+          xAxis && !Array.isArray(xAxis) && xAxis.labels ? xAxis.labels : xAxis;
 
         // 2. Extract Data Structure
         if (Array.isArray(rawData) && rawData.length > 0) {
           if (Array.isArray(rawData[0])) {
             // It's a 2D array (table-like)
             // Check if Row 0 is a header (all items are strings)
-            const isHeader = rawData[0].every((item: any) => typeof item === "string");
-            
+            const isHeader = rawData[0].every(
+              (item: any) => typeof item === "string",
+            );
+
             // Normalize Header
             const headerRow = isHeader ? [...rawData[0]] : [];
             if (isHeader) {
-                headerRow[0] = "Label";
+              headerRow[0] = "Label";
             } else {
-                // If row 0 is data, synthesize header from legends
-                const legends = (
-                    node.widgets ||
-                    node.barChart?.widgets ||
-                    node.splineChart?.widgets ||
-                    node.areaChart?.widgets ||
-                    node.multiAxisChart?.widgets ||
-                    []
-                ).map((w: any) => w.legendName || "Legend");
-                headerRow.push("Label", ...(legends.length > 0 ? legends : Array(rawData[0].length - 1).fill("Legend")));
+              // If row 0 is data, synthesize header from legends
+              const legends = (
+                node.widgets ||
+                node.barChart?.widgets ||
+                node.splineChart?.widgets ||
+                node.areaChart?.widgets ||
+                node.multiAxisChart?.widgets ||
+                []
+              ).map((w: any) => w.legendName || "Legend");
+              headerRow.push(
+                "Label",
+                ...(legends.length > 0
+                  ? legends
+                  : Array(rawData[0].length - 1).fill("Legend")),
+              );
             }
 
             const dataRows = isHeader ? rawData.slice(1) : rawData;
@@ -358,8 +399,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             currentAOA = [headerRow, ...rows];
           } else {
             // It's a flat array of labels
-            const isHeader = typeof rawData[0] === "string" && isNaN(Number(rawData[0]));
-            
+            const isHeader =
+              typeof rawData[0] === "string" && isNaN(Number(rawData[0]));
+
             const legends = (
               node.widgets ||
               node.barChart?.widgets ||
@@ -373,7 +415,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             const headers = ["Label", ...legends];
             // Skip index 0 only if it's a header
             const dataLabels = isHeader ? rawData.slice(1) : rawData;
-            
+
             const rows = dataLabels
               .filter((lbl: any) => String(lbl || "").trim() !== "")
               .map((lbl: any) => [String(lbl || ""), ...legends.map(() => 0)]);
@@ -456,16 +498,11 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         />
       );
 
-    if (isPage.projectDetails) {
-      return (
-        <PrimaryButton
-          title="Download CSV"
-          leftIcon={<Download />}
-          type="Primary"
-          onClick={handleDownloadCSV}
-        />
-      );
-    }
+    // if (isPage.projectDetails) {
+    //   return (
+
+    //   );
+    // }
 
     if (isPage.projectBuilder) {
       if (isPage.importCSV) return null;
@@ -536,88 +573,141 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           <SidebarTrigger className="md:hidden shrink-0" />
           {currentPath.includes("/client-panel") && (
             <div className="min-w-0">
-              <h1 className="text-2xl md:text-[32px] font-semibold truncate">
-                Good Morning, 👋
-              </h1>
-              <p className="text-sm md:text-base text-gray-500 truncate">
-                This is dashboard overview of Acme Corporation
-              </p>
+              {isPage.projectDetails && projectName ? (
+                <>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-[28px] md:text-[32px] font-bold truncate">
+                      {projectName}
+                    </h1>
+                    {projectStatus && (
+                      <span
+                        className={`inline-block px-3 py-1 rounded-md text-xs font-semibold capitalize border ${statusColor(projectStatus)}`}
+                      >
+                        {projectStatus}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1 text-gray-500">
+                    <MapPin className="w-4 h-4 shrink-0 text-[#98A2B3]" />
+                    <p className="text-sm md:text-[15px] truncate border-b border-blue-200/50 pb-0.5 leading-tight text-[#475467]">
+                      25 Union Square W, New York, NY 10003, USA
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-2xl md:text-[32px] font-semibold truncate">
+                    Good Morning, 👋
+                  </h1>
+                  <p className="text-sm md:text-base text-gray-500 truncate">
+                    This is dashboard overview of Acme Corporation
+                  </p>
+                </>
+              )}
             </div>
           )}
         </div>
 
         <div className="flex-1 w-full lg:w-auto flex justify-center mt-2 lg:mt-0 relative group px-0 lg:px-4">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          {searchTerm && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 max-h-[400px] overflow-y-auto z-50 py-2">
-              {filteredPrograms.length === 0 &&
-              filteredProjects.length === 0 ? (
-                <div className="p-4 text-center text-gray-500 text-sm">
-                  No results found
-                </div>
-              ) : (
-                <>
-                  {filteredPrograms.length > 0 && (
-                    <div className="mb-2">
-                      <h3 className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Programs
-                      </h3>
-                      {filteredPrograms.map((program: any) => (
-                        <div
-                          key={program.id}
-                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition-colors"
-                          onClick={() => {
-                            setSearchTerm("");
-                            navigate(
-                              `/client-panel/all-program/program-overview/${program.id}`,
-                            );
-                          }}
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                            <Layers className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {program.programName || program.name}
-                            </p>
-                            <p className="text-xs text-gray-500">Program</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {filteredProjects.length > 0 && (
-                    <div>
-                      <h3 className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Projects
-                      </h3>
-                      {filteredProjects.map((project: any) => (
-                        <div
-                          key={project.id}
-                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition-colors"
-                          onClick={() => {
-                            setSearchTerm("");
-                            navigate(
-                              `/client-panel/all-program/program-overview/${project.programId}/project-details/${project.id}`,
-                            );
-                          }}
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
-                            <Briefcase className="w-4 h-4 text-indigo-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {project.name}
-                            </p>
-                            <p className="text-xs text-gray-500">Project</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
+          {isPage.projectDetails ? (
+            <div className="flex bg-white items-center border border-gray-200 rounded-lg space-x-1 p-1">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSearchParams({ tab: tab.id })}
+                    className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all cursor-pointer rounded-lg ${
+                      isActive
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Icon size={18} />
+                    <span className="hidden sm:inline">{tab.name}</span>
+                  </button>
+                );
+              })}
             </div>
+          ) : (
+            <>
+              <SearchBar
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+              />
+              {searchTerm && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 max-h-[400px] overflow-y-auto z-50 py-2">
+                  {filteredPrograms.length === 0 &&
+                  filteredProjects.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500 text-sm">
+                      No results found
+                    </div>
+                  ) : (
+                    <>
+                      {filteredPrograms.length > 0 && (
+                        <div className="mb-2">
+                          <h3 className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Programs
+                          </h3>
+                          {filteredPrograms.map((program: any) => (
+                            <div
+                              key={program.id}
+                              className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition-colors"
+                              onClick={() => {
+                                setSearchTerm("");
+                                navigate(
+                                  `/client-panel/all-program/program-overview/${program.id}`,
+                                );
+                              }}
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                                <Layers className="w-4 h-4 text-blue-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">
+                                  {program.programName || program.name}
+                                </p>
+                                <p className="text-xs text-gray-500">Program</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {filteredProjects.length > 0 && (
+                        <div>
+                          <h3 className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Projects
+                          </h3>
+                          {filteredProjects.map((project: any) => (
+                            <div
+                              key={project.id}
+                              className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition-colors"
+                              onClick={() => {
+                                setSearchTerm("");
+                                navigate(
+                                  `/client-panel/all-program/program-overview/${project.programId}/project-details/${project.id}`,
+                                );
+                              }}
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+                                <Briefcase className="w-4 h-4 text-indigo-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">
+                                  {project.name}
+                                </p>
+                                <p className="text-xs text-gray-500">Project</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -636,12 +726,28 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
             )}
           </div>
           {isPage.projectDetails && (
-            <PrimaryButton
-              leftIcon={<Upload className="text-xl md:text-2xl" />}
-              type="Outline"
-              onClick={() => setIsUploadModalOpen(true)}
-              className="p-2 md:p-3"
-            />
+            <div className="flex items-center gap-2 md:gap-4">
+              <PrimaryButton
+                leftIcon={<Upload className="text-xl md:text-2xl" />}
+                type="Outline"
+                onClick={() => setIsUploadModalOpen(true)}
+                className="p-2 md:p-3"
+              />
+              <PrimaryButton
+                // title="Download CSV"
+                leftIcon={<Download className="text-xl md:text-2xl" />}
+                type="Primary"
+                onClick={handleDownloadCSV}
+                className="p-2 md:p-3"
+              />
+              <PrimaryButton
+                leftIcon={<GitBranch className="text-xl md:text-2xl" />}
+                title="Show Version"
+                type="Primary"
+                onClick={() => console.log("Show Version clicked")}
+                className="hidden md:flex"
+              />
+            </div>
           )}
           <NotificationModal
             isOpen={isNotificationOpen}
