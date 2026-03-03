@@ -23,6 +23,7 @@ import NotificationModal from "@/components/client/NotificationModal";
 import { toast } from "sonner";
 import AddEmployeeModal from "@/components/client/Employee/AddEmployeeModal";
 import NewProjectModal from "@/components/client/NewProjectModal";
+import VersionHistoryModal from "@/components/client/VersionHistoryModal";
 import ProjectSuccessModal from "./CreateProject/ProjectSuccessModal";
 import {
   Bell,
@@ -226,6 +227,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   } | null>(null);
   const [projectSuccessOpen, setProjectSuccessOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const { data: allProgramsData } = useGetAllProgramQuery({});
@@ -744,9 +746,15 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
                 leftIcon={<GitBranch className="text-xl md:text-2xl" />}
                 title="Show Version"
                 type="Primary"
-                onClick={() => console.log("Show Version clicked")}
-                className="hidden md:flex"
+                onClick={() => setIsVersionHistoryOpen(true)}
+                className="hidden md:flex relative"
               />
+              <VersionHistoryModal
+                isOpen={isVersionHistoryOpen}
+                onClose={() => setIsVersionHistoryOpen(false)}
+                projectName={projectName || "Project"}
+              />
+
             </div>
           )}
           <NotificationModal
