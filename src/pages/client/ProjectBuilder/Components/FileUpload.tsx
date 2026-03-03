@@ -43,7 +43,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const reduxProjectId = useAppSelector((state) => state.chartSlice.projectId);
   const projectId = propProjectId || reduxProjectId;
   const navigate = useNavigate();
-
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [projectNote, setProjectNote] = useState("");
