@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useMemo } from "react";
 import {
   PieChart as RechartsPieChart,
   Pie,
@@ -23,6 +24,7 @@ interface DoughnutChartProps {
   centerLabel: string;
   onDelete?: () => void;
   onCopy?: (data: any) => void;
+  allUploadedData?: any;
 }
 
 export default function DoughnutChart({
@@ -31,12 +33,23 @@ export default function DoughnutChart({
   centerLabel,
   onDelete,
   onCopy,
+  allUploadedData,
 }: DoughnutChartProps) {
+  const chartData = useMemo(() => {
+    if (allUploadedData) {
+      const sheetName = (title || "Sheet")
+        .replace(/[:/?*[\\]\\\\]/g, " ")
+        .trim()
+        .substring(0, 31);
+      return allUploadedData?.[sheetName] ?? data;
+    }
+    return data;
+  }, [allUploadedData, title, data]);
   const handleCopy = () => {
     if (onCopy) {
-      onCopy(data);
+      onCopy(chartData);
     } else {
-      navigator.clipboard.writeText(JSON.stringify(data));
+      navigator.clipboard.writeText(JSON.stringify(chartData));
       // toast could be added here if imported
     }
   };
@@ -49,7 +62,7 @@ export default function DoughnutChart({
     }
   };
 
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const total = chartData.reduce((sum: number, item: ChartData) => sum + Number(item.value), 0);
 
   return (
     <Card className="w-full max-w-2xl bg-white p-6 shadow-sm border border-gray-200">
@@ -76,7 +89,7 @@ export default function DoughnutChart({
 
       {/* Legend */}
       <div className="flex flex-wrap gap-6 mb-8">
-        {data.map((item) => (
+        {chartData.map((item) => (
           <div key={item.name} className="flex items-center gap-2">
             <div
               className="w-3 h-3 rounded-full"

@@ -5,6 +5,7 @@ import ProjectConfiguration, {
 import AreaChart from "@/common/Charts/CompletedCharts/AreaChart/AreaChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
+import { toast } from "sonner";
 
 const AreaChartModule = ({
   onDelete,
@@ -67,7 +68,7 @@ const AreaChartModule = ({
       setNumOfXAxisDataSet(value);
     } else {
       setNumOfXAxisDataSet(1);
-      alert(
+      toast(
         `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }

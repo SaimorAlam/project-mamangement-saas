@@ -318,7 +318,14 @@ export default function NotificationModal({
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <h4 className="font-semibold text-lg">Notifications</h4>
+          <div className="flex items-center gap-2">
+            <h4 className="font-semibold text-lg">Notifications</h4>
+            {currentNotifications.filter((n: any) => !n.isRead).length > 0 && (
+              <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">
+                {currentNotifications.filter((n: any) => !n.isRead).length}
+              </span>
+            )}
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -356,6 +363,11 @@ export default function NotificationModal({
           {filteredNotifications.length > 0 ? (
             filteredNotifications.map((notification) => {
               const senderInfo = getSenderInfo(notification.senderId);
+              const isRead =
+                notification.isRead !== undefined
+                  ? notification.isRead
+                  : notification.status === "read";
+
               const displayName =
                 senderInfo?.name ||
                 notification?.sender?.name ||
@@ -368,9 +380,7 @@ export default function NotificationModal({
                 "/placeholder.svg";
               const displayInitials =
                 senderInfo?.initials ||
-                (notification?.sender?.name ||
-                  notification?.user?.name ||
-                  "S")
+                (notification?.sender?.name || notification?.user?.name || "S")
                   .substring(0, 2)
                   .toUpperCase();
 
@@ -378,25 +388,19 @@ export default function NotificationModal({
                 <div
                   key={notification.id}
                   className={cn(
-                    "p-5 border-b border-gray-100 transition-colors cursor-pointer hover:bg-gray-50",
-                    (notification.isRead !== undefined
-                      ? !notification.isRead
-                      : notification.status === "new")
-                      ? "bg-blue-50/30"
-                      : "bg-white",
+                    "p-5 border-b border-gray-100 transition-all cursor-pointer hover:bg-gray-50 relative",
+                    !isRead ? "bg-blue-50/40" : "bg-white",
                   )}
                   onClick={() =>
-                    handleNotificationClick(
-                      notification.id,
-                      notification.isRead !== undefined
-                        ? notification.isRead
-                        : notification.status === "read",
-                    )
+                    handleNotificationClick(notification.id, isRead)
                   }
                 >
+                  {!isRead && (
+                    <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-blue-600 rounded-full" />
+                  )}
                   <div className="flex space-x-3">
                     <div className="relative shrink-0 h-10 w-10">
-                      <Avatar className="h-10 w-10 border border-gray-100">
+                      <Avatar className="h-10 w-10 border border-gray-100 shadow-sm">
                         <AvatarImage src={displayAvatar} alt={displayName} />
                         <AvatarFallback className="text-xs font-medium bg-gray-50">
                           {displayInitials}
@@ -534,7 +538,6 @@ export default function NotificationModal({
             </div>
           )}
         </div>
-
       </div>
     </>
   );

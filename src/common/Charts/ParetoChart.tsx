@@ -5,7 +5,7 @@ import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleOneWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -33,6 +33,7 @@ type Props = {
   chartId?: string;
   onDelete?: () => void;
   isPreview?: boolean;
+  allUploadedData?: any;
 };
 
 /*       COMPONENT       */
@@ -214,7 +215,6 @@ export default function ParetoChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle={`${dataPoints.length} categories`}
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
@@ -279,6 +279,7 @@ export default function ParetoChart({
                 chartId={tier.id}
                 isPreview={isPreview}
                 onDelete={onDelete}
+                allUploadedData={[]} // Assuming an empty array or appropriate default if not provided
               />
             ))}
           </div>

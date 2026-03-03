@@ -7,8 +7,8 @@ const notificationApi = baseApi.injectEndpoints({
             providesTags: ["Notification"],
         }),
         updateNotification: builder.mutation({
-            query: (id: string) => ({
-                url: `notification/client/${id}`,
+            query: () => ({
+                url: `notification/client`,
                 method: "PUT",
             }),
             invalidatesTags: ["Notification"],

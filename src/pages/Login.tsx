@@ -202,13 +202,13 @@ const Login = () => {
             Login
           </button>
 
-          <NavLink to="/signup">
+          {/* <NavLink to="/signup">
             <div className="text-center mt-6">
               <h3 className="font-normal text-[#0151FF]">
                 Create a new account
               </h3>
             </div>
-          </NavLink>
+          </NavLink> */}
         </form>
       </div>
     </div>

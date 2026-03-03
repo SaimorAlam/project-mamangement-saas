@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { AgCharts } from "ag-charts-react";
 import type { AgChartOptions } from "ag-charts-community";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 import {
   AnimationModule,
@@ -43,8 +43,7 @@ type Props = {
 };
 
 const generateId = () =>
-  crypto.randomUUID?.() ??
-  Math.random().toString(36).substring(2, 10);
+  crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
 
 /*       COMPONENT       */
 
@@ -70,7 +69,7 @@ export default function MarimekkoChart({
       const item: any = { category };
       legendValues.forEach((legend, index) => {
         // Generate random value for demo
-        item[legend.field] = Math.floor(Math.random() * 50) + 10 + (index * 5); 
+        item[legend.field] = Math.floor(Math.random() * 50) + 10 + index * 5;
       });
       return item;
     });
@@ -126,11 +125,11 @@ export default function MarimekkoChart({
   const handleDownload = () => {
     setIsDownloading(true);
     const csvId = generateId();
-    
+
     // Simple CSV export
-    const header = ["Category", ...legendValues.map(l => l.label)].join(",");
-    const rows = chartData.map(item => 
-      [item.category, ...legendValues.map(() => "")].join(",")
+    const header = ["Category", ...legendValues.map((l) => l.label)].join(",");
+    const rows = chartData.map((item) =>
+      [item.category, ...legendValues.map(() => "")].join(","),
     );
     const csv = [header, ...rows].join("\n");
 
@@ -148,7 +147,6 @@ export default function MarimekkoChart({
   return (
     <ChartCardWrapper
       title={widgetTitle}
-      chartId={chartId}
       menuActions={{
         onCopy: handleCopy,
         onDownload: handleDownload,

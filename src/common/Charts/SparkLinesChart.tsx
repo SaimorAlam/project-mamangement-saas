@@ -1,206 +1,129 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo } from "react";
 import {
   Sparklines,
   SparklinesLine,
   SparklinesSpots,
   SparklinesReferenceLine,
 } from "react-sparklines";
-import AddTierModal from "../Modal/AddTierModal";
-import TierChartModal from "../Modal/TierChartModal";
-import { downloadCSVForModuleOne } from "@/utils/DownlaodChartCSV";
-import ChartCardWrapper from "./components/ChartCardWrapper";
-import { useChartTools } from "./hooks/useChartTools";
-import { useChartTiers } from "./hooks/useChartTiers";
+import BaseChartContainer from "./CompletedCharts/Common/BaseChartContainer";
+import {
+  BaseChartProps,
+  LegendValue,
+} from "./CompletedCharts/Common/chartTypes";
+import {
+  parseCommonChartData,
+  generateHeatmapChartData,
+  extractLegendsFromXAxis,
+} from "./CompletedCharts/Common/chartUtils";
 
-/* ---------- TYPES ---------- */
-
-export type TierChart = {
-  id: string;
-  name: string;
-  xAxisValues: string[];
-  children: TierChart[];
-};
-type LegendValue = {
-  label: string;
-  field: string;
-  color: string;
-};
-
-type Props = {
-  widgetTitle?: string;
-  xAxisValues?: string[];
-  startingRange: number;
-  endingRange: number;
-  onToggleWidget?: () => void;
-  tierLevel?: number;
-  chartId?: string;
-  onDelete?: () => void;
-  legendValues?: LegendValue[];
-  isPreview?: boolean;
-};
-
-/* ---------- COMPONENT ---------- */
-
-export default function SparkLinesChart({
-  widgetTitle = "Trend Analysis",
-  xAxisValues = [],
-  startingRange,
-  endingRange,
-  onToggleWidget,
-  tierLevel = 0,
-  legendValues,
-  chartId = "root",
-  onDelete,
-  isPreview = false,
-}: Props) {
-  /* ---------- HOOKS ---------- */
-  const { isDownloading, handleCopy, handleDownloadWrapper } = useChartTools();
-
-  const {
-    childTiers,
-    showAddTierModal,
-    setShowAddTierModal,
-    showChildrenModal,
-    setShowChildrenModal,
-    handleAddTier,
-    openTierModal,
-  } = useChartTiers(chartId, widgetTitle, xAxisValues);
-
-  /* ---------- DATA ---------- */
-
-  const generateData = useMemo(
-    () => () => {
-      if (!xAxisValues.length) return [];
-      // Randomize slightly for sparklines effect
-      return xAxisValues.map(
-        () =>
-          Math.floor(Math.random() * (endingRange - startingRange + 1)) +
-          startingRange
-      );
-    },
-    [xAxisValues, startingRange, endingRange]
-  );
-
-  /* ---------- SERIES ---------- */
-
-  const series = useMemo(() => {
-    if (legendValues?.length) {
-      return legendValues.map((legend) => ({
-        name: legend.label,
-        color: legend.color,
-        data: generateData(),
+export default function SparkLinesChart(props: BaseChartProps) {
+  const getTierLegends = (tier: any): LegendValue[] => {
+    const widgets = tier.widgets || [];
+    if (widgets.length > 0) {
+      return widgets.map((w: any) => ({
+        label: w.legendName || w.label,
+        color: w.color || "#13A490",
+        field: (w.legendName || w.label)?.toLowerCase().replace(/\s+/g, ""),
       }));
     }
-    return [
-      {
-        name: widgetTitle,
-        color: "#13A490",
-        data: generateData(),
-      },
-    ];
-  }, [legendValues, widgetTitle, generateData]);
-
-  /* ---------- ACTIONS ---------- */
-
-  const onCopy = () => {
-    const dataToCopy = series[0]?.data || [];
-    const copyData = xAxisValues.map((label, index) => ({
-      label,
-      value: dataToCopy[index],
+    // Fallback if no widgets/metadata
+    const derived = extractLegendsFromXAxis(tier.xAxis);
+    return derived.map((lbl, idx) => ({
+      label: lbl,
+      field: lbl.toLowerCase().replace(/\s+/g, ""),
+      color: ["#13A490", "#35B6EE", "#6F78F9", "#F26419"][idx % 4],
     }));
-    handleCopy(copyData);
   };
 
-  const onDownload = () => {
-    handleDownloadWrapper(() => {
-      downloadCSVForModuleOne(
-        widgetTitle,
-        xAxisValues,
-        legendValues && legendValues.length > 0
-          ? legendValues
-          : [{ label: widgetTitle }]
-      );
-    });
+  const parseTierData = (xAxis: any, legends: LegendValue[], title: string) => {
+    return parseCommonChartData(xAxis, legends, title);
   };
 
-  /* ---------- RENDER ---------- */
+  const renderChildChart = (tier: any, childProps: any) => (
+    <SparkLinesChart {...childProps} key={tier.id} />
+  );
 
   return (
-    <>
-      <ChartCardWrapper
-        title={widgetTitle}
-        subtitle={`${xAxisValues.length} points`}
-        chartId={chartId}
-        tierLevel={tierLevel}
-        onHeaderClick={openTierModal}
-        menuActions={{
-          onCopy,
-          onDownload,
-          onDelete,
-          onAddTier: () => setShowAddTierModal(true),
-          onToggleWidget,
-        }}
-        isDownloading={isDownloading}
-        isPreview={isPreview}
-        footer={
-          childTiers.length > 0 ? (
-            <p className="text-sm text-blue-600 font-medium">
-              Click chart to view {childTiers.length} tier
-              {childTiers.length > 1 ? "s" : ""}
-            </p>
-          ) : undefined
-        }
-      >
-        {/* Chart Content */}
-        {xAxisValues?.length ? (
-          <div className="w-full h-[350px] flex flex-col justify-center space-y-4">
-            {series.map((s, i) => (
-              <div key={i} className="flex-1">
-                {series.length > 1 && (
-                  <p className="text-xs text-gray-500 mb-1">{s.name}</p>
-                )}
-                <Sparklines data={s.data} height={20}>
-                  <SparklinesLine
-                    color={s.color}
-                    style={{ strokeWidth: 2, fill: s.color }}
-                  />
-                  <SparklinesSpots />
-                  <SparklinesReferenceLine type="avg" />
-                </Sparklines>
+    <BaseChartContainer
+      {...props}
+      category="SPARKLINE"
+      excelType="sparklineChart"
+      generatorFunc={generateHeatmapChartData}
+      getTierLegends={getTierLegends}
+      parseTierData={parseTierData}
+      renderChildChart={renderChildChart}
+    >
+      {({ chartData, effectiveLegendValues }) => (
+        <div className="w-full h-[400px] flex flex-col gap-4 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+          {effectiveLegendValues.map((legend) => {
+            // Extract numbers for this legend field across all data points
+            const dataPoints = chartData.map(
+              (d) => Number(d[legend.field]) || 0,
+            );
+
+            return (
+              <div
+                key={legend.field}
+                className="flex-1 flex flex-col min-h-[140px] bg-gray-50/40 rounded-xl p-4 border border-gray-100/60 transition-all hover:bg-gray-50/60 group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className="w-3 h-3 rounded-full shrink-0 shadow-sm"
+                      style={{ backgroundColor: legend.color }}
+                    />
+                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.1em]">
+                      {legend.label}
+                    </span>
+                  </div>
+                  {dataPoints.length > 0 && (
+                    <div className="flex flex-col items-end">
+                      <span className="text-[9px] font-bold text-gray-300 uppercase leading-none mb-1">
+                        Latest Point
+                      </span>
+                      <span
+                        className="text-base font-mono font-black tracking-tight"
+                        style={{ color: legend.color }}
+                      >
+                        {dataPoints[dataPoints.length - 1]}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 w-full relative min-h-0">
+                  <Sparklines data={dataPoints} margin={5} height={60}>
+                    <SparklinesLine
+                      color={legend.color}
+                      style={{
+                        strokeWidth: 3,
+                        stroke: legend.color,
+                        fill: `${legend.color}10`,
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round",
+                      }}
+                    />
+                    <SparklinesSpots size={4} />
+                    <SparklinesReferenceLine
+                      type="avg"
+                      style={{
+                        stroke: "#94a3b8",
+                        strokeDasharray: "6, 4",
+                        opacity: 0.6,
+                      }}
+                    />
+                  </Sparklines>
+                </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="h-[350px] flex items-center justify-center text-gray-400">
-            No data available
-          </div>
-        )}
-      </ChartCardWrapper>
-
-      {/* Modals */}
-      <AddTierModal
-        isOpen={showAddTierModal}
-        onClose={() => setShowAddTierModal(false)}
-        onSave={handleAddTier}
-        parentChartName={widgetTitle}
-      />
-
-      {showChildrenModal && (
-        <TierChartModal
-          isOpen={showChildrenModal}
-          onClose={() => setShowChildrenModal(false)}
-          tierLevel={tierLevel + 1}
-          title={widgetTitle}
-        >
-          {/* Recursive rendering logic remains same or can be improved */}
-          <div className="p-4 bg-gray-50 rounded">
-            <p className="text-center text-gray-500">
-              Tier view for Sparklines
-            </p>
-          </div>
-        </TierChartModal>
+            );
+          })}
+          {chartData.length === 0 && (
+            <div className="h-full flex items-center justify-center text-gray-400 italic">
+              No trend data available
+            </div>
+          )}
+        </div>
       )}
-    </>
+    </BaseChartContainer>
   );
 }

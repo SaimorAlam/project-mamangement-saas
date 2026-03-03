@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useAppSelector } from "@/hooks/useRedux";
 import { useCreateChartMutation } from "@/store/Api/ChartApi/ChartApi";
 import { toast } from "sonner";
 import { useGetUser } from "@/hooks/useGetUser";
+import { useLocation } from "react-router-dom";
 
 export type LegendValue = {
   label: string;
@@ -32,7 +33,20 @@ const PieChartConfiguration = ({
   onClose,
   onDelete,
 }: PieChartConfigurationProps) => {
-  const projectIdFromSlice = useAppSelector((state) => state.chartSlice.projectId);
+  const [projectId, setProjectId] = useState<string>("");
+  const projectIdFromSlice = useAppSelector(
+    (state) => state.chartSlice.projectId,
+  );
+  const location = useLocation();
+  const projectIdFromState = location.state?.projectId;
+
+  useEffect(() => {
+    if (projectIdFromSlice) {
+      setProjectId(projectIdFromSlice);
+    } else if (projectIdFromState) {
+      setProjectId(projectIdFromState);
+    }
+  }, [projectIdFromSlice, projectIdFromState]);
 
   const [createChart, { isLoading }] = useCreateChartMutation();
   const { name, role, profileImage } = useGetUser();
@@ -40,7 +54,9 @@ const PieChartConfiguration = ({
   const assignedBy = {
     name: name || "Admin User",
     role: role || "Analyst",
-    image: profileImage || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    image:
+      profileImage ||
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
   };
 
   const minSlices = 1;
@@ -49,18 +65,28 @@ const PieChartConfiguration = ({
   const handleSetNumOfSlices = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     if (isNaN(value) || value < minSlices || value > maxSlices) {
-      toast.error(`Please enter a number between ${minSlices} and ${maxSlices}`);
+      toast.error(
+        `Please enter a number between ${minSlices} and ${maxSlices}`,
+      );
       return;
     }
-    
+
     setNumOfLegendDataSet(value);
     setLegendValues((prev) => {
       const updated = [...prev];
       const colors = [
-        "#13A490", "#35B6EE", "#6F78F9", "#F26419", "#F6AE2D",
-        "#862BB0", "#D72638", "#3F88C5", "#44BBA4", "#FF9505"
+        "#13A490",
+        "#35B6EE",
+        "#6F78F9",
+        "#F26419",
+        "#F6AE2D",
+        "#862BB0",
+        "#D72638",
+        "#3F88C5",
+        "#44BBA4",
+        "#FF9505",
       ];
-      
+
       while (updated.length < value) {
         const i = updated.length;
         updated.push({
@@ -103,12 +129,18 @@ const PieChartConfiguration = ({
     }
 
     const toastId = toast.loading("Creating Pie Chart...");
-    
-    // Create the xAxis structure for Pie Charts: ["Label", "Legend1", "Legend2"...] followed by ["Value", 0, 0...]
-    // This follows Module One standard which is more reliable for backend validation
+
+    /**
+     * xAxis format for Pie charts:
+     *   Row 0 (header): ["Label", "Legend Name 1", "Legend Name 2", ...]
+     *   Row 1 (values): ["Value",  0,               0, ...]
+     *
+     * Row 0 is used by parsePieChartData to map uploaded column values
+     * back to the correct slice names and colors.
+     */
     const xAxisData = [
-      // ["Label", ...legendValues.map(l => l.label)],
-      ["Value", ...Array(legendValues.length).fill(0)]
+      ["Label", ...legendValues.map((l) => l.label)],
+      ["Value", ...Array(legendValues.length).fill(0)],
     ];
 
     const payload = {
@@ -125,7 +157,7 @@ const PieChartConfiguration = ({
       xAxis: JSON.stringify(xAxisData),
       yAxis: JSON.stringify({}),
       zAxis: JSON.stringify({}),
-      projectId: projectIdFromSlice,
+      projectId: projectId,
       rootchart: true,
       roottitle: widgetTitle,
       grouptitle: widgetTitle,
@@ -149,11 +181,15 @@ const PieChartConfiguration = ({
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100 bg-gray-50/50">
         <div>
-          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-tight">Pie Configuration</h2>
-          <p className="text-[10px] text-gray-500 font-medium">Define your data slices</p>
+          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-tight">
+            Pie Configuration
+          </h2>
+          <p className="text-[10px] text-gray-500 font-medium">
+            Define your data slices
+          </p>
         </div>
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
           className="p-1.5 hover:bg-gray-200 rounded-full transition-colors text-gray-400 hover:text-gray-600"
         >
           <X size={16} />
@@ -183,7 +219,9 @@ const PieChartConfiguration = ({
               Data Slices
             </h3>
             <div className="flex items-center gap-2 bg-blue-50 px-2 py-1 rounded-md border border-blue-100">
-              <span className="text-[10px] font-semibold text-blue-700">Total:</span>
+              <span className="text-[10px] font-semibold text-blue-700">
+                Total:
+              </span>
               <input
                 type="number"
                 min={minSlices}
@@ -202,7 +240,7 @@ const PieChartConfiguration = ({
                 className="p-3 border border-gray-100 rounded-xl bg-gray-50/30 hover:bg-gray-50 transition-colors space-y-3 group"
               >
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold text-white shadow-sm"
                     style={{ backgroundColor: l.color }}
                   >
@@ -216,20 +254,26 @@ const PieChartConfiguration = ({
                     className="flex-1 bg-white px-2.5 py-1.5 text-xs border border-gray-200 rounded-md focus:border-blue-400 outline-none transition-all shadow-sm group-hover:border-gray-300"
                   />
                 </div>
-                
+
                 <div className="flex items-center justify-between pl-9">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Hex Color</span>
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
+                    Hex Color
+                  </span>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={l.color}
-                      onChange={(e) => handleSliceColorChange(index, e.target.value)}
+                      onChange={(e) =>
+                        handleSliceColorChange(index, e.target.value)
+                      }
                       className="w-16 text-[10px] font-mono text-gray-500 bg-transparent outline-none text-right"
                     />
                     <input
                       type="color"
                       value={l.color}
-                      onChange={(e) => handleSliceColorChange(index, e.target.value)}
+                      onChange={(e) =>
+                        handleSliceColorChange(index, e.target.value)
+                      }
                       className="w-6 h-6 rounded-md cursor-pointer border-none p-0 outline-none shadow-sm"
                     />
                   </div>

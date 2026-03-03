@@ -9,7 +9,7 @@ import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./useChartData";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 /*       TYPES       */
 
 export type ChartData = {
@@ -327,7 +327,6 @@ export default function HorizontalStackedBarChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="Stacked Distribution"
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{
@@ -386,7 +385,6 @@ export default function HorizontalStackedBarChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
         parentChartName={widgetTitle}
       />
 
