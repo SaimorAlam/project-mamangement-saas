@@ -29,17 +29,17 @@ import StaffEmployeeNotificationModal from "@/components/staffEmployee/StaffEmpl
 import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
-import { setIsPreview } from "@/store/Slices/ChartSlice/ChartSlice";
+// import { setIsPreview } from "@/store/Slices/ChartSlice/ChartSlice";
 
 const StaffEmployeeDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
   // Mirror client panel: read isPreview from Redux
-  const { isPreview } = useAppSelector((state) => state.chartSlice);
+  // const { isPreview } = useAppSelector((state) => state.chartSlice);
 
   const { breadcrumb } = useHeaderContext();
   const { name } = useGetUser();
