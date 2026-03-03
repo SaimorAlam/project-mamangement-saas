@@ -2,21 +2,31 @@
 
 import React, { useState, useRef } from "react";
 import * as XLSX from "xlsx";
+import { format } from "date-fns";
 import {
   Upload,
   FileText,
   X,
   CheckCircle,
   HelpCircle,
-  Plus,
+  // Plus,
   Send,
   ArrowRight,
   Waypoints,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 import { useUploadChartDataMutation } from "@/store/Api/ChartApi/ChartApi";
 import { useAppSelector } from "@/hooks/useRedux";
 import ProjectUploadSuccessModal from "./ProjectUploadSuccessModal";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface FileUploadProps {
   onFileUpload?: (file: File) => void;
@@ -41,6 +51,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const [uploadStatus, setUploadStatus] = useState<"success" | "error" | null>(
     null,
   );
+  const [datasetDate, setDatasetDate] = useState<Date>(new Date());
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -115,7 +126,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
         workbook.SheetNames.forEach((sheetName) => {
           const sheet = workbook.Sheets[sheetName];
-          const jsonData: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const jsonData: any[][] = XLSX.utils.sheet_to_json(sheet, {
+            header: 1,
+          });
 
           // Parse sheet name for ID
           const lastUnderscoreIndex = sheetName.lastIndexOf("_");
@@ -141,7 +154,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
           // 1. Detect if the first row is a header (all strings)
           const isHeader = rawRows[0].every((cell: any) => {
-            if (cell === null || cell === undefined || String(cell).trim() === "")
+            if (
+              cell === null ||
+              cell === undefined ||
+              String(cell).trim() === ""
+            )
               return true;
             return typeof cell === "string" && isNaN(Number(cell));
           });
@@ -166,8 +183,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
           chartsPayload.push({
             id: id,
             xAxis: JSON.stringify(finalXAxisData),
-            yAxis: JSON.stringify({ values: [] }),
-            zAxis: JSON.stringify({ values: [] }),
+            yAxis: JSON.stringify(finalXAxisData),
+            zAxis: JSON.stringify(finalXAxisData),
+            datasettime: datasetDate.toISOString(),
           });
         });
 
@@ -316,6 +334,39 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
             {/* Footer Section - Notes */}
             <div className="w-full self-start">
+              {/* Data Set Date Selector */}
+              <div className="mb-6">
+                <label className="flex items-center gap-1.5 text-xs text-[#374151] font-medium mb-2">
+                  Data Set Date
+                  <HelpCircle className="w-3.5 h-3.5 text-[#9CA3AF]" />
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal border-[#E5E7EB] hover:bg-gray-50",
+                        !datasetDate && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {datasetDate ? (
+                        format(datasetDate, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={datasetDate}
+                      onSelect={(date) => date && setDatasetDate(date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
               {/* Toggle Header */}
               <div className="flex items-center gap-3 mb-4">
                 <button
@@ -376,11 +427,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
         </div>
 
         {/* Right Sidebar - Preserved */}
-        <div className={`w-96 h-fit overflow-y-auto ${
-          isModal ? "hidden" : "hidden xl:block"
-        }`}>
+        {/* <div
+          className={`w-96 h-fit overflow-y-auto ${
+            isModal ? "hidden" : "hidden xl:block"
+          }`}
+        >
           <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm h-full">
-            {/* Program Manager */}
+           
             <div className="mb-8">
               <h3 className="text-sm font-medium text-gray-500 mb-4">
                 Program Manager
@@ -404,7 +457,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               </div>
             </div>
 
-            {/* Program Duration */}
+          
             <div className="mb-8">
               <h3 className="text-sm font-medium text-gray-500 mb-4">
                 Program Duration
@@ -449,7 +502,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
               </div>
             </div>
 
-            {/* Tags */}
             <div className="mb-4">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-sm text-gray-500 font-medium">
@@ -461,7 +513,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
               </div>
             </div>
 
-            {/* Issues */}
             <div>
               <div className="bg-[#F8F9FA] rounded-xl p-4 text-center">
                 <p className="text-sm font-medium text-gray-500">
@@ -470,7 +521,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <ProjectUploadSuccessModal
