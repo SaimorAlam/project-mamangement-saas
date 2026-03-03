@@ -12,7 +12,7 @@ import {
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import { downloadCSVForModuleOne } from "@/utils/DownlaodChartCSV";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 import { useChartTools } from "./hooks/useChartTools";
 import { useChartTiers } from "./hooks/useChartTiers";
 import { generateLineChartData } from "@/utils";
@@ -80,13 +80,13 @@ export default function LogarithmicChart({
     if (!xAxisValues.length || !legendValues.length) return [];
     // Ensure data is suitable for log scale (values > 0)
     const data = generateLineChartData(
-        xAxisValues,
-        legendValues,
-        Math.max(1, startingRange), // Log scale requires positive values
-        endingRange
+      xAxisValues,
+      legendValues,
+      Math.max(1, startingRange), // Log scale requires positive values
+      endingRange,
     );
-     // Filter or adjust 0/negative values if necessary for log scale, 
-     // but generateLineChartData usually follows range.
+    // Filter or adjust 0/negative values if necessary for log scale,
+    // but generateLineChartData usually follows range.
     return data;
   }, [xAxisValues, legendValues, startingRange, endingRange]);
 
@@ -103,7 +103,7 @@ export default function LogarithmicChart({
         xAxisValues,
         legendValues && legendValues.length > 0
           ? legendValues
-          : [{ label: widgetTitle }]
+          : [{ label: widgetTitle }],
       );
     });
   };
@@ -130,7 +130,6 @@ export default function LogarithmicChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="Logarithmic Scale"
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={openTierModal}
         menuActions={{
@@ -157,13 +156,9 @@ export default function LogarithmicChart({
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
-              <YAxis 
-                scale="log" 
-                domain={['auto', 'auto']} 
-                allowDataOverflow
-              />
+              <YAxis scale="log" domain={["auto", "auto"]} allowDataOverflow />
               <Tooltip content={<CustomTooltip />} />
-              
+
               {legendValues.map((l) => (
                 <Line
                   key={l.field}
@@ -173,9 +168,7 @@ export default function LogarithmicChart({
                   strokeWidth={2}
                   dot
                   opacity={
-                    hoveredLine === null || hoveredLine === l.field
-                      ? 1
-                      : 0.3
+                    hoveredLine === null || hoveredLine === l.field ? 1 : 0.3
                   }
                   onMouseEnter={() => setHoveredLine(l.field)}
                   onMouseLeave={() => setHoveredLine(null)}
@@ -185,7 +178,7 @@ export default function LogarithmicChart({
           </ResponsiveContainer>
         ) : (
           <div className="h-[350px] flex items-center justify-center text-gray-400">
-             No data available
+            No data available
           </div>
         )}
       </ChartCardWrapper>

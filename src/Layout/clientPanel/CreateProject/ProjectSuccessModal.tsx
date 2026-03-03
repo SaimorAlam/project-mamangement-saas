@@ -31,7 +31,10 @@ const ProjectSuccessModal = ({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setProjectId(projectId));
+    if (projectId) {
+      dispatch(setProjectId(projectId));
+      sessionStorage.setItem("chartBuilder_projectId", projectId);
+    }
   }, [projectId, dispatch]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

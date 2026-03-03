@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./useChartData";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 /*       TYPES       */
 
@@ -274,10 +274,10 @@ export default function MatrixTableChart({
                           key={colIndex}
                           className="px-2 py-3 border-r border-gray-100 last:border-r-0 text-center font-medium transition-all duration-200"
                           style={{
-                              backgroundColor: cellColorFunction(cellValue),
-                              color:
-                                getOpacity(cellValue) > 0.6 ? "#fff" : "#374151",
-                            }}
+                            backgroundColor: cellColorFunction(cellValue),
+                            color:
+                              getOpacity(cellValue) > 0.6 ? "#fff" : "#374151",
+                          }}
                         >
                           {cellValue}
                         </td>
@@ -298,7 +298,6 @@ export default function MatrixTableChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
         parentChartName={widgetTitle}
         onSave={() => {
           // refetch();

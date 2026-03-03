@@ -14,7 +14,7 @@ import {
 } from "recharts";
 import { BarChart3, LineChart as LineIcon } from "lucide-react";
 import { downloadCSVForModuleOne } from "@/utils/DownlaodChartCSV";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 /*     TYPES     */
 

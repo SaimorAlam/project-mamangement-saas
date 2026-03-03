@@ -74,7 +74,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
 
   const [getAllTheLeafChart] = useLazyGetAllTheLeafChartQuery();
   const projectId = projectIdFromParams || projectIdFromState;
-
   // Optimized Page Type Detection
   const isPage = useMemo(() => {
     const p = currentPath;
@@ -87,7 +86,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         !p.includes("/project-details/"),
       projectDetails: p.includes("/project-details/"),
       projectReview: p.includes("/client-panel/project-review"),
-      projectBuilder: p.includes("/client-panel/project-builder"),
+      projectBuilder:
+        p.includes("/client-panel/project-builder") &&
+        !p.includes("/project-details/"),
       publish: p.includes("/project-builder/publish"),
       importCSV: p.includes("/project-builder/file-upload"),
       projectReviewDetails: p.startsWith(
@@ -262,15 +263,13 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
   };
 
   const handleDownloadCSV = async () => {
-    if (!projectIdFromState) {
+    if (!projectId) {
       toast.error("Project ID is missing");
       return;
     }
     const toastId = toast.loading("Downloading...");
     try {
-      const res = await getAllTheLeafChart(
-        projectIdFromState as string,
-      ).unwrap();
+      const res = await getAllTheLeafChart(projectId as string).unwrap();
       const groups = res?.data || [];
       // Flatten charts from all groups
       const allCharts = groups.flatMap((group: any) => group.charts || []);
@@ -278,31 +277,6 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
       if (allCharts.length === 0) {
         toast.error("No data found to download", { id: toastId });
         return;
-      }
-
-      // Extract template structure if any chart has xAxis
-      let templateAOA: any[][] = [];
-      for (const node of allCharts) {
-        let xAxis = node.xAxis;
-        if (typeof xAxis === "string") {
-          try {
-            xAxis = JSON.parse(xAxis);
-          } catch {
-            /* ignore */
-          }
-        }
-        if (
-          Array.isArray(xAxis) &&
-          xAxis.length > 1 &&
-          Array.isArray(xAxis[0])
-        ) {
-          templateAOA = xAxis.map((row: any[], rIdx: number) =>
-            row.map((cell: any, cIdx: number) =>
-              rIdx === 0 || cIdx === 0 ? cell : "",
-            ),
-          );
-          break;
-        }
       }
 
       const wb = XLSX.utils.book_new();
@@ -334,7 +308,7 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         ids.push(node.id);
         let currentAOA: any[][] = [];
 
-        // Try to get structure from current node's xAxis
+        // 1. Normalize xAxis data
         let xAxis = node.xAxis;
         if (typeof xAxis === "string") {
           try {
@@ -344,51 +318,81 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           }
         }
 
-        if (
-          Array.isArray(xAxis) &&
-          xAxis.length > 1 &&
-          Array.isArray(xAxis[0])
-        ) {
-          currentAOA = xAxis.map((row: any[], rIdx: number) =>
-            row.map((cell: any, cIdx: number) =>
-              rIdx === 0 || cIdx === 0 ? cell : "",
-            ),
-          );
+        const rawData =
+          xAxis && !Array.isArray(xAxis) && xAxis.labels
+            ? xAxis.labels
+            : xAxis;
+
+        // 2. Extract Data Structure
+        if (Array.isArray(rawData) && rawData.length > 0) {
+          if (Array.isArray(rawData[0])) {
+            // It's a 2D array (table-like)
+            // Check if Row 0 is a header (all items are strings)
+            const isHeader = rawData[0].every((item: any) => typeof item === "string");
+            
+            // Normalize Header
+            const headerRow = isHeader ? [...rawData[0]] : [];
+            if (isHeader) {
+                headerRow[0] = "Label";
+            } else {
+                // If row 0 is data, synthesize header from legends
+                const legends = (
+                    node.widgets ||
+                    node.barChart?.widgets ||
+                    node.splineChart?.widgets ||
+                    node.areaChart?.widgets ||
+                    node.multiAxisChart?.widgets ||
+                    []
+                ).map((w: any) => w.legendName || "Legend");
+                headerRow.push("Label", ...(legends.length > 0 ? legends : Array(rawData[0].length - 1).fill("Legend")));
+            }
+
+            const dataRows = isHeader ? rawData.slice(1) : rawData;
+            const rows = dataRows.map((row: any[]) =>
+              row.map((cell: any, cIdx: number) => {
+                if (cIdx === 0) return cell; // Keep label
+                return cell !== undefined && cell !== null ? cell : 0;
+              }),
+            );
+
+            currentAOA = [headerRow, ...rows];
+          } else {
+            // It's a flat array of labels
+            const isHeader = typeof rawData[0] === "string" && isNaN(Number(rawData[0]));
+            
+            const legends = (
+              node.widgets ||
+              node.barChart?.widgets ||
+              node.splineChart?.widgets ||
+              node.areaChart?.widgets ||
+              node.multiAxisChart?.widgets ||
+              []
+            ).map((w: any) => w.legendName || "Legend");
+            if (legends.length === 0) legends.push("Value");
+
+            const headers = ["Label", ...legends];
+            // Skip index 0 only if it's a header
+            const dataLabels = isHeader ? rawData.slice(1) : rawData;
+            
+            const rows = dataLabels
+              .filter((lbl: any) => String(lbl || "").trim() !== "")
+              .map((lbl: any) => [String(lbl || ""), ...legends.map(() => 0)]);
+
+            currentAOA = [headers, ...rows];
+          }
         } else {
-          // Fallback legacy structure reconstruction
+          // 3. Last resort fallback from widgets
           const nodeWidgets =
             node.widgets ||
             node.barChart?.widgets ||
-            node.multiAxisChart?.widgets ||
-            node.horizontalBarChart?.widgets ||
+            node.splineChart?.widgets ||
             node.areaChart?.widgets ||
-            node.pi?.widgets ||
             [];
-
-          if (nodeWidgets.length > 0) {
-            const legends = nodeWidgets.map(
-              (w: any) => w.legendName || w.label || "Legend",
-            );
-            const xAxisLabels =
-              node.xAxisValues ||
-              (node.xAxis &&
-              Array.isArray(node.xAxis) &&
-              !Array.isArray(node.xAxis[0])
-                ? node.xAxis
-                : ["Data"]);
-
+          const legends = nodeWidgets.map((w: any) => w.legendName || "Legend");
+          if (legends.length > 0) {
             const headers = ["Label", ...legends];
-            const rows = xAxisLabels.map((label: string) => [
-              label,
-              ...legends.map(() => ""),
-            ]);
-            currentAOA = [headers, ...rows];
+            currentAOA = [headers, ["Sample Entry", ...legends.map(() => 0)]];
           }
-        }
-
-        // Use global template if specific chart still has no structure
-        if (currentAOA.length === 0 && templateAOA.length > 0) {
-          currentAOA = templateAOA;
         }
 
         if (currentAOA.length > 0) {
@@ -412,9 +416,9 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
         ids.length > 5 ? ids.slice(0, 5).join("_") + "_more" : ids.join("_");
       XLSX.writeFile(
         wb,
-        `${projectName || "Project"}_Template_${filenameIds}.xlsx`,
+        `${projectName || "Project"}_Data_${filenameIds}.xlsx`,
       );
-      toast.success("Excel template downloaded successfully", { id: toastId });
+      toast.success("Excel downloaded successfully", { id: toastId });
     } catch (error) {
       console.error("Excel download failed", error);
       toast.error("Failed to download Excel", { id: toastId });
@@ -451,6 +455,17 @@ const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = () => {
           onClick={() => setIsProjectModalOpen(true)}
         />
       );
+
+    if (isPage.projectDetails) {
+      return (
+        <PrimaryButton
+          title="Download CSV"
+          leftIcon={<Download />}
+          type="Primary"
+          onClick={handleDownloadCSV}
+        />
+      );
+    }
 
     if (isPage.projectBuilder) {
       if (isPage.importCSV) return null;

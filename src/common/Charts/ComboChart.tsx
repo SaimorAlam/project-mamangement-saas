@@ -18,7 +18,7 @@ import { generateChartData } from "@/utils";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./useChartData";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 // Register Chart.js components
 ChartJS.register(
@@ -87,7 +87,6 @@ export default function ComboChart({
   isPreview = false,
   allUploadedData,
 }: Props) {
-
   const { childTiers } = useChartData({
     newData,
     isCreationMode,
@@ -328,7 +327,6 @@ export default function ComboChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
         parentChartName={widgetTitle}
       />
 

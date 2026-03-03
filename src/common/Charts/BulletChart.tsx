@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
 import useChartData from "./useChartData";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 /*       TYPES       */
 
@@ -251,12 +251,7 @@ export default function BulletChart({
         color: legend.color,
         data: generatedData[legend.label] || [0, 0],
       }));
-  }, [
-    legendValues,
-    widgetTitle,
-    allUploadedData,
-    generatedData,
-  ]);
+  }, [legendValues, widgetTitle, allUploadedData, generatedData]);
 
   /*   ACTIONS   */
   const handleCopy = useCallback(() => {
@@ -346,13 +341,7 @@ export default function BulletChart({
       onAddTier: handleAddTierClick,
       onToggleWidget: onToggleWidget,
     }),
-    [
-      handleCopy,
-      handleDownload,
-      onDelete,
-      handleAddTierClick,
-      onToggleWidget,
-    ],
+    [handleCopy, handleDownload, onDelete, handleAddTierClick, onToggleWidget],
   );
 
   return (
@@ -407,10 +396,9 @@ export default function BulletChart({
       <AddTierModal
         isOpen={showAddTierModal}
         onClose={() => setShowAddTierModal(false)}
-        chartId={chartId}
         parentChartName={widgetTitle}
         onSave={() => {
-            setShowAddTierModal(false);
+          setShowAddTierModal(false);
         }}
       />
 

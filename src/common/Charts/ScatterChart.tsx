@@ -15,7 +15,7 @@ import { useGetChartTitleIdMutation } from "@/store/Api/ProgramApi/ProgramApi";
 import { DownloadAndSaveCSVforModuleTwoWidget } from "@/utils/Download&SaveCSV";
 import AddTierModal from "../Modal/AddTierModal";
 import TierChartModal from "../Modal/TierChartModal";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 /*       TYPES       */
 
@@ -49,6 +49,7 @@ type Props = {
   tierLevel?: number;
   chartId?: string;
   isPreview?: boolean;
+  allUploadedData?: any;
 };
 
 /*       COMPONENT       */
@@ -64,6 +65,7 @@ export default function ScatterChart({
   tierLevel = 0,
   chartId = "root",
   isPreview = false,
+  allUploadedData,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -98,6 +100,21 @@ export default function ScatterChart({
   };
 
   const scatterDataSets = useMemo(() => {
+    // Prioritize uploaded data if available
+    const sheetName = (widgetTitle || "Sheet")
+      .replace(/[:/?*[\\]\\]/g, " ")
+      .trim()
+      .substring(0, 31);
+    const uploadedDataFromApi = allUploadedData?.[sheetName];
+    if (uploadedDataFromApi && uploadedDataFromApi.length > 0) {
+      // Expect uploadedData to be an array of points {x,y,z}
+      return [{
+        name: widgetTitle || "Scatter",
+        data: uploadedDataFromApi,
+        color: legendValues[0]?.color || "#8884d8",
+      }];
+    }
+
     if (!legendValues.length) return [];
 
     return legendValues
@@ -107,7 +124,7 @@ export default function ScatterChart({
         data: generateScatterData(index * 37, 6),
         color: legend.color,
       }));
-  }, [legendValues, startingRange, endingRange, generateScatterData]);
+  }, [legendValues, startingRange, endingRange, generateScatterData, allUploadedData, widgetTitle]);
 
   /*   TOTAL POINTS   */
   const totalPoints = useMemo(() => {
@@ -201,7 +218,6 @@ export default function ScatterChart({
       <ChartCardWrapper
         title={widgetTitle}
         subtitle="3D Scatter Distribution"
-        chartId={chartId}
         tierLevel={tierLevel}
         onHeaderClick={handleChartClick}
         menuActions={{

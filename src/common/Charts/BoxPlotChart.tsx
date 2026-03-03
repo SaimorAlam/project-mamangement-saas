@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { AgCharts } from "ag-charts-react";
 import type { AgChartOptions } from "ag-charts-community";
-import ChartCardWrapper from "./components/ChartCardWrapper";
+import ChartCardWrapper from "./CompletedCharts/Common/ChartCardWrapper";
 
 import {
   AnimationModule,
@@ -49,21 +49,43 @@ type Props = {
 };
 
 const generateId = () =>
-  crypto.randomUUID?.() ??
-  Math.random().toString(36).substring(2, 10);
+  crypto.randomUUID?.() ?? Math.random().toString(36).substring(2, 10);
 
 /*       COMPONENT       */
 
 export default function BoxPlotChart({
   widgetTitle = "Box & Whisker Plot",
   data = [
-    { x: "Group A", min: 10, q1: 20, median: 35, q3: 50, max: 70, outliers: [5, 85] },
-    { x: "Group B", min: 15, q1: 25, median: 40, q3: 55, max: 75, outliers: [8, 90] },
-    { x: "Group C", min: 5, q1: 15, median: 30, q3: 45, max: 60, outliers: [2, 70] },
+    {
+      x: "Group A",
+      min: 10,
+      q1: 20,
+      median: 35,
+      q3: 50,
+      max: 70,
+      outliers: [5, 85],
+    },
+    {
+      x: "Group B",
+      min: 15,
+      q1: 25,
+      median: 40,
+      q3: 55,
+      max: 75,
+      outliers: [8, 90],
+    },
+    {
+      x: "Group C",
+      min: 5,
+      q1: 15,
+      median: 30,
+      q3: 45,
+      max: 60,
+      outliers: [2, 70],
+    },
   ],
   chartHeight = 400,
   onToggleWidget,
-  chartId = "root",
   onDelete,
   isPreview = false,
 }: Props) {
@@ -124,10 +146,18 @@ export default function BoxPlotChart({
   const handleDownload = () => {
     setIsDownloading(true);
     const csvId = generateId();
-    
+
     // Simple CSV export template (Headers + X-axis column)
-    const header = ["Category", "Min", "Q1", "Median", "Q3", "Max", "Outliers"].join(",");
-    const rows = data.map(item => [item.x, "", "", "", "", "", ""].join(","));
+    const header = [
+      "Category",
+      "Min",
+      "Q1",
+      "Median",
+      "Q3",
+      "Max",
+      "Outliers",
+    ].join(",");
+    const rows = data.map((item) => [item.x, "", "", "", "", "", ""].join(","));
     const csv = [header, ...rows].join("\n");
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -144,7 +174,6 @@ export default function BoxPlotChart({
   return (
     <ChartCardWrapper
       title={widgetTitle}
-      chartId={chartId}
       menuActions={{
         onCopy: handleCopy,
         onDownload: handleDownload,

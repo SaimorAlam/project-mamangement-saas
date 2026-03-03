@@ -54,6 +54,9 @@ interface ProjectWidgetProps {
   selectedWidgets: string[];
 }
 
+const SESSION_KEY_PROJECT = "chartBuilder_projectId";
+const SESSION_KEY_PROGRAM = "chartBuilder_programId";
+
 const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   onWidgetSelect,
   selectedWidgets,
@@ -67,11 +70,18 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
   const { programId: reduxProgramId, projectId: reduxProjectId } =
     useAppSelector((state) => state.chartSlice);
 
+  // Resolve initial values: locationState → Redux → sessionStorage → ""
   const [selectedProgram, setSelectedProgram] = useState<string>(
-    reduxProgramId || defaultProgramId || "",
+    reduxProgramId ||
+      defaultProgramId ||
+      sessionStorage.getItem(SESSION_KEY_PROGRAM) ||
+      "",
   );
   const [selectedProject, setSelectedProject] = useState<string>(
-    reduxProjectId || defaultProjectId || "",
+    reduxProjectId ||
+      defaultProjectId ||
+      sessionStorage.getItem(SESSION_KEY_PROJECT) ||
+      "",
   );
   const widgets: Widget[] = [
     {
@@ -123,6 +133,13 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       icon: <ChartArea className="w-5 h-5" />,
     },
     {
+      id: "column-chart",
+      name: "Column Chart",
+      description: "Compare data across categories",
+      icon: <ChartColumnBig className="w-5 h-5" />,
+    },
+
+    {
       id: "sparklines-chart",
       name: "Sparklines Chart",
       description: "Show trends over time with filled areas",
@@ -170,12 +187,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
       description: "Show bubble chart",
       icon: <Bubbles className="w-5 h-5" />,
     },
-    {
-      id: "column-chart",
-      name: "Column Chart",
-      description: "Compare data across categories",
-      icon: <ChartColumnBig className="w-5 h-5" />,
-    },
+
     {
       id: "funnel-chart",
       name: "Funnel Chart",
@@ -316,6 +328,7 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     isFetching: projectFetching,
   } = useGetLazyProject(selectedProgram, isProgramBuilder);
   const dispatch = useAppDispatch();
+  // Sync local state when Redux values change (e.g. restored from sessionStorage on refresh)
   useEffect(() => {
     if (reduxProgramId && !selectedProgram) {
       setSelectedProgram(reduxProgramId);
@@ -325,24 +338,19 @@ const ProjectWidget: React.FC<ProjectWidgetProps> = ({
     }
   }, [reduxProgramId, reduxProjectId, selectedProgram, selectedProject]);
 
-  // Clear projectId from slice if in Program Builder context
-  useEffect(() => {
-    if (isProgramBuilder) {
-      dispatch(setProjectId(""));
-      setSelectedProject("");
-    }
-  }, [isProgramBuilder, dispatch]);
 
   const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setSelectedProgram(val);
     dispatch(setProgramId(val));
+    sessionStorage.setItem(SESSION_KEY_PROGRAM, val);
   };
 
   const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setSelectedProject(val);
     dispatch(setProjectId(val));
+    sessionStorage.setItem(SESSION_KEY_PROJECT, val);
   };
 
   return (

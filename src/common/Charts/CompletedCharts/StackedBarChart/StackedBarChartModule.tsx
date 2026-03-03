@@ -5,6 +5,7 @@ import ProjectConfiguration, {
 import StackedBarChart from "@/common/Charts/CompletedCharts/StackedBarChart/StackedBarChart";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setWidgetConfig } from "@/store/Slices/ChartSlice/ChartSlice";
+import { toast } from "sonner";
 
 const StackedBarChartModule = ({
   onDelete,
@@ -64,7 +65,7 @@ const StackedBarChartModule = ({
       setNumOfXAxisDataSet(value);
     } else {
       setNumOfXAxisDataSet(1);
-      alert(
+      toast(
         `Please enter a number between ${minXaxisField} and ${maxXaxisField}`,
       );
     }
