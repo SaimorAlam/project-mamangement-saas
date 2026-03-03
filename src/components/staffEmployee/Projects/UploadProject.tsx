@@ -13,6 +13,7 @@ import * as XLSX from "xlsx";
 import { useCreateEmployeeSubmissionMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import DateRangePicker from "@/components/client/DateRange";
 
 const UploadProject = () => {
   // ── URL search params (set when navigating from project details) ──────────
@@ -378,6 +379,8 @@ const UploadProject = () => {
         )}
 
         {/* Date Range Selector */}
+        {/* i want to use this DateRangePicker component except the below data picker by select option  */}
+        {/* <DateRangePicker/>  */}
         <div className="mb-8">
           <label className="text-sm mb-1 block">
             Data Upload Date Range *

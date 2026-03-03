@@ -43,6 +43,7 @@ import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import {
   useEditSubmissionMutation,
 } from "@/store/Api/staffManagerApi/StaffManagerApi";
+import DateRangePicker from "@/components/client/DateRange";
 
 const StaffManagerDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -423,7 +424,6 @@ const StaffManagerDashboardHeader = () => {
             <PrimaryButton
               leftIcon={<Download />}
               type="Primary"
-              title="Download Charts"
               onClick={handleDownloadCharts}
             />
           )}
@@ -431,10 +431,11 @@ const StaffManagerDashboardHeader = () => {
           {/* ── Review-specific: Return for Edit & Go Live ───────────────── */}
           {isPage.projectReviewDetails && (
             <>
+
               <PrimaryButton
                 leftIcon={<Undo2 className="text-2xl" />}
-                className="bg-red-700 hover:bg-red-800"
-                title="Return for Edit"
+                className="bg-red-700 hover:bg-red-800 border-none"
+                title="Send Back"
                 type="Primary"
                 onClick={() => handleUpdateStatus("REJECTED")}
                 disabled={isUpdatingStatus}

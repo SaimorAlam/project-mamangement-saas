@@ -30,6 +30,7 @@ import { useLazyGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
 import { useGetProjectByIdQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setIsPreview } from "@/store/Slices/ChartSlice/ChartSlice";
+import DateRangePicker from "@/components/client/DateRange";
 
 const StaffEmployeeDashboardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -311,6 +312,9 @@ const StaffEmployeeDashboardHeader = () => {
           </div>
         </div>
 
+        {/* {!isOnProjectDetails && (
+          <StaffEmployeeGlobalSearch />
+        )} */}
         <StaffEmployeeGlobalSearch />
 
         {/* Right Controls */}
@@ -351,6 +355,15 @@ const StaffEmployeeDashboardHeader = () => {
           )}
 
           {/* ── Project-details buttons (mirrors client panel project builder) ── */}
+          {!isOnProjectDetails && (
+            <PrimaryButton
+              leftIcon={<Upload className="text-2xl" />}
+              title="Upload Submission"
+              type="Primary"
+
+              onClick={handleUploadSubmission}
+            />
+          )}
           {isOnProjectDetails && (
             <>
               {/* Preview toggle — same Redux action as client panel */}
@@ -359,6 +372,7 @@ const StaffEmployeeDashboardHeader = () => {
                 type="Outline"
                 onClick={() => dispatch(setIsPreview(!isPreview))}
               /> */}
+              {/* <DateRangePicker /> */}
 
               {/* Save as Draft — same UX as client panel */}
               <PrimaryButton
