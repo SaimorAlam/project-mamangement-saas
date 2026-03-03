@@ -82,35 +82,12 @@ const StaffEmployeeDashboardHeader = () => {
         return;
       }
 
-      // Build global template from first chart that has a 2-D xAxis
-      let templateAOA: any[][] = [];
-      for (const node of allCharts) {
-        let xAxis = node.xAxis;
-        if (typeof xAxis === "string") {
-          try {
-            xAxis = JSON.parse(xAxis);
-          } catch {
-            /* ignore */
-          }
-        }
-        if (Array.isArray(xAxis) && xAxis.length > 1 && Array.isArray(xAxis[0])) {
-          templateAOA = xAxis.map((row: any[], rIdx: number) =>
-            row.map((cell: any, cIdx: number) =>
-              rIdx === 0 || cIdx === 0 ? cell : ""
-            )
-          );
-          break;
-        }
-      }
-
       const wb = XLSX.utils.book_new();
       const ids: string[] = [];
       const usedNames = new Set<string>();
 
-      const getUniqueSheetName = (sheetLabel: string, id: string) => {
-        let baseName = (sheetLabel || "Sheet")
-          .replace(/[:/?*[\]\\]/g, " ")
-          .trim();
+      const getUniqueSheetName = (name: string, id: string) => {
+        let baseName = (name || "Sheet").replace(/[:/?*[\]\\]/g, " ").trim();
         const idSuffix = id ? `_${id.slice(-8)}` : "";
         if (baseName.length + idSuffix.length > 31)
           baseName = baseName.substring(0, 31 - idSuffix.length);
@@ -120,10 +97,8 @@ const StaffEmployeeDashboardHeader = () => {
         while (usedNames.has(uniqueName.toLowerCase())) {
           const suffix = `_${counter}`;
           uniqueName =
-            combinedName.substring(
-              0,
-              Math.min(combinedName.length, 31 - suffix.length)
-            ) + suffix;
+            combinedName.substring(0, Math.min(combinedName.length, 31 - suffix.length)) +
+            suffix;
           counter++;
         }
         usedNames.add(uniqueName.toLowerCase());
@@ -134,57 +109,74 @@ const StaffEmployeeDashboardHeader = () => {
         ids.push(node.id);
         let currentAOA: any[][] = [];
 
+        // 1. Normalize xAxis
         let xAxis = node.xAxis;
         if (typeof xAxis === "string") {
-          try {
-            xAxis = JSON.parse(xAxis);
-          } catch {
-            /* ignore */
-          }
+          try { xAxis = JSON.parse(xAxis); } catch { /* ignore */ }
         }
 
-        if (
-          Array.isArray(xAxis) &&
-          xAxis.length > 1 &&
-          Array.isArray(xAxis[0])
-        ) {
-          currentAOA = xAxis.map((row: any[], rIdx: number) =>
-            row.map((cell: any, cIdx: number) =>
-              rIdx === 0 || cIdx === 0 ? cell : ""
-            )
-          );
+        // Handle { labels: [...] } wrapper (set by FileUpload)
+        const rawData =
+          xAxis && !Array.isArray(xAxis) && xAxis.labels ? xAxis.labels : xAxis;
+
+        // 2. Extract data structure
+        if (Array.isArray(rawData) && rawData.length > 0) {
+          if (Array.isArray(rawData[0])) {
+            // 2D array (table-like)
+            const isHeader = rawData[0].every((item: any) => typeof item === "string");
+            const headerRow = isHeader ? [...rawData[0]] : [];
+            if (isHeader) {
+              headerRow[0] = "Label";
+            } else {
+              const legends = (
+                node.widgets ||
+                node.barChart?.widgets ||
+                node.splineChart?.widgets ||
+                node.areaChart?.widgets ||
+                node.multiAxisChart?.widgets ||
+                []
+              ).map((w: any) => w.legendName || "Legend");
+              headerRow.push("Label", ...(legends.length > 0 ? legends : Array(rawData[0].length - 1).fill("Legend")));
+            }
+            const dataRows = isHeader ? rawData.slice(1) : rawData;
+            const rows = dataRows.map((row: any[]) =>
+              row.map((cell: any, cIdx: number) => {
+                if (cIdx === 0) return cell;
+                return cell !== undefined && cell !== null ? cell : 0;
+              })
+            );
+            currentAOA = [headerRow, ...rows];
+          } else {
+            // Flat array of labels
+            const isHeader = typeof rawData[0] === "string" && isNaN(Number(rawData[0]));
+            const legends = (
+              node.widgets ||
+              node.barChart?.widgets ||
+              node.splineChart?.widgets ||
+              node.areaChart?.widgets ||
+              node.multiAxisChart?.widgets ||
+              []
+            ).map((w: any) => w.legendName || "Legend");
+            if (legends.length === 0) legends.push("Value");
+            const headers = ["Label", ...legends];
+            const dataLabels = isHeader ? rawData.slice(1) : rawData;
+            const rows = dataLabels
+              .filter((lbl: any) => String(lbl || "").trim() !== "")
+              .map((lbl: any) => [String(lbl || ""), ...legends.map(() => 0)]);
+            currentAOA = [headers, ...rows];
+          }
         } else {
+          // 3. Last resort: build from widgets
           const nodeWidgets =
             node.widgets ||
             node.barChart?.widgets ||
-            node.multiAxisChart?.widgets ||
-            node.horizontalBarChart?.widgets ||
+            node.splineChart?.widgets ||
             node.areaChart?.widgets ||
-            node.pi?.widgets ||
             [];
-
-          if (nodeWidgets.length > 0) {
-            const legends = nodeWidgets.map(
-              (w: any) => w.legendName || w.label || "Legend"
-            );
-            const xAxisLabels =
-              node.xAxisValues ||
-              (node.xAxis &&
-                Array.isArray(node.xAxis) &&
-                !Array.isArray(node.xAxis[0])
-                ? node.xAxis
-                : ["Data"]);
-            const headers = ["Label", ...legends];
-            const rows = xAxisLabels.map((label: string) => [
-              label,
-              ...legends.map(() => ""),
-            ]);
-            currentAOA = [headers, ...rows];
+          const legends = nodeWidgets.map((w: any) => w.legendName || "Legend");
+          if (legends.length > 0) {
+            currentAOA = [["Label", ...legends], ["Sample Entry", ...legends.map(() => 0)]];
           }
-        }
-
-        if (currentAOA.length === 0 && templateAOA.length > 0) {
-          currentAOA = templateAOA;
         }
 
         if (currentAOA.length > 0) {
@@ -198,22 +190,14 @@ const StaffEmployeeDashboardHeader = () => {
       });
 
       if (wb.SheetNames.length === 0) {
-        toast.error("No valid chart structure found to generate Excel", {
-          id: toastId,
-        });
+        toast.error("No valid chart structure found to generate Excel", { id: toastId });
         return;
       }
 
-      // Embed ALL chart IDs in the filename (first 5 + "more" if many)
       const filenameIds =
-        ids.length > 5
-          ? ids.slice(0, 5).join("_") + "_more"
-          : ids.join("_");
-      XLSX.writeFile(
-        wb,
-        `${projectName || "Project"}_Template_${filenameIds}.xlsx`
-      );
-      toast.success("Excel template downloaded successfully", { id: toastId });
+        ids.length > 5 ? ids.slice(0, 5).join("_") + "_more" : ids.join("_");
+      XLSX.writeFile(wb, `${projectName || "Project"}_Data_${filenameIds}.xlsx`);
+      toast.success("Excel downloaded successfully", { id: toastId });
     } catch (error) {
       console.error("Excel download failed", error);
       toast.error("Failed to download Excel", { id: toastId });
@@ -232,6 +216,7 @@ const StaffEmployeeDashboardHeader = () => {
       navigate("/staff-employee-panel/upload-submission");
     }
   };
+
 
   // ─── Sidebar / breadcrumb ──────────────────────────────────────────────────
   const allRoutes = useMemo(
