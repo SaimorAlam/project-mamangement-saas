@@ -86,7 +86,6 @@ export default function BoxPlotChart({
   ],
   chartHeight = 400,
   onToggleWidget,
-  chartId = "root",
   onDelete,
   isPreview = false,
 }: Props) {

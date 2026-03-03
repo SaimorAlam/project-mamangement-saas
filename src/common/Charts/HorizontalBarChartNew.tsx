@@ -63,7 +63,6 @@ export default function HorizontalBarChartNew({
   return (
     <ChartCardWrapper
       title={widgetTitle}
-      chartId={generateId()}
       menuActions={{
         onCopy: handleCopy,
         onDownload: handleExportCSV,

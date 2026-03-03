@@ -65,6 +65,7 @@ export default function ScatterChart({
   tierLevel = 0,
   chartId = "root",
   isPreview = false,
+  allUploadedData,
 }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -104,12 +105,12 @@ export default function ScatterChart({
       .replace(/[:/?*[\\]\\]/g, " ")
       .trim()
       .substring(0, 31);
-    const uploadedData = allUploadedData?.[sheetName];
-    if (uploadedData && uploadedData.length > 0) {
+    const uploadedDataFromApi = allUploadedData?.[sheetName];
+    if (uploadedDataFromApi && uploadedDataFromApi.length > 0) {
       // Expect uploadedData to be an array of points {x,y,z}
       return [{
         name: widgetTitle || "Scatter",
-        data: uploadedData,
+        data: uploadedDataFromApi,
         color: legendValues[0]?.color || "#8884d8",
       }];
     }

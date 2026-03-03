@@ -89,7 +89,7 @@ export default function DoughnutChart({
 
       {/* Legend */}
       <div className="flex flex-wrap gap-6 mb-8">
-        {chartData.map((item) => (
+        {chartData.map((item: ChartData) => (
           <div key={item.name} className="flex items-center gap-2">
             <div
               className="w-3 h-3 rounded-full"
@@ -110,7 +110,7 @@ export default function DoughnutChart({
         <ResponsiveContainer width="100%" height={350}>
           <RechartsPieChart>
             <Pie
-              data={data}
+              data={chartData}
               cx="50%"
               cy="50%"
               innerRadius={80}
@@ -120,7 +120,7 @@ export default function DoughnutChart({
               startAngle={90}
               endAngle={-270}
             >
-              {data.map((entry, index) => (
+              {chartData.map((entry: ChartData, index: number) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>

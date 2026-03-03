@@ -56,7 +56,6 @@ export default function MarimekkoChart({
   ],
   chartHeight = 400,
   onToggleWidget,
-  chartId = "root",
   onDelete,
   isPreview = false,
 }: Props) {

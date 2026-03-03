@@ -181,7 +181,6 @@ export default function DecompositionTreeChart({
   widgetTitle = "Decomposition Tree",
   data,
   onToggleWidget,
-  chartId = "root",
   onDelete,
   isPreview = false,
   // onDataChange,
