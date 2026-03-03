@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { UploadCloud, ChevronDown, Upload } from "lucide-react";
+import { UploadCloud, ChevronDown, Upload, Calendar as CalendarIcon, HelpCircle } from "lucide-react";
 import { FaRoad } from "react-icons/fa";
+import { format } from "date-fns";
 import { useGetAllProgramQuery } from "@/store/Api/ProgramApi/ProgramApi";
 import { useGetAllProjectsQuery } from "@/store/Api/ProjectApi/ProjectApi";
 import { useGetAllTheLeafChartQuery } from "@/store/Api/ChartApi/ChartApi";
@@ -11,26 +12,30 @@ import * as XLSX from "xlsx";
 import { useCreateEmployeeSubmissionMutation } from "@/store/Api/StaffEmployeeApi/StaffEmployeeApi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import DateRangePicker from "@/components/client/DateRange";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const UploadProject = () => {
-  // ── URL search params (pre-filled when navigating from project details) ────
+  // ── URL search params (pre-filled when navigating from project-details) ────
   const [searchParams] = useSearchParams();
   const presetProgramId = searchParams.get("programId") ?? "";
   const presetProjectId = searchParams.get("projectId") ?? "";
 
-  // ── Form state ───────────────────────────────────────────────────────────
+  // ── Form state ─────────────────────────────────────────────────────────────
   const [program, setProgram] = useState(presetProgramId);
   const [project, setProject] = useState(presetProjectId);
   const [information, setInformation] = useState("");
   const [ipAddress, setIpAddress] = useState<string>("::1");
+  const [datasetDate, setDatasetDate] = useState<Date>(new Date());
   const [file, setFile] = useState<File | null>(null);
   const [addNotes, setAddNotes] = useState(false);
   const [projectNote, setProjectNote] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  // Sync URL params → state when params change (e.g. browser back/forward)
+  // Sync URL params → state when params change
   useEffect(() => {
     if (presetProgramId) setProgram(presetProgramId);
     if (presetProjectId) setProject(presetProjectId);
@@ -40,26 +45,19 @@ const UploadProject = () => {
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
-      .then((data) => {
-        if (data?.ip) setIpAddress(data.ip);
-      })
+      .then((data) => { if (data?.ip) setIpAddress(data.ip); })
       .catch(() => { });
   }, []);
 
   // ── API hooks ──────────────────────────────────────────────────────────────
   const { data: programs } = useGetAllProgramQuery({});
   const { data: projects } = useGetAllProjectsQuery({});
-  const { data: leafChartsData } = useGetAllTheLeafChartQuery(project, {
-    skip: !project,
-  });
-  const [createSubmission, { isLoading: isSubmitting }] =
-    useCreateEmployeeSubmissionMutation();
-  const [uploadChartData, { isLoading: isUploading }] =
-    useUploadChartDataMutation();
+  const { data: leafChartsData } = useGetAllTheLeafChartQuery(project, { skip: !project });
+  const [createSubmission, { isLoading: isSubmitting }] = useCreateEmployeeSubmissionMutation();
+  const [uploadChartData, { isLoading: isUploading }] = useUploadChartDataMutation();
 
-  // ── Derived: all projects & filter by selected program ────────────────────
-  const allProjects: any[] =
-    projects?.data?.projects?.data || projects?.data?.data || [];
+  // ── Derived: all projects filtered by selected program ────────────────────
+  const allProjects: any[] = projects?.data?.projects?.data || projects?.data?.data || [];
 
   const filteredProjects = useMemo(() => {
     if (!program) return allProjects;
@@ -68,7 +66,7 @@ const UploadProject = () => {
     );
   }, [program, allProjects]);
 
-  // Flat list of all leaf charts (for full-UUID matching)
+  // Flat list of leaf charts (for full UUID matching)
   const allLeafCharts: any[] = useMemo(
     () => (leafChartsData?.data || []).flatMap((g: any) => g.charts || []),
     [leafChartsData]
@@ -85,8 +83,7 @@ const UploadProject = () => {
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) setFile(droppedFile);
   };
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
-    e.preventDefault();
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
   const handleClearData = () => {
     setFile(null);
     setProjectNote("");
@@ -94,7 +91,7 @@ const UploadProject = () => {
     setInformation("");
   };
 
-  // Reset project when program changes and the selected project no longer belongs
+  // Reset project when program changes and selected project no longer belongs
   const handleProgramChange = (newProgramId: string) => {
     setProgram(newProgramId);
     const stillBelongs = allProjects.some(
@@ -105,27 +102,19 @@ const UploadProject = () => {
     if (!stillBelongs) setProject("");
   };
 
-  // Resolve full chart UUID from the 8-char suffix embedded in the sheet name
+  // Resolve full chart UUID from the 8-char suffix in the sheet name
   const resolveChartId = (idSuffix: string): string => {
     if (!idSuffix) return idSuffix;
     const matched = allLeafCharts.find(
-      (c: any) =>
-        c.id === idSuffix ||
-        c.id?.slice(-8) === idSuffix
+      (c: any) => c.id === idSuffix || c.id?.slice(-8) === idSuffix
     );
     return matched?.id ?? idSuffix;
   };
 
   // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    if (!file) {
-      toast.error("Please select a file first.");
-      return;
-    }
-    if (!project) {
-      toast.error("Please select a project.");
-      return;
-    }
+    if (!file) { toast.error("Please select a file first."); return; }
+    if (!project) { toast.error("Please select a project."); return; }
 
     try {
       const reader = new FileReader();
@@ -133,18 +122,16 @@ const UploadProject = () => {
         const data = e.target?.result;
         const workbook = XLSX.read(data, { type: "binary" });
 
-        if (workbook.SheetNames.length === 0) {
-          toast.error("No sheets found in file.");
-          return;
-        }
+        if (workbook.SheetNames.length === 0) { toast.error("No sheets found in file."); return; }
 
         const chartsPayload: any[] = [];
         const elements: any[] = [];
 
         workbook.SheetNames.forEach((sheetName) => {
           const sheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const jsonData: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+          // Parse ID suffix from sheet name (mirrors client panel logic)
           const lastUnderscoreIndex = sheetName.lastIndexOf("_");
           let idSuffix = sheetName;
           if (lastUnderscoreIndex !== -1) {
@@ -153,26 +140,66 @@ const UploadProject = () => {
           if (!idSuffix) idSuffix = sheetName;
 
           const fullChartId = resolveChartId(idSuffix);
-          const xAxisStr = JSON.stringify({ labels: jsonData });
-          const yAxisStr = JSON.stringify({ values: [] });
-          const zAxisStr = JSON.stringify({ values: [] });
 
-          chartsPayload.push({ id: fullChartId, xAxis: xAxisStr, yAxis: yAxisStr, zAxis: zAxisStr });
-          elements.push({ chartId: fullChartId, xAxis: xAxisStr, yAxis: yAxisStr, zAxis: zAxisStr });
+          // Process data structure: same logic as client panel FileUpload.tsx
+          const rawRows = jsonData.filter(
+            (row) =>
+              Array.isArray(row) &&
+              row.length > 0 &&
+              String(row[0] || "").trim() !== ""
+          );
+
+          if (rawRows.length === 0) return;
+
+          // Detect if first row is a header (all strings, non-numeric)
+          const isHeader = rawRows[0].every((cell: any) => {
+            if (cell === null || cell === undefined || String(cell).trim() === "") return true;
+            return typeof cell === "string" && isNaN(Number(cell));
+          });
+
+          let finalXAxisData: any[][];
+          if (isHeader) {
+            const normalizedHeader = [...rawRows[0]];
+            normalizedHeader[0] = "Label";
+            finalXAxisData = [normalizedHeader, ...rawRows.slice(1)];
+          } else {
+            const colCount = Math.max(...rawRows.map((r) => r.length));
+            const syntheticHeader = ["Label"];
+            for (let i = 1; i < colCount; i++) syntheticHeader.push(`Legend ${i}`);
+            finalXAxisData = [syntheticHeader, ...rawRows];
+          }
+
+          const xAxisStr = JSON.stringify(finalXAxisData);
+          const yAxisStr = JSON.stringify(finalXAxisData);
+          const zAxisStr = JSON.stringify(finalXAxisData);
+
+          // For uploadChartData (same format as client panel)
+          chartsPayload.push({
+            id: fullChartId,
+            xAxis: xAxisStr,
+            yAxis: yAxisStr,
+            zAxis: zAxisStr,
+            datasettime: datasetDate.toISOString(),
+          });
+
+          // For createSubmission
+          elements.push({
+            chartId: fullChartId,
+            xAxis: xAxisStr,
+            yAxis: yAxisStr,
+            zAxis: zAxisStr,
+          });
         });
 
-        if (chartsPayload.length === 0) {
-          toast.error("Could not build chart elements from file.");
-          return;
-        }
+        if (chartsPayload.length === 0) { toast.error("Could not build chart elements from file."); return; }
 
         try {
-          // Step 1: write chart values to DB (same as client panel)
+          // Step 1: Write chart values to DB (same call as client panel)
           const toastId = toast.loading("Uploading chart data…");
           await uploadChartData({ charts: chartsPayload }).unwrap();
           toast.success(`${chartsPayload.length} chart(s) updated!`, { id: toastId });
 
-          // Step 2: create submission record for review
+          // Step 2: Create submission record for review
           const payload = {
             information: information || "Submission from staff manager panel",
             submission: projectNote || "Draft submission for manager review",
@@ -183,14 +210,12 @@ const UploadProject = () => {
           await createSubmission(payload).unwrap();
           toast.success("Submission sent for review!");
 
-          // Reset & navigate
           setFile(null);
           setProjectNote("");
           setAddNotes(false);
           setInformation("");
           navigate(`/staff-manager-panel/projects/project-details/${project}`);
         } catch (apiError: unknown) {
-          console.error("API Error:", apiError);
           const err = apiError as { data?: { message?: string }; status?: number };
           toast.error(err?.data?.message || "Failed to submit. Please try again.");
         }
@@ -233,9 +258,7 @@ const UploadProject = () => {
             >
               <option value="">Select program name</option>
               {programs?.data?.data?.map((p: { id: string; programName: string }) => (
-                <option key={p.id} value={p.id}>
-                  {p.programName}
-                </option>
+                <option key={p.id} value={p.id}>{p.programName}</option>
               ))}
             </select>
             <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
@@ -256,9 +279,7 @@ const UploadProject = () => {
                 {program ? "Select Project Name" : "Select a program first"}
               </option>
               {filteredProjects.map((p: { id: string; name: string }) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
+                <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
             <ChevronDown className="absolute right-3 top-2.5 text-gray-500" size={16} />
@@ -288,10 +309,34 @@ const UploadProject = () => {
           </div>
         )}
 
-        {/* Date Range Selector – using the shared DateRangePicker */}
+        {/* Dataset Date – matches client panel exactly */}
         <div className="mb-8">
-          <label className="text-sm mb-2 block">Data Upload Date Range *</label>
-          <DateRangePicker />
+          <label className="flex items-center gap-1.5 text-sm font-medium mb-2">
+            Data Set Date
+            <HelpCircle className="w-3.5 h-3.5 text-gray-400" />
+          </label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal border-gray-200 hover:bg-gray-50",
+                  !datasetDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {datasetDate ? format(datasetDate, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={datasetDate}
+                onSelect={(date) => date && setDatasetDate(date)}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Upload drop zone */}
@@ -302,9 +347,7 @@ const UploadProject = () => {
                 <FaRoad size={32} className="text-gray-500" />
               </div>
             </div>
-            <h3 className="text-center text-lg font-semibold mb-2">
-              No File Added Yet
-            </h3>
+            <h3 className="text-center text-lg font-semibold mb-2">No File Added Yet</h3>
             <p className="text-center text-sm text-gray-400 mb-6">
               Upload the Excel file you downloaded from the project details page.
               Each sheet corresponds to one chart and its values will be updated immediately.
@@ -315,23 +358,14 @@ const UploadProject = () => {
               className="border border-dashed border-gray-500 rounded-lg p-10 text-center mb-4"
             >
               <Upload size={32} className="mx-auto text-gray-400 mb-4" />
-              <p className="text-sm text-gray-600 mb-2">
-                Drag and drop your XLSX file here
-              </p>
+              <p className="text-sm text-gray-600 mb-2">Drag and drop your XLSX file here</p>
               <p className="text-sm text-gray-400 mb-2">or</p>
               <label className="text-blue-400 cursor-pointer">
                 Browse your device →
-                <input
-                  type="file"
-                  accept=".csv,.xls,.xlsx"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
+                <input type="file" accept=".csv,.xls,.xlsx" onChange={handleFileSelect} className="hidden" />
               </label>
             </div>
-            <p className="text-xs text-gray-500 text-center mb-6">
-              Supported formats: .xlsx | Max file size: 10 MB
-            </p>
+            <p className="text-xs text-gray-500 text-center mb-6">Supported formats: .xlsx | Max file size: 10 MB</p>
             <div className="flex justify-center mb-4">
               <button
                 onClick={handleImportClick}
@@ -341,13 +375,7 @@ const UploadProject = () => {
                 Import Project File
               </button>
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv,.xls,.xlsx"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
+            <input ref={fileInputRef} type="file" accept=".csv,.xls,.xlsx" onChange={handleFileSelect} className="hidden" />
           </>
         )}
 
@@ -374,9 +402,7 @@ const UploadProject = () => {
                 onChange={(e) => setAddNotes(e.target.checked)}
                 className="w-4 h-4"
               />
-              <span className="text-sm text-gray-700">
-                Add Notes for Project Admin/Manager
-              </span>
+              <span className="text-sm text-gray-700">Add Notes for Project Admin/Manager</span>
             </div>
             <textarea
               value={projectNote}
